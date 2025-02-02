@@ -384,7 +384,7 @@ function Page() {
           </section>
 
           {/* FAQ Section */}
-          <section className="py-12">
+          {/* <section className="py-12">
             <div className="text-center mb-6" style={{ color: "#7e1a0b", fontWeight: "600" }}>
               Frequently Asked Questions
             </div>
@@ -410,7 +410,7 @@ function Page() {
                   </Accordion>
                 ))}
             </div>
-          </section>
+          </section> */}
 
           {/* Video Section (Intro Video) */}
           <section className="py-12 bg-gray-100">

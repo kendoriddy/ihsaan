@@ -362,8 +362,8 @@ function Header() {
             <Modal
               title={
                 type === "mentor"
-                  ? "Become a Mentor on YRM Learning"
-                  : "Become a Councellor on YRM Learning"
+                  ? "Become a Mentor on IHSAAN Learning"
+                  : "Become a Councellor on IHSAAN Learning"
               }
               isOpen={open}
               handleClose={() => setOpen(false)}
@@ -602,7 +602,7 @@ function Header() {
                   </div>
 
                   {/* Dropdown button */}
-                  <div className="relative text-slate-50 rounded group  cursor-pointer">
+                  {/* <div className="relative text-slate-50 rounded group  cursor-pointer">
                     <div className="bg-primary px-3 py-2">Become a mentor/counsellor</div>
                     <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300 ">
                       <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
@@ -616,7 +616,7 @@ function Header() {
                         </Link>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </ul>
               </div>
               <div className={``}>
