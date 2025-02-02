@@ -67,39 +67,36 @@ function Page() {
             <div className="flex-1 pr-6 px-3 text-sm">
               <div className="text-sm text-primary py-2">Who we are</div>
               <div className="py-4 font-bold text-2xl text-neutral-800">
-                IHSAAN is a Mentorship Program, founded with the mission of providing support and
-                guidance to students at all levels.
+                IHSAAN Islamic Academy is dedicated to providing high-quality Islamic education,
+                focusing on Arabic, Quranic studies, and essential Islamic sciences.
               </div>
               <p className="py-2">
-                This platform was founded by Mr Oladitan Saliu who is an exceptional Software
-                Engineer and AI Researcher and has acquired a decade of experience. Being a
-                certified mentor himself, he has successfully mentored several individuals who are
-                doing great in their respective domains.
+                Our mission is to equip students with profound knowledge of the Arabic language and
+                Islamic teachings, ensuring they develop strong faith, character, and academic
+                excellence.
               </p>
               <p>
-                In order to make the world a better place, he decided to invite professionals around
-                the world and recruit mentors to provide people with the best mentorship experience.
-                Being an author who has published several beneficial books, those books and other
-                resources would be displayed on the platform to help people achieve success and
-                happiness which is the main goal of this platform.
+                We offer structured courses in Quran recitation, Arabic grammar, Hadith, Fiqh, and
+                more, making it accessible for learners at different levels to deepen their
+                understanding of Islam.
               </p>
               {/* Bottom */}
               <div className="flex flex-wrap py-4">
                 <div className="w-1/2 flex items-center gap-2">
                   <SchoolIcon className="text-primary" />
-                  <div className="text-lg">Expert Trainers</div>
+                  <div className="text-lg">Qualified Scholars</div>
                 </div>
                 <div className="w-1/2 flex items-center gap-2">
                   <AccessTimeIcon className="text-primary" />
-                  <div className="text-lg">Lifetime Access</div>
+                  <div className="text-lg">Flexible Learning</div>
                 </div>
                 <div className="w-1/2 flex items-center gap-2 py-2">
                   <ConnectWithoutContactIcon className="text-primary" />
-                  <div className="text-lg">Remote Learning</div>
+                  <div className="text-lg">Online & Offline Classes</div>
                 </div>
                 <div className="w-1/2 flex items-center gap-2 py-2">
                   <LocalLibraryIcon className="text-primary" />
-                  <div className="text-lg">Self Development</div>
+                  <div className="text-lg">Comprehensive Curriculum</div>
                 </div>
               </div>
             </div>
@@ -113,25 +110,24 @@ function Page() {
               <div className="max-w-[500px]">
                 <ul>
                   <li className="py-2">
-                    <span className="font-bold">Affordable services: </span>
+                    <span className="font-bold">Authentic Islamic Education: </span>
                     <span>
-                      our products and services are designed to be affordable for everyone, so you
-                      can get professional mentoring experience, courses and books without breaking
-                      the bank.
+                      Our curriculum is rooted in authentic Islamic teachings, ensuring students
+                      receive accurate and reliable knowledge.
                     </span>
                   </li>
                   <li className="py-2">
-                    <span className="font-bold">Professionals with years of experience: </span>
+                    <span className="font-bold">Experienced Instructors: </span>
                     <span>
-                      Our mentors are industry experts who have years of experience in their fields.
-                      They know exactly what you need to succeed.
+                      Our teachers are well-trained in Arabic and Islamic studies, bringing years of
+                      experience to help students excel.
                     </span>
                   </li>
                   <li className="py-2">
-                    <span className="font-bold">Trained mentors: </span>
+                    <span className="font-bold">Flexible Learning Options: </span>
                     <span>
-                      All of our mentors have undergone adequate training to ensure they can provide
-                      the best mentoring experience while upholding professional ethics.
+                      We offer both online and in-person classes to cater to students from different
+                      backgrounds and schedules.
                     </span>
                   </li>
                 </ul>
@@ -171,8 +167,10 @@ function Page() {
                 </div>
                 <div className="text-center py-4 font-bold">Our Mission</div>
                 <div className="text-center">
-                  We aim to empower individuals to reach their full potential through accessible and
-                  inclusive mentorship, fostering a world where everyone can succeed and thrive.
+                  At IHSAAN, our mission is to provide accessible and high-quality Islamic
+                  education, equipping students with a deep understanding of Arabic, Qur'an, and
+                  Islamic sciences while fostering a love for lifelong learning and spiritual
+                  growth.
                 </div>
               </div>
             </div>
@@ -190,8 +188,9 @@ function Page() {
                 </div>
                 <div className="text-center py-4 font-bold">Our Vission</div>
                 <div className="text-center">
-                  To provide mentees with the resources, tools, encouragement and guidance they need
-                  to achieve their goals and reach their full potential.
+                  Our vision is to become a leading Islamic learning institution, empowering
+                  students with authentic knowledge, moral excellence, and a strong connection to
+                  their faith, so they can contribute positively to their communities and the world.
                 </div>
               </div>
             </div>
@@ -203,10 +202,10 @@ function Page() {
               {/* Top */}
               <div className="top max-w-[500px] mx-auto text-center">
                 <div className="text-primary py-4">Courses</div>
-                <div className="text-lg pb-2">Different Professional Courses Available</div>
+                <div className="text-lg pb-2">Explore Our Islamic Courses</div>
                 <div>
-                  Looking for something specific? Our platform offers a variety of courses to choose
-                  from, covering a wide range of topics.
+                  At IHSAAN, we offer a diverse range of courses in Arabic, Qur'an, and Islamic
+                  studies, tailored to different levels of learners.
                 </div>
               </div>
 

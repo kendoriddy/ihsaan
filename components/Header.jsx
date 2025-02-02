@@ -246,14 +246,14 @@ function Header() {
                 Courses
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 href="/books"
                 className={` navlink ${currentRoute.includes("/books") && "text-primary"}`}
               >
                 Books
               </Link>
-            </li>
+            </li> */}
             {isAuth && (
               <li>
                 <Link

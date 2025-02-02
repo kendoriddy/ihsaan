@@ -98,7 +98,7 @@ function Footer() {
           <div className="flex gap-3">
             <PhoneIcon />
             <Link href="tel:+2348130938573" className="hover:text-[#ff6600]">
-              +2348130938573
+              +2348000000000
             </Link>
           </div>
           <div className="flex gap-3 py-1">
