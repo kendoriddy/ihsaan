@@ -18,6 +18,8 @@ import { Skeleton } from "@mui/material";
 import { logoutAfterSixHours } from "@/utils/utilFunctions";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import Loader from "@/components/Loader";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function Page() {
   const router = useRouter();
@@ -37,24 +39,80 @@ function Page() {
 
   const slides = [
     <span key="1">
-      We mentor from <span className="text-primary"> ZERO </span> or little experience to{" "}
-      <span className="text-primary"> JOB </span> and{" "}
-      <span className="text-primary">PROFESSIONALISM</span>
+      Learn <span className="text-[#ff6600]">Arabic</span> and Islamic studies with expert guidance.
     </span>,
-    ,
     <span key="2">
-      Mentorship is
-      <span className="text-primary"> KEY </span> to unlocking your
-      <span className="text-primary"> POTENTIALS </span> and achieving your
-      <span className="text-primary"> GOALS </span>
+      <span className="text-[#7e1a0b]">Master</span> the Quran, Tajweed, and Islamic history.
     </span>,
     <span key="3">
-      The Right
-      <span className="text-primary"> COUNSELLOR </span> will help resolve the concerns between you
-      and your
-      <span className="text-primary"> GOALS </span>
+      Enrich your knowledge and <span className="text-[#ff6600]">grow in faith</span> with IHSAAN.
     </span>,
   ];
+
+  // Dummy data for new sections:
+  const instructors = [
+    {
+      id: 1,
+      name: "Sheikh Ahmed",
+      subject: "Arabic & Islamic Studies",
+      image:
+        "https://cdn.sanity.io/images/7gucqrpj/production/fee103ecdeaf692228b2cee3811996e6478053b8-740x740.jpg",
+    },
+    {
+      id: 2,
+      name: "Ustaz Fatima",
+      subject: "Quran Recitation",
+      image:
+        "https://cdn.sanity.io/images/7gucqrpj/production/fee103ecdeaf692228b2cee3811996e6478053b8-740x740.jpg",
+    },
+    {
+      id: 3,
+      name: "Dr. Yusuf",
+      subject: "History & Culture",
+      image:
+        "https://cdn.sanity.io/images/7gucqrpj/production/fee103ecdeaf692228b2cee3811996e6478053b8-740x740.jpg",
+    },
+  ];
+
+  const testimonials = [
+    {
+      id: 1,
+      quote:
+        "IHSAAN has transformed my learning journey. The passion and dedication of the instructors are unmatched.",
+      author: "Aisha Bello",
+      role: "Student",
+    },
+    {
+      id: 2,
+      quote: "An excellent blend of traditional Islamic teachings and modern education methods.",
+      author: "Ali Musa",
+      role: "Parent",
+    },
+    {
+      id: 3,
+      quote:
+        "The quality of the courses and the supportive community at IHSAAN are simply outstanding.",
+      author: "Hassan Suleiman",
+      role: "Alumni",
+    },
+  ];
+
+  const events = [
+    {
+      id: 1,
+      title: "Quran Recitation Competition",
+      date: "March 20, 2025",
+      location: "Main Auditorium",
+    },
+    {
+      id: 2,
+      title: "Islamic History Workshop",
+      date: "April 15, 2025",
+      location: "Conference Hall",
+    },
+    { id: 3, title: "Arabic Language Bootcamp", date: "May 10, 2025", location: "Room 101" },
+  ];
+
   var settings = {
     dots: false,
     infinite: true,
@@ -114,11 +172,14 @@ function Page() {
         <Header />
 
         {/* main */}
-        <main className="">
+        <main className="max-w-[90%] mx-auto px-6 py-10">
           {/* Hero */}
-          <section className="flex flex-col lg:flex-row text-sm px-6 py-4 gap-4 items-center w-screen justify-center  max-w-[1500px] mx-auto">
+          <section className="flex flex-col lg:flex-row items-center gap-6">
             {/* Hero left */}
-            <div className="flex-1 text-center lg:text-left w-full">
+            <div className="flex-1 text-center lg:text-left">
+              <h1 className="text-5xl font-bold leading-tight text-[#7e1a0b]">
+                IHSAAN: Islamic Learning Made Easy
+              </h1>
               <div
                 className="text-[55px] font-extrabold text-neutral-800 lg:mt-4 w-full lg:max-w-[600px] leading-[32px]"
                 style={{ lineHeight: "1.5" }}
@@ -126,15 +187,15 @@ function Page() {
                 <Slider {...settings}>
                   {slides.map((slide, index) => (
                     <div key={index} className="slide">
-                      <h2>{slide}</h2>
+                      <h2 className="text-2xl font-semibold">{slide}</h2>
                     </div>
                   ))}
                 </Slider>
               </div>
-              <div className="py-2 text-neutral-700">
-                The Right COUNSELLOR will help resolve all the concerns that stand between you and
-                your GOALS.
-              </div>
+              <p className="py-2 text-neutral-700">
+                {" "}
+                A place to strengthen faith and knowledge through quality education.{" "}
+              </p>
 
               <div className="py-2">
                 <form
@@ -146,7 +207,7 @@ function Page() {
                   <div className="w-full border border-red-600 rounded-md py-2 px-2">
                     <input
                       type="text"
-                      placeholder="Search for mentors, courses, books..."
+                      placeholder="Search for courses..."
                       className="flex-1 outline-none bg-transparent border-none w-full"
                       ref={searchRef}
                       onChange={handleSearchChange}
@@ -176,74 +237,204 @@ function Page() {
             </div>
 
             {/* Hero right */}
-            <div className="flex-1 ">
-              <Image src={IMAGES.banner1} width={500} height={500} alt="Your-right-mentors" />
+            <div className="flex-1">
+              <Image
+                src={IMAGES.banner1}
+                width={500}
+                height={500}
+                alt="IHSAAN Learning"
+                style={{ float: "right" }}
+              />
             </div>
           </section>
 
-          {/* Quotes */}
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <>
-              {quotes && (
-                <section className="py-6 px-4">
-                  <div className="text-center text-primary py-3 text-sm">Daily Quote</div>
-                  <div>
-                    <div className="text-center text-2xl font-bold text-neutral-800 flex justify-center">
-                      {quotes?.content || (
-                        <Skeleton animation="wave" width={500} height={60} className="block" />
-                      )}
-                    </div>
-                    <div className="text-center text-sm text-neutral-700 py-4 flex justify-center">
-                      {quotes?.quote_author || (
-                        <Skeleton animation="wave" width={200} height={30} className="block" />
-                      )}
-                    </div>
-                  </div>
-                </section>
-              )}
-            </>
-          )}
-
-          {/* Intro video */}
-          <section className="py-4">
-            <div className="text-center text-primary py-3 text-sm">Intro</div>
-            <VideoModal url={"videos/intro.mp4"} />
+          {/* About IHSAAN Section */}
+          <section className="py-12 px-6 bg-white">
+            <div className="max-w-[70%] mx-auto text-center">
+              <h2 className="text-3xl font-bold mb-4" style={{ color: "#7e1a0b" }}>
+                About IHSAAN
+              </h2>
+              <p className="text-lg text-gray-700">
+                IHSAAN is a dynamic Islamic school dedicated to providing comprehensive education in
+                Arabic language, Quranic studies, and other subjects. We blend traditional Islamic
+                teachings with modern educational methodologies to help our students excel
+                academically and spiritually.
+              </p>
+              <p className="mt-4 text-gray-600 text-base">
+                Our mission is to nurture a generation of knowledgeable, compassionate, and
+                resilient individuals who carry forward the values of excellence and integrity.
+              </p>
+            </div>
           </section>
 
-          {/* FAQ */}
-          <section className="py-6 flex flex-col justify-center items-center">
-            <div className="text-center text-primary py-3 text-sm">Frequently Asked Questions</div>
-            <div className="w-4/5 max-w-[850px] text-sm">
-              {FAQs && (
-                <>
-                  {FAQs?.map((faq) => {
-                    return (
-                      <Accordion key={faq?.id}>
-                        <AccordionSummary
-                          expandIcon={<ExpandMoreIcon />}
-                          aria-controls="panel1-content"
-                          id="panel1-header"
-                        >
-                          {faq?.title}
-                        </AccordionSummary>
-                        <AccordionDetails>{faq?.content}</AccordionDetails>
-                      </Accordion>
-                    );
-                  })}
-                </>
-              )}
+          <section className="py-6 bg-gray-100 mt-4">
+            <div className="text-center text-primary py-3 text-3xl mb-4">Why Choose IHSAAN?</div>
+            <div className="flex flex-wrap justify-center gap-6">
+              <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white">
+                <h3 className="font-bold text-lg"> Expert Teachers </h3>
+                <p>
+                  Learn from highly qualified and experienced Islamic scholars and Arabic tutors.
+                </p>
+              </div>
+              <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white">
+                <h3 className="font-bold text-lg"> Flexible Learning </h3>
+                <p>Study at your own pace with our structured and interactive courses.</p>
+              </div>
+              <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white">
+                <h3 className="font-bold text-lg"> Community Support </h3>
+                <p>Join a like-minded community focused on personal and spiritual growth.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Instructors Section */}
+          <section className="py-12 px-6 bg-white">
+            <div className="max-w-[70%] mx-auto text-center mb-8">
+              <h2 className="text-3xl font-bold" style={{ color: "#7e1a0b" }}>
+                Meet Our Instructors
+              </h2>
+              <p className="text-gray-700 mt-4 text-base">
+                Our passionate instructors bring together years of experience in Islamic studies,
+                Arabic language, and more.
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-8">
+              {instructors.map((inst) => (
+                <div key={inst.id} className="w-64 bg-gray-50 rounded-lg shadow-lg p-6 text-center">
+                  <Image
+                    src={inst.image}
+                    alt={inst.name}
+                    width={120}
+                    height={120}
+                    className="mx-auto rounded-full mb-4"
+                  />
+                  <h3 className="text-xl font-bold" style={{ color: "#7e1a0b" }}>
+                    {inst.name}
+                  </h3>
+                  <p className="text-gray-600">{inst.subject}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Testimonials Section */}
+          <section className="py-12 bg-gray-100">
+            <div className="max-w-[70%] mx-auto text-center mb-8">
+              <h2 className="text-3xl font-bold" style={{ color: "#7e1a0b" }}>
+                What Our Community Says
+              </h2>
+            </div>
+            <Slider
+              dots={true}
+              infinite={true}
+              speed={500}
+              slidesToShow={1}
+              slidesToScroll={1}
+              autoplay={true}
+              autoplaySpeed={7000}
+              className="max-w-2xl mx-auto"
+              nextArrow={<div className="custom-arrow slick-next" />}
+              prevArrow={<div className="custom-arrow slick-prev" />}
+            >
+              {testimonials.map((testi) => (
+                <div key={testi.id} className="px-6">
+                  <blockquote className="italic text-lg text-gray-800 mb-4">
+                    “{testi.quote}”
+                  </blockquote>
+                  <p className="font-bold" style={{ color: "#ff6600" }}>
+                    {testi.author}
+                  </p>
+                  <p className="text-sm text-gray-600">{testi.role}</p>
+                </div>
+              ))}
+            </Slider>
+          </section>
+
+          {/* Upcoming Events Section */}
+          <section className="py-12 px-6 bg-white">
+            <div className="max-w-[70%] mx-auto text-center mb-8">
+              <h2 className="text-3xl font-bold" style={{ color: "#7e1a0b" }}>
+                Upcoming Events
+              </h2>
+              <p className="text-gray-700 mt-4">
+                Join us for our upcoming events and workshops to enrich your learning journey.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {events.map((event) => (
+                <div
+                  key={event.id}
+                  className="border rounded-lg p-6 shadow-md hover:shadow-xl transition"
+                >
+                  <h3 className="text-xl font-bold mb-2" style={{ color: "#7e1a0b" }}>
+                    {event.title}
+                  </h3>
+                  <p className="text-gray-600 mb-1">Date: {event.date}</p>
+                  <p className="text-gray-600 mb-4">Location: {event.location}</p>
+                  <Link
+                    href="/events"
+                    className="text-sm font-semibold"
+                    style={{ color: "#ff6600" }}
+                  >
+                    Learn More →
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* FAQ Section */}
+          <section className="py-12">
+            <div className="text-center mb-6" style={{ color: "#7e1a0b", fontWeight: "600" }}>
+              Frequently Asked Questions
+            </div>
+            <div className="w-full max-w-3xl mx-auto">
+              {FAQs &&
+                FAQs.map((faq) => (
+                  <Accordion
+                    key={faq.id}
+                    className="mb-4 rounded-md shadow-sm"
+                    sx={{
+                      border: "1px solid #ff6600",
+                      "&::before": { display: "none" },
+                    }}
+                  >
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon style={{ color: "#ff6600" }} />}
+                      aria-controls="panel1-content"
+                      id="panel1-header"
+                    >
+                      <span style={{ fontWeight: 600, color: "#7e1a0b" }}>{faq.title}</span>
+                    </AccordionSummary>
+                    <AccordionDetails style={{ color: "#555" }}>{faq.content}</AccordionDetails>
+                  </Accordion>
+                ))}
+            </div>
+          </section>
+
+          {/* Video Section (Intro Video) */}
+          <section className="py-12 bg-gray-100">
+            <div className="text-center mb-6" style={{ color: "#7e1a0b", fontWeight: "600" }}>
+              Intro
+            </div>
+            <div className="flex justify-center">
+              <div className="border-4 border-[#ff6600] rounded-lg overflow-hidden shadow-lg w-full max-w-3xl">
+                <VideoModal url={"videos/intro.mp4"} />
+              </div>
             </div>
           </section>
 
           {/* COURSES */}
           <section className="py-6 w-full">
             {/* Top */}
-            <div className="text-center max-w-[500px] m-auto">
-              <p className="uppercase text-primary text-sm">Courses</p>
-              <p className="font-bold text-2xl py-2">Check Out Our Certified Courses</p>
-              <p className="text-sm text-gray-500">
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <p className="uppercase text-sm" style={{ color: "#ff6600", letterSpacing: "0.1em" }}>
+                Courses
+              </p>
+              <h2 className="text-3xl font-bold py-2" style={{ color: "#7e1a0b" }}>
+                Check Out Our Certified Courses
+              </h2>
+              <p className="text-sm text-gray-600">
                 Our courses are consistently updated with information that can help you.
               </p>
             </div>
@@ -252,6 +443,7 @@ function Page() {
               {courses && (
                 <>
                   {courses?.slice(0, 6)?.map((course) => {
+                    console.log(course, "coursess");
                     return (
                       <Link
                         key={course?.id}
@@ -264,7 +456,7 @@ function Page() {
                             alt={course?.title}
                             width={500}
                             height={300}
-                            className="group-hover:scale-150 duration-300"
+                            className="transition-transform duration-300 group-hover:scale-110"
                           />
                         </div>
                         <div className="px-2 py-2 text-sm">
@@ -283,19 +475,6 @@ function Page() {
                               />
                               <div className="text-primary text-xs">{course?.instructor_name}</div>
                             </div>
-                            {/* Date */}
-                            {/* <div className="flex items-center gap-1">
-                          <div>
-                            <DateRangeIcon
-                              className="text-gray-400 "
-                              sx={{ fontSize: 18 }}
-                            />
-                          </div>
-                          <div className="text-gray-500 text-xs">
-                            
-                            {formatDate(post.created_at)}
-                          </div>
-                        </div> */}
                           </div>
                         </div>
                       </Link>

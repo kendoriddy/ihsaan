@@ -52,6 +52,17 @@ input[type="number"] {
   scrollbar-width: none; /* Firefox */
 }
 
+.custom-arrow {
+  color: #7e1a0b !important;
+}
+
+.slick-prev:before,
+.slick-next:before {
+  color: #7e1a0b !important; /* Change arrow color */
+  font-size: 24px !important; /* Adjust size */
+  opacity: 1 !important; /* Ensure visibility */
+}
+
 /* Buuton CSS */
 .ripple {
   position: absolute;

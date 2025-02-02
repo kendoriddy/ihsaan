@@ -195,14 +195,14 @@ function Header() {
     refetch();
   }, [createNewaccounts]);
   return (
-    <header className="sticky top-0 text-sm z-20 bg-white py-3 max-w-[100vw]">
+    <header className="sticky top-0 text-sm z-20 bg-white py-3 px-24 max-w-[100vw]">
       <div className="flex justify-between items-center py-2 px-4  ">
         {/* Logo */}
         <div className="text-lg font-bold">
           <div>
             <Link href="/" className="flex items-center gap-2 text-xl">
               <Image src={IMAGES.icon} alt="logo" width={50} height={50} />
-              <div>Your Right Mentors</div>
+              <div>IHSAAN</div>
             </Link>
           </div>
         </div>
@@ -211,7 +211,7 @@ function Header() {
           <ul className="flex gap-2 items-center text-[15px] font-bold">
             <li>
               <Link href="/" className={` navlink ${currentRoute == "/" && "text-primary"}`}>
-                Home2
+                Home
               </Link>
             </li>
             <li>
@@ -222,7 +222,7 @@ function Header() {
                 Why us
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 href="/mentors"
                 className={` navlink ${currentRoute.includes("/mentors") && "text-primary"}`}
@@ -237,7 +237,7 @@ function Header() {
               >
                 Counselors
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link
                 href="/courses"
@@ -324,7 +324,7 @@ function Header() {
             </div>
             {/* Dropdown button */}
 
-            {isUserBoth ? null : (
+            {/* {isUserBoth ? null : (
               <div className="relative text-slate-50 rounded group cursor-pointer">
                 <div className="bg-primary px-3 py-2">Become a mentor/counsellor</div>
                 <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300">
@@ -356,7 +356,7 @@ function Header() {
                   )}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* MODAL */}
             <Modal
