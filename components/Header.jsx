@@ -669,22 +669,7 @@ function Header() {
                     Why Us
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/mentors"
-                    className={` navlink ${currentRoute.includes("/mentors") && "text-primary"}`}
-                  >
-                    Mentors
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/counsellors"
-                    className={` navlink ${currentRoute.includes("/counselors") && "text-primary"}`}
-                  >
-                    Counselors
-                  </Link>
-                </li>
+
                 <li>
                   <Link
                     href="/courses"
@@ -693,14 +678,14 @@ function Header() {
                     Courses
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link
                     href="/books"
                     className={` navlink ${currentRoute.includes("/books") && "text-primary"}`}
                   >
                     Books
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   {isAuth && (
                     <Link
@@ -747,14 +732,14 @@ function Header() {
                   </li>
                 )}
 
-                <li>
+                {/* <li>
                   <Link
                     href="/cart"
                     className={` navlink ${currentRoute.includes("/cart") && "text-primary"}`}
                   >
                     Cart
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   {isAuth ? (
                     <div className="navlink" onClick={logOut}>
@@ -767,7 +752,7 @@ function Header() {
                   )}
                 </li>
                 {/* Dropdown button */}
-                <div className="relative w-full h-[38.5px] rounded-md overflow-hidden hover:h-[116px] transition-all duration-300">
+                {/* <div className="relative w-full h-[38.5px] rounded-md overflow-hidden hover:h-[116px] transition-all duration-300">
                   <div
                     className="absolute top-0 left-0 w-full border text-neutral-50 cursor-pointer 
                 "
@@ -784,7 +769,7 @@ function Header() {
                       </Link>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </ul>
             </div>
           </div>
