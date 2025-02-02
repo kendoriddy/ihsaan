@@ -73,7 +73,8 @@ function Page({ params }) {
                   name="gender"
                   id="gender"
                   // placeholder="Gender"
-                  className="flex-1 bg-gray-100 border-b-2 px-2 py-2 focus:outline-none focus:border-blue-600 focus:bg-blue-200 rounded">
+                  className="flex-1 bg-gray-100 border-b-2 px-2 py-2 focus:outline-none focus:border-blue-600 focus:bg-blue-200 rounded"
+                >
                   <option value="Gender" className="bg-gray-400">
                     Select Your gender
                   </option>
@@ -249,7 +250,8 @@ function Page({ params }) {
                 <select
                   name="maritalStatus"
                   id="maritalStatus"
-                  className="flex-1 bg-gray-100 border-b-2 px-2 py-2 focus:outline-none focus:border-blue-600 focus:bg-blue-200 rounded">
+                  className="flex-1 bg-gray-100 border-b-2 px-2 py-2 focus:outline-none focus:border-blue-600 focus:bg-blue-200 rounded"
+                >
                   <option value="" className="bg-gray-400">
                     Marital Status
                   </option>
@@ -312,9 +314,7 @@ function Page({ params }) {
                     id="backgroundCheck"
                     className="bg-gray-100 border-2 border-gray-400 rounded"
                   />
-                  <label htmlFor="backgroundCheck">
-                    Your Right Mentors can run background checks about me
-                  </label>
+                  <label htmlFor="backgroundCheck">Ihsaan can run background checks about me</label>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -324,8 +324,8 @@ function Page({ params }) {
                     className="bg-gray-100 border-2 border-gray-400 rounded"
                   />
                   <label htmlFor="lawfulTransaction">
-                    No unlawful transactions in a way that goes against YRMs
-                    instructions or legal laws
+                    No unlawful transactions in a way that goes against YRMs instructions or legal
+                    laws
                   </label>
                 </div>
                 <div className="flex items-center gap-2">
@@ -335,9 +335,7 @@ function Page({ params }) {
                     id="newsletter"
                     className="bg-gray-100 border-2 border-gray-400 rounded"
                   />
-                  <label htmlFor="newsletter">
-                    I want to receive monthly newsletters
-                  </label>
+                  <label htmlFor="newsletter">I want to receive monthly newsletters</label>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
