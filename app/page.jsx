@@ -200,7 +200,7 @@ function Page() {
                 <form
                   action=""
                   method="post"
-                  className="w-full flex flex-col sm:flex-row justify-center items-center gap-2"
+                  className="w-full flex flex-col sm:flex-row justify-start items-center gap-2"
                   onSubmit={handleSubmit}
                 >
                   <div className="w-full sm:w-[70%] border border-red-600 rounded-md py-2 px-3 flex items-center">
