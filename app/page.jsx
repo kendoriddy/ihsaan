@@ -172,50 +172,50 @@ function Page() {
         <Header />
 
         {/* main */}
-        <main className="max-w-[90%] mx-auto px-6 py-10">
+        <main className="max-w-full md:max-w-[90%] mx-auto px-2 md:px-6 py-10 overflow-hidden">
           {/* Hero */}
-          <section className="flex flex-col lg:flex-row items-center gap-6">
-            {/* Hero left */}
-            <div className="flex-1 text-center lg:text-left">
-              <h1 className="text-5xl font-bold leading-tight text-[#7e1a0b]">
+          <section className="flex flex-col lg:flex-row items-center gap-6 px-0 md:px-8 lg:px-12 py-0 md:py-8">
+            {/* Hero Left */}
+            <div className="flex-1 text-center lg:text-left w-full">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
                 IHSAAN: Islamic Learning Made Easy
               </h1>
-              <div
-                className="text-[55px] font-extrabold text-neutral-800 lg:mt-4 w-full lg:max-w-[600px] leading-[32px]"
-                style={{ lineHeight: "1.5" }}
-              >
+
+              <div className="text-2xl sm:text-3xl md:text-[40px] font-extrabold text-neutral-800 lg:mt-4 w-full lg:max-w-[600px]">
                 <Slider {...settings}>
                   {slides.map((slide, index) => (
                     <div key={index} className="slide">
-                      <h2 className="text-2xl font-semibold">{slide}</h2>
+                      <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{slide}</h2>
                     </div>
                   ))}
                 </Slider>
               </div>
-              <p className="py-2 text-neutral-700">
-                {" "}
-                A place to strengthen faith and knowledge through quality education.{" "}
+
+              <p className="py-2 text-neutral-700 text-sm sm:text-base">
+                A place to strengthen faith and knowledge through quality education.
               </p>
 
+              {/* Search Bar */}
               <div className="py-2">
                 <form
                   action=""
                   method="post"
-                  className="w-full flex flex-col sm:flex-row justify-center gap-2 relative"
+                  className="w-full flex flex-col sm:flex-row justify-center items-center gap-2"
                   onSubmit={handleSubmit}
                 >
-                  <div className="w-full border border-red-600 rounded-md py-2 px-2">
+                  <div className="w-full sm:w-[70%] border border-red-600 rounded-md py-2 px-3 flex items-center">
                     <input
                       type="text"
                       placeholder="Search for courses..."
-                      className="flex-1 outline-none bg-transparent border-none w-full"
+                      className="flex-1 outline-none bg-transparent border-none w-full text-sm sm:text-base"
                       ref={searchRef}
                       onChange={handleSearchChange}
                     />
                   </div>
+
+                  {/* Search Suggestions */}
                   <div
-                    className={`absolute top-12 left-0 bg-gray-200 rounded z-10 w-[calc(100%)]
-            sm:w-[calc(100%-78px)] 
+                    className={`absolute top-12 left-0 bg-gray-200 rounded z-10 w-[calc(100%)] sm:w-[calc(70%-78px)] 
             ${searchVariable.length >= 3 ? "block" : "hidden"}`}
                   >
                     <ul className="w-full">
@@ -226,7 +226,7 @@ function Page() {
                       ))}
                       <li className="py-2 px-2">
                         Can't find what you are looking for?{" "}
-                        <Link href="/courses" className="link">
+                        <Link href="/courses" className="text-blue-600 underline">
                           Click here
                         </Link>
                       </li>
@@ -236,22 +236,22 @@ function Page() {
               </div>
             </div>
 
-            {/* Hero right */}
-            <div className="flex-1">
+            {/* Hero Right - Image */}
+            <div className="flex-1 flex justify-center">
               <Image
                 src={IMAGES.banner1}
                 width={500}
                 height={500}
                 alt="IHSAAN Learning"
-                style={{ float: "right" }}
+                className="w-[90%] md:w-[60%] lg:w-[500px] h-auto"
               />
             </div>
           </section>
 
           {/* About IHSAAN Section */}
-          <section className="py-12 px-6 bg-white">
-            <div className="max-w-[70%] mx-auto text-center">
-              <h2 className="text-3xl font-bold mb-4" style={{ color: "#7e1a0b" }}>
+          <section className="py-4 md:py-12 md:px-6 bg-white">
+            <div className="md:max-w-[70%] mx-auto text-center">
+              <h2 className="text-3xl font-bold mb-0 py-4" style={{ color: "#7e1a0b" }}>
                 About IHSAAN
               </h2>
               <p className="text-lg text-gray-700">
@@ -270,17 +270,17 @@ function Page() {
           <section className="py-6 bg-gray-100 mt-4">
             <div className="text-center text-primary py-3 text-3xl mb-4">Why Choose IHSAAN?</div>
             <div className="flex flex-wrap justify-center gap-6">
-              <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white">
+              <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white ml-6 mr-6 md:mx-0">
                 <h3 className="font-bold text-lg"> Expert Teachers </h3>
                 <p>
                   Learn from highly qualified and experienced Islamic scholars and Arabic tutors.
                 </p>
               </div>
-              <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white">
+              <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white ml-6 mr-6 md:mx-0">
                 <h3 className="font-bold text-lg"> Flexible Learning </h3>
                 <p>Study at your own pace with our structured and interactive courses.</p>
               </div>
-              <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white">
+              <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white ml-6 mr-6 md:mx-0">
                 <h3 className="font-bold text-lg"> Community Support </h3>
                 <p>Join a like-minded community focused on personal and spiritual growth.</p>
               </div>
@@ -288,8 +288,8 @@ function Page() {
           </section>
 
           {/* Instructors Section */}
-          <section className="py-12 px-6 bg-white">
-            <div className="max-w-[70%] mx-auto text-center mb-8">
+          <section className="py-12 px-0 md:px-6 bg-white">
+            <div className="max-w-full md:max-w-[70%] mx-auto text-center mb-8">
               <h2 className="text-3xl font-bold" style={{ color: "#7e1a0b" }}>
                 Meet Our Instructors
               </h2>
@@ -319,7 +319,7 @@ function Page() {
 
           {/* Testimonials Section */}
           <section className="py-12 bg-gray-100">
-            <div className="max-w-[70%] mx-auto text-center mb-8">
+            <div className="max-w-full md:max-w-[70%] mx-auto text-center mb-8">
               <h2 className="text-3xl font-bold" style={{ color: "#7e1a0b" }}>
                 What Our Community Says
               </h2>
@@ -337,7 +337,7 @@ function Page() {
               prevArrow={<div className="custom-arrow slick-prev" />}
             >
               {testimonials.map((testi) => (
-                <div key={testi.id} className="px-6">
+                <div key={testi.id} className="px-2 md:px-6">
                   <blockquote className="italic text-lg text-gray-800 mb-4">
                     “{testi.quote}”
                   </blockquote>
@@ -351,8 +351,8 @@ function Page() {
           </section>
 
           {/* Upcoming Events Section */}
-          <section className="py-12 px-6 bg-white">
-            <div className="max-w-[70%] mx-auto text-center mb-8">
+          <section className="py-12 px-0 md:px-6 bg-white">
+            <div className="max-w-full md:max-w-[70%] mx-auto text-center mb-8">
               <h2 className="text-3xl font-bold" style={{ color: "#7e1a0b" }}>
                 Upcoming Events
               </h2>
