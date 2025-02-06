@@ -283,7 +283,7 @@ function Page() {
             </div>
 
             {/* Hero Right - Image */}
-            <div className="flex-1 flex justify-center">
+            <div className="flex-1 flex justify-center pr-4">
               <Image
                 src={IMAGES.banner1}
                 width={500}
