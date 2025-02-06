@@ -11,15 +11,15 @@
 }
 
 .text-primary {
-  color: rgb(243, 65, 3);
+  color: rgb(126 26 11);
 }
 .bg-primary {
-  background-color: rgb(243, 65, 3);
+  background-color: rgb(126 26 11);
 }
 
 .link {
   @apply hover:text-red-800 duration-300 cursor-pointer;
-  color: rgb(243, 65, 3);
+  color: rgb(126 26 11);
 }
 
 .navlink {
@@ -38,7 +38,7 @@ input[type="number"] {
 
 .theme-btn {
   @apply text-white px-3 py-2 rounded cursor-pointer hover:bg-blue-600 transition-all duration-300;
-  background-color: rgb(243, 65, 3);
+  background-color: rgb(126 26 11);
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -96,14 +96,17 @@ input[type="number"] {
  */
 
 .tilt-in-fwd-bl {
-  -webkit-animation: tilt-in-fwd-bl 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  -webkit-animation: tilt-in-fwd-bl 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    both;
   animation: tilt-in-fwd-bl 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 @-webkit-keyframes tilt-in-fwd-bl {
   0% {
-    -webkit-transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px) skew(-35deg, 10deg);
-    transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px) skew(-35deg, 10deg);
+    -webkit-transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px)
+      skew(-35deg, 10deg);
+    transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px)
+      skew(-35deg, 10deg);
     opacity: 0;
   }
   100% {
@@ -114,8 +117,10 @@ input[type="number"] {
 }
 @keyframes tilt-in-fwd-bl {
   0% {
-    -webkit-transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px) skew(-35deg, 10deg);
-    transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px) skew(-35deg, 10deg);
+    -webkit-transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px)
+      skew(-35deg, 10deg);
+    transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px)
+      skew(-35deg, 10deg);
     opacity: 0;
   }
   100% {

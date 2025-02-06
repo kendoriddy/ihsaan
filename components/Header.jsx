@@ -9,7 +9,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { IMAGES } from "@/constants";
 import Image from "next/image";
 import { useSelector } from "react-redux";
-import { selectIsAuth, currentlyLoggedInUser } from "@/utils/redux/slices/auth.reducer";
+import {
+  selectIsAuth,
+  currentlyLoggedInUser,
+} from "@/utils/redux/slices/auth.reducer";
 import { logoutUser } from "@/utils/redux/slices/auth.reducer";
 import { useDispatch } from "react-redux";
 import Modal from "./validation/Modal";
@@ -33,7 +36,8 @@ function Header() {
     isLoading,
     refetch,
   } = useFetch("authUser", `/auth/logged-in-user/`);
-  const authenticatedUsersPayload = getAuthUserInformation && getAuthUserInformation?.data;
+  const authenticatedUsersPayload =
+    getAuthUserInformation && getAuthUserInformation?.data;
   const isAuth = useSelector(selectIsAuth);
   const signedInUserName = useSelector(currentlyLoggedInUser);
   const dispatch = useDispatch();
@@ -57,7 +61,8 @@ function Header() {
     years_of_experience: authenticatedUsersPayload?.years_of_experience || "",
     country: authenticatedUsersPayload?.country || "",
     about_me: authenticatedUsersPayload?.about_me || "",
-    additional_informations: authenticatedUsersPayload?.additional_information || "",
+    additional_informations:
+      authenticatedUsersPayload?.additional_information || "",
     skills: authenticatedUsersPayload?.skill || "",
     qualifications: authenticatedUsersPayload?.qualification || "",
     religion: authenticatedUsersPayload?.religion || "",
@@ -89,19 +94,22 @@ function Header() {
     setOpen(false);
     router.push("/dashboard");
   };
-  const { mutate: createNewaccounts, isLoading: isUpdating } = usePost("/auth/register", {
-    onSuccess: () => {
-      toast.success(
-        "Registration successful. Please verify your email by clicking the link sent to your mail."
-      );
-      queryClient.invalidateQueries("authUser");
-      handleCloseModal();
-    },
-    onError: (error) => {
-      console.log(error);
-      toast.error("error occured, please try again later");
-    },
-  });
+  const { mutate: createNewaccounts, isLoading: isUpdating } = usePost(
+    "/auth/register",
+    {
+      onSuccess: () => {
+        toast.success(
+          "Registration successful. Please verify your email by clicking the link sent to your mail."
+        );
+        queryClient.invalidateQueries("authUser");
+        handleCloseModal();
+      },
+      onError: (error) => {
+        console.log(error);
+        toast.error("error occured, please try again later");
+      },
+    }
+  );
   const handleSubmit = (values) => {
     const {
       first_name,
@@ -156,7 +164,8 @@ function Header() {
     router.push("/login");
   };
   const isUserMentor = authenticatedUsersPayload?.roles?.includes("mentor");
-  const isUserCouncellor = authenticatedUsersPayload?.roles?.includes("counsellor");
+  const isUserCouncellor =
+    authenticatedUsersPayload?.roles?.includes("counsellor");
   const isUserBoth = ["mentor", "counsellor"].every((role) =>
     authenticatedUsersPayload?.roles?.includes(role)
   );
@@ -164,7 +173,10 @@ function Header() {
     return { key: country, value: country.toLowerCase().replace(/\s+/g, "-") };
   });
   const qualificationsList = allPossibleQualifications.map((qualification) => {
-    return { key: qualification, value: qualification.toLowerCase().replace(/\s+/g, "-") };
+    return {
+      key: qualification,
+      value: qualification.toLowerCase().replace(/\s+/g, "-"),
+    };
   });
   // Create an array of numbers from 1 to 100
   const yearsOfExperienceOptions = Array.from({ length: 100 }, (_, i) => ({
@@ -210,18 +222,34 @@ function Header() {
         <div className="hidden lg:flex-1 lg:flex justify-end">
           <ul className="flex gap-2 items-center text-[15px] font-bold">
             <li>
-              <Link href="/" className={` navlink ${currentRoute == "/" && "text-primary"}`}>
+              <Link
+                href="/"
+                className={` navlink ${currentRoute == "/" && "text-primary"}`}
+              >
                 Home
               </Link>
             </li>
             <li>
               <Link
                 href="/about"
-                className={` navlink ${currentRoute.includes("/about") && "text-primary"}`}
+                className={` navlink ${
+                  currentRoute.includes("/about") && "text-primary"
+                }`}
               >
                 Why us
               </Link>
             </li>
+            <li>
+              <Link
+                href="/"
+                className={` navlink ${
+                  currentRoute.includes("/") && "text-primary"
+                }`}
+              >
+                Qur&apos;an Tutors
+              </Link>
+            </li>
+
             {/* <li>
               <Link
                 href="/mentors"
@@ -241,7 +269,9 @@ function Header() {
             <li>
               <Link
                 href="/courses"
-                className={` navlink ${currentRoute.includes("/courses") && "text-primary"}`}
+                className={` navlink ${
+                  currentRoute.includes("/courses") && "text-primary"
+                }`}
               >
                 Courses
               </Link>
@@ -258,7 +288,9 @@ function Header() {
               <li>
                 <Link
                   href="/dashboard"
-                  className={` navlink ${currentRoute.includes("/dashboard") && "text-primary"}`}
+                  className={` navlink ${
+                    currentRoute.includes("/dashboard") && "text-primary"
+                  }`}
                 >
                   Dashboard
                 </Link>
@@ -282,7 +314,9 @@ function Header() {
             <li>
               <Link
                 href="/blog"
-                className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
+                className={` navlink ${
+                  currentRoute.includes("/blog") && "text-primary"
+                }`}
               >
                 Blog
               </Link>
@@ -323,10 +357,11 @@ function Header() {
               )}
             </div>
             {/* Dropdown button */}
-
-            {/* {isUserBoth ? null : (
+            {isUserBoth ? null : (
               <div className="relative text-slate-50 rounded group cursor-pointer">
-                <div className="bg-primary px-3 py-2">Become a mentor/counsellor</div>
+                <div className="bg-primary px-3 py-2 min-w-[200px] text-center">
+                  Register
+                </div>
                 <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300">
                   {!isUserMentor && (
                     <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
@@ -337,7 +372,7 @@ function Header() {
                           setType("mentor");
                         }}
                       >
-                        Become a mentor
+                        Become a student
                       </div>
                     </div>
                   )}
@@ -350,20 +385,20 @@ function Header() {
                           setType("councellor");
                         }}
                       >
-                        Become a counsellor
+                        Become a teacher
                       </div>
                     </div>
                   )}
                 </div>
               </div>
-            )} */}
+            )}
 
             {/* MODAL */}
             <Modal
               title={
                 type === "mentor"
-                  ? "Become a Mentor on IHSAAN Learning"
-                  : "Become a Councellor on IHSAAN Learning"
+                  ? "Be a Teacher at IHSAAN Learning"
+                  : "Pick a Student at IHSAAN Learning"
               }
               isOpen={open}
               handleClose={() => setOpen(false)}
@@ -379,16 +414,28 @@ function Header() {
                       <Form>
                         <div className="flex flex-col gap-6">
                           <div>
-                            <FormikControl name="first_name" placeholder="First name" />
+                            <FormikControl
+                              name="first_name"
+                              placeholder="First name"
+                            />
                           </div>
                           <div>
-                            <FormikControl name="last_name" placeholder="Last name" />
+                            <FormikControl
+                              name="last_name"
+                              placeholder="Last name"
+                            />
                           </div>
                           <div>
-                            <FormikControl name="middle_name" placeholder="Middle name" />
+                            <FormikControl
+                              name="middle_name"
+                              placeholder="Middle name"
+                            />
                           </div>
                           <div>
-                            <FormikControl name="email" placeholder="Email address" />
+                            <FormikControl
+                              name="email"
+                              placeholder="Email address"
+                            />
                           </div>
                           <div>
                             <FormikControl
@@ -403,7 +450,11 @@ function Header() {
                                       onClick={handleClickShowPassword}
                                       onMouseDown={handleMouseDownPassword}
                                     >
-                                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                                      {showPassword ? (
+                                        <VisibilityOff />
+                                      ) : (
+                                        <Visibility />
+                                      )}
                                     </IconButton>
                                   </InputAdornment>
                                 ),
@@ -424,7 +475,11 @@ function Header() {
                                       onClick={handleClickShowPassword}
                                       onMouseDown={handleMouseDownPassword}
                                     >
-                                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                                      {showPassword ? (
+                                        <VisibilityOff />
+                                      ) : (
+                                        <Visibility />
+                                      )}
                                     </IconButton>
                                   </InputAdornment>
                                 ),
@@ -657,14 +712,21 @@ function Header() {
             <div className="">
               <ul className="flex flex-col gap-2 px-6 pt-2">
                 <li>
-                  <Link href="/" className={` navlink ${currentRoute == "/" && "text-primary"}`}>
+                  <Link
+                    href="/"
+                    className={` navlink ${
+                      currentRoute == "/" && "text-primary"
+                    }`}
+                  >
                     Home
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/about"
-                    className={` navlink ${currentRoute.includes("/about") && "text-primary"}`}
+                    className={` navlink ${
+                      currentRoute.includes("/about") && "text-primary"
+                    }`}
                   >
                     Why Us
                   </Link>
@@ -673,7 +735,9 @@ function Header() {
                 <li>
                   <Link
                     href="/courses"
-                    className={` navlink ${currentRoute.includes("/courses") && "text-primary"}`}
+                    className={` navlink ${
+                      currentRoute.includes("/courses") && "text-primary"
+                    }`}
                   >
                     Courses
                   </Link>
@@ -705,7 +769,8 @@ function Header() {
                     <Link
                       href="admin/dashboard"
                       className={` navlink ${
-                        currentRoute.includes("admin/dashboard") && "text-primary"
+                        currentRoute.includes("admin/dashboard") &&
+                        "text-primary"
                       }`}
                     >
                       Admin Dashboard
@@ -716,7 +781,9 @@ function Header() {
                 <li>
                   <Link
                     href="/blog"
-                    className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
+                    className={` navlink ${
+                      currentRoute.includes("/blog") && "text-primary"
+                    }`}
                   >
                     Blog
                   </Link>
@@ -725,7 +792,9 @@ function Header() {
                   <li>
                     <Link
                       href="/admin/login"
-                      className={` navlink ${currentRoute.includes("/admin") && "text-primary"}`}
+                      className={` navlink ${
+                        currentRoute.includes("/admin") && "text-primary"
+                      }`}
                     >
                       Admin
                     </Link>

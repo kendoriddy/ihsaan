@@ -39,13 +39,27 @@ function Page() {
 
   const slides = [
     <span key="1">
-      Learn <span className="text-[#ff6600]">Arabic</span> and Islamic studies with expert guidance.
+      Enroll for fully online self-paced Arabic School and get Certified.
+      <span className="text-[#7e1a0b]">
+        Abtidaaiyah (Primary), I'idaadiyah (Junior Sec), Thaanawiyah (Senior
+        Sec)
+      </span>
+      المرحلة الابتدائية والإعدادية والثانوية
     </span>,
     <span key="2">
-      <span className="text-[#7e1a0b]">Master</span> the Quran, Tajweed, and Islamic history.
+      <span>You can pick a Course or Module and get Certified in it.</span>
+      <span className="text-[#7e1a0b]">
+        {" "}
+        فقه (Jurisprudence), توحيد (Belief), نحو (Grammar), صرف (Morphology),
+      </span>
+      تجويد (Qur'an Principles), حديث (Tradition) etc. (Start)
     </span>,
     <span key="3">
-      Enrich your knowledge and <span className="text-[#ff6600]">grow in faith</span> with IHSAAN.
+      Create and Sell an Islamic Course on this Platform{" "}
+      <span className="text-[#ff6600]">
+        As a sound Islamic Tutor, you can create and sell your course on this
+        platform (learn more)
+      </span>
     </span>,
   ];
 
@@ -84,7 +98,8 @@ function Page() {
     },
     {
       id: 2,
-      quote: "An excellent blend of traditional Islamic teachings and modern education methods.",
+      quote:
+        "An excellent blend of traditional Islamic teachings and modern education methods.",
       author: "Ali Musa",
       role: "Parent",
     },
@@ -110,7 +125,12 @@ function Page() {
       date: "April 15, 2025",
       location: "Conference Hall",
     },
-    { id: 3, title: "Arabic Language Bootcamp", date: "May 10, 2025", location: "Room 101" },
+    {
+      id: 3,
+      title: "Arabic Language Bootcamp",
+      date: "May 10, 2025",
+      location: "Room 101",
+    },
   ];
 
   var settings = {
@@ -125,7 +145,9 @@ function Page() {
   };
   // Fetch suggested courses
   const fetchSuggestedCourses = async () => {
-    const courseResponse = await fetch(`https://yrms-api.onrender.com/api/courses`);
+    const courseResponse = await fetch(
+      `https://yrms-api.onrender.com/api/courses`
+    );
     const course = await courseResponse.json();
     setSuggestedCourses(course.results);
   };
@@ -133,11 +155,15 @@ function Page() {
   const fetchData = async () => {
     try {
       // Courses
-      const coursesResponse = await fetch("https://yrms-api.onrender.com/api/courses");
+      const coursesResponse = await fetch(
+        "https://yrms-api.onrender.com/api/courses"
+      );
       const courses = await coursesResponse.json();
       setCourses(courses.result);
       // FAQs
-      const FAQsResponse = await fetch("https://yrms-api.onrender.com/api/faqs");
+      const FAQsResponse = await fetch(
+        "https://yrms-api.onrender.com/api/faqs"
+      );
       const FAQs = await FAQsResponse.json();
       setFAQs(FAQs.results);
     } catch (error) {
@@ -174,7 +200,7 @@ function Page() {
         {/* main */}
         <main className="max-w-full md:max-w-[90%] mx-auto px-2 md:px-6 py-10 overflow-hidden">
           {/* Hero */}
-          <section className="flex flex-col lg:flex-row items-center gap-6 px-0 md:px-8 lg:px-12 py-0 md:py-8">
+          <section className="flex flex-col lg:flex-row items-center gap-6 px-0 md:px-8 md:pr-0 lg:px-12 py-0 md:py-8">
             {/* Hero Left */}
             <div className="flex-1 text-center lg:text-left w-full">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
@@ -185,14 +211,17 @@ function Page() {
                 <Slider {...settings}>
                   {slides.map((slide, index) => (
                     <div key={index} className="slide">
-                      <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{slide}</h2>
+                      <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+                        {slide}
+                      </h2>
                     </div>
                   ))}
                 </Slider>
               </div>
 
               <p className="py-2 text-neutral-700 text-sm sm:text-base">
-                A place to strengthen faith and knowledge through quality education.
+                A place to strengthen faith and knowledge through quality
+                Islamic education.
               </p>
 
               {/* Search Bar */}
@@ -220,13 +249,21 @@ function Page() {
                   >
                     <ul className="w-full">
                       {suggestedCourses?.slice(0, 6).map((course, index) => (
-                        <li key={index} className="py-2 px-2 hover:bg-gray-300 cursor-pointer">
-                          <Link href={`/courses/${course.id}`}>{course.title}</Link>
+                        <li
+                          key={index}
+                          className="py-2 px-2 hover:bg-gray-300 cursor-pointer"
+                        >
+                          <Link href={`/courses/${course.id}`}>
+                            {course.title}
+                          </Link>
                         </li>
                       ))}
                       <li className="py-2 px-2">
                         Can't find what you are looking for?{" "}
-                        <Link href="/courses" className="text-blue-600 underline">
+                        <Link
+                          href="/courses"
+                          className="text-blue-600 underline"
+                        >
                           Click here
                         </Link>
                       </li>
@@ -251,38 +288,52 @@ function Page() {
           {/* About IHSAAN Section */}
           <section className="py-4 md:py-12 md:px-6 bg-white">
             <div className="md:max-w-[70%] mx-auto text-center">
-              <h2 className="text-3xl font-bold mb-0 py-4" style={{ color: "#7e1a0b" }}>
+              <h2
+                className="text-3xl font-bold mb-0 py-4"
+                style={{ color: "#7e1a0b" }}
+              >
                 About IHSAAN
               </h2>
               <p className="text-lg text-gray-700">
-                IHSAAN is a dynamic Islamic school dedicated to providing comprehensive education in
-                Arabic language, Quranic studies, and other subjects. We blend traditional Islamic
-                teachings with modern educational methodologies to help our students excel
+                IHSAAN is a dynamic Islamic school dedicated to providing
+                comprehensive education in Arabic language, Quranic studies, and
+                other subjects. We blend traditional Islamic teachings with
+                modern educational methodologies to help our students excel
                 academically and spiritually.
               </p>
               <p className="mt-4 text-gray-600 text-base">
-                Our mission is to nurture a generation of knowledgeable, compassionate, and
-                resilient individuals who carry forward the values of excellence and integrity.
+                Our mission is to nurture a generation of knowledgeable,
+                compassionate, and resilient individuals who carry forward the
+                values of excellence and integrity.
               </p>
             </div>
           </section>
 
           <section className="py-6 bg-gray-100 mt-4">
-            <div className="text-center text-primary py-3 text-3xl mb-4">Why Choose IHSAAN?</div>
+            <div className="text-center text-primary py-3 text-3xl mb-4">
+              Why Choose IHSAAN?
+            </div>
             <div className="flex flex-wrap justify-center gap-6">
               <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white ml-6 mr-6 md:mx-0">
                 <h3 className="font-bold text-lg"> Expert Teachers </h3>
                 <p>
-                  Learn from highly qualified and experienced Islamic scholars and Arabic tutors.
+                  Learn from highly qualified and experienced Islamic scholars
+                  and Arabic tutors.
                 </p>
               </div>
               <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white ml-6 mr-6 md:mx-0">
                 <h3 className="font-bold text-lg"> Flexible Learning </h3>
-                <p>Study at your own pace with our structured and interactive courses.</p>
+                <p>
+                  Study at your own pace with our structured and interactive
+                  courses.
+                </p>
               </div>
               <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white ml-6 mr-6 md:mx-0">
                 <h3 className="font-bold text-lg"> Community Support </h3>
-                <p>Join a like-minded community focused on personal and spiritual growth.</p>
+                <p>
+                  Join a like-minded community focused on personal and spiritual
+                  growth.
+                </p>
               </div>
             </div>
           </section>
@@ -294,13 +345,16 @@ function Page() {
                 Meet Our Instructors
               </h2>
               <p className="text-gray-700 mt-4 text-base">
-                Our passionate instructors bring together years of experience in Islamic studies,
-                Arabic language, and more.
+                Our passionate instructors bring together years of experience in
+                Islamic studies, Arabic language, and more.
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-8">
               {instructors.map((inst) => (
-                <div key={inst.id} className="w-64 bg-gray-50 rounded-lg shadow-lg p-6 text-center">
+                <div
+                  key={inst.id}
+                  className="w-64 bg-gray-50 rounded-lg shadow-lg p-6 text-center"
+                >
                   <Image
                     src={inst.image}
                     alt={inst.name}
@@ -308,7 +362,10 @@ function Page() {
                     height={120}
                     className="mx-auto rounded-full mb-4"
                   />
-                  <h3 className="text-xl font-bold" style={{ color: "#7e1a0b" }}>
+                  <h3
+                    className="text-xl font-bold"
+                    style={{ color: "#7e1a0b" }}
+                  >
                     {inst.name}
                   </h3>
                   <p className="text-gray-600">{inst.subject}</p>
@@ -357,7 +414,8 @@ function Page() {
                 Upcoming Events
               </h2>
               <p className="text-gray-700 mt-4">
-                Join us for our upcoming events and workshops to enrich your learning journey.
+                Join us for our upcoming events and workshops to enrich your
+                learning journey.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -366,11 +424,16 @@ function Page() {
                   key={event.id}
                   className="border rounded-lg p-6 shadow-md hover:shadow-xl transition"
                 >
-                  <h3 className="text-xl font-bold mb-2" style={{ color: "#7e1a0b" }}>
+                  <h3
+                    className="text-xl font-bold mb-2"
+                    style={{ color: "#7e1a0b" }}
+                  >
                     {event.title}
                   </h3>
                   <p className="text-gray-600 mb-1">Date: {event.date}</p>
-                  <p className="text-gray-600 mb-4">Location: {event.location}</p>
+                  <p className="text-gray-600 mb-4">
+                    Location: {event.location}
+                  </p>
                   <Link
                     href="/events"
                     className="text-sm font-semibold"
@@ -414,7 +477,10 @@ function Page() {
 
           {/* Video Section (Intro Video) */}
           <section className="py-12 bg-gray-100">
-            <div className="text-center mb-6" style={{ color: "#7e1a0b", fontWeight: "600" }}>
+            <div
+              className="text-center mb-6"
+              style={{ color: "#7e1a0b", fontWeight: "600" }}
+            >
               Intro
             </div>
             <div className="flex justify-center">
@@ -428,14 +494,21 @@ function Page() {
           <section className="py-6 w-full">
             {/* Top */}
             <div className="text-center max-w-xl mx-auto mb-8">
-              <p className="uppercase text-sm" style={{ color: "#ff6600", letterSpacing: "0.1em" }}>
+              <p
+                className="uppercase text-sm"
+                style={{ color: "#ff6600", letterSpacing: "0.1em" }}
+              >
                 Courses
               </p>
-              <h2 className="text-3xl font-bold py-2" style={{ color: "#7e1a0b" }}>
+              <h2
+                className="text-3xl font-bold py-2"
+                style={{ color: "#7e1a0b" }}
+              >
                 Check Out Our Certified Courses
               </h2>
               <p className="text-sm text-gray-600">
-                Our courses are consistently updated with information that can help you.
+                Our courses are consistently updated with information that can
+                help you.
               </p>
             </div>
             {/* Bottom */}
@@ -460,9 +533,12 @@ function Page() {
                           />
                         </div>
                         <div className="px-2 py-2 text-sm">
-                          <div className="uppercase text-gray-700">{course?.category}</div>
+                          <div className="uppercase text-gray-700">
+                            {course?.category}
+                          </div>
                           <div className="capitalize font-bold  py-2 text-xl h-[72px] ">
-                            {course?.title.slice(0, 40)} {course?.title.length > 40 ? "..." : ""}
+                            {course?.title.slice(0, 40)}{" "}
+                            {course?.title.length > 40 ? "..." : ""}
                           </div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -473,7 +549,9 @@ function Page() {
                                 height={30}
                                 className="rounded-full"
                               />
-                              <div className="text-primary text-xs">{course?.instructor_name}</div>
+                              <div className="text-primary text-xs">
+                                {course?.instructor_name}
+                              </div>
                             </div>
                           </div>
                         </div>
