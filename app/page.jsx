@@ -38,29 +38,38 @@ function Page() {
   }, [quotesList]);
 
   const slides = [
-    <span key="1">
-      Enroll for fully online self-paced Arabic School and get Certified.
-      <span className="text-[#7e1a0b]">
-        Abtidaaiyah (Primary), I'idaadiyah (Junior Sec), Thaanawiyah (Senior
-        Sec)
-      </span>
-      المرحلة الابتدائية والإعدادية والثانوية
-    </span>,
-    <span key="2">
-      <span>You can pick a Course or Module and get Certified in it.</span>
-      <span className="text-[#7e1a0b]">
-        {" "}
-        فقه (Jurisprudence), توحيد (Belief), نحو (Grammar), صرف (Morphology),
-      </span>
-      تجويد (Qur'an Principles), حديث (Tradition) etc. (Start)
-    </span>,
-    <span key="3">
-      Create and Sell an Islamic Course on this Platform{" "}
-      <span className="text-[#ff6600]">
-        As a sound Islamic Tutor, you can create and sell your course on this
-        platform (learn more)
-      </span>
-    </span>,
+    <div key="1" className="p-4 text-left">
+      <p>
+        Enroll for fully online self-paced Arabic School and get Certified.
+        <span className="text-[#7e1a0b] block mt-2">
+          Abtidaaiyah (Primary), I'idaadiyah (Junior Sec), Thaanawiyah (Senior
+          Sec)
+        </span>
+        <span className="block mt-2">
+          المرحلة الابتدائية والإعدادية والثانوية
+        </span>
+      </p>
+    </div>,
+    <div key="2" className="p-4 text-left">
+      <p>
+        You can pick a Course or Module and get Certified in it.
+        <span className="text-[#7e1a0b] block mt-2">
+          فقه (Jurisprudence), توحيد (Belief), نحو (Grammar), صرف (Morphology),
+        </span>
+        <span className="block mt-2 text-[#ff6600]">
+          تجويد (Qur'an Principles), حديث (Tradition) etc.
+        </span>
+      </p>
+    </div>,
+    <div key="3" className="p-4 text-left">
+      <p>
+        Create and Sell an Islamic Course on this Platform
+        <span className="text-[#ff6600] block mt-2">
+          As a sound Islamic Tutor, you can create and sell your course on this
+          platform (learn more)
+        </span>
+      </p>
+    </div>,
   ];
 
   // Dummy data for new sections:
