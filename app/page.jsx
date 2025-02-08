@@ -105,7 +105,7 @@ function Page() {
     {
       id: 1,
       quote:
-        "IHSAAN has transformed my learning journey. The passion and dedication of the instructors are unmatched.",
+        "IHSAAN ACADEMIA has transformed my learning journey. The passion and dedication of the instructors are unmatched.",
       author: "Aisha Bello",
       role: "Student",
     },
@@ -119,7 +119,7 @@ function Page() {
     {
       id: 3,
       quote:
-        "The quality of the courses and the supportive community at IHSAAN are simply outstanding.",
+        "The quality of the courses and the supportive community at IHSAAN ACADEMIA are simply outstanding.",
       author: "Hassan Suleiman",
       role: "Alumni",
     },
@@ -217,7 +217,7 @@ function Page() {
             {/* Hero Left */}
             <div className="flex-1 text-center lg:text-left w-full">
               {/* <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
-                IHSAAN: Islamic Learning Made Easy
+                IHSAAN ACADEMIA: Islamic Learning Made Easy
               </h1> */}
 
               <div className="text-2xl sm:text-3xl md:text-[40px] font-extrabold text-neutral-800 lg:mt-4 w-full lg:max-w-[600px]">
@@ -292,7 +292,7 @@ function Page() {
                 src={IMAGES.banner1}
                 width={500}
                 height={500}
-                alt="IHSAAN Learning"
+                alt="IHSAAN ACADEMIA Learning"
                 className="w-[90%] md:w-[60%] lg:w-[500px] h-auto"
               />
             </div>
@@ -313,21 +313,21 @@ function Page() {
             </div>
           </section>
 
-          {/* About IHSAAN Section */}
+          {/* About IHSAAN ACADEMIA Section */}
           <section className="py-4 md:py-12 md:px-6 bg-white">
             <div className="md:max-w-[70%] mx-auto text-center">
               <h2
                 className="text-3xl font-bold mb-0 py-4"
                 style={{ color: "#7e1a0b" }}
               >
-                About IHSAAN
+                About IHSAAN ACADEMIA
               </h2>
               <p className="text-lg text-gray-700">
-                IHSAAN is a dynamic Islamic school dedicated to providing
-                comprehensive education in Arabic language, Quranic studies, and
-                other subjects. We blend traditional Islamic teachings with
-                modern educational methodologies to help our students excel
-                academically and spiritually.
+                IHSAAN ACADEMIA is a dynamic Islamic school dedicated to
+                providing comprehensive education in Arabic language, Quranic
+                studies, and other subjects. We blend traditional Islamic
+                teachings with modern educational methodologies to help our
+                students excel academically and spiritually.
               </p>
               <p className="mt-4 text-gray-600 text-base">
                 Our mission is to nurture a generation of knowledgeable,
@@ -339,7 +339,7 @@ function Page() {
 
           <section className="py-6 bg-gray-100 mt-4">
             <div className="text-center text-primary py-3 text-3xl mb-4">
-              Why Choose IHSAAN?
+              Why Choose IHSAAN ACADEMIA?
             </div>
             <div className="flex flex-wrap justify-center gap-6">
               <div className="p-4 border rounded-lg shadow-md w-80 text-center bg-white ml-6 mr-6 md:mx-0">
