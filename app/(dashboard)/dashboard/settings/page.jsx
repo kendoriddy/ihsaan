@@ -314,7 +314,9 @@ function Page({ params }) {
                     id="backgroundCheck"
                     className="bg-gray-100 border-2 border-gray-400 rounded"
                   />
-                  <label htmlFor="backgroundCheck">Ihsaan can run background checks about me</label>
+                  <label htmlFor="backgroundCheck">
+                    Ihsaan Academia can run background checks about me
+                  </label>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -324,8 +326,8 @@ function Page({ params }) {
                     className="bg-gray-100 border-2 border-gray-400 rounded"
                   />
                   <label htmlFor="lawfulTransaction">
-                    No unlawful transactions in a way that goes against YRMs instructions or legal
-                    laws
+                    No unlawful transactions in a way that goes against YRMs
+                    instructions or legal laws
                   </label>
                 </div>
                 <div className="flex items-center gap-2">
@@ -335,7 +337,9 @@ function Page({ params }) {
                     id="newsletter"
                     className="bg-gray-100 border-2 border-gray-400 rounded"
                   />
-                  <label htmlFor="newsletter">I want to receive monthly newsletters</label>
+                  <label htmlFor="newsletter">
+                    I want to receive monthly newsletters
+                  </label>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
