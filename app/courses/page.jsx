@@ -107,7 +107,11 @@ export default function Courses() {
                   >
                     <div className="flex flex-col lg:flex-row gap-3">
                       <div>
-                        <Image src={course.image} width={145} alt={course.title} />
+                        <Image
+                          src={course.image}
+                          width={145}
+                          alt={course.title}
+                        />
                         {/* <img
                           src={COURSE.image}
                           className="rounded-md w-[145px] h-[145px]"
@@ -115,20 +119,25 @@ export default function Courses() {
                       </div>
                       <div className="flex flex-col gap-2">
                         <div className="text-lg capitalize">{course.title}</div>
-                        <div className="text-slate-500">IHSAAN</div>
+                        <div className="text-slate-500">IHSAAN ACADEMIA</div>
                         <div>
                           {[1, 2, 3, 4, 5].map((index) => (
                             <span key={index}>
                               <StarIcon
                                 className={`${
-                                  index <= course.stars ? "text-yellow-500" : "text-slate-400"
+                                  index <= course.stars
+                                    ? "text-yellow-500"
+                                    : "text-slate-400"
                                 } text-base`}
                               />
                             </span>
                           ))}
                         </div>
                         <div className="flex lg:w-full">
-                          <Link href={`courses/${course.id}`} className="w-full">
+                          <Link
+                            href={`courses/${course.id}`}
+                            className="w-full"
+                          >
                             <button className="bg-blue-500 h-10 p-2 text-white rounded w-full">
                               DETAILS
                             </button>
@@ -148,7 +157,8 @@ export default function Courses() {
                           <PaymentsOutlinedIcon className="text-[16px]" />
                         </span>
                         <span className="flex items-center gap-1">
-                          NGN {course.price} <InfoIcon className="text-[16px]" />
+                          NGN {course.price}{" "}
+                          <InfoIcon className="text-[16px]" />
                         </span>
                       </div>
                       <Link href="/cart" className="w-full">

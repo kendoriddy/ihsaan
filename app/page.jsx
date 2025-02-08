@@ -39,10 +39,12 @@ function Page() {
 
   const slides = [
     <div key="1" className="p-4 text-left">
-      <p>
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
         Enroll for fully online self-paced Arabic School and get Certified.
+      </h1>
+      <p>
         <span className="text-[#7e1a0b] block mt-2">
-          Abtidaaiyah (Primary), I'idaadiyah (Junior Sec), Thaanawiyah (Senior
+          Ibtidaaiyah (Primary), I'idaadiyah (Junior Sec), Thaanawiyah (Senior
           Sec)
         </span>
         <span className="block mt-2">
@@ -51,19 +53,21 @@ function Page() {
       </p>
     </div>,
     <div key="2" className="p-4 text-left">
-      <p>
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
         You can pick a Course or Module and get Certified in it.
+      </h1>
+      <p>
         <span className="text-[#7e1a0b] block mt-2">
           فقه (Jurisprudence), توحيد (Belief), نحو (Grammar), صرف (Morphology),
-        </span>
-        <span className="block mt-2 text-[#ff6600]">
           تجويد (Qur'an Principles), حديث (Tradition) etc.
         </span>
       </p>
     </div>,
     <div key="3" className="p-4 text-left">
-      <p>
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
         Create and Sell an Islamic Course on this Platform
+      </h1>
+      <p>
         <span className="text-[#ff6600] block mt-2">
           As a sound Islamic Tutor, you can create and sell your course on this
           platform (learn more)
@@ -212,9 +216,9 @@ function Page() {
           <section className="flex flex-col lg:flex-row items-center gap-6 px-0 md:px-8 md:pr-0 lg:px-12 py-0 md:py-8">
             {/* Hero Left */}
             <div className="flex-1 text-center lg:text-left w-full">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
+              {/* <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
                 IHSAAN: Islamic Learning Made Easy
-              </h1>
+              </h1> */}
 
               <div className="text-2xl sm:text-3xl md:text-[40px] font-extrabold text-neutral-800 lg:mt-4 w-full lg:max-w-[600px]">
                 <Slider {...settings}>
@@ -291,6 +295,21 @@ function Page() {
                 alt="IHSAAN Learning"
                 className="w-[90%] md:w-[60%] lg:w-[500px] h-auto"
               />
+            </div>
+          </section>
+
+          {/* Video Section (Intro Video) */}
+          <section className="py-12 bg-gray-100">
+            <div
+              className="text-center mb-6"
+              style={{ color: "#7e1a0b", fontWeight: "600" }}
+            >
+              Intro
+            </div>
+            <div className="flex justify-center">
+              <div className="border-4 border-[#ff6600] rounded-lg overflow-hidden shadow-lg w-full max-w-3xl">
+                <VideoModal url={"videos/intro.mp4"} />
+              </div>
             </div>
           </section>
 
@@ -483,21 +502,6 @@ function Page() {
                 ))}
             </div>
           </section> */}
-
-          {/* Video Section (Intro Video) */}
-          <section className="py-12 bg-gray-100">
-            <div
-              className="text-center mb-6"
-              style={{ color: "#7e1a0b", fontWeight: "600" }}
-            >
-              Intro
-            </div>
-            <div className="flex justify-center">
-              <div className="border-4 border-[#ff6600] rounded-lg overflow-hidden shadow-lg w-full max-w-3xl">
-                <VideoModal url={"videos/intro.mp4"} />
-              </div>
-            </div>
-          </section>
 
           {/* COURSES */}
           <section className="py-6 w-full">

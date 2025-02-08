@@ -48,28 +48,50 @@ function Footer() {
     <div className="text-[13px] bg-[#7e1a0b] text-white px-6 py-6">
       <div className="flex flex-col md:flex-row justify-evenly py-6 gap-4">
         <div className="flex-1">
-          <div className="text-lg font-bold py-3">IHSAAN Islamic Academy</div>
+          <div className="text-lg font-bold py-3">IHSAAN ACADEMIA</div>
           <p>
-            IHSAAN is dedicated to providing high-quality Islamic education, teaching Arabic and
-            other essential subjects to nurture strong and knowledgeable Muslims.
+            IHSAAN ACADEMIA is dedicated to providing high-quality Islamic
+            education, teaching Arabic and other essential subjects to nurture
+            strong and knowledgeable Muslims.
           </p>
           <p className="py-2">
-            Join our growing community and embark on a journey of learning and faith.
+            Join our growing community and embark on a journey of learning and
+            faith.
           </p>
           <div className="py-2 flex gap-3">
-            <Link href="https://www.facebook.com" target="_blank" className="hover:text-[#ff6600]">
+            <Link
+              href="https://www.facebook.com"
+              target="_blank"
+              className="hover:text-[#ff6600]"
+            >
               <FacebookIcon />
             </Link>
-            <Link href="https://www.youtube.com" target="_blank" className="hover:text-[#ff6600]">
+            <Link
+              href="https://www.youtube.com"
+              target="_blank"
+              className="hover:text-[#ff6600]"
+            >
               <YouTubeIcon />
             </Link>
-            <Link href="https://www.x.com" target="_blank" className="hover:text-[#ff6600]">
+            <Link
+              href="https://www.x.com"
+              target="_blank"
+              className="hover:text-[#ff6600]"
+            >
               <XIcon />
             </Link>
-            <Link href="https://www.instagram.com" target="_blank" className="hover:text-[#ff6600]">
+            <Link
+              href="https://www.instagram.com"
+              target="_blank"
+              className="hover:text-[#ff6600]"
+            >
               <InstagramIcon />
             </Link>
-            <Link href="https://www.linkedin.com" target="_blank" className="hover:text-[#ff6600]">
+            <Link
+              href="https://www.linkedin.com"
+              target="_blank"
+              className="hover:text-[#ff6600]"
+            >
               <LinkedInIcon />
             </Link>
           </div>
@@ -103,15 +125,23 @@ function Footer() {
           </div>
           <div className="flex gap-3 py-1">
             <EmailIcon />
-            <Link href="mailto:contact@ihsaanacademy.com" className="hover:text-[#ff6600]">
+            <Link
+              href="mailto:contact@ihsaanacademy.com"
+              className="hover:text-[#ff6600]"
+            >
               contact@ihsaanacademy.com
             </Link>
           </div>
         </div>
 
         <div className="flex-1">
-          <h3 className="text-lg font-bold py-3">Subscribe to our Newsletter</h3>
-          <p>Get updates on new courses, events, and learning resources directly to your inbox.</p>
+          <h3 className="text-lg font-bold py-3">
+            Subscribe to our Newsletter
+          </h3>
+          <p>
+            Get updates on new courses, events, and learning resources directly
+            to your inbox.
+          </p>
           <div className="py-3 w-full max-w-[500px]">
             <Formik
               initialValues={initialValues}
@@ -150,7 +180,11 @@ function Footer() {
                       },
                     }}
                   />
-                  <AuthButton text="Subscribe" disabled={isLoading} isLoading={isLoading} />
+                  <AuthButton
+                    text="Subscribe"
+                    disabled={isLoading}
+                    isLoading={isLoading}
+                  />
                 </div>
               </Form>
             </Formik>
@@ -163,7 +197,7 @@ function Footer() {
       </div>
 
       <div className="py-4 flex flex-col lg:flex-row justify-between text-center gap-3">
-        <div>&copy; {footerDate()} IHSAAN Islamic Academy. All rights reserved.</div>
+        <div>&copy; {footerDate()} IHSAAN ACADEMIA. All rights reserved.</div>
         <div>
           <Link href="/privacy-policy" className="hover:text-[#ff6600]">
             Privacy Policy

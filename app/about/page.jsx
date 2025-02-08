@@ -57,28 +57,49 @@ function Page() {
             {/* Left */}
             <div className="flex-1 ">
               <div className="flex flex-wrap p-8 max-w-[500px] m-auto">
-                <Image src={IMAGES.aboutImg1} alt="about" width={200} className="w-1/2" />
-                <Image src={IMAGES.aboutImg2} alt="about" width={150} className="w-1/2" />
-                <Image src={IMAGES.aboutImg3} alt="about" width={150} className="w-1/2" />
-                <Image src={IMAGES.aboutImg4} alt="about" width={150} className="w-1/2" />
+                <Image
+                  src={IMAGES.aboutImg1}
+                  alt="about"
+                  width={200}
+                  className="w-1/2"
+                />
+                <Image
+                  src={IMAGES.aboutImg2}
+                  alt="about"
+                  width={150}
+                  className="w-1/2"
+                />
+                <Image
+                  src={IMAGES.aboutImg3}
+                  alt="about"
+                  width={150}
+                  className="w-1/2"
+                />
+                <Image
+                  src={IMAGES.aboutImg4}
+                  alt="about"
+                  width={150}
+                  className="w-1/2"
+                />
               </div>
             </div>
             {/* Right */}
             <div className="flex-1 pr-6 px-3 text-sm">
               <div className="text-sm text-primary py-2">Who we are</div>
               <div className="py-4 font-bold text-2xl text-neutral-800">
-                IHSAAN Islamic Academy is dedicated to providing high-quality Islamic education,
-                focusing on Arabic, Quranic studies, and essential Islamic sciences.
+                IHSAAN ACADEMIA is dedicated to providing high-quality Islamic
+                education, focusing on Arabic, Quranic studies, and essential
+                Islamic sciences.
               </div>
               <p className="py-2">
-                Our mission is to equip students with profound knowledge of the Arabic language and
-                Islamic teachings, ensuring they develop strong faith, character, and academic
-                excellence.
+                Our mission is to equip students with profound knowledge of the
+                Arabic language and Islamic teachings, ensuring they develop
+                strong faith, character, and academic excellence.
               </p>
               <p>
-                We offer structured courses in Quran recitation, Arabic grammar, Hadith, Fiqh, and
-                more, making it accessible for learners at different levels to deepen their
-                understanding of Islam.
+                We offer structured courses in Quran recitation, Arabic grammar,
+                Hadith, Fiqh, and more, making it accessible for learners at
+                different levels to deepen their understanding of Islam.
               </p>
               {/* Bottom */}
               <div className="flex flex-wrap py-4">
@@ -110,24 +131,29 @@ function Page() {
               <div className="max-w-[500px]">
                 <ul>
                   <li className="py-2">
-                    <span className="font-bold">Authentic Islamic Education: </span>
+                    <span className="font-bold">
+                      Authentic Islamic Education:{" "}
+                    </span>
                     <span>
-                      Our curriculum is rooted in authentic Islamic teachings, ensuring students
-                      receive accurate and reliable knowledge.
+                      Our curriculum is rooted in authentic Islamic teachings,
+                      ensuring students receive accurate and reliable knowledge.
                     </span>
                   </li>
                   <li className="py-2">
                     <span className="font-bold">Experienced Instructors: </span>
                     <span>
-                      Our teachers are well-trained in Arabic and Islamic studies, bringing years of
-                      experience to help students excel.
+                      Our teachers are well-trained in Arabic and Islamic
+                      studies, bringing years of experience to help students
+                      excel.
                     </span>
                   </li>
                   <li className="py-2">
-                    <span className="font-bold">Flexible Learning Options: </span>
+                    <span className="font-bold">
+                      Flexible Learning Options:{" "}
+                    </span>
                     <span>
-                      We offer both online and in-person classes to cater to students from different
-                      backgrounds and schedules.
+                      We offer both online and in-person classes to cater to
+                      students from different backgrounds and schedules.
                     </span>
                   </li>
                 </ul>
@@ -167,10 +193,10 @@ function Page() {
                 </div>
                 <div className="text-center py-4 font-bold">Our Mission</div>
                 <div className="text-center">
-                  At IHSAAN, our mission is to provide accessible and high-quality Islamic
-                  education, equipping students with a deep understanding of Arabic, Qur'an, and
-                  Islamic sciences while fostering a love for lifelong learning and spiritual
-                  growth.
+                  At IHSAAN ACADEMIA, our mission is to provide accessible and
+                  high-quality Islamic education, equipping students with a deep
+                  understanding of Arabic, Qur'an, and Islamic sciences while
+                  fostering a love for lifelong learning and spiritual growth.
                 </div>
               </div>
             </div>
@@ -188,9 +214,11 @@ function Page() {
                 </div>
                 <div className="text-center py-4 font-bold">Our Vission</div>
                 <div className="text-center">
-                  Our vision is to become a leading Islamic learning institution, empowering
-                  students with authentic knowledge, moral excellence, and a strong connection to
-                  their faith, so they can contribute positively to their communities and the world.
+                  Our vision is to become a leading Islamic learning
+                  institution, empowering students with authentic knowledge,
+                  moral excellence, and a strong connection to their faith, so
+                  they can contribute positively to their communities and the
+                  world.
                 </div>
               </div>
             </div>
@@ -204,8 +232,9 @@ function Page() {
                 <div className="text-primary py-4">Courses</div>
                 <div className="text-lg pb-2">Explore Our Islamic Courses</div>
                 <div>
-                  At IHSAAN, we offer a diverse range of courses in Arabic, Qur'an, and Islamic
-                  studies, tailored to different levels of learners.
+                  At IHSAAN ACADEMIA, we offer a diverse range of courses in
+                  Arabic, Qur'an, and Islamic studies, tailored to different
+                  levels of learners.
                 </div>
               </div>
 
@@ -232,7 +261,8 @@ function Page() {
                       {/* Link Bottom */}
                       <div className="p-2">
                         <div className="font-bold py-2">
-                          {course.title.slice(0, 25)} {course.title.length > 25 ? "..." : ""}
+                          {course.title.slice(0, 25)}{" "}
+                          {course.title.length > 25 ? "..." : ""}
                         </div>
                         <div className="text-sm">
                           <Rating
@@ -247,7 +277,8 @@ function Page() {
                           <span>
                             <CreditCardIcon className="text-neutral-400" />
                           </span>{" "}
-                          <span>NGN</span> {course.price.toLocaleString("en-US")}.00
+                          <span>NGN</span>{" "}
+                          {course.price.toLocaleString("en-US")}.00
                         </div>
                       </div>
                     </Link>

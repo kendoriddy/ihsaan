@@ -214,9 +214,12 @@ function Header() {
           <div>
             <Link href="/" className="flex items-center gap-2 text-xl">
               <Image src={IMAGES.icon} alt="logo" width={50} height={50} />
-              <div>IHSAAN</div>
+              <div>IHSAAN ACADEMIA</div>
             </Link>
           </div>
+        </div>
+        <div>
+          <p>Learning Islam Made Easy</p>
         </div>
         {/* Desktop menu */}
         <div className="hidden lg:flex-1 lg:flex justify-end">
@@ -239,16 +242,39 @@ function Header() {
                 Why us
               </Link>
             </li>
-            <li>
-              <Link
-                href="/"
-                className={` navlink ${
-                  currentRoute.includes("/") && "text-primary"
-                }`}
-              >
+            <div className="relative text-slate-50 rounded group cursor-pointer">
+              <h3 className="text-[15px] font-bold text-black">
                 Qur&apos;an Tutors
-              </Link>
-            </li>
+              </h3>
+              <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
+                {!isUserMentor && (
+                  <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                    <div
+                      className="block w-full h-full"
+                      onClick={() => {
+                        handleOpenModal("mentor");
+                        setType("mentor");
+                      }}
+                    >
+                      Pick a Qur'an Tutor
+                    </div>
+                  </div>
+                )}
+                {!isUserCouncellor && (
+                  <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                    <div
+                      className="block w-full h-full"
+                      onClick={() => {
+                        handleOpenModal("councellor");
+                        setType("councellor");
+                      }}
+                    >
+                      Become a Qur'an Tutor
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* <li>
               <Link
@@ -266,16 +292,21 @@ function Header() {
                 Counselors
               </Link>
             </li> */}
-            <li>
-              <Link
-                href="/courses"
-                className={` navlink ${
-                  currentRoute.includes("/courses") && "text-primary"
-                }`}
-              >
-                Courses
-              </Link>
-            </li>
+            <div className="relative text-slate-50 rounded group cursor-pointer">
+              <h3 className="text-[15px] font-bold text-black">Courses</h3>
+              <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
+                <div className="bg-slate-500 px-1 py-2 hover:bg-blue-600 transition-all duration-300">
+                  <Link href="/courses" className="block w-full h-full">
+                    Take a Course
+                  </Link>
+                </div>
+                <div className="bg-slate-500 px-1 py-2 hover:bg-blue-600 transition-all duration-300">
+                  <Link href="/courses" className="block w-full h-full">
+                    Upload and Sell a Course
+                  </Link>
+                </div>
+              </div>
+            </div>
             {/* <li>
               <Link
                 href="/books"
@@ -395,11 +426,7 @@ function Header() {
 
             {/* MODAL */}
             <Modal
-              title={
-                type === "mentor"
-                  ? "Be a Teacher at IHSAAN Learning"
-                  : "Pick a Student at IHSAAN Learning"
-              }
+              title={type === "mentor" ? "Become a Student" : "Become a Tutor"}
               isOpen={open}
               handleClose={() => setOpen(false)}
             >
