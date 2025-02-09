@@ -218,7 +218,7 @@ function Header() {
             </Link>
           </div>
         </div>
-        <div>
+        <div className="ml-1 md:ml-[50px]">
           <p>Learning Islam Made Easy</p>
         </div>
         {/* Desktop menu */}
@@ -248,7 +248,7 @@ function Header() {
               </h3>
               <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
                 {!isUserMentor && (
-                  <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                  <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                     <div
                       className="block w-full h-full"
                       onClick={() => {
@@ -261,7 +261,7 @@ function Header() {
                   </div>
                 )}
                 {!isUserCouncellor && (
-                  <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                  <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                     <div
                       className="block w-full h-full"
                       onClick={() => {
@@ -295,12 +295,12 @@ function Header() {
             <div className="relative text-slate-50 rounded group cursor-pointer">
               <h3 className="text-[15px] font-bold text-black">Courses</h3>
               <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
-                <div className="bg-slate-500 px-1 py-2 hover:bg-blue-600 transition-all duration-300">
+                <div className="bg-slate-500 px-1 py-2 hover:bg-primary transition-all duration-300">
                   <Link href="/courses" className="block w-full h-full">
                     Take a Course
                   </Link>
                 </div>
-                <div className="bg-slate-500 px-1 py-2 hover:bg-blue-600 transition-all duration-300">
+                <div className="bg-slate-500 px-1 py-2 hover:bg-primary transition-all duration-300">
                   <Link href="/courses" className="block w-full h-full">
                     Upload and Sell a Course
                   </Link>
@@ -395,7 +395,7 @@ function Header() {
                 </div>
                 <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300">
                   {!isUserMentor && (
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                       <div
                         className="block w-full h-full"
                         onClick={() => {
@@ -408,7 +408,7 @@ function Header() {
                     </div>
                   )}
                   {!isUserCouncellor && (
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                       <div
                         className="block w-full h-full"
                         onClick={() => {
@@ -687,12 +687,12 @@ function Header() {
                   {/* <div className="relative text-slate-50 rounded group  cursor-pointer">
                     <div className="bg-primary px-3 py-2">Become a mentor/counsellor</div>
                     <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300 ">
-                      <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                         <Link href="/mentors" className="block w-full h-full">
                           Become a mentor
                         </Link>
                       </div>
-                      <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                         <Link href="/counsellors" className="block w-full h-full">
                           Become a counsellor
                         </Link>
@@ -735,7 +735,7 @@ function Header() {
           </div>
 
           {/* Bottom */}
-          <div className={`lg:hidden overflow-hidden `}>
+          <div className={`lg:hidden overflow-hidden h-screen`}>
             <div className="">
               <ul className="flex flex-col gap-2 px-6 pt-2">
                 <li>
@@ -777,6 +777,39 @@ function Header() {
                     Books
                   </Link>
                 </li> */}
+                <div className="relative text-slate-50 rounded group cursor-pointer">
+                  <h3 className="text-[15px] font-normal text-black">
+                    Qur&apos;an Tutors
+                  </h3>
+                  <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
+                    {!isUserMentor && (
+                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
+                        <div
+                          className="block w-full h-full"
+                          onClick={() => {
+                            handleOpenModal("mentor");
+                            setType("mentor");
+                          }}
+                        >
+                          Pick a Qur'an Tutor
+                        </div>
+                      </div>
+                    )}
+                    {!isUserCouncellor && (
+                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
+                        <div
+                          className="block w-full h-full"
+                          onClick={() => {
+                            handleOpenModal("councellor");
+                            setType("councellor");
+                          }}
+                        >
+                          Become a Qur'an Tutor
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <li>
                   {isAuth && (
                     <Link
@@ -827,6 +860,39 @@ function Header() {
                     </Link>
                   </li>
                 )}
+                <div className="relative text-slate-50 rounded group cursor-pointer">
+                  <div className="text-[15px] font-normal text-black">
+                    Register
+                  </div>
+                  <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300">
+                    {!isUserMentor && (
+                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
+                        <div
+                          className="block w-full h-full"
+                          onClick={() => {
+                            handleOpenModal("mentor");
+                            setType("mentor");
+                          }}
+                        >
+                          Become a student
+                        </div>
+                      </div>
+                    )}
+                    {!isUserCouncellor && (
+                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
+                        <div
+                          className="block w-full h-full"
+                          onClick={() => {
+                            handleOpenModal("councellor");
+                            setType("councellor");
+                          }}
+                        >
+                          Become a teacher
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 {/* <li>
                   <Link
@@ -854,12 +920,12 @@ function Header() {
                 "
                   >
                     <div className="bg-primary px-3 py-2">Become a mentor/counsellor</div>
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                       <Link href="/mentors" className="block w-full h-full">
                         Become a mentor
                       </Link>
                     </div>
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                       <Link href="/counsellors" className="block w-full h-full">
                         Become a counsellor
                       </Link>

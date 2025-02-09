@@ -68,7 +68,7 @@ function Page() {
         Create and Sell an Islamic Course on this Platform
       </h1>
       <p>
-        <span className="text-[#ff6600] block mt-2">
+        <span className="text-[#7e1a0b] block mt-2">
           As a sound Islamic Tutor, you can create and sell your course on this
           platform (learn more)
         </span>
