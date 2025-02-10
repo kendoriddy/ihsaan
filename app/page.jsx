@@ -38,7 +38,7 @@ function Page() {
   }, [quotesList]);
 
   const slides = [
-    <div key="1" className="p-4 text-left">
+    <div key="1" className="p-0 text-left">
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
         Enroll for fully online self-paced Arabic School and get Certified.
       </h1>
@@ -216,12 +216,13 @@ function Page() {
           <section className="flex flex-col lg:flex-row items-center gap-6 px-0 md:px-8 md:pr-0 lg:px-12 py-0 md:py-8">
             {/* Hero Left */}
             <div className="flex-1 text-center lg:text-left w-full">
-              {/* <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
-                IHSAAN ACADEMIA: Islamic Learning Made Easy
-              </h1> */}
-
-              <div className="text-2xl sm:text-3xl md:text-[40px] font-extrabold text-neutral-800 lg:mt-4 w-full lg:max-w-[600px]">
-                <Slider {...settings}>
+              <div className="text-2xl sm:text-3xl md:text-[40px] font-extrabold text-neutral-800 w-[83%] m-auto lg:mt-4 lg:max-w-[600px]">
+                <Slider
+                  {...settings}
+                  className="max-w-2xl mx-auto"
+                  nextArrow={<div className="custom-arrow slick-next" />}
+                  prevArrow={<div className="custom-arrow slick-prev" />}
+                >
                   {slides.map((slide, index) => (
                     <div key={index} className="slide">
                       <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">

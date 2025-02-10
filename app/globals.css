@@ -54,6 +54,29 @@ input[type="number"] {
 
 .custom-arrow {
   color: #7e1a0b !important;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  cursor: pointer;
+}
+
+.custom-arrow.slick-prev {
+  left: 10px; /* Adjust as needed */
+}
+
+.custom-arrow.slick-next {
+  right: 10px; /* Adjust as needed */
+}
+
+@media (max-width: 768px) {
+  .custom-arrow.slick-prev {
+    left: 5px; /* Adjust as needed for mobile */
+  }
+
+  .custom-arrow.slick-next {
+    right: 5px; /* Adjust as needed for mobile */
+  }
 }
 
 .slick-prev:before,
