@@ -265,8 +265,8 @@ const TutorApplication = () => {
                     className="w-full p-2 border rounded"
                   >
                     <option value="PENDING">Pending</option>
-                    <option value="APPROVE">Approved</option>
-                    <option value="REJECT">Rejected</option>
+                    <option value="ACCEPTED">Approved</option>
+                    <option value="REJECTED">Rejected</option>
                   </select>
                 </div>
                 <div className="flex justify-center py-4">
