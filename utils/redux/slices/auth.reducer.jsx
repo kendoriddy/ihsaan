@@ -27,17 +27,17 @@ export const authSlice = createSlice({
   reducers: {
     loginUserSuccess(state, details) {
       state.auth = true;
-      state.authToken = details.payload.payload.access;
-      state.refreshToken = details.payload.payload.refresh;
-      state.email = details.payload.payload.email;
-      state.roles = details.payload.payload.roles;
-      state.first_name = details.payload.payload.first_name;
+      state.authToken = details.payload.access;
+      state.refreshToken = details.payload.refresh;
+      state.email = details.payload.email;
+      state.roles = details.payload.roles;
+      state.first_name = details.payload.first_name;
       if (typeof window !== "undefined") {
-        localStorage.setItem("token", details.payload.payload.access);
-        localStorage.setItem("refresh-token", details.payload.payload.refresh);
-        localStorage.setItem("user", details.payload.payload.first_name);
-        localStorage.setItem("email", details.payload.payload.email);
-        localStorage.setItem("roles", JSON.stringify(details.payload.payload.roles));
+        localStorage.setItem("token", details.payload.access);
+        localStorage.setItem("refresh-token", details.payload.refresh);
+        localStorage.setItem("user", details.payload.first_name);
+        localStorage.setItem("email", details.payload.email);
+        localStorage.setItem("roles", JSON.stringify(details.payload.roles));
       }
     },
 
