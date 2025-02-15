@@ -27,6 +27,8 @@ const TutorApplication = () => {
   const [tutorToEdit, setTutorToEdit] = useState(null);
   const [modalContent, setModalContent] = useState("addTutor");
   const [isLoading, setIsLoading] = useState(false);
+  const [isActiveModalOpen, setIsActiveModalOpen] = useState(false);
+  const [tutorToToggle, setTutorToToggle] = useState(null);
 
   const tutorApplicationStatusRef = useRef();
 
@@ -36,6 +38,57 @@ const TutorApplication = () => {
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleToggleActiveStatus = (tutor) => {
+    setTutorToToggle(tutor);
+    setIsActiveModalOpen(true);
+  };
+
+  const { mutate: updateApplicationActiveStatus } = usePut("/users", {
+    onSuccess: () => dispatch(fetchTutors({ page: 1, pageSize: 10 })),
+  });
+
+  const handleConfirmToggleActiveStatus = async () => {
+    const updateStatusPromise = new Promise((resolve, reject) => {
+      updateApplicationActiveStatus(
+        {
+          id: `${tutorToToggle.id}/activate-deactivate/`,
+          data: {
+            is_active: !tutorToToggle.is_active,
+          },
+        },
+        {
+          onSuccess: () => {
+            setIsModalClose(true);
+            toast.success(
+              `Tutor has been ${
+                tutorToToggle.is_active ? "deactivated" : "activated"
+              }`
+            );
+            setIsActiveModalOpen(false);
+          },
+          onError: (error) => {
+            console.error("Failed to update status:", error);
+            setIsLoading(false);
+            toast.error(error.response.data.detail || "An error occurred");
+            toast.error(
+              error.response.data.tutor_application_status[0]
+                ? error.response.data.tutor_application_status[0]
+                : error.response.data.detail || "An error occurred"
+            );
+            reject(error);
+          },
+        }
+      );
+    });
+    try {
+      await updateStatusPromise;
+    } catch (error) {
+      console.error("Caught error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const { mutate: addTutor } = usePost("/tutors", {
@@ -66,6 +119,19 @@ const TutorApplication = () => {
     setIsModalClose(false);
   };
 
+  useEffect(() => {
+    if (tutorToEdit && tutorApplicationStatusRef.current) {
+      tutorApplicationStatusRef.current.value =
+        tutorToEdit.tutor_application_status;
+    }
+  }, [tutorToEdit]);
+
+  const resetForm = () => {
+    if (tutorApplicationStatusRef.current) {
+      tutorApplicationStatusRef.current.value = "PENDING"; // Reset to default value
+    }
+  };
+
   const handleStatusUpdate = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -82,13 +148,18 @@ const TutorApplication = () => {
         {
           onSuccess: () => {
             setIsModalClose(true);
+            toast.success("Successful!");
+            resetForm();
             resolve();
           },
           onError: (error) => {
             console.error("Failed to update status:", error);
+            setIsLoading(false);
+            toast.error(error.response.data.detail || "An error occurred");
             toast.error(
-              error.response.data.tutor_application_status[0] ||
-                "An error occurred"
+              error.response.data.tutor_application_status[0]
+                ? error.response.data.tutor_application_status[0]
+                : error.response.data.detail || "An error occurred"
             );
             reject(error);
           },
@@ -136,15 +207,15 @@ const TutorApplication = () => {
         >
           <div className="p-4">
             {/* Top */}
-            <div className="flex justify-between items-center">
+            {/* <div className="flex justify-between items-center">
               <div className="text-lg font-bold"></div>
               <div
                 className="bg-red-600 text-white px-3 py-2 rounded hover:bg-blue-600 transition-all duration-300 cursor-pointer"
-                // onClick={handleAddTutorBtn}
+                onClick={handleAddTutorBtn}
               >
                 Add A Tutor
               </div>
-            </div>
+            </div> */}
             {/* Table */}
             <div className="mt-4 flex-1 max-h-[650px] overflow-y-scroll relative py-4">
               <div className="p-2 font-bold  bg-white">Tutor List</div>
@@ -199,6 +270,16 @@ const TutorApplication = () => {
                             {" "}
                             Delete
                           </span>
+                          <span
+                            className={`${
+                              tutor.is_active
+                                ? "text-green-600"
+                                : "text-gray-600"
+                            } hover:underline cursor-pointer`}
+                            onClick={() => handleToggleActiveStatus(tutor)}
+                          >
+                            {tutor.is_active ? "Active" : "Inactive"}
+                          </span>
                         </div>
                       </td>
                     </tr>
@@ -246,7 +327,7 @@ const TutorApplication = () => {
               {/* Top */}
               <div>
                 <div className="flex justify-between items-center p-4">
-                  <div className="text-lg font-bold">Edir Tutor</div>
+                  <div className="text-lg font-bold">Edit Tutor</div>
                   <div
                     className="cursor-pointer text-red-600 hover:text-blue-600 transition-all duration-300"
                     onClick={() => setIsModalClose(true)}
@@ -265,7 +346,7 @@ const TutorApplication = () => {
                     className="w-full p-2 border rounded"
                   >
                     <option value="PENDING">Pending</option>
-                    <option value="ACCEPTED">Approved</option>
+                    <option value="ACCEPTED">Accepted</option>
                     <option value="REJECTED">Rejected</option>
                   </select>
                 </div>
@@ -281,6 +362,37 @@ const TutorApplication = () => {
             </div>
           </div>
         </section>
+
+        {/* Modal for activating/deactivating tutor */}
+        {isActiveModalOpen && (
+          <section className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+            <div className="bg-white w-[400px] rounded p-4">
+              <div className="text-lg font-bold">
+                {tutorToToggle.is_active ? "Deactivate" : "Activate"} Tutor
+              </div>
+              <div className="py-4">
+                Are you sure you want to{" "}
+                {tutorToToggle.is_active ? "deactivate" : "activate"} this
+                tutor?
+              </div>
+              <div className="flex justify-end gap-4">
+                <button
+                  className="bg-gray-600 text-white px-4 py-2 rounded"
+                  onClick={() => setIsActiveModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="bg-red-600 text-white px-4 py-2 rounded"
+                  onClick={handleConfirmToggleActiveStatus}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Loading..." : "Confirm"}
+                </button>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );

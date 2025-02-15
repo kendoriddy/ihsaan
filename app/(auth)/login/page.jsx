@@ -37,7 +37,7 @@ const LogIn = () => {
 
       dispatch(loginUserSuccess({ payload: data })); // Wrap data in payload
       toast.success("Logged in successfully");
-      router.push("/");
+      router.push("/dashboard");
     },
     onError: (error) => {
       toast.error(error.response.data.message);
