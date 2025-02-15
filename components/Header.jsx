@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 import {
   selectIsAuth,
   currentlyLoggedInUser,
-} from "@/utils/redux/slices/auth.reducer";
+} from "../utils/redux/slices/auth.reducer";
 import { logoutUser } from "@/utils/redux/slices/auth.reducer";
 import { useDispatch } from "react-redux";
 import Modal from "./validation/Modal";

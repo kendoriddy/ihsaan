@@ -50,7 +50,7 @@ const LogIn = () => {
   return (
     <>
       <main className="h-screen w-screen flex items-center justify-center bg-blue-100">
-        <section className="w-[350px] bg-blue-300 h-[500px] rounded-l-md hidden md:flex items-center justify-center">
+        <section className="w-[350px] bg-primary h-[500px] rounded-l-md hidden md:flex items-center justify-center">
           <Image src={IMAGES.icon} alt="logo" width={100} height={100} />
         </section>
 
@@ -89,7 +89,11 @@ const LogIn = () => {
                                     onClick={handleClickShowPassword}
                                     onMouseDown={handleMouseDownPassword}
                                   >
-                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    {showPassword ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
                                   </IconButton>
                                 </InputAdornment>
                               ),
@@ -124,11 +128,15 @@ const LogIn = () => {
               <h1>
                 Dont have an account ?{" "}
                 <Link href={"/register"}>
-                  <span className="mr-2 cursor-pointer hover:text-blue-500">Register</span>
+                  <span className="mr-2 cursor-pointer hover:text-blue-500">
+                    Register
+                  </span>
                 </Link>
                 <p>or</p>
                 <Link href={"/"}>
-                  <span className="ml-2 cursor-pointer hover:text-blue-500">Go Home</span>
+                  <span className="ml-2 cursor-pointer hover:text-blue-500">
+                    Go Home
+                  </span>
                 </Link>
               </h1>
             </div>

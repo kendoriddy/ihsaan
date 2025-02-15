@@ -68,6 +68,11 @@ const DASHBOARD_LIST = {
     { id: 2, name: "Account Manager", path: "/admin/account-manager" },
     {
       id: 3,
+      name: "Tutor Application",
+      path: "/admin/tutor",
+    },
+    {
+      id: 3,
       name: "Mentor",
       path: "/admin/mentor",
     },
