@@ -12,8 +12,8 @@ function ModalWhyUs() {
   const stopPropagation = (e) => e.stopPropagation();
 
   return (
-    <div className="test-sm ">
-      <div onClick={openModal} className=" cursor-pointer link">
+    <div className="text-sm">
+      <div onClick={openModal} className="cursor-pointer link">
         Read more ...
       </div>
 
@@ -21,12 +21,14 @@ function ModalWhyUs() {
         className={`${
           isModalOpen ? "flex" : "hidden"
         } fixed top-0 left-0 w-screen h-full bg-neutral-800/80 z-20 justify-center items-center `}
-        onClick={closeModal}>
+        onClick={closeModal}
+      >
         <div
-          className="w-4/5 max-w-[500px] rounded-md bg-neutral-50 p-4 overflow-y-scroll h-3/4  z-30"
-          onClick={(e) => stopPropagation(e)}>
-          <div className=" flex justify-between items-center">
-            <span className="text-primary">Why choose us</span>
+          className="w-4/5 max-w-[500px] rounded-md bg-neutral-50 p-4 overflow-y-scroll h-3/4 z-30"
+          onClick={(e) => stopPropagation(e)}
+        >
+          <div className="flex justify-between items-center">
+            <span className="text-primary">Why Choose Us</span>
             <span className="cursor-pointer navlink">
               <CloseIcon onClick={closeModal} sx={{ fontSize: 30 }} />
             </span>
@@ -35,32 +37,7 @@ function ModalWhyUs() {
           <div className="text-sm">
             <ul>
               <li className="py-2">
-                <span className="font-bold">Affordable services: </span>
-                <span>
-                  our products and services are designed to be affordable for
-                  everyone, so you can get professional mentoring experience,
-                  courses and books without breaking the bank.
-                </span>
-              </li>
-              <li className="py-2">
-                <span className="font-bold">
-                  Professionals with years of experience:{" "}
-                </span>
-                <span>
-                  Our mentors are industry experts who have years of experience
-                  in their fields. They know exactly what you need to succeed.
-                </span>
-              </li>
-              <li className="py-2">
-                <span className="font-bold">Trained mentors: </span>
-                <span>
-                  All of our mentors have undergone adequate training to ensure
-                  they can provide the best mentoring experience while upholding
-                  professional ethics.
-                </span>
-              </li>
-              <li className="py-2">
-                <span className="font-bold">Multiple available mentors: </span>
+                <span className="font-bold">Authentic Islamic Education: </span>
                 <span>
                   You are not limited to just few mentors. You have access to
                   variety of mentors from different parts of the world.
@@ -122,9 +99,8 @@ function ModalWhyUs() {
               <li className="py-2">
                 <span className="font-bold">Confidential: </span>
                 <span>
-                  We value confidentiality and data protection. Thus, a number
-                  of measures have been put in place to protect the information
-                  of both the mentors and mentees.
+                  Our teachers and staff are committed to providing a welcoming and encouraging
+                  atmosphere for all students.
                 </span>
               </li>
             </ul>

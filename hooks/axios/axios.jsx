@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiLink = "https://yrms-api.onrender.com/api";
+const apiLink = "https://ihsaanlms.onrender.com/api";
 let authToken = null;
 
 const http = axios.create({

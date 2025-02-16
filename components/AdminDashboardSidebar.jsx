@@ -4,6 +4,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { DASHBOARD_LIST } from "@/constants";
 import { userRole } from "@/utils/redux/slices/auth.reducer";
 import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
 function AdminDashboardSidebar({
   isSidebarOpen,
@@ -11,14 +12,21 @@ function AdminDashboardSidebar({
   openSubMenuIndex,
   currentRoute,
 }) {
-  const roles = useSelector(userRole);
-  const isAdmin = roles.includes("admin");
-  const isSuperAdmin = roles.includes("super admin");
+  const [roles, setRoles] = useState([]);
+  useEffect(() => {
+    const userRole = localStorage.getItem("roles");
+    const user = userRole ? JSON.parse(userRole) : null;
+    setRoles(user);
+  }, []);
+
+  // const roles = localStorage.getItem("roles");
+  const isAdmin = roles.includes("ADMIN");
+  const isSuperAdmin = roles.includes("SUPERADMIN");
+  const roles2 = useSelector(userRole);
 
   const filteredDashboardList = DASHBOARD_LIST.admin.filter(
     (item) => !(isAdmin && item.name === "Account Manager")
   );
-
   return (
     <section
       className={`${!isSidebarOpen && "w-0"} ${

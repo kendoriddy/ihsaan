@@ -14,6 +14,7 @@ import { Formik, Form } from "formik";
 import { newsLetterSchema } from "./validationSchemas/ValidationSchema";
 import FormikControl from "./validation/FormikControl";
 import AuthButton from "./AuthButton";
+
 function Footer() {
   const footerDate = () => {
     const date = new Date();
@@ -44,10 +45,8 @@ function Footer() {
   };
 
   return (
-    <div className="text-[13px] bg-neutral-100 px-6">
-      {/* top */}
-      <div className="flex  flex-col md:flex-row justify-evenly py-6 gap-4">
-        {/* Left */}
+    <div className="text-[13px] bg-[#7e1a0b] text-white px-6 py-6">
+      <div className="flex flex-col md:flex-row justify-evenly py-6 gap-4">
         <div className="flex-1">
           <div className="text-lg font-bold py-3">Your Right Mentor </div>
           <div>
@@ -179,16 +178,11 @@ function Footer() {
           <h3 className="text-lg font-bold py-3">
             Subscribe to our Newsletter
           </h3>
-
-          <p className="max-w-[500px] ">
-            Get actionable tips, insights and opportunities around the world to
-            help you achieve your goals - delivered straight to your inbox
-            weekly (For all: Students, Working Class, Entrepreneurs, Investors,
-            Parents, Others.)
+          <p>
+            Get updates on new courses, events, and learning resources directly
+            to your inbox.
           </p>
-          {/* Form */}
-
-          <div className="py-3 w-full max-w-[500px] ">
+          <div className="py-3 w-full max-w-[500px]">
             <Formik
               initialValues={initialValues}
               onSubmit={handleSubmit}
@@ -196,19 +190,41 @@ function Footer() {
             >
               <Form>
                 <div className="flex flex-col gap-2">
-                  <div>
-                    <FormikControl
-                      placeholder={"kindly include a valid email"}
-                      name={"email"}
-                    />
-                  </div>
-                  <div>
-                    <AuthButton
-                      text={"subscribe"}
-                      disabled={isLoading}
-                      isLoading={isLoading}
-                    />
-                  </div>
+                  <FormikControl
+                    placeholder="Enter your email"
+                    name="email"
+                    className="text-white"
+                    sx={{
+                      "& .MuiOutlinedInput-input": {
+                        color: "#ffffff", // Change text color inside input
+                        fontWeight: "bold",
+                        padding: "12px", // Adjust padding
+                      },
+                      "& .MuiInputLabel-root.Mui-error": {
+                        color: "#ff6600", // Your custom error color
+                        fontWeight: "bold",
+                      },
+                      "& .MuiOutlinedInput-root.Mui-error": {
+                        borderColor: "#ff6600", // Change input border on error
+                      },
+                      "& .MuiInputLabel-root": {
+                        color: "#ffffff", // Change label color
+                        fontSize: "1rem",
+                        fontWeight: "bold",
+                      },
+                      "& .MuiInputLabel-root.Mui-focused": {
+                        color: "#ffffff", // Change color on focus
+                      },
+                      "& .Mui-error": {
+                        color: "red", // Error state color
+                      },
+                    }}
+                  />
+                  <AuthButton
+                    text="Subscribe"
+                    disabled={isLoading}
+                    isLoading={isLoading}
+                  />
                 </div>
               </Form>
             </Formik>
@@ -217,7 +233,7 @@ function Footer() {
       </div>
 
       <div className="max-w-[700px] m-auto">
-        <Divider />
+        <Divider className="bg-[#ff6600]" />
       </div>
 
       {/* Bottom */}
@@ -229,8 +245,9 @@ function Footer() {
           <Link href={"/privacy-policy"} className="link">
             Privacy Policy
           </Link>{" "}
-          |{" "}
-          <Link href={"/terms-of-service"} className="link">
+          |
+          <Link href="/terms-of-service" className="hover:text-[#ff6600]">
+            {" "}
             Terms & Conditions
           </Link>
         </div>
