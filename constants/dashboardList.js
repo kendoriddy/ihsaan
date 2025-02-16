@@ -68,11 +68,14 @@ const DASHBOARD_LIST = {
     { id: 2, name: "Account Manager", path: "/admin/account-manager" },
     {
       id: 3,
+<<<<<<< HEAD
       name: "Tutor Application",
       path: "/admin/tutor",
     },
     {
       id: 3,
+=======
+>>>>>>> 18fd2aa (initial)
       name: "Mentor",
       path: "/admin/mentor",
     },

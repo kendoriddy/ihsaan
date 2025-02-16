@@ -24,7 +24,13 @@ function Page() {
   const fetchData = async () => {
     try {
       setIsLoading(true);
+<<<<<<< HEAD
       const blogResponse = await fetch("https://yrms-api.onrender.com/api/blogs");
+=======
+      const blogResponse = await fetch(
+        "https://yrms-api.onrender.com/api/blogs"
+      );
+>>>>>>> 18fd2aa (initial)
       const blog = await blogResponse.json();
       setBlog(blog);
     } catch (error) {
@@ -52,7 +58,11 @@ function Page() {
 
             <div className="flex flex-wrap justify-center gap-6 flex-col md:flex-row items-center ">
               {/* POSTS */}
+<<<<<<< HEAD
               {blog?.results?.slice(blogpostIdx[0], blogpostIdx[1]).map((post) => {
+=======
+              {blog?.slice(blogpostIdx[0], blogpostIdx[1]).map((post) => {
+>>>>>>> 18fd2aa (initial)
                 return (
                   <Link
                     key={post?.id}
@@ -72,9 +82,18 @@ function Page() {
                       />
                     </div>
                     <div className="px-2 py-2 text-sm">
+<<<<<<< HEAD
                       <div className="uppercase text-gray-700">{post?.category}</div>
                       <div className="capitalize font-bold text-neutral-800 py-2 text-xl h-[72px]">
                         {post?.title.slice(0, 40)} {post?.title.length > 40 ? "..." : ""}
+=======
+                      <div className="uppercase text-gray-700">
+                        {post?.category}
+                      </div>
+                      <div className="capitalize font-bold text-neutral-800 py-2 text-xl h-[72px]">
+                        {post?.title.slice(0, 40)}{" "}
+                        {post?.title.length > 40 ? "..." : ""}
+>>>>>>> 18fd2aa (initial)
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -85,11 +104,24 @@ function Page() {
                             height={30}
                             className="rounded-full"
                           />
+<<<<<<< HEAD
                           <div className="text-primary text-xs">{post?.author}</div>
                         </div>
                         <div className="flex items-center gap-1">
                           <div>
                             <DateRangeIcon className="text-gray-400 " sx={{ fontSize: 18 }} />
+=======
+                          <div className="text-primary text-xs">
+                            {post?.author}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div>
+                            <DateRangeIcon
+                              className="text-gray-400 "
+                              sx={{ fontSize: 18 }}
+                            />
+>>>>>>> 18fd2aa (initial)
                           </div>
                           <div className="text-gray-500 text-xs">
                             {formatDate(post?.created_at)}

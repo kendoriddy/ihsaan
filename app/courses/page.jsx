@@ -64,8 +64,12 @@ export default function Courses() {
         <Header />
         <main
           className="min-h-[500px] flex flex-col  align-start
+<<<<<<< HEAD
           p-[30px] md:flex-row gap-2 "
         >
+=======
+          p-[30px] md:flex-row gap-2 ">
+>>>>>>> 18fd2aa (initial)
           <section className="flex flex-col lg:flex-row md:w-[300px] lg:w-[360px] h-[195px]">
             <div className="flex-col flex border  lg:w-[333px] p-6 justify-center gap-2">
               <h4 className="text-lg">Filter by Field</h4>
@@ -74,8 +78,12 @@ export default function Courses() {
                   action=""
                   method="post"
                   onSubmit={(e) => handleSubmit(e)}
+<<<<<<< HEAD
                   className="flex-col"
                 >
+=======
+                  className="flex-col">
+>>>>>>> 18fd2aa (initial)
                   <input
                     type="text"
                     className="w-full border border-inherit-400 h-[40px] bg-white-500 outline-none box-border shadow p-2"
@@ -103,8 +111,12 @@ export default function Courses() {
                   <div
                     className="flex flex-col lg:flex-row lg:justify-between border lg:h-[193px] gap-2 p-2 mb-2
                   w-full items-center"
+<<<<<<< HEAD
                     key={course.id}
                   >
+=======
+                    key={course.id}>
+>>>>>>> 18fd2aa (initial)
                     <div className="flex flex-col lg:flex-row gap-3">
                       <div>
                         <Image
@@ -119,7 +131,11 @@ export default function Courses() {
                       </div>
                       <div className="flex flex-col gap-2">
                         <div className="text-lg capitalize">{course.title}</div>
+<<<<<<< HEAD
                         <div className="text-slate-500">IHSAAN ACADEMIA</div>
+=======
+                        <div className="text-slate-500">Your Right Mentors</div>
+>>>>>>> 18fd2aa (initial)
                         <div>
                           {[1, 2, 3, 4, 5].map((index) => (
                             <span key={index}>
@@ -136,8 +152,12 @@ export default function Courses() {
                         <div className="flex lg:w-full">
                           <Link
                             href={`courses/${course.id}`}
+<<<<<<< HEAD
                             className="w-full"
                           >
+=======
+                            className="w-full">
+>>>>>>> 18fd2aa (initial)
                             <button className="bg-blue-500 h-10 p-2 text-white rounded w-full">
                               DETAILS
                             </button>

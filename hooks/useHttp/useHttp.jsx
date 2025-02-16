@@ -62,6 +62,7 @@ export const useDelete = (url, options) => {
 };
 
 export const usePut = (url, options) => {
+<<<<<<< HEAD
   const { mutate, isLoading } = useMutation(async ({ id, data }) => {
     try {
       const response = await http.put(`${url}/${id}`, data);
@@ -70,6 +71,12 @@ export const usePut = (url, options) => {
       throw error; // Ensure error is thrown
     }
   }, options);
+=======
+  const { mutate, isLoading } = useMutation(
+    ({ id, data }) => http.put(`${url}/${id}`, data),
+    options
+  );
+>>>>>>> 18fd2aa (initial)
   return {
     mutate,
     isLoading,

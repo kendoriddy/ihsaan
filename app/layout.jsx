@@ -6,8 +6,13 @@ import Provider from "./provider";
 import Toastify from "@/components/Toastify";
 
 export const metadata = {
+<<<<<<< HEAD
   title: "IHSAAN ACADEMIA",
   description: "IHSAAN ACADEMIA",
+=======
+  title: "Your Right Mentors",
+  description: "Your Right Mentors",
+>>>>>>> 18fd2aa (initial)
 };
 
 export default function RootLayout({ children }) {

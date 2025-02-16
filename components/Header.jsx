@@ -9,10 +9,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { IMAGES } from "@/constants";
 import Image from "next/image";
 import { useSelector } from "react-redux";
+<<<<<<< HEAD
 import {
   selectIsAuth,
   currentlyLoggedInUser,
 } from "../utils/redux/slices/auth.reducer";
+=======
+import { selectIsAuth, currentlyLoggedInUser } from "@/utils/redux/slices/auth.reducer";
+>>>>>>> 18fd2aa (initial)
 import { logoutUser } from "@/utils/redux/slices/auth.reducer";
 import { useDispatch } from "react-redux";
 import Modal from "./validation/Modal";
@@ -36,15 +40,22 @@ function Header() {
     isLoading,
     refetch,
   } = useFetch("authUser", `/auth/logged-in-user/`);
+<<<<<<< HEAD
   const authenticatedUsersPayload =
     getAuthUserInformation && getAuthUserInformation?.data;
+=======
+  const authenticatedUsersPayload = getAuthUserInformation && getAuthUserInformation?.data;
+>>>>>>> 18fd2aa (initial)
   const isAuth = useSelector(selectIsAuth);
   const signedInUserName = useSelector(currentlyLoggedInUser);
   const dispatch = useDispatch();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState(null);
+<<<<<<< HEAD
   const [userType, setUserType] = useState(null);
+=======
+>>>>>>> 18fd2aa (initial)
   const [showPassword, setShowPassword] = useState(true);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -54,6 +65,7 @@ function Header() {
   const intialValues = {
     first_name: signedInUserName || "",
     last_name: authenticatedUsersPayload?.last_name || "",
+<<<<<<< HEAD
     email: authenticatedUsersPayload?.email || "",
     password: "",
     confirm_password: "",
@@ -81,28 +93,61 @@ function Header() {
     setIsMobileHeaderOpen(!isMobileHeaderOpen);
   };
 
+=======
+    middle_name: authenticatedUsersPayload?.middle_name || "",
+    password: "",
+    confirm_password: "",
+    email: authenticatedUsersPayload?.email || "",
+    mentorship_areas: authenticatedUsersPayload?.mentorship_areas || "",
+    years_of_experience: authenticatedUsersPayload?.years_of_experience || "",
+    country: authenticatedUsersPayload?.country || "",
+    about_me: authenticatedUsersPayload?.about_me || "",
+    additional_informations: authenticatedUsersPayload?.additional_information || "",
+    skills: authenticatedUsersPayload?.skill || "",
+    qualifications: authenticatedUsersPayload?.qualification || "",
+    religion: authenticatedUsersPayload?.religion || "",
+    marital_status: authenticatedUsersPayload?.marital_status || "",
+    date_of_birth: authenticatedUsersPayload?.date_of_birth || "",
+    gender: authenticatedUsersPayload?.gender || "",
+    picture: authenticatedUsersPayload?.picture || "",
+    menteeGender: authenticatedUsersPayload?.menteeGender || "",
+  };
+  const toggleMobileHeader = () => {
+    setIsMobileHeaderOpen(!isMobileHeaderOpen);
+  };
+>>>>>>> 18fd2aa (initial)
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
         setIsMobileHeaderOpen(false);
       }
     };
+<<<<<<< HEAD
 
+=======
+>>>>>>> 18fd2aa (initial)
     window.addEventListener("resize", handleResize);
     // Cleanup event listener on component unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+<<<<<<< HEAD
 
   const handleOpenModal = (mode) => {
     setOpen(true);
   };
 
+=======
+  const handleOpenModal = (mode) => {
+    setOpen(true);
+  };
+>>>>>>> 18fd2aa (initial)
   const handleCloseModal = () => {
     setOpen(false);
     router.push("/dashboard");
   };
+<<<<<<< HEAD
 
   const { mutate: createNewaccounts, isLoading: isCreating } = usePost(
     "/auth/register",
@@ -120,10 +165,26 @@ function Header() {
       },
     }
   );
+=======
+  const { mutate: createNewaccounts, isLoading: isUpdating } = usePost("/auth/register", {
+    onSuccess: () => {
+      toast.success(
+        "Registration successful. Please verify your email by clicking the link sent to your mail."
+      );
+      queryClient.invalidateQueries("authUser");
+      handleCloseModal();
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error("error occured, please try again later");
+    },
+  });
+>>>>>>> 18fd2aa (initial)
   const handleSubmit = (values) => {
     const {
       first_name,
       last_name,
+<<<<<<< HEAD
       email,
       password,
       confirm_password,
@@ -167,14 +228,66 @@ function Header() {
     createNewaccounts(payload);
   };
   console.log(type, "oooo");
+=======
+      middle_name,
+      email,
+      password,
+      confirm_password,
+      mentorship_areas,
+      years_of_experience,
+      country,
+      about_me,
+      additional_informations,
+      skills,
+      qualifications,
+      marital_status,
+      religion,
+      date_of_birth,
+      gender,
+      picture,
+      menteeGender,
+    } = values;
+    const payload = {
+      roles: type === "mentor" ? ["user", "mentor"] : ["user", "counsellor"],
+      first_name: first_name,
+      last_name: last_name,
+      middle_name: middle_name,
+      email: email,
+      password: password,
+      confirm_password: confirm_password,
+      date_joined: authenticatedUsersPayload?.date_joined,
+      newsletter_subscribed: authenticatedUsersPayload?.newsletter_subscribed,
+      mentorship_areas: mentorship_areas,
+      years_of_experience: years_of_experience,
+      country: country,
+      about_me: about_me,
+      availability: true,
+      additional_information: additional_informations,
+      skill: skills,
+      qualification: qualifications,
+      marital_status: marital_status,
+      religion: religion,
+      date_of_birth: date_of_birth,
+      gender: gender,
+      picture: picture,
+      menteeGender: menteeGender,
+    };
+    createNewaccounts(payload);
+  };
+>>>>>>> 18fd2aa (initial)
   const logOut = () => {
     dispatch(logoutUser());
     router.push("/login");
   };
+<<<<<<< HEAD
 
   const isUserMentor = authenticatedUsersPayload?.roles?.includes("mentor");
   const isUserCouncellor =
     authenticatedUsersPayload?.roles?.includes("counsellor");
+=======
+  const isUserMentor = authenticatedUsersPayload?.roles?.includes("mentor");
+  const isUserCouncellor = authenticatedUsersPayload?.roles?.includes("counsellor");
+>>>>>>> 18fd2aa (initial)
   const isUserBoth = ["mentor", "counsellor"].every((role) =>
     authenticatedUsersPayload?.roles?.includes(role)
   );
@@ -182,10 +295,14 @@ function Header() {
     return { key: country, value: country.toLowerCase().replace(/\s+/g, "-") };
   });
   const qualificationsList = allPossibleQualifications.map((qualification) => {
+<<<<<<< HEAD
     return {
       key: qualification,
       value: qualification.toLowerCase().replace(/\s+/g, "-"),
     };
+=======
+    return { key: qualification, value: qualification.toLowerCase().replace(/\s+/g, "-") };
+>>>>>>> 18fd2aa (initial)
   });
   // Create an array of numbers from 1 to 100
   const yearsOfExperienceOptions = Array.from({ length: 100 }, (_, i) => ({
@@ -212,18 +329,27 @@ function Header() {
     { key: "Married", value: "married" },
     { key: "Others", value: "others" },
   ];
+<<<<<<< HEAD
 
+=======
+>>>>>>> 18fd2aa (initial)
   useEffect(() => {
     refetch();
   }, [createNewaccounts]);
   return (
+<<<<<<< HEAD
     <header className="sticky top-0 text-sm z-20 bg-white py-3 px-2 md:px-24 max-w-[100vw]">
       <div className="flex justify-between items-center py-2 px-0 sm:px-4">
+=======
+    <header className="sticky top-0 text-sm z-20 bg-white py-3 max-w-[100vw] shadow-md">
+      <div className="flex justify-between items-center py-2 px-4  ">
+>>>>>>> 18fd2aa (initial)
         {/* Logo */}
         <div className="text-lg font-bold">
           <div>
             <Link href="/" className="flex items-center gap-2 text-xl">
               <Image src={IMAGES.icon} alt="logo" width={50} height={50} />
+<<<<<<< HEAD
               <div>IHSAAN ACADEMIA</div>
             </Link>
           </div>
@@ -231,27 +357,43 @@ function Header() {
         <div className="ml-1 md:ml-[50px]">
           <p>Learning Islam Made Easy</p>
         </div>
+=======
+              <div>Your Right Mentors</div>
+            </Link>
+          </div>
+        </div>
+>>>>>>> 18fd2aa (initial)
         {/* Desktop menu */}
         <div className="hidden lg:flex-1 lg:flex justify-end">
           <ul className="flex gap-2 items-center text-[15px] font-bold">
             <li>
+<<<<<<< HEAD
               <Link
                 href="/"
                 className={` navlink ${currentRoute == "/" && "text-primary"}`}
               >
                 Home
+=======
+              <Link href="/" className={` navlink ${currentRoute == "/" && "text-primary"}`}>
+                Home2
+>>>>>>> 18fd2aa (initial)
               </Link>
             </li>
             <li>
               <Link
                 href="/about"
+<<<<<<< HEAD
                 className={` navlink ${
                   currentRoute.includes("/about") && "text-primary"
                 }`}
+=======
+                className={` navlink ${currentRoute.includes("/about") && "text-primary"}`}
+>>>>>>> 18fd2aa (initial)
               >
                 Why us
               </Link>
             </li>
+<<<<<<< HEAD
             <div className="relative text-slate-50 rounded group cursor-pointer">
               <h3 className="text-[15px] font-bold text-black">
                 Qur&apos;an Tutors
@@ -302,29 +444,103 @@ function Header() {
               </div>
             </div>
 
+=======
+            <li>
+              <Link
+                href="/mentors"
+                className={` navlink ${currentRoute.includes("/mentors") && "text-primary"}`}
+              >
+                Mentors
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/counsellors"
+                className={` navlink ${currentRoute.includes("/counsellors") && "text-primary"}`}
+              >
+                Counselors
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/courses"
+                className={` navlink ${currentRoute.includes("/courses") && "text-primary"}`}
+              >
+                Courses
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/books"
+                className={` navlink ${currentRoute.includes("/books") && "text-primary"}`}
+              >
+                Books
+              </Link>
+            </li>
+>>>>>>> 18fd2aa (initial)
             {isAuth && (
               <li>
                 <Link
                   href="/dashboard"
+<<<<<<< HEAD
                   className={` navlink ${
                     currentRoute.includes("/dashboard") && "text-primary"
                   }`}
+=======
+                  className={` navlink ${currentRoute.includes("/dashboard") && "text-primary"}`}
+>>>>>>> 18fd2aa (initial)
                 >
                   Dashboard
                 </Link>
               </li>
             )}
 
+<<<<<<< HEAD
             <li>
               <Link
                 href="/blog"
                 className={` navlink ${
                   currentRoute.includes("/blog") && "text-primary"
                 }`}
+=======
+            {/* Show when logged in */}
+            {/* {!isAuth && (
+              <li>
+                <Link
+                  href="admin/dashboard"
+                  className={` navlink ${
+                    currentRoute.includes("admin/dashboard") && "text-primary"
+                  }`}
+                >
+                  Admin Dashboard
+                </Link>
+              </li>
+            )} */}
+
+            <li>
+              <Link
+                href="/blog"
+                className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
+>>>>>>> 18fd2aa (initial)
               >
                 Blog
               </Link>
             </li>
+<<<<<<< HEAD
+=======
+            {/* {!isAuth && (
+              <li>
+                <Link
+                  href="/admin/login"
+                  className={` navlink ${
+                    currentRoute.includes("/admin") && "text-primary"
+                  }`}
+                >
+                  Admin
+                </Link>
+              </li>
+            )} */}
+>>>>>>> 18fd2aa (initial)
 
             <li>
               <Link href={"/cart"}>
@@ -349,6 +565,7 @@ function Header() {
               )}
             </div>
             {/* Dropdown button */}
+<<<<<<< HEAD
             {isUserBoth ? null : (
               <div className="relative text-slate-50 rounded group cursor-pointer">
                 <div className="bg-primary px-3 py-2 min-w-[200px] text-center">
@@ -365,10 +582,28 @@ function Header() {
                         }}
                       >
                         Become a student
+=======
+
+            {isUserBoth ? null : (
+              <div className="relative text-slate-50 rounded group cursor-pointer">
+                <div className="bg-primary px-3 py-2">Become a mentor/counsellor</div>
+                <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300">
+                  {!isUserMentor && (
+                    <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                      <div
+                        className="block w-full h-full"
+                        onClick={() => {
+                          handleOpenModal("mentor");
+                          setType("mentor");
+                        }}
+                      >
+                        Become a mentor
+>>>>>>> 18fd2aa (initial)
                       </div>
                     </div>
                   )}
                   {!isUserCouncellor && (
+<<<<<<< HEAD
                     <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                       <div
                         className="block w-full h-full"
@@ -378,6 +613,17 @@ function Header() {
                         }}
                       >
                         Become a teacher
+=======
+                    <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                      <div
+                        className="block w-full h-full"
+                        onClick={() => {
+                          handleOpenModal("councellor");
+                          setType("councellor");
+                        }}
+                      >
+                        Become a counsellor
+>>>>>>> 18fd2aa (initial)
                       </div>
                     </div>
                   )}
@@ -387,7 +633,15 @@ function Header() {
 
             {/* MODAL */}
             <Modal
+<<<<<<< HEAD
               title={type === "student" ? "Become a Student" : "Become a Tutor"}
+=======
+              title={
+                type === "mentor"
+                  ? "Become a Mentor on YRM Learning"
+                  : "Become a Councellor on YRM Learning"
+              }
+>>>>>>> 18fd2aa (initial)
               isOpen={open}
               handleClose={() => setOpen(false)}
             >
@@ -402,6 +656,7 @@ function Header() {
                       <Form>
                         <div className="flex flex-col gap-6">
                           <div>
+<<<<<<< HEAD
                             <FormikControl
                               name="first_name"
                               placeholder="First name"
@@ -418,6 +673,18 @@ function Header() {
                               name="email"
                               placeholder="Email address"
                             />
+=======
+                            <FormikControl name="first_name" placeholder="First name" />
+                          </div>
+                          <div>
+                            <FormikControl name="last_name" placeholder="Last name" />
+                          </div>
+                          <div>
+                            <FormikControl name="middle_name" placeholder="Middle name" />
+                          </div>
+                          <div>
+                            <FormikControl name="email" placeholder="Email address" />
+>>>>>>> 18fd2aa (initial)
                           </div>
                           <div>
                             <FormikControl
@@ -432,11 +699,15 @@ function Header() {
                                       onClick={handleClickShowPassword}
                                       onMouseDown={handleMouseDownPassword}
                                     >
+<<<<<<< HEAD
                                       {showPassword ? (
                                         <VisibilityOff />
                                       ) : (
                                         <Visibility />
                                       )}
+=======
+                                      {showPassword ? <VisibilityOff /> : <Visibility />}
+>>>>>>> 18fd2aa (initial)
                                     </IconButton>
                                   </InputAdornment>
                                 ),
@@ -457,27 +728,40 @@ function Header() {
                                       onClick={handleClickShowPassword}
                                       onMouseDown={handleMouseDownPassword}
                                     >
+<<<<<<< HEAD
                                       {showPassword ? (
                                         <VisibilityOff />
                                       ) : (
                                         <Visibility />
                                       )}
+=======
+                                      {showPassword ? <VisibilityOff /> : <Visibility />}
+>>>>>>> 18fd2aa (initial)
                                     </IconButton>
                                   </InputAdornment>
                                 ),
                               }}
                             />
                           </div>
+<<<<<<< HEAD
                           {type === "tutor" && (
                             <div>
                               <FormikControl
                                 name="professional_bio"
                                 placeholder="Enter professional bio"
+=======
+                          {type === "mentor" && (
+                            <div>
+                              <FormikControl
+                                name="mentorship_areas"
+                                placeholder="Enter intrested areas of mentorship with comma seperating each"
+>>>>>>> 18fd2aa (initial)
                                 multiline
                                 minRows={3}
                               />
                             </div>
                           )}
+<<<<<<< HEAD
                           {type === "tutor" && (
                             <div>
                               <div>
@@ -488,14 +772,31 @@ function Header() {
                                   minRows={3}
                                 />
                               </div>
+=======
+                          {type === "councellor" && (
+                            <div>
+                              <FormikControl
+                                name="councelling_areas"
+                                placeholder="Enter intrested areas of councelling with comma seperating each"
+                                multiline
+                                minRows={3}
+                              />
+>>>>>>> 18fd2aa (initial)
                             </div>
                           )}
                           <div>
                             <FormikControl
+<<<<<<< HEAD
                               name="highest_qualification"
                               options={qualificationsList}
                               control={"select"}
                               placeholder="Select your highest qualification"
+=======
+                              name="years_of_experience"
+                              options={yearsOfExperienceOptions}
+                              control={"select"}
+                              placeholder="Total years of experience"
+>>>>>>> 18fd2aa (initial)
                             />
                           </div>
                           <div>
@@ -508,14 +809,45 @@ function Header() {
                           </div>
                           <div>
                             <FormikControl
+<<<<<<< HEAD
                               name="additional_info"
+=======
+                              name="about_me"
+                              placeholder="Discuss about your self professionally(max 250words)"
+                              multiline
+                              minRows={3}
+                              maxLength={250}
+                            />
+                          </div>
+                          <div>
+                            <FormikControl
+                              name="additional_informations"
+>>>>>>> 18fd2aa (initial)
                               placeholder="Other information you will like us to know about(max 250words)"
                               multiline
                               minRows={3}
                               maxLength={250}
                             />
                           </div>
+<<<<<<< HEAD
 
+=======
+                          <div>
+                            <FormikControl
+                              control="tagInput"
+                              name="skills"
+                              placeholder="List skills related to your field"
+                            />
+                          </div>
+                          <div>
+                            <FormikControl
+                              name="qualifications"
+                              options={qualificationsList}
+                              control={"select"}
+                              placeholder="Select your highest qualification"
+                            />
+                          </div>
+>>>>>>> 18fd2aa (initial)
                           <div>
                             <FormikControl
                               name="religion"
@@ -547,21 +879,33 @@ function Header() {
                               placeholder="Input your date of birth"
                             />
                           </div>
+<<<<<<< HEAD
                           {/* <div>
+=======
+                          <div>
+>>>>>>> 18fd2aa (initial)
                             <FormikControl
                               control="imageUpload"
                               name="picture"
                               placeholder="Upload your picture"
                             />
+<<<<<<< HEAD
                           </div> */}
                           <div>
                             <FormikControl
                               name="preferred_mentee_gender"
+=======
+                          </div>
+                          <div>
+                            <FormikControl
+                              name="menteeGender"
+>>>>>>> 18fd2aa (initial)
                               options={menteeGender}
                               control={"select"}
                               placeholder="Which gender of mentee do you prefer?"
                             />
                           </div>
+<<<<<<< HEAD
                           <div>
                             <FormikControl
                               name="mentorship_areas"
@@ -574,12 +918,27 @@ function Header() {
                               placeholder="Concelling areas"
                             />
                           </div>
+=======
+
+                          {/* <div>
+                            <FormikControl
+                              name="availability"
+                              control={"checkbox"}
+                              label="Check box if you are currently available (you can update your availability after registering)"
+                            />
+                          </div> */}
+>>>>>>> 18fd2aa (initial)
 
                           <div className="flex justify-center">
                             <AuthButton
                               text="submit"
+<<<<<<< HEAD
                               isLoading={isCreating}
                               disabled={isCreating}
+=======
+                              isLoading={isUpdating}
+                              disabled={isUpdating}
+>>>>>>> 18fd2aa (initial)
                               onClick={handleSubmit}
                             />
                           </div>
@@ -620,6 +979,26 @@ function Header() {
                       </Link>
                     )}
                   </div>
+<<<<<<< HEAD
+=======
+
+                  {/* Dropdown button */}
+                  <div className="relative text-slate-50 rounded group  cursor-pointer">
+                    <div className="bg-primary px-3 py-2">Become a mentor/counsellor</div>
+                    <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300 ">
+                      <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                        <Link href="/mentors" className="block w-full h-full">
+                          Become a mentor
+                        </Link>
+                      </div>
+                      <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                        <Link href="/counsellors" className="block w-full h-full">
+                          Become a counsellor
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+>>>>>>> 18fd2aa (initial)
                 </ul>
               </div>
               <div className={``}>
@@ -656,6 +1035,7 @@ function Header() {
           </div>
 
           {/* Bottom */}
+<<<<<<< HEAD
           <div className={`lg:hidden overflow-hidden h-screen`}>
             <div className="">
               <ul className="flex flex-col gap-2 px-6 pt-2">
@@ -666,19 +1046,31 @@ function Header() {
                       currentRoute == "/" && "text-primary"
                     }`}
                   >
+=======
+          <div className={`lg:hidden overflow-hidden `}>
+            <div className="">
+              <ul className="flex flex-col gap-2 px-6 pt-2">
+                <li>
+                  <Link href="/" className={` navlink ${currentRoute == "/" && "text-primary"}`}>
+>>>>>>> 18fd2aa (initial)
                     Home
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/about"
+<<<<<<< HEAD
                     className={` navlink ${
                       currentRoute.includes("/about") && "text-primary"
                     }`}
+=======
+                    className={` navlink ${currentRoute.includes("/about") && "text-primary"}`}
+>>>>>>> 18fd2aa (initial)
                   >
                     Why Us
                   </Link>
                 </li>
+<<<<<<< HEAD
 
                 <li>
                   <Link
@@ -686,10 +1078,33 @@ function Header() {
                     className={` navlink ${
                       currentRoute.includes("/courses") && "text-primary"
                     }`}
+=======
+                <li>
+                  <Link
+                    href="/mentors"
+                    className={` navlink ${currentRoute.includes("/mentors") && "text-primary"}`}
+                  >
+                    Mentors
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/counsellors"
+                    className={` navlink ${currentRoute.includes("/counselors") && "text-primary"}`}
+                  >
+                    Counselors
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/courses"
+                    className={` navlink ${currentRoute.includes("/courses") && "text-primary"}`}
+>>>>>>> 18fd2aa (initial)
                   >
                     Courses
                   </Link>
                 </li>
+<<<<<<< HEAD
                 <div className="relative text-slate-50 rounded group cursor-pointer">
                   <h3 className="text-[15px] font-normal text-black">
                     Qur&apos;an Tutors
@@ -723,6 +1138,16 @@ function Header() {
                     )}
                   </div>
                 </div>
+=======
+                <li>
+                  <Link
+                    href="/books"
+                    className={` navlink ${currentRoute.includes("/books") && "text-primary"}`}
+                  >
+                    Books
+                  </Link>
+                </li>
+>>>>>>> 18fd2aa (initial)
                 <li>
                   {isAuth && (
                     <Link
@@ -742,8 +1167,12 @@ function Header() {
                     <Link
                       href="admin/dashboard"
                       className={` navlink ${
+<<<<<<< HEAD
                         currentRoute.includes("admin/dashboard") &&
                         "text-primary"
+=======
+                        currentRoute.includes("admin/dashboard") && "text-primary"
+>>>>>>> 18fd2aa (initial)
                       }`}
                     >
                       Admin Dashboard
@@ -754,9 +1183,13 @@ function Header() {
                 <li>
                   <Link
                     href="/blog"
+<<<<<<< HEAD
                     className={` navlink ${
                       currentRoute.includes("/blog") && "text-primary"
                     }`}
+=======
+                    className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
+>>>>>>> 18fd2aa (initial)
                   >
                     Blog
                   </Link>
@@ -765,14 +1198,19 @@ function Header() {
                   <li>
                     <Link
                       href="/admin/login"
+<<<<<<< HEAD
                       className={` navlink ${
                         currentRoute.includes("/admin") && "text-primary"
                       }`}
+=======
+                      className={` navlink ${currentRoute.includes("/admin") && "text-primary"}`}
+>>>>>>> 18fd2aa (initial)
                     >
                       Admin
                     </Link>
                   </li>
                 )}
+<<<<<<< HEAD
                 <div className="relative text-slate-50 rounded group cursor-pointer">
                   <div className="text-[15px] font-normal text-black">
                     Register
@@ -808,6 +1246,18 @@ function Header() {
                 </div>
 
                 <li>
+=======
+
+                <li>
+                  <Link
+                    href="/cart"
+                    className={` navlink ${currentRoute.includes("/cart") && "text-primary"}`}
+                  >
+                    Cart
+                  </Link>
+                </li>
+                <li>
+>>>>>>> 18fd2aa (initial)
                   {isAuth ? (
                     <div className="navlink" onClick={logOut}>
                       Logout
@@ -818,6 +1268,28 @@ function Header() {
                     </Link>
                   )}
                 </li>
+<<<<<<< HEAD
+=======
+                {/* Dropdown button */}
+                <div className="relative w-full h-[38.5px] rounded-md overflow-hidden hover:h-[116px] transition-all duration-300">
+                  <div
+                    className="absolute top-0 left-0 w-full border text-neutral-50 cursor-pointer 
+                "
+                  >
+                    <div className="bg-primary px-3 py-2">Become a mentor/counsellor</div>
+                    <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                      <Link href="/mentors" className="block w-full h-full">
+                        Become a mentor
+                      </Link>
+                    </div>
+                    <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
+                      <Link href="/counsellors" className="block w-full h-full">
+                        Become a counsellor
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+>>>>>>> 18fd2aa (initial)
               </ul>
             </div>
           </div>

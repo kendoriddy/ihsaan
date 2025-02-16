@@ -33,7 +33,11 @@ const LogIn = () => {
       const { data } = response;
       const roles = data && data?.roles;
 
+<<<<<<< HEAD
       if (roles?.includes("ADMIN") || roles?.includes("SUPERADMIN")) {
+=======
+      if (roles?.includes("admin") || roles?.includes("super admin")) {
+>>>>>>> 18fd2aa (initial)
         dispatch(loginUserSuccess(data));
         router.push("/admin/dashboard");
         toast.success("Logged in successfully");
@@ -89,11 +93,15 @@ const LogIn = () => {
                                     onClick={handleClickShowPassword}
                                     onMouseDown={handleMouseDownPassword}
                                   >
+<<<<<<< HEAD
                                     {showPassword ? (
                                       <VisibilityOff />
                                     ) : (
                                       <Visibility />
                                     )}
+=======
+                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+>>>>>>> 18fd2aa (initial)
                                   </IconButton>
                                 </InputAdornment>
                               ),
