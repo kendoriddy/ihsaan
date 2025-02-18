@@ -18,11 +18,8 @@ import { Skeleton } from "@mui/material";
 import { logoutAfterSixHours } from "@/utils/utilFunctions";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import Loader from "@/components/Loader";
-<<<<<<< HEAD
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-=======
->>>>>>> 18fd2aa (initial)
 
 function Page() {
   const router = useRouter();
@@ -41,7 +38,6 @@ function Page() {
   }, [quotesList]);
 
   const slides = [
-<<<<<<< HEAD
     <div key="1" className="p-0 text-left">
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#7e1a0b]">
         Enroll for fully online self-paced Arabic School and get Certified.
@@ -150,27 +146,6 @@ function Page() {
     },
   ];
 
-=======
-    <span key="1">
-      We mentor from <span className="text-primary"> ZERO </span> or little experience to{" "}
-      <span className="text-primary"> JOB </span> and{" "}
-      <span className="text-primary">PROFESSIONALISM</span>
-    </span>,
-    ,
-    <span key="2">
-      Mentorship is
-      <span className="text-primary"> KEY </span> to unlocking your
-      <span className="text-primary"> POTENTIALS </span> and achieving your
-      <span className="text-primary"> GOALS </span>
-    </span>,
-    <span key="3">
-      The Right
-      <span className="text-primary"> COUNSELLOR </span> will help resolve the concerns between you
-      and your
-      <span className="text-primary"> GOALS </span>
-    </span>,
-  ];
->>>>>>> 18fd2aa (initial)
   var settings = {
     dots: false,
     infinite: true,
@@ -183,13 +158,9 @@ function Page() {
   };
   // Fetch suggested courses
   const fetchSuggestedCourses = async () => {
-<<<<<<< HEAD
     const courseResponse = await fetch(
       `https://yrms-api.onrender.com/api/courses`
     );
-=======
-    const courseResponse = await fetch(`https://yrms-api.onrender.com/api/courses`);
->>>>>>> 18fd2aa (initial)
     const course = await courseResponse.json();
     setSuggestedCourses(course.results);
   };
@@ -197,7 +168,6 @@ function Page() {
   const fetchData = async () => {
     try {
       // Courses
-<<<<<<< HEAD
       const coursesResponse = await fetch(
         "https://yrms-api.onrender.com/api/courses"
       );
@@ -207,13 +177,6 @@ function Page() {
       const FAQsResponse = await fetch(
         "https://yrms-api.onrender.com/api/faqs"
       );
-=======
-      const coursesResponse = await fetch("https://yrms-api.onrender.com/api/courses");
-      const courses = await coursesResponse.json();
-      setCourses(courses.result);
-      // FAQs
-      const FAQsResponse = await fetch("https://yrms-api.onrender.com/api/faqs");
->>>>>>> 18fd2aa (initial)
       const FAQs = await FAQsResponse.json();
       setFAQs(FAQs.results);
     } catch (error) {
@@ -248,7 +211,6 @@ function Page() {
         <Header />
 
         {/* main */}
-<<<<<<< HEAD
         <main className="max-w-full md:max-w-[90%] mx-auto px-2 md:px-6 py-10 overflow-hidden">
           {/* Hero */}
           <section className="flex flex-col lg:flex-row items-center gap-6 px-0 md:px-8 md:pr-0 lg:px-12 py-0 md:py-8">
@@ -266,26 +228,10 @@ function Page() {
                       <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
                         {slide}
                       </h2>
-=======
-        <main className="">
-          {/* Hero */}
-          <section className="flex flex-col lg:flex-row text-sm px-6 py-4 gap-4 items-center w-screen justify-center  max-w-[1500px] mx-auto">
-            {/* Hero left */}
-            <div className="flex-1 text-center lg:text-left w-full">
-              <div
-                className="text-[55px] font-extrabold text-neutral-800 lg:mt-4 w-full lg:max-w-[600px] leading-[32px]"
-                style={{ lineHeight: "1.5" }}
-              >
-                <Slider {...settings}>
-                  {slides.map((slide, index) => (
-                    <div key={index} className="slide">
-                      <h2>{slide}</h2>
->>>>>>> 18fd2aa (initial)
                     </div>
                   ))}
                 </Slider>
               </div>
-<<<<<<< HEAD
 
               <p className="py-2 text-neutral-700 text-sm sm:text-base">
                 A place to strengthen faith and knowledge through quality
@@ -293,18 +239,10 @@ function Page() {
               </p>
 
               {/* Search Bar */}
-=======
-              <div className="py-2 text-neutral-700">
-                The Right COUNSELLOR will help resolve all the concerns that stand between you and
-                your GOALS.
-              </div>
-
->>>>>>> 18fd2aa (initial)
               <div className="py-2">
                 <form
                   action=""
                   method="post"
-<<<<<<< HEAD
                   className="w-full flex flex-col sm:flex-row justify-start items-center gap-2"
                   onSubmit={handleSubmit}
                 >
@@ -313,35 +251,18 @@ function Page() {
                       type="text"
                       placeholder="Search for courses..."
                       className="flex-1 outline-none bg-transparent border-none w-full text-sm sm:text-base"
-=======
-                  className="w-full flex flex-col sm:flex-row justify-center gap-2 relative"
-                  onSubmit={handleSubmit}
-                >
-                  <div className="w-full border border-red-600 rounded-md py-2 px-2">
-                    <input
-                      type="text"
-                      placeholder="Search for mentors, courses, books..."
-                      className="flex-1 outline-none bg-transparent border-none w-full"
->>>>>>> 18fd2aa (initial)
                       ref={searchRef}
                       onChange={handleSearchChange}
                     />
                   </div>
-<<<<<<< HEAD
 
                   {/* Search Suggestions */}
                   <div
                     className={`absolute top-12 left-0 bg-gray-200 rounded z-10 w-[calc(100%)] sm:w-[calc(70%-78px)] 
-=======
-                  <div
-                    className={`absolute top-12 left-0 bg-gray-200 rounded z-10 w-[calc(100%)]
-            sm:w-[calc(100%-78px)] 
->>>>>>> 18fd2aa (initial)
             ${searchVariable.length >= 3 ? "block" : "hidden"}`}
                   >
                     <ul className="w-full">
                       {suggestedCourses?.slice(0, 6).map((course, index) => (
-<<<<<<< HEAD
                         <li
                           key={index}
                           className="py-2 px-2 hover:bg-gray-300 cursor-pointer"
@@ -349,22 +270,14 @@ function Page() {
                           <Link href={`/courses/${course.id}`}>
                             {course.title}
                           </Link>
-=======
-                        <li key={index} className="py-2 px-2 hover:bg-gray-300 cursor-pointer">
-                          <Link href={`/courses/${course.id}`}>{course.title}</Link>
->>>>>>> 18fd2aa (initial)
                         </li>
                       ))}
                       <li className="py-2 px-2">
                         Can't find what you are looking for?{" "}
-<<<<<<< HEAD
                         <Link
                           href="/courses"
                           className="text-blue-600 underline"
                         >
-=======
-                        <Link href="/courses" className="link">
->>>>>>> 18fd2aa (initial)
                           Click here
                         </Link>
                       </li>
@@ -374,7 +287,6 @@ function Page() {
               </div>
             </div>
 
-<<<<<<< HEAD
             {/* Hero Right - Image */}
             <div className="flex-1 flex justify-center pr-4">
               <Image
@@ -611,78 +523,6 @@ function Page() {
               <p className="text-sm text-gray-600">
                 Our courses are consistently updated with information that can
                 help you.
-=======
-            {/* Hero right */}
-            <div className="flex-1 ">
-              <Image src={IMAGES.banner1} width={500} height={500} alt="Your-right-mentors" />
-            </div>
-          </section>
-
-          {/* Quotes */}
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <>
-              {quotes && (
-                <section className="py-6 px-4">
-                  <div className="text-center text-primary py-3 text-sm">Daily Quote</div>
-                  <div>
-                    <div className="text-center text-2xl font-bold text-neutral-800 flex justify-center">
-                      {quotes?.content || (
-                        <Skeleton animation="wave" width={500} height={60} className="block" />
-                      )}
-                    </div>
-                    <div className="text-center text-sm text-neutral-700 py-4 flex justify-center">
-                      {quotes?.quote_author || (
-                        <Skeleton animation="wave" width={200} height={30} className="block" />
-                      )}
-                    </div>
-                  </div>
-                </section>
-              )}
-            </>
-          )}
-
-          {/* Intro video */}
-          <section className="py-4">
-            <div className="text-center text-primary py-3 text-sm">Intro</div>
-            <VideoModal url={"videos/intro.mp4"} />
-          </section>
-
-          {/* FAQ */}
-          <section className="py-6 flex flex-col justify-center items-center">
-            <div className="text-center text-primary py-3 text-sm">Frequently Asked Questions</div>
-            <div className="w-4/5 max-w-[850px] text-sm">
-              {FAQs && (
-                <>
-                  {FAQs?.map((faq) => {
-                    return (
-                      <Accordion key={faq?.id}>
-                        <AccordionSummary
-                          expandIcon={<ExpandMoreIcon />}
-                          aria-controls="panel1-content"
-                          id="panel1-header"
-                        >
-                          {faq?.title}
-                        </AccordionSummary>
-                        <AccordionDetails>{faq?.content}</AccordionDetails>
-                      </Accordion>
-                    );
-                  })}
-                </>
-              )}
-            </div>
-          </section>
-
-          {/* COURSES */}
-          <section className="py-6 w-full">
-            {/* Top */}
-            <div className="text-center max-w-[500px] m-auto">
-              <p className="uppercase text-primary text-sm">Courses</p>
-              <p className="font-bold text-2xl py-2">Check Out Our Certified Courses</p>
-              <p className="text-sm text-gray-500">
-                Our courses are consistently updated with information that can help you.
->>>>>>> 18fd2aa (initial)
               </p>
             </div>
             {/* Bottom */}
@@ -690,10 +530,7 @@ function Page() {
               {courses && (
                 <>
                   {courses?.slice(0, 6)?.map((course) => {
-<<<<<<< HEAD
                     console.log(course, "coursess");
-=======
->>>>>>> 18fd2aa (initial)
                     return (
                       <Link
                         key={course?.id}
@@ -706,7 +543,6 @@ function Page() {
                             alt={course?.title}
                             width={500}
                             height={300}
-<<<<<<< HEAD
                             className="transition-transform duration-300 group-hover:scale-110"
                           />
                         </div>
@@ -717,15 +553,6 @@ function Page() {
                           <div className="capitalize font-bold  py-2 text-xl h-[72px] ">
                             {course?.title.slice(0, 40)}{" "}
                             {course?.title.length > 40 ? "..." : ""}
-=======
-                            className="group-hover:scale-150 duration-300"
-                          />
-                        </div>
-                        <div className="px-2 py-2 text-sm">
-                          <div className="uppercase text-gray-700">{course?.category}</div>
-                          <div className="capitalize font-bold  py-2 text-xl h-[72px] ">
-                            {course?.title.slice(0, 40)} {course?.title.length > 40 ? "..." : ""}
->>>>>>> 18fd2aa (initial)
                           </div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -736,28 +563,10 @@ function Page() {
                                 height={30}
                                 className="rounded-full"
                               />
-<<<<<<< HEAD
                               <div className="text-primary text-xs">
                                 {course?.instructor_name}
                               </div>
                             </div>
-=======
-                              <div className="text-primary text-xs">{course?.instructor_name}</div>
-                            </div>
-                            {/* Date */}
-                            {/* <div className="flex items-center gap-1">
-                          <div>
-                            <DateRangeIcon
-                              className="text-gray-400 "
-                              sx={{ fontSize: 18 }}
-                            />
-                          </div>
-                          <div className="text-gray-500 text-xs">
-                            
-                            {formatDate(post.created_at)}
-                          </div>
-                        </div> */}
->>>>>>> 18fd2aa (initial)
                           </div>
                         </div>
                       </Link>

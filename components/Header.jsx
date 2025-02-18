@@ -9,14 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { IMAGES } from "@/constants";
 import Image from "next/image";
 import { useSelector } from "react-redux";
-<<<<<<< HEAD
-import {
-  selectIsAuth,
-  currentlyLoggedInUser,
-} from "../utils/redux/slices/auth.reducer";
-=======
 import { selectIsAuth, currentlyLoggedInUser } from "@/utils/redux/slices/auth.reducer";
->>>>>>> 18fd2aa (initial)
 import { logoutUser } from "@/utils/redux/slices/auth.reducer";
 import { useDispatch } from "react-redux";
 import Modal from "./validation/Modal";
@@ -40,22 +33,13 @@ function Header() {
     isLoading,
     refetch,
   } = useFetch("authUser", `/auth/logged-in-user/`);
-<<<<<<< HEAD
-  const authenticatedUsersPayload =
-    getAuthUserInformation && getAuthUserInformation?.data;
-=======
   const authenticatedUsersPayload = getAuthUserInformation && getAuthUserInformation?.data;
->>>>>>> 18fd2aa (initial)
   const isAuth = useSelector(selectIsAuth);
   const signedInUserName = useSelector(currentlyLoggedInUser);
   const dispatch = useDispatch();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState(null);
-<<<<<<< HEAD
-  const [userType, setUserType] = useState(null);
-=======
->>>>>>> 18fd2aa (initial)
   const [showPassword, setShowPassword] = useState(true);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -65,35 +49,6 @@ function Header() {
   const intialValues = {
     first_name: signedInUserName || "",
     last_name: authenticatedUsersPayload?.last_name || "",
-<<<<<<< HEAD
-    email: authenticatedUsersPayload?.email || "",
-    password: "",
-    confirm_password: "",
-    role: authenticatedUsersPayload?.role || [],
-    country: authenticatedUsersPayload?.country || "",
-    professional_bio: authenticatedUsersPayload?.professional_bio || "",
-    additional_info: authenticatedUsersPayload?.additional_info || "",
-    skills: authenticatedUsersPayload?.skills || "",
-    highest_qualification:
-      authenticatedUsersPayload?.highest_qualification || "",
-    religion: authenticatedUsersPayload?.religion || "",
-    gender: authenticatedUsersPayload?.gender || "",
-    marital_status: authenticatedUsersPayload?.marital_status || "",
-    date_of_birth: authenticatedUsersPayload?.date_of_birth || "",
-    preferred_mentee_gender:
-      authenticatedUsersPayload?.preferred_mentee_gender || "",
-    mentorship_areas: authenticatedUsersPayload?.mentorship_areas || "",
-    councelling_areas: authenticatedUsersPayload?.councelling_areas || "",
-    student_application_status:
-      authenticatedUsersPayload?.student_application_status || "",
-    is_active: authenticatedUsersPayload?.is_active || "",
-  };
-
-  const toggleMobileHeader = () => {
-    setIsMobileHeaderOpen(!isMobileHeaderOpen);
-  };
-
-=======
     middle_name: authenticatedUsersPayload?.middle_name || "",
     password: "",
     confirm_password: "",
@@ -115,57 +70,25 @@ function Header() {
   const toggleMobileHeader = () => {
     setIsMobileHeaderOpen(!isMobileHeaderOpen);
   };
->>>>>>> 18fd2aa (initial)
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
         setIsMobileHeaderOpen(false);
       }
     };
-<<<<<<< HEAD
-
-=======
->>>>>>> 18fd2aa (initial)
     window.addEventListener("resize", handleResize);
     // Cleanup event listener on component unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-<<<<<<< HEAD
-
   const handleOpenModal = (mode) => {
     setOpen(true);
   };
-
-=======
-  const handleOpenModal = (mode) => {
-    setOpen(true);
-  };
->>>>>>> 18fd2aa (initial)
   const handleCloseModal = () => {
     setOpen(false);
     router.push("/dashboard");
   };
-<<<<<<< HEAD
-
-  const { mutate: createNewaccounts, isLoading: isCreating } = usePost(
-    "/auth/register",
-    {
-      onSuccess: () => {
-        toast.success(
-          "Registration successful. Please verify your email by clicking the link sent to your mail."
-        );
-        queryClient.invalidateQueries("authUser");
-        handleCloseModal();
-      },
-      onError: (error) => {
-        console.log(error);
-        toast.error("error occured, please try again later");
-      },
-    }
-  );
-=======
   const { mutate: createNewaccounts, isLoading: isUpdating } = usePost("/auth/register", {
     onSuccess: () => {
       toast.success(
@@ -179,56 +102,10 @@ function Header() {
       toast.error("error occured, please try again later");
     },
   });
->>>>>>> 18fd2aa (initial)
   const handleSubmit = (values) => {
     const {
       first_name,
       last_name,
-<<<<<<< HEAD
-      email,
-      password,
-      confirm_password,
-      country,
-      professional_bio,
-      additional_info,
-      skills,
-      highest_qualification,
-      religion,
-      gender,
-      marital_status,
-      date_of_birth,
-      preferred_mentee_gender,
-      councelling_areas,
-      mentorship_areas,
-      student_application_status,
-    } = values;
-    const payload = {
-      first_name: first_name,
-      last_name: last_name,
-      email: email,
-      password: password,
-      confirm_password: confirm_password,
-      roles: type === "student" ? ["USER", "STUDENT"] : ["USER", "TUTOR"],
-      country: country,
-      professional_bio: professional_bio,
-      skills: skills,
-      highest_qualification: highest_qualification,
-      additional_info: additional_info,
-      religion: religion,
-      gender: gender,
-      marital_status: marital_status,
-      date_of_birth: date_of_birth,
-      preferred_mentee_gender: preferred_mentee_gender,
-      mentorship_areas: mentorship_areas,
-      councelling_areas: councelling_areas,
-      tutor_application_status: "PENDING",
-      student_application_status: "PENDING",
-      is_active: true,
-    };
-    createNewaccounts(payload);
-  };
-  console.log(type, "oooo");
-=======
       middle_name,
       email,
       password,
@@ -274,20 +151,12 @@ function Header() {
     };
     createNewaccounts(payload);
   };
->>>>>>> 18fd2aa (initial)
   const logOut = () => {
     dispatch(logoutUser());
     router.push("/login");
   };
-<<<<<<< HEAD
-
-  const isUserMentor = authenticatedUsersPayload?.roles?.includes("mentor");
-  const isUserCouncellor =
-    authenticatedUsersPayload?.roles?.includes("counsellor");
-=======
   const isUserMentor = authenticatedUsersPayload?.roles?.includes("mentor");
   const isUserCouncellor = authenticatedUsersPayload?.roles?.includes("counsellor");
->>>>>>> 18fd2aa (initial)
   const isUserBoth = ["mentor", "counsellor"].every((role) =>
     authenticatedUsersPayload?.roles?.includes(role)
   );
@@ -295,14 +164,7 @@ function Header() {
     return { key: country, value: country.toLowerCase().replace(/\s+/g, "-") };
   });
   const qualificationsList = allPossibleQualifications.map((qualification) => {
-<<<<<<< HEAD
-    return {
-      key: qualification,
-      value: qualification.toLowerCase().replace(/\s+/g, "-"),
-    };
-=======
     return { key: qualification, value: qualification.toLowerCase().replace(/\s+/g, "-") };
->>>>>>> 18fd2aa (initial)
   });
   // Create an array of numbers from 1 to 100
   const yearsOfExperienceOptions = Array.from({ length: 100 }, (_, i) => ({
@@ -329,127 +191,37 @@ function Header() {
     { key: "Married", value: "married" },
     { key: "Others", value: "others" },
   ];
-<<<<<<< HEAD
-
-=======
->>>>>>> 18fd2aa (initial)
   useEffect(() => {
     refetch();
   }, [createNewaccounts]);
   return (
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <header className="sticky top-0 text-sm z-20 bg-white py-3 px-2 md:px-24 max-w-[100vw]">
-      <div className="flex justify-between items-center py-2 px-0 sm:px-4">
-=======
-    <header className="sticky top-0 text-sm z-20 bg-white py-3 max-w-[100vw] shadow-md">
-      <div className="flex justify-between items-center py-2 px-4  ">
->>>>>>> 18fd2aa (initial)
-=======
     <header className="fixed top-0 left-0 w-full text-sm z-50 bg-white py-3 shadow-md">
   <div className="flex justify-between items-center py-2 px-4">
->>>>>>> f632bce (Saving local changes before merge)
         {/* Logo */}
         <div className="text-lg font-bold">
           <div>
             <Link href="/" className="flex items-center gap-2 text-xl">
               <Image src={IMAGES.icon} alt="logo" width={50} height={50} />
-<<<<<<< HEAD
-              <div>IHSAAN ACADEMIA</div>
-            </Link>
-          </div>
-        </div>
-        <div className="ml-1 md:ml-[50px]">
-          <p>Learning Islam Made Easy</p>
-        </div>
-=======
               <div>Your Right Mentors</div>
             </Link>
           </div>
         </div>
->>>>>>> 18fd2aa (initial)
         {/* Desktop menu */}
         <div className="hidden lg:flex-1 lg:flex justify-end">
           <ul className="flex gap-2 items-center text-[15px] font-bold">
             <li>
-<<<<<<< HEAD
-              <Link
-                href="/"
-                className={` navlink ${currentRoute == "/" && "text-primary"}`}
-              >
-                Home
-=======
               <Link href="/" className={` navlink ${currentRoute == "/" && "text-primary"}`}>
                 Home2
->>>>>>> 18fd2aa (initial)
               </Link>
             </li>
             <li>
               <Link
                 href="/about"
-<<<<<<< HEAD
-                className={` navlink ${
-                  currentRoute.includes("/about") && "text-primary"
-                }`}
-=======
                 className={` navlink ${currentRoute.includes("/about") && "text-primary"}`}
->>>>>>> 18fd2aa (initial)
               >
                 Why us
               </Link>
             </li>
-<<<<<<< HEAD
-            <div className="relative text-slate-50 rounded group cursor-pointer">
-              <h3 className="text-[15px] font-bold text-black">
-                Qur&apos;an Tutors
-              </h3>
-              <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
-                {!isUserMentor && (
-                  <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                    <div
-                      className="block w-full h-full"
-                      onClick={() => {
-                        handleOpenModal("pick tutor");
-                        setType("pick tutor");
-                      }}
-                    >
-                      Pick a Qur'an Tutor
-                    </div>
-                  </div>
-                )}
-                {!isUserCouncellor && (
-                  <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                    <div
-                      className="block w-full h-full"
-                      onClick={() => {
-                        handleOpenModal("become tutor");
-                        setType("become tutor");
-                      }}
-                    >
-                      Become a Qur'an Tutor
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="relative text-slate-50 rounded group cursor-pointer">
-              <h3 className="text-[15px] font-bold text-black">Courses</h3>
-              <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
-                <div className="bg-slate-500 px-1 py-2 hover:bg-primary transition-all duration-300">
-                  <Link href="/courses" className="block w-full h-full">
-                    Take a Course
-                  </Link>
-                </div>
-                <div className="bg-slate-500 px-1 py-2 hover:bg-primary transition-all duration-300">
-                  <Link href="/courses" className="block w-full h-full">
-                    Upload and Sell a Course
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-=======
             <li>
               <Link
                 href="/mentors"
@@ -482,32 +254,17 @@ function Header() {
                 Books
               </Link>
             </li>
->>>>>>> 18fd2aa (initial)
             {isAuth && (
               <li>
                 <Link
                   href="/dashboard"
-<<<<<<< HEAD
-                  className={` navlink ${
-                    currentRoute.includes("/dashboard") && "text-primary"
-                  }`}
-=======
                   className={` navlink ${currentRoute.includes("/dashboard") && "text-primary"}`}
->>>>>>> 18fd2aa (initial)
                 >
                   Dashboard
                 </Link>
               </li>
             )}
 
-<<<<<<< HEAD
-            <li>
-              <Link
-                href="/blog"
-                className={` navlink ${
-                  currentRoute.includes("/blog") && "text-primary"
-                }`}
-=======
             {/* Show when logged in */}
             {/* {!isAuth && (
               <li>
@@ -524,20 +281,12 @@ function Header() {
 
             <li>
               <Link
-<<<<<<< HEAD
-                href="/blog"
-                className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
->>>>>>> 18fd2aa (initial)
-=======
                 href="/quiz"
                 className={` navlink ${currentRoute.includes("/quiz") && "text-primary"}`}
->>>>>>> f632bce (Saving local changes before merge)
               >
                 Blog
               </Link>
             </li>
-<<<<<<< HEAD
-=======
             {/* {!isAuth && (
               <li>
                 <Link
@@ -550,7 +299,6 @@ function Header() {
                 </Link>
               </li>
             )} */}
->>>>>>> 18fd2aa (initial)
 
             <li>
               <Link href={"/cart"}>
@@ -575,24 +323,6 @@ function Header() {
               )}
             </div>
             {/* Dropdown button */}
-<<<<<<< HEAD
-            {isUserBoth ? null : (
-              <div className="relative text-slate-50 rounded group cursor-pointer">
-                <div className="bg-primary px-3 py-2 min-w-[200px] text-center">
-                  Register
-                </div>
-                <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300">
-                  {!isUserMentor && (
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                      <div
-                        className="block w-full h-full"
-                        onClick={() => {
-                          handleOpenModal("student");
-                          setType("student");
-                        }}
-                      >
-                        Become a student
-=======
 
             {isUserBoth ? null : (
               <div className="relative text-slate-50 rounded group cursor-pointer">
@@ -608,22 +338,10 @@ function Header() {
                         }}
                       >
                         Become a mentor
->>>>>>> 18fd2aa (initial)
                       </div>
                     </div>
                   )}
                   {!isUserCouncellor && (
-<<<<<<< HEAD
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                      <div
-                        className="block w-full h-full"
-                        onClick={() => {
-                          handleOpenModal("teacher");
-                          setType("teacher");
-                        }}
-                      >
-                        Become a teacher
-=======
                     <div className="bg-slate-500 px-3 py-2 hover:bg-blue-600 transition-all duration-300">
                       <div
                         className="block w-full h-full"
@@ -633,7 +351,6 @@ function Header() {
                         }}
                       >
                         Become a counsellor
->>>>>>> 18fd2aa (initial)
                       </div>
                     </div>
                   )}
@@ -643,15 +360,11 @@ function Header() {
 
             {/* MODAL */}
             <Modal
-<<<<<<< HEAD
-              title={type === "student" ? "Become a Student" : "Become a Tutor"}
-=======
               title={
                 type === "mentor"
                   ? "Become a Mentor on YRM Learning"
                   : "Become a Councellor on YRM Learning"
               }
->>>>>>> 18fd2aa (initial)
               isOpen={open}
               handleClose={() => setOpen(false)}
             >
@@ -666,24 +379,6 @@ function Header() {
                       <Form>
                         <div className="flex flex-col gap-6">
                           <div>
-<<<<<<< HEAD
-                            <FormikControl
-                              name="first_name"
-                              placeholder="First name"
-                            />
-                          </div>
-                          <div>
-                            <FormikControl
-                              name="last_name"
-                              placeholder="Last name"
-                            />
-                          </div>
-                          <div>
-                            <FormikControl
-                              name="email"
-                              placeholder="Email address"
-                            />
-=======
                             <FormikControl name="first_name" placeholder="First name" />
                           </div>
                           <div>
@@ -694,7 +389,6 @@ function Header() {
                           </div>
                           <div>
                             <FormikControl name="email" placeholder="Email address" />
->>>>>>> 18fd2aa (initial)
                           </div>
                           <div>
                             <FormikControl
@@ -709,15 +403,7 @@ function Header() {
                                       onClick={handleClickShowPassword}
                                       onMouseDown={handleMouseDownPassword}
                                     >
-<<<<<<< HEAD
-                                      {showPassword ? (
-                                        <VisibilityOff />
-                                      ) : (
-                                        <Visibility />
-                                      )}
-=======
                                       {showPassword ? <VisibilityOff /> : <Visibility />}
->>>>>>> 18fd2aa (initial)
                                     </IconButton>
                                   </InputAdornment>
                                 ),
@@ -738,51 +424,23 @@ function Header() {
                                       onClick={handleClickShowPassword}
                                       onMouseDown={handleMouseDownPassword}
                                     >
-<<<<<<< HEAD
-                                      {showPassword ? (
-                                        <VisibilityOff />
-                                      ) : (
-                                        <Visibility />
-                                      )}
-=======
                                       {showPassword ? <VisibilityOff /> : <Visibility />}
->>>>>>> 18fd2aa (initial)
                                     </IconButton>
                                   </InputAdornment>
                                 ),
                               }}
                             />
                           </div>
-<<<<<<< HEAD
-                          {type === "tutor" && (
-                            <div>
-                              <FormikControl
-                                name="professional_bio"
-                                placeholder="Enter professional bio"
-=======
                           {type === "mentor" && (
                             <div>
                               <FormikControl
                                 name="mentorship_areas"
                                 placeholder="Enter intrested areas of mentorship with comma seperating each"
->>>>>>> 18fd2aa (initial)
                                 multiline
                                 minRows={3}
                               />
                             </div>
                           )}
-<<<<<<< HEAD
-                          {type === "tutor" && (
-                            <div>
-                              <div>
-                                <FormikControl
-                                  name="additional_info"
-                                  placeholder="List skills related to your field, with comma seperating each"
-                                  multiline
-                                  minRows={3}
-                                />
-                              </div>
-=======
                           {type === "councellor" && (
                             <div>
                               <FormikControl
@@ -791,22 +449,14 @@ function Header() {
                                 multiline
                                 minRows={3}
                               />
->>>>>>> 18fd2aa (initial)
                             </div>
                           )}
                           <div>
                             <FormikControl
-<<<<<<< HEAD
-                              name="highest_qualification"
-                              options={qualificationsList}
-                              control={"select"}
-                              placeholder="Select your highest qualification"
-=======
                               name="years_of_experience"
                               options={yearsOfExperienceOptions}
                               control={"select"}
                               placeholder="Total years of experience"
->>>>>>> 18fd2aa (initial)
                             />
                           </div>
                           <div>
@@ -819,9 +469,6 @@ function Header() {
                           </div>
                           <div>
                             <FormikControl
-<<<<<<< HEAD
-                              name="additional_info"
-=======
                               name="about_me"
                               placeholder="Discuss about your self professionally(max 250words)"
                               multiline
@@ -832,16 +479,12 @@ function Header() {
                           <div>
                             <FormikControl
                               name="additional_informations"
->>>>>>> 18fd2aa (initial)
                               placeholder="Other information you will like us to know about(max 250words)"
                               multiline
                               minRows={3}
                               maxLength={250}
                             />
                           </div>
-<<<<<<< HEAD
-
-=======
                           <div>
                             <FormikControl
                               control="tagInput"
@@ -857,7 +500,6 @@ function Header() {
                               placeholder="Select your highest qualification"
                             />
                           </div>
->>>>>>> 18fd2aa (initial)
                           <div>
                             <FormikControl
                               name="religion"
@@ -889,46 +531,21 @@ function Header() {
                               placeholder="Input your date of birth"
                             />
                           </div>
-<<<<<<< HEAD
-                          {/* <div>
-=======
                           <div>
->>>>>>> 18fd2aa (initial)
                             <FormikControl
                               control="imageUpload"
                               name="picture"
                               placeholder="Upload your picture"
                             />
-<<<<<<< HEAD
-                          </div> */}
-                          <div>
-                            <FormikControl
-                              name="preferred_mentee_gender"
-=======
                           </div>
                           <div>
                             <FormikControl
                               name="menteeGender"
->>>>>>> 18fd2aa (initial)
                               options={menteeGender}
                               control={"select"}
                               placeholder="Which gender of mentee do you prefer?"
                             />
                           </div>
-<<<<<<< HEAD
-                          <div>
-                            <FormikControl
-                              name="mentorship_areas"
-                              placeholder="Mentorship areas"
-                            />
-                          </div>
-                          <div>
-                            <FormikControl
-                              name="councelling_areas"
-                              placeholder="Concelling areas"
-                            />
-                          </div>
-=======
 
                           {/* <div>
                             <FormikControl
@@ -937,18 +554,12 @@ function Header() {
                               label="Check box if you are currently available (you can update your availability after registering)"
                             />
                           </div> */}
->>>>>>> 18fd2aa (initial)
 
                           <div className="flex justify-center">
                             <AuthButton
                               text="submit"
-<<<<<<< HEAD
-                              isLoading={isCreating}
-                              disabled={isCreating}
-=======
                               isLoading={isUpdating}
                               disabled={isUpdating}
->>>>>>> 18fd2aa (initial)
                               onClick={handleSubmit}
                             />
                           </div>
@@ -989,8 +600,6 @@ function Header() {
                       </Link>
                     )}
                   </div>
-<<<<<<< HEAD
-=======
 
                   {/* Dropdown button */}
                   <div className="relative text-slate-50 rounded group  cursor-pointer">
@@ -1008,7 +617,6 @@ function Header() {
                       </div>
                     </div>
                   </div>
->>>>>>> 18fd2aa (initial)
                 </ul>
               </div>
               <div className={``}>
@@ -1045,50 +653,22 @@ function Header() {
           </div>
 
           {/* Bottom */}
-<<<<<<< HEAD
-          <div className={`lg:hidden overflow-hidden h-screen`}>
-            <div className="">
-              <ul className="flex flex-col gap-2 px-6 pt-2">
-                <li>
-                  <Link
-                    href="/"
-                    className={` navlink ${
-                      currentRoute == "/" && "text-primary"
-                    }`}
-                  >
-=======
           <div className={`lg:hidden overflow-hidden `}>
             <div className="">
               <ul className="flex flex-col gap-2 px-6 pt-2">
                 <li>
                   <Link href="/" className={` navlink ${currentRoute == "/" && "text-primary"}`}>
->>>>>>> 18fd2aa (initial)
                     Home
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/about"
-<<<<<<< HEAD
-                    className={` navlink ${
-                      currentRoute.includes("/about") && "text-primary"
-                    }`}
-=======
                     className={` navlink ${currentRoute.includes("/about") && "text-primary"}`}
->>>>>>> 18fd2aa (initial)
                   >
                     Why Us
                   </Link>
                 </li>
-<<<<<<< HEAD
-
-                <li>
-                  <Link
-                    href="/courses"
-                    className={` navlink ${
-                      currentRoute.includes("/courses") && "text-primary"
-                    }`}
-=======
                 <li>
                   <Link
                     href="/mentors"
@@ -1109,46 +689,10 @@ function Header() {
                   <Link
                     href="/courses"
                     className={` navlink ${currentRoute.includes("/courses") && "text-primary"}`}
->>>>>>> 18fd2aa (initial)
                   >
                     Courses
                   </Link>
                 </li>
-<<<<<<< HEAD
-                <div className="relative text-slate-50 rounded group cursor-pointer">
-                  <h3 className="text-[15px] font-normal text-black">
-                    Qur&apos;an Tutors
-                  </h3>
-                  <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
-                    {!isUserMentor && (
-                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                        <div
-                          className="block w-full h-full"
-                          onClick={() => {
-                            handleOpenModal("student");
-                            setType("student");
-                          }}
-                        >
-                          Pick a Qur'an Tutor
-                        </div>
-                      </div>
-                    )}
-                    {!isUserCouncellor && (
-                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                        <div
-                          className="block w-full h-full"
-                          onClick={() => {
-                            handleOpenModal("tutor");
-                            setType("tutor");
-                          }}
-                        >
-                          Become a Qur'an Tutor
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-=======
                 <li>
                   <Link
                     href="/books"
@@ -1157,7 +701,6 @@ function Header() {
                     Books
                   </Link>
                 </li>
->>>>>>> 18fd2aa (initial)
                 <li>
                   {isAuth && (
                     <Link
@@ -1177,12 +720,7 @@ function Header() {
                     <Link
                       href="admin/dashboard"
                       className={` navlink ${
-<<<<<<< HEAD
-                        currentRoute.includes("admin/dashboard") &&
-                        "text-primary"
-=======
                         currentRoute.includes("admin/dashboard") && "text-primary"
->>>>>>> 18fd2aa (initial)
                       }`}
                     >
                       Admin Dashboard
@@ -1192,19 +730,8 @@ function Header() {
 
                 <li>
                   <Link
-<<<<<<< HEAD
-                    href="/blog"
-<<<<<<< HEAD
-                    className={` navlink ${
-                      currentRoute.includes("/blog") && "text-primary"
-                    }`}
-=======
-                    className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
->>>>>>> 18fd2aa (initial)
-=======
                     href="/quiz"
                     className={` navlink ${currentRoute.includes("/quiz") && "text-primary"}`}
->>>>>>> f632bce (Saving local changes before merge)
                   >
                     Blog
                   </Link>
@@ -1213,55 +740,12 @@ function Header() {
                   <li>
                     <Link
                       href="/admin/login"
-<<<<<<< HEAD
-                      className={` navlink ${
-                        currentRoute.includes("/admin") && "text-primary"
-                      }`}
-=======
                       className={` navlink ${currentRoute.includes("/admin") && "text-primary"}`}
->>>>>>> 18fd2aa (initial)
                     >
                       Admin
                     </Link>
                   </li>
                 )}
-<<<<<<< HEAD
-                <div className="relative text-slate-50 rounded group cursor-pointer">
-                  <div className="text-[15px] font-normal text-black">
-                    Register
-                  </div>
-                  <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300">
-                    {!isUserMentor && (
-                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                        <div
-                          className="block w-full h-full"
-                          onClick={() => {
-                            handleOpenModal("student");
-                            setType("student");
-                          }}
-                        >
-                          Become a student
-                        </div>
-                      </div>
-                    )}
-                    {!isUserCouncellor && (
-                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                        <div
-                          className="block w-full h-full"
-                          onClick={() => {
-                            handleOpenModal("tutor");
-                            setType("tutor");
-                          }}
-                        >
-                          Become a teacher
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <li>
-=======
 
                 <li>
                   <Link
@@ -1272,7 +756,6 @@ function Header() {
                   </Link>
                 </li>
                 <li>
->>>>>>> 18fd2aa (initial)
                   {isAuth ? (
                     <div className="navlink" onClick={logOut}>
                       Logout
@@ -1283,8 +766,6 @@ function Header() {
                     </Link>
                   )}
                 </li>
-<<<<<<< HEAD
-=======
                 {/* Dropdown button */}
                 <div className="relative w-full h-[38.5px] rounded-md overflow-hidden hover:h-[116px] transition-all duration-300">
                   <div
@@ -1304,14 +785,12 @@ function Header() {
                     </div>
                   </div>
                 </div>
->>>>>>> 18fd2aa (initial)
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
+    </ul>
+    </div>
+    </div>
+    </div>
+    </div>
+     </header>
+  )
 
-export default Header;
+}

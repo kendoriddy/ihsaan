@@ -11,26 +11,15 @@
 }
 
 .text-primary {
-<<<<<<< HEAD
   color: rgb(126 26 11);
 }
 .bg-primary {
   background-color: rgb(126 26 11);
-=======
-  color: rgb(243, 65, 3);
-}
-.bg-primary {
-  background-color: rgb(243, 65, 3);
->>>>>>> 18fd2aa (initial)
 }
 
 .link {
   @apply hover:text-red-800 duration-300 cursor-pointer;
-<<<<<<< HEAD
   color: rgb(126 26 11);
-=======
-  color: rgb(243, 65, 3);
->>>>>>> 18fd2aa (initial)
 }
 
 .navlink {
@@ -49,11 +38,7 @@ input[type="number"] {
 
 .theme-btn {
   @apply text-white px-3 py-2 rounded cursor-pointer hover:bg-blue-600 transition-all duration-300;
-<<<<<<< HEAD
   background-color: rgb(126 26 11);
-=======
-  background-color: rgb(243, 65, 3);
->>>>>>> 18fd2aa (initial)
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -67,7 +52,6 @@ input[type="number"] {
   scrollbar-width: none; /* Firefox */
 }
 
-<<<<<<< HEAD
 .custom-arrow {
   color: #7e1a0b !important;
   position: absolute;
@@ -102,8 +86,6 @@ input[type="number"] {
   opacity: 1 !important; /* Ensure visibility */
 }
 
-=======
->>>>>>> 18fd2aa (initial)
 /* Buuton CSS */
 .ripple {
   position: absolute;
@@ -137,26 +119,17 @@ input[type="number"] {
  */
 
 .tilt-in-fwd-bl {
-<<<<<<< HEAD
   -webkit-animation: tilt-in-fwd-bl 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)
     both;
-=======
-  -webkit-animation: tilt-in-fwd-bl 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
->>>>>>> 18fd2aa (initial)
   animation: tilt-in-fwd-bl 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 @-webkit-keyframes tilt-in-fwd-bl {
   0% {
-<<<<<<< HEAD
     -webkit-transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px)
       skew(-35deg, 10deg);
     transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px)
       skew(-35deg, 10deg);
-=======
-    -webkit-transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px) skew(-35deg, 10deg);
-    transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px) skew(-35deg, 10deg);
->>>>>>> 18fd2aa (initial)
     opacity: 0;
   }
   100% {
@@ -167,15 +140,10 @@ input[type="number"] {
 }
 @keyframes tilt-in-fwd-bl {
   0% {
-<<<<<<< HEAD
     -webkit-transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px)
       skew(-35deg, 10deg);
     transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px)
       skew(-35deg, 10deg);
-=======
-    -webkit-transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px) skew(-35deg, 10deg);
-    transform: rotateY(-20deg) rotateX(-35deg) translate(-300px, 300px) skew(-35deg, 10deg);
->>>>>>> 18fd2aa (initial)
     opacity: 0;
   }
   100% {
@@ -184,15 +152,10 @@ input[type="number"] {
     opacity: 1;
   }
 }
-<<<<<<< HEAD
-=======
 
 .sec{
   transition:all 1s ease-in-out;
 }
-<<<<<<< HEAD
->>>>>>> 18fd2aa (initial)
-=======
 
 .loading{
  
@@ -234,4 +197,3 @@ input[type="number"] {
   scroll-snap-type: mandatory;
   overflow-y: scroll;
 }
->>>>>>> f632bce (Saving local changes before merge)
