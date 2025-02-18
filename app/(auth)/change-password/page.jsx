@@ -23,7 +23,7 @@ function Page() {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  const { mutate, isLoading } = usePost("api/auth/login", {
+  const { mutate, isLoading } = usePost("/api/auth/login", {
     onSuccess: (response) => {
       console.log(response);
       const { data } = response;

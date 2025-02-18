@@ -338,12 +338,17 @@ function Header() {
   }, [createNewaccounts]);
   return (
 <<<<<<< HEAD
+<<<<<<< HEAD
     <header className="sticky top-0 text-sm z-20 bg-white py-3 px-2 md:px-24 max-w-[100vw]">
       <div className="flex justify-between items-center py-2 px-0 sm:px-4">
 =======
     <header className="sticky top-0 text-sm z-20 bg-white py-3 max-w-[100vw] shadow-md">
       <div className="flex justify-between items-center py-2 px-4  ">
 >>>>>>> 18fd2aa (initial)
+=======
+    <header className="fixed top-0 left-0 w-full text-sm z-50 bg-white py-3 shadow-md">
+  <div className="flex justify-between items-center py-2 px-4">
+>>>>>>> f632bce (Saving local changes before merge)
         {/* Logo */}
         <div className="text-lg font-bold">
           <div>
@@ -519,9 +524,14 @@ function Header() {
 
             <li>
               <Link
+<<<<<<< HEAD
                 href="/blog"
                 className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
 >>>>>>> 18fd2aa (initial)
+=======
+                href="/quiz"
+                className={` navlink ${currentRoute.includes("/quiz") && "text-primary"}`}
+>>>>>>> f632bce (Saving local changes before merge)
               >
                 Blog
               </Link>
@@ -1182,6 +1192,7 @@ function Header() {
 
                 <li>
                   <Link
+<<<<<<< HEAD
                     href="/blog"
 <<<<<<< HEAD
                     className={` navlink ${
@@ -1190,6 +1201,10 @@ function Header() {
 =======
                     className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
 >>>>>>> 18fd2aa (initial)
+=======
+                    href="/quiz"
+                    className={` navlink ${currentRoute.includes("/quiz") && "text-primary"}`}
+>>>>>>> f632bce (Saving local changes before merge)
                   >
                     Blog
                   </Link>

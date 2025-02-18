@@ -29,7 +29,7 @@ const LogIn = () => {
     password: "",
   };
 
-  const { mutate, isLoading } = usePost("/auth/login", {
+  const { mutate, isLoading } = usePost("/api/auth/login", {
     onSuccess: (response) => {
       const { data } = response;
       console.log(data, "data sent");

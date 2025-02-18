@@ -1,10 +1,14 @@
 import axios from "axios";
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 const apiLink = "https://ihsaanlms.onrender.com/api";
 =======
 const apiLink = "https://yrms-api.onrender.com/api";
 >>>>>>> 18fd2aa (initial)
+=======
+const apiLink = "https://ihsaanlms.onrender.com/";
+>>>>>>> f632bce (Saving local changes before merge)
 let authToken = null;
 
 const http = axios.create({
@@ -35,7 +39,7 @@ if (typeof window !== "undefined") {
   // Function to refresh token using refresh token
   async function refreshToken() {
     try {
-      const response = await axios.post(`${apiLink}/auth/token/refresh`, {
+      const response = await axios.post(`${apiLink}/api/auth/token/refresh`, {
         refresh: localStorage.getItem("refresh-token"),
       });
       const newToken = response.data.token;

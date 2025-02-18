@@ -1,17 +1,17 @@
 "use client";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import { MENTORS } from "@/constants";
+import Footer from "../../../components/Footer";
+import Header from "../../../components/Header";
+import { MENTORS } from "../../../constants";
 import { usePathname } from "next/navigation";
 import GroupsIcon from "@mui/icons-material/Groups";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import DashboardSidebar from "@/components/DashboardSidebar";
+import DashboardSidebar from "../../../components/DashboardSidebar";
 import WavingHandIcon from "@mui/icons-material/WavingHand";
 import { useSelector } from "react-redux";
-import { currentlyLoggedInUser } from "@/utils/redux/slices/auth.reducer";
-import RequireAuth from "@/app/lib/ReuquireAuth";
-import UserDashTab from "@/components/dashboard-components/UserDashTab";
+import { currentlyLoggedInUser } from "../../../utils/redux/slices/auth.reducer"
+import RequireAuth from "../../../app/lib/ReuquireAuth";
+import UserDashTab from "../../../components/dashboard-components/UserDashTab";
 function Page() {
   const currentRoute = usePathname();
   const user = useSelector(currentlyLoggedInUser);

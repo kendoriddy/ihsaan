@@ -27,7 +27,7 @@ function Page() {
     password: "",
     confirm_password: "",
   };
-  const { mutate, isLoading } = usePost("/auth/password-reset-confirm/", {
+  const { mutate, isLoading } = usePost("/api/auth/password-reset-confirm/", {
     onSuccess: (response) => {
       console.log(response);
       const { data } = response;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import http from "../../../hooks/axios/axios";
 
 export default function CreateQuestion ()  {
   const [question, setQuestion] = useState({
@@ -12,6 +13,7 @@ export default function CreateQuestion ()  {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState(null)
 
   const handleChange = (e) => {
     setQuestion({ ...question, [e.target.name]: e.target.value });
@@ -28,18 +30,23 @@ export default function CreateQuestion ()  {
     setLoading(true);
     setMessage("");
 
+    const optionsObject = {
+      A: question.options[0],
+      B: question.options[1],
+      C: question.options[2],
+      D: question.options[3],
+    };
     try {
-      const response = await fetch("https://ihsaanlms.onrender.com/assessment/mcquestions/", {
-        method: "POST",
+      const response = await http.post("/assessment/mcquestions/", JSON.stringify({
+        ...question,
+        options: optionsObject, // Convert array to JSON string
+      }), {
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...question,
-          options: JSON.stringify(question.options), // Convert array to JSON string
-        }),
       });
 
-      if (!response.ok) throw new Error("Failed to create question");
-
+      if (!response.ok) {
+        setError("Failed to create question");
+}
       setMessage("Question created successfully!");
       setQuestion({ course: "", question_text: "", options: ["", "", "", ""], correct_answer: "" });
     } catch (error) {
@@ -50,9 +57,9 @@ export default function CreateQuestion ()  {
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto bg-white shadow-md rounded-lg">
+    <div className="p-6 max-w-lg mx-auto my-10 bg-white shadow-md rounded-lg">
       <h2 className="text-xl font-bold mb-4">Create Question</h2>
-      {message && <p className="mb-2 text-green-600">{message}</p>}
+      {message && <p className="mb-2 text-green-600 text-center">{message}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -99,9 +106,10 @@ export default function CreateQuestion ()  {
         <button
           type="submit"
           className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded hover:bg-blue-700"
-          disabled={loading}
+          disabled={!question.course || !question.correct_answer || !question.options || !question.question_text}
         >
-          {loading ? "Creating..." : "Create Question"}
+          {loading ? <p className="loading"></p> : "Create Question"}
+          
         </button>
       </form>
     </div>
