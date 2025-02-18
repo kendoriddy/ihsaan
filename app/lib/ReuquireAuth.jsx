@@ -3,8 +3,8 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
-import { selectIsAuth } from "@/utils/redux/slices/auth.reducer";
-import Loader from "@/components/Loader";
+import { selectIsAuth } from "../../utils/redux/slices/auth.reducer";
+import Loader from "../../components/Loader";
 import path from "path";
 
 const authenticatedRoutes = ["/dashboard"];

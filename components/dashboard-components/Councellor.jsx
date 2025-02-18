@@ -1,5 +1,5 @@
 import { Task } from "@mui/icons-material";
-import { COUNSELLORS } from "@/constants";
+import { COUNSELLORS } from "../../constants";
 import { useRouter } from "next/navigation";
 
 const Councellor = () => {

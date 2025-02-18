@@ -11,7 +11,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  return (
+  return  (
     <ReduxProvider>
       <ThemeProvider theme={muiTheme}>
         <html lang="en">

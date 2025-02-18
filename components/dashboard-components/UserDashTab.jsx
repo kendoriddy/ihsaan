@@ -1,5 +1,5 @@
 import { Grid, Typography } from "@mui/material";
-import CustomizedTab from "@/components/Tabs";
+import CustomizedTab from "../../components/Tabs";
 import { lazy, LazyExoticComponent, FC } from "react";
 const Mentor = lazy(() => import("./MentorTab"));
 const Mentee = lazy(() => import("./MenteeTab"));

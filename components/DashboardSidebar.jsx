@@ -3,7 +3,7 @@
 import { DASHBOARD_LIST, MENTORS } from "@/constants";
 import Rating from "@mui/material/Rating";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ProfileCompletionRate from "@/components/ProfileCompletionRate";
+import ProfileCompletionRate from '../components/ProfileCompletionRate'
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
@@ -43,7 +43,7 @@ function DashboardSidebar({ currentRoute }) {
       </div>
 
       <div
-        className={`absolute top-0 left-0 min-h-screen h-full w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out z-40 py-4 rounded-r-lg ${
+        className={`absolute top-0 left-0  w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out z-40 py-4 rounded-r-lg ${
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}>
         {/* Left Top */}
@@ -77,10 +77,10 @@ function DashboardSidebar({ currentRoute }) {
 
         {/* Left list */}
         <div>
-          <ul className="px-4">
+          <ul className="px-4 text-white">
             {DASHBOARD_LIST.mentor.map((item) => (
-              <li key={item.id}>
-                {item.name === "Logout" ? (
+              <li key={item.id} className="text-white">
+                {item.name === <p className="text-white">Logout</p> ? (
                   <div
                     onClick={handleLogout}
                     className={`flex items-center justify-between pl-2 py-2 cursor-pointer transition-all duration-300 rounded ${
@@ -90,10 +90,10 @@ function DashboardSidebar({ currentRoute }) {
                       "hover:bg-gray-100 hover:pr-3 text-black"
                     }`}>
                     <div className="flex items-center">
-                      <item.icon className="mr-2" />
+                      <item.icon className="mr-2 text-white" />
                       <span>{item.name}</span>
                     </div>
-                    <div>
+                    <div className="text-white">
                       <ChevronRightIcon />
                     </div>
                   </div>

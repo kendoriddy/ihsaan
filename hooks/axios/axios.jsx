@@ -31,7 +31,7 @@ if (typeof window !== "undefined") {
   // Function to refresh token using refresh token
   async function refreshToken() {
     try {
-      const response = await axios.post(`${apiLink}/auth/token/refresh`, {
+      const response = await axios.post(`${apiLink}/api/auth/token/refresh`, {
         refresh: localStorage.getItem("refresh-token"),
       });
       const newToken = response.data.token;

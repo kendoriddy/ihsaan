@@ -38,7 +38,7 @@ function Page() {
     "VISITOR",
   ];
 
-  const { mutate, isLoading } = usePost("/auth/register", {
+  const { mutate, isLoading } = usePost("/api/auth/register", {
     onSuccess: (response) => {
       toast.info(
         "Registration successful. Please verify your email by clicking the link sent to your mail."

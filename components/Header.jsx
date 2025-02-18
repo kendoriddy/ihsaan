@@ -214,8 +214,8 @@ function Header() {
     refetch();
   }, [createNewaccounts]);
   return (
-    <header className="sticky top-0 text-sm z-20 bg-white py-3 px-2 md:px-24 max-w-[100vw]">
-      <div className="flex justify-between items-center py-2 px-0 sm:px-4">
+    <header className="sticky top-0 text-sm z-20 bg-white py-3 max-w-[100vw] shadow-md">
+      <div className="flex justify-between items-center py-2 px-4  ">
         {/* Logo */}
         <div className="text-lg font-bold">
           <div>
@@ -328,14 +328,26 @@ function Header() {
 
             <li>
               <Link
+
                 href="/blog"
-                className={` navlink ${
-                  currentRoute.includes("/blog") && "text-primary"
-                }`}
+                className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
+
               >
                 Blog
               </Link>
             </li>
+            {/* {!isAuth && (
+              <li>
+                <Link
+                  href="/admin/login"
+                  className={` navlink ${
+                    currentRoute.includes("/admin") && "text-primary"
+                  }`}
+                >
+                  Admin
+                </Link>
+              </li>
+            )} */}
 
             <li>
               <Link href={"/cart"}>
@@ -754,10 +766,7 @@ function Header() {
 
                 <li>
                   <Link
-                    href="/blog"
-                    className={` navlink ${
-                      currentRoute.includes("/blog") && "text-primary"
-                    }`}
+                    className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
                   >
                     Blog
                   </Link>

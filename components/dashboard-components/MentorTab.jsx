@@ -1,4 +1,4 @@
-import { MENTORS } from "@/constants";
+import { MENTORS } from "../../constants";
 import { Task } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 
