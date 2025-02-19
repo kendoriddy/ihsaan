@@ -40,7 +40,7 @@ const DASHBOARD_LIST = {
       id: 5,
       name: "Assignment",
       icon: IntegrationInstructionsIcon,
-      path: "/assigment",
+      path: "/assignment",
     },
     {
       id: 6,
@@ -91,7 +91,6 @@ const DASHBOARD_LIST = {
     },
     {
       id: 3,
-
       name: "Mentor",
       path: "/admin/mentor",
     },

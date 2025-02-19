@@ -75,14 +75,12 @@ function Header() {
   const toggleMobileHeader = () => {
     setIsMobileHeaderOpen(!isMobileHeaderOpen);
   };
-
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
         setIsMobileHeaderOpen(false);
       }
     };
-
     window.addEventListener("resize", handleResize);
     // Cleanup event listener on component unmount
     return () => {
@@ -209,7 +207,6 @@ function Header() {
     { key: "Married", value: "married" },
     { key: "Others", value: "others" },
   ];
-
   useEffect(() => {
     refetch();
   }, [createNewaccounts]);
@@ -533,7 +530,6 @@ function Header() {
                               maxLength={250}
                             />
                           </div>
-
                           <div>
                             <FormikControl
                               name="religion"
@@ -586,13 +582,13 @@ function Header() {
                               control={"checkbox"}
                               label="Check box if you are currently available (you can update your availability after registering)"
                             />
-                          </div>
+                          </div> 
 
                           <div className="flex justify-center">
                             <AuthButton
                               text="submit"
-                              isLoading={isCreating}
-                              disabled={isCreating}
+                              isLoading={isUpdating}
+                              disabled={isUpdating}
                               onClick={handleSubmit}
                             />
                           </div>
@@ -837,4 +833,3 @@ function Header() {
   );
 }
 
-export default Header;
