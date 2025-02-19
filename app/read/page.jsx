@@ -39,7 +39,7 @@ const QuizInstructions = () => {
   return (
     <div>
       <Header />
-      <div className="flex mt-20">
+      <div className="flex mt-0">
         {/* Sidebar */}
         <div className="w-1/4">
           <DashboardSidebar currentRoute={currentRoute} />

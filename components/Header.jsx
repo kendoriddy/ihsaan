@@ -211,7 +211,7 @@ function Header() {
     refetch();
   }, [createNewaccounts]);
   return (
-    <header className="sticky top-0 text-sm z-20 bg-white py-3 max-w-[100vw] shadow-md">
+    <header className="sticky top-0 text-sm z-20 bg-white py-3 w-full shadow-md">
       <div className="flex justify-between items-center py-2 px-4  ">
         {/* Logo */}
         <div className="text-lg font-bold">

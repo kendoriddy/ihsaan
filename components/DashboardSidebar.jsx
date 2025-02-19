@@ -1,13 +1,13 @@
 "use client";
 
-import { DASHBOARD_LIST, MENTORS } from "@/constants";
+import { DASHBOARD_LIST, MENTORS } from "../constants";
 import Rating from "@mui/material/Rating";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ProfileCompletionRate from '../components/ProfileCompletionRate'
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
-import { logoutUser } from "@/utils/redux/slices/auth.reducer";
+import { logoutUser } from "../utils/redux/slices/auth.reducer";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { FaBars, FaTimes } from "react-icons/fa";
@@ -31,98 +31,96 @@ function DashboardSidebar({ currentRoute }) {
   };
 
   return (
-    <section
-      className="flex relative md:w-64">
-      {/* Mobile Hamburger Menu */}
-      <div className="absolute top-4 left-4 md:hidden z-50">
-        <button
-          onClick={toggleSidebar}
-          className="p-2 focus:outline-none bg-gray-800 text-white rounded-md">
-          {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-        </button>
+    <section className="flex relative -translate-y-14 md:w-64">
+    {/* Mobile Hamburger Menu */}
+    <div className="absolute top-4 left-4 md:hidden z-50">
+      <button
+        onClick={toggleSidebar}
+        className="p-2 focus:outline-none bg-gray-800 text-white rounded-md">
+        {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+      </button>
+    </div>
+  
+    {/* Sidebar positioned below the header */}
+    <div
+      className={`absolute top-[60px] left-0 w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out z-10 py-4 rounded-r-lg ${
+        isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      }`}>
+      
+      {/* Sidebar Content */}
+      <div className="flex flex-col items-center text-center">
+        <div className="w-[100px] h-[100px] relative rounded-full overflow-hidden p-3 shadow-md">
+          <Image
+            src={MENTORS[0].image}
+            alt="mentor"
+            fill
+            className="rounded-full p-1"
+          />
+        </div>
+        <div className="py-2">
+          <Rating
+            name="read-only"
+            value={MENTORS[0].rating}
+            readOnly
+            precision={0.5}
+            size="small"
+          />
+          <div className="text-gray-500">{MENTORS[0].title}</div>
+        </div>
       </div>
-
-      <div
-        className={`absolute top-0 left-0  w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out z-40 py-4 rounded-r-lg ${
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}>
-        {/* Left Top */}
-        <div className="flex flex-col items-center text-center">
-          <div className="w-[100px] h-[100px] relative rounded-full overflow-hidden p-3 shadow-md">
-            <Image
-              src={MENTORS[0].image}
-              alt="mentor"
-              // width={350}
-              // height={350}
-              fill
-              className="rounded-full p-1"
-            />
-          </div>
-          <div className="py-2">
-            <Rating
-              name="read-only"
-              value={MENTORS[0].rating}
-              readOnly
-              precision={0.5}
-              size="small"
-            />
-            <div className="text-gray-500">{MENTORS[0].title}</div>
-          </div>
-        </div>
-
-        {/* Left Middle */}
-        <div className="px-4 py-12">
-          <ProfileCompletionRate />
-        </div>
-
-        {/* Left list */}
-        <div>
-          <ul className="px-4 text-white">
-            {DASHBOARD_LIST.mentor.map((item) => (
-              <li key={item.id} className="text-white">
-                {item.name === <p className="text-white">Logout</p> ? (
+  
+      {/* Profile Completion */}
+      <div className="px-4 py-12">
+        <ProfileCompletionRate />
+      </div>
+  
+      {/* Sidebar Menu */}
+      <div>
+        <ul className="px-4 text-white">
+          {DASHBOARD_LIST.mentor.map((item) => (
+            <li key={item.id} className="text-white">
+              {item.name === "Logout" ? (
+                <div
+                  onClick={handleLogout}
+                  className={`flex items-center justify-between pl-2 py-2 cursor-pointer transition-all duration-300 rounded ${
+                    currentRoute === item.path && "bg-blue-600 text-white"
+                  } ${
+                    currentRoute !== item.path &&
+                    "hover:bg-gray-100 hover:text-black hover:pr-3 text-black"
+                  }`}>
+                  <div className="flex items-center">
+                    <item.icon className="mr-2 text-white" />
+                    <span>{item.name}</span>
+                  </div>
+                  <div className="text-white">
+                    <ChevronRightIcon />
+                  </div>
+                </div>
+              ) : (
+                <Link href={item.path}>
                   <div
-                    onClick={handleLogout}
                     className={`flex items-center justify-between pl-2 py-2 cursor-pointer transition-all duration-300 rounded ${
                       currentRoute === item.path && "bg-blue-600 text-white"
                     } ${
-                      currentRoute !== item.path &&
-                      "hover:bg-gray-100 hover:pr-3 text-black"
+                      currentRoute !== item.path && "hover:bg-gray-100 hover:text-black hover:pr-3"
                     }`}>
                     <div className="flex items-center">
-                      <item.icon className="mr-2 text-white" />
+                      <item.icon className="mr-2" />
                       <span>{item.name}</span>
                     </div>
-                    <div className="text-white">
+                    <div>
                       <ChevronRightIcon />
                     </div>
                   </div>
-                ) : (
-                  <Link href={item.path}>
-                    <div
-                      className={`flex items-center justify-between pl-2 py-2 cursor-pointer transition-all duration-300 rounded ${
-                        currentRoute === item.path && "bg-blue-600 text-white"
-                      } ${
-                        currentRoute !== item.path &&
-                        "hover:bg-gray-100 hover:pr-3"
-                      }`}>
-                      <div className="flex items-center">
-                        <item.icon className="mr-2" />
-                        <span>{item.name}</span>
-                      </div>
-                      <div>
-                        <ChevronRightIcon />
-                      </div>
-                    </div>
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
-    </section>
-  );
+    </div>
+  </section>
+    );
 }
 
 export default DashboardSidebar;
