@@ -8,7 +8,7 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import Divider from "@mui/material/Divider";
-import { usePost } from "@/hooks/useHttp/useHttp";
+import { usePost } from "../hooks/useHttp/useHttp";
 import { toast } from "react-toastify";
 import { Formik, Form } from "formik";
 import { newsLetterSchema } from "./validationSchemas/ValidationSchema";

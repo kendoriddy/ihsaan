@@ -13,15 +13,15 @@ import {
   selectIsAuth,
   currentlyLoggedInUser,
 } from "../utils/redux/slices/auth.reducer";
-import { logoutUser } from "@/utils/redux/slices/auth.reducer";
+import { logoutUser } from "../utils/redux/slices/auth.reducer";
 import { useDispatch } from "react-redux";
 import Modal from "./validation/Modal";
 import { toast } from "react-toastify";
 import FormikControl from "./validation/FormikControl";
 import { Formik, Form } from "formik";
 import AuthButton from "./AuthButton";
-import { countryNames, allPossibleQualifications } from "@/utils/utilFunctions";
-import { useFetch, usePost, useProfileUpdate } from "@/hooks/useHttp/useHttp";
+import { countryNames, allPossibleQualifications } from "../utils/utilFunctions";
+import { useFetch, usePost, useProfileUpdate } from "../hooks/useHttp/useHttp";
 import Loader from "./Loader";
 import { useQueryClient } from "@tanstack/react-query";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -368,6 +368,8 @@ function Header() {
                 </Link>
               )}
             </div>
+   
+   
             {/* Dropdown button */}
             {isUserBoth ? null : (
               <div className="relative text-slate-50 rounded group cursor-pointer">
@@ -761,7 +763,7 @@ function Header() {
                 )}
 
                 <li>
-                  <Link
+                  <Link href='/blog'
                     className={` navlink ${currentRoute.includes("/blog") && "text-primary"}`}
                   >
                     Blog
@@ -833,3 +835,4 @@ function Header() {
   );
 }
 
+export default Header 

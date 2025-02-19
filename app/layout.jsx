@@ -1,5 +1,5 @@
 import "./globals.css";
-import ReduxProvider from "@/utils/redux/ReduxProvider";
+import ReduxProvider from "../utils/redux/ReduxProvider";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { muiTheme } from "@/utils/muiTheme";
 import Provider from "./provider";
