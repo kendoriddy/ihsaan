@@ -43,6 +43,12 @@ const DASHBOARD_LIST = {
       path: "/assignment",
     },
     {
+      id: 5,
+      name: "Submit Assignment",
+      icon: QuizIcon,
+      path: "/submit",
+    },
+    {
       id: 6,
       name: "Mentors Training",
       icon: CastForEducationIcon,

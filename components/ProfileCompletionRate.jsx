@@ -1,4 +1,4 @@
-import { MENTORS } from "@/constants";
+import { MENTORS } from "../constants";
 
 function ProfileCompletionRate() {
   return (

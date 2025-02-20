@@ -6,7 +6,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { IMAGES } from "@/constants";
+import { IMAGES } from "../constants";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 import {
