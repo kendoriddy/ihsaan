@@ -8,6 +8,7 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import QuizIcon from "@mui/icons-material/Quiz";
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
 import StorefrontIcon from "@mui/icons-material/Storefront";
+import { StarRateSharp } from "@mui/icons-material";
 
 const DASHBOARD_LIST = {
   mentor: [
@@ -47,6 +48,12 @@ const DASHBOARD_LIST = {
       name: "Submit Assignment",
       icon: QuizIcon,
       path: "/submit",
+    },
+    {
+      id: 5,
+      name: "Review",
+      icon:StarRateSharp,
+      path: "/review",
     },
     {
       id: 6,
