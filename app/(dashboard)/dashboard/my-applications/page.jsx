@@ -237,7 +237,7 @@ const Page = () => {
       </main>
       <Footer />
 
-      {/* Modal for Viewing Application Details */}
+      {/* Modal */}
       <Modal open={open} onClose={handleClose}>
         <Box className="bg-white p-6 rounded-lg overflow-scroll md:w-[60%] h-[90%] mx-auto mt-20">
           <h2 className="text-lg font-semibold mb-4">Edit Application</h2>
