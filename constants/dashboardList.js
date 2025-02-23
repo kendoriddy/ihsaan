@@ -13,6 +13,12 @@ const DASHBOARD_LIST = {
   mentor: [
     { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
     {
+      id: 12,
+      name: "Applications",
+      icon: BookmarkIcon,
+      path: "/dashboard/my-applications",
+    },
+    {
       id: 2,
       name: "Bookings",
       icon: BookmarkIcon,

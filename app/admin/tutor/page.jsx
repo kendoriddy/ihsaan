@@ -29,6 +29,10 @@ const TutorApplication = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isActiveModalOpen, setIsActiveModalOpen] = useState(false);
   const [tutorToToggle, setTutorToToggle] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(
+    tutorToEdit?.tutor_application_status || "PENDING"
+  );
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const tutorApplicationStatusRef = useRef();
 
@@ -136,14 +140,20 @@ const TutorApplication = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    const data = {
+      tutor_application_status: tutorApplicationStatusRef.current.value,
+    };
+
+    if (selectedStatus === "REJECTED") {
+      data.rejection_reason = rejectionReason;
+    }
+
     // Wrap mutate in a Promise to handle errors properly
     const updateStatusPromise = new Promise((resolve, reject) => {
       updateApplicationStatus(
         {
           id: `${tutorToEdit.id}/`,
-          data: {
-            tutor_application_status: tutorApplicationStatusRef.current.value,
-          },
+          data,
         },
         {
           onSuccess: () => {
@@ -229,7 +239,7 @@ const TutorApplication = () => {
                     <th className=" border px-4 py-2">
                       Highest Qualification{" "}
                     </th>
-                    <th className=" border px-4 py-2">Professional Bio</th>
+                    <th className=" border px-4 py-2">Years of Experience</th>
                     <th className=" border px-4 py-2">Application Status</th>
                     <th className=" border px-4 py-2">Action</th>
                   </tr>
@@ -250,36 +260,49 @@ const TutorApplication = () => {
                         {tutor.highest_qualification}
                       </td>
                       <td className="border px-4 py-2">
-                        {tutor.professional_bio}
+                        {tutor.total_years_experience}
                       </td>
                       <td className="border px-4 py-2">
-                        {tutor.tutor_application_status}
+                        <td className="border px-4 py-2">
+                          <button
+                            onClick={() => handleEditTutorBtn(tutor)}
+                            className={`${
+                              tutor.tutor_application_status === "ACCEPTED"
+                                ? "bg-green-500"
+                                : tutor.tutor_application_status === "REJECTED"
+                                ? "bg-red-500"
+                                : "bg-yellow-500"
+                            } text-white px-4 py-2 rounded-full`}
+                          >
+                            {tutor.tutor_application_status}
+                          </button>
+                        </td>
                       </td>
                       <td className="border px-4 py-2">
                         <div className="flex gap-2">
-                          <span
+                          {/* <span
                             className="text-blue-600 hover:underline cursor-pointer"
                             onClick={() => handleEditTutorBtn(tutor)}
                           >
                             Edit
-                          </span>
-                          <span
+                          </span> */}
+                          {/* <span
                             className="text-red-600 hover:underline cursor-pointer"
                             onClick={() => deleteTutor(tutor.id)}
                           >
                             {" "}
                             Delete
-                          </span>
-                          <span
-                            className={`${
+                          </span> */}
+                          <button
+                            className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 ${
                               tutor.is_active
-                                ? "text-green-600"
-                                : "text-gray-600"
-                            } hover:underline cursor-pointer`}
+                                ? "bg-green-600 hover:bg-green-700"
+                                : "bg-gray-600 hover:bg-gray-700"
+                            }`}
                             onClick={() => handleToggleActiveStatus(tutor)}
                           >
                             {tutor.is_active ? "Active" : "Inactive"}
-                          </span>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -343,21 +366,48 @@ const TutorApplication = () => {
                   <select
                     ref={tutorApplicationStatusRef}
                     defaultValue={tutorToEdit?.tutor_application_status}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
                     className="w-full p-2 border rounded"
                   >
-                    <option value="PENDING">Pending</option>
-                    <option value="ACCEPTED">Accepted</option>
-                    <option value="REJECTED">Rejected</option>
+                    {tutorToEdit?.tutor_application_status === "PENDING" ? (
+                      <>
+                        <option value="PENDING">Pending</option>
+                        <option value="ACCEPTED">Accepted</option>
+                        <option value="REJECTED">Rejected</option>
+                      </>
+                    ) : (
+                      <option value={tutorToEdit?.tutor_application_status}>
+                        {tutorToEdit?.tutor_application_status
+                          .charAt(0)
+                          .toUpperCase() +
+                          tutorToEdit?.tutor_application_status
+                            .slice(1)
+                            .toLowerCase()}
+                      </option>
+                    )}
                   </select>
+                  {selectedStatus === "REJECTED" && (
+                    <div className="py-3 px-3">
+                      <textarea
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        placeholder="Enter the reason for rejection"
+                      />
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-center py-4">
-                  <button
-                    type="submit"
-                    className="bg-red-600 text-white px-4 py-2 rounded"
-                  >
-                    {isLoading ? "Loading..." : "Update Status"}
-                  </button>
-                </div>
+
+                {tutorToEdit?.tutor_application_status === "PENDING" && (
+                  <div className="flex justify-center py-4">
+                    <button
+                      type="submit"
+                      className="bg-red-600 text-white px-4 py-2 rounded"
+                    >
+                      {isLoading ? "Loading..." : "Update Status"}
+                    </button>
+                  </div>
+                )}
               </form>
             </div>
           </div>

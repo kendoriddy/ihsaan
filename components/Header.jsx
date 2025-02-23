@@ -52,7 +52,7 @@ function Header() {
   };
 
   const intialValues = {
-    first_name: signedInUserName || "",
+    first_name: authenticatedUsersPayload?.first_name || "",
     last_name: authenticatedUsersPayload?.last_name || "",
     email: authenticatedUsersPayload?.email || "",
     password: "",
@@ -72,6 +72,8 @@ function Header() {
       authenticatedUsersPayload?.preferred_mentee_gender || "",
     mentorship_areas: authenticatedUsersPayload?.mentorship_areas || "",
     councelling_areas: authenticatedUsersPayload?.councelling_areas || "",
+    total_years_experience:
+      authenticatedUsersPayload?.total_years_experience || "",
     student_application_status:
       authenticatedUsersPayload?.student_application_status || "",
     is_active: authenticatedUsersPayload?.is_active || "",
@@ -115,8 +117,21 @@ function Header() {
         handleCloseModal();
       },
       onError: (error) => {
-        console.log(error);
-        toast.error("error occured, please try again later");
+        console.log(error, "ounda");
+
+        if (error.response && error.response.data) {
+          const errors = error.response.data;
+
+          // Convert error object into a string
+          const errorMessages = Object.keys(errors)
+            .map((key) => `${key}: ${errors[key].join(", ")}`)
+            .join("\n");
+
+          // Show all errors in a toast
+          toast.error(errorMessages);
+        } else {
+          toast.error("An unexpected error occurred. Please try again later.");
+        }
       },
     }
   );
@@ -139,7 +154,7 @@ function Header() {
       preferred_mentee_gender,
       councelling_areas,
       mentorship_areas,
-      student_application_status,
+      total_years_experience,
     } = values;
     const payload = {
       first_name: first_name,
@@ -160,6 +175,7 @@ function Header() {
       preferred_mentee_gender: preferred_mentee_gender,
       mentorship_areas: mentorship_areas,
       councelling_areas: councelling_areas,
+      // total_years_experience: total_years_experience,
       tutor_application_status: "PENDING",
       student_application_status: "PENDING",
       is_active: true,
@@ -377,7 +393,7 @@ function Header() {
                           setType("teacher");
                         }}
                       >
-                        Become a teacher
+                        Become a tutor
                       </div>
                     </div>
                   )}
@@ -500,6 +516,14 @@ function Header() {
                           </div>
                           <div>
                             <FormikControl
+                              name="total_years_experience"
+                              options={yearsOfExperienceOptions}
+                              control={"select"}
+                              placeholder="Select your years of experience"
+                            />
+                          </div>
+                          <div>
+                            <FormikControl
                               name="country"
                               options={countriesList}
                               control={"select"}
@@ -509,7 +533,7 @@ function Header() {
                           <div>
                             <FormikControl
                               name="additional_info"
-                              placeholder="Other information you will like us to know about(max 250words)"
+                              placeholder="Other info you would like us to know about you(max 250words)"
                               multiline
                               minRows={3}
                               maxLength={250}
@@ -554,26 +578,26 @@ function Header() {
                               placeholder="Upload your picture"
                             />
                           </div> */}
-                          <div>
+                          {/* <div>
                             <FormikControl
                               name="preferred_mentee_gender"
                               options={menteeGender}
                               control={"select"}
                               placeholder="Which gender of mentee do you prefer?"
                             />
-                          </div>
+                          </div> */}
                           <div>
                             <FormikControl
                               name="mentorship_areas"
-                              placeholder="Mentorship areas"
+                              placeholder="Areas of expertise"
                             />
                           </div>
-                          <div>
+                          {/* <div>
                             <FormikControl
                               name="councelling_areas"
                               placeholder="Concelling areas"
                             />
-                          </div>
+                          </div> */}
 
                           <div className="flex justify-center">
                             <AuthButton
@@ -800,7 +824,7 @@ function Header() {
                             setType("tutor");
                           }}
                         >
-                          Become a teacher
+                          Become a tutor
                         </div>
                       </div>
                     )}
