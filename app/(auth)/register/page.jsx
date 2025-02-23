@@ -30,14 +30,12 @@ function Page() {
   };
 
   const roleOptions = [
-    "user",
-    "admin",
-    "super admin",
-    "counsellee",
-    "counsellor",
-    "mentee",
-    "mentor",
-    "visitor",
+    "USER",
+    "ADMIN",
+    "SUPERADMIN",
+    "TUTOR",
+    "STUDENT",
+    "VISITOR",
   ];
 
   const { mutate, isLoading } = usePost("/auth/register", {
@@ -88,10 +86,16 @@ function Page() {
                     <div className="flex flex-col gap-6">
                       <div className="grid grid-cols-12 gap-1">
                         <div className="col-span-6">
-                          <FormikControl name="first_name" placeholder="First Name" />
+                          <FormikControl
+                            name="first_name"
+                            placeholder="First Name"
+                          />
                         </div>
                         <div className="col-span-6">
-                          <FormikControl name="last_name" placeholder="Last Name" />
+                          <FormikControl
+                            name="last_name"
+                            placeholder="Last Name"
+                          />
                         </div>
                       </div>
 
@@ -112,7 +116,11 @@ function Page() {
                                   onClick={handleClickShowPassword}
                                   onMouseDown={handleMouseDownPassword}
                                 >
-                                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                                  {showPassword ? (
+                                    <VisibilityOff />
+                                  ) : (
+                                    <Visibility />
+                                  )}
                                 </IconButton>
                               </InputAdornment>
                             ),
@@ -133,7 +141,11 @@ function Page() {
                                   onClick={handleClickShowPassword}
                                   onMouseDown={handleMouseDownPassword}
                                 >
-                                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                                  {showPassword ? (
+                                    <VisibilityOff />
+                                  ) : (
+                                    <Visibility />
+                                  )}
                                 </IconButton>
                               </InputAdornment>
                             ),
@@ -147,9 +159,15 @@ function Page() {
                           multiple
                           options={roleOptions}
                           value={values.roles}
-                          onChange={(event, newValue) => setFieldValue("roles", newValue)}
+                          onChange={(event, newValue) =>
+                            setFieldValue("roles", newValue)
+                          }
                           renderInput={(params) => (
-                            <TextField {...params} variant="outlined" placeholder="Roles" />
+                            <TextField
+                              {...params}
+                              variant="outlined"
+                              placeholder="Roles"
+                            />
                           )}
                         />
                       </div>
@@ -169,11 +187,17 @@ function Page() {
             </div>
             <div className="xs:flex xs:flex-col sm:flex sm:flex-row items-center gap-2 text-gray-600">
               <p>Already have an account?</p>
-              <Link className="hover:text-red-600 transition-all duration-300" href={"/login"}>
+              <Link
+                className="hover:text-red-600 transition-all duration-300"
+                href={"/login"}
+              >
                 Login
               </Link>{" "}
               <p>or</p>
-              <Link className="hover:text-red-600 transition-all duration-300" href="/">
+              <Link
+                className="hover:text-red-600 transition-all duration-300"
+                href="/"
+              >
                 Go Home
               </Link>
             </div>
