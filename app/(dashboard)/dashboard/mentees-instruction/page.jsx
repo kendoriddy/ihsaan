@@ -24,7 +24,7 @@ function Page() {
           {/* Right */}
           <div className="px-4  w-full py-8 lg:py-0">
             <div className="text-sm my-3">
-              Welcome <span className="text-lg">{user}</span>{" "}
+              Welcome <span className="text-lg">{user.name}</span>{" "}
               <WavingHandIcon sx={{ color: "blue", fontSize: "2rem" }} />
             </div>
             {/*  Table */}

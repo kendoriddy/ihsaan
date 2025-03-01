@@ -33,15 +33,6 @@ const TutorApplication = () => {
     tutorToEdit?.tutor_application_status || "PENDING"
   );
   const [rejectionReason, setRejectionReason] = useState("");
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedTutor, setSelectedTutor] = useState(null);
-
-  const handleViewTutor = (tutor) => {
-    setSelectedTutor(tutor);
-    console.log(tutor, "4444");
-    setSelectedStatus(tutor.tutor_application_status); // Set status in modal
-    setIsViewModalOpen(true);
-  };
 
   const tutorApplicationStatusRef = useRef();
 
@@ -145,47 +136,6 @@ const TutorApplication = () => {
     }
   };
 
-  const handleStatusUpdate2 = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    const data = {
-      tutor_application_status: selectedStatus,
-    };
-
-    if (selectedStatus === "REJECTED") {
-      data.tutor_rejection_reason = rejectionReason;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      await updateApplicationStatus(
-        {
-          id: `${selectedTutor.id}/`,
-          data,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-        {
-          onSuccess: () => {
-            setIsViewModalOpen(false);
-            toast.success("Status updated successfully!");
-            resetForm();
-          },
-          onError: (error) => {
-            console.error("Error updating status:", error);
-            toast.error(error.response.data.detail || "An error occurred");
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Caught error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleStatusUpdate = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -198,17 +148,12 @@ const TutorApplication = () => {
       data.tutor_rejection_reason = rejectionReason;
     }
 
-    const token = localStorage.getItem("token");
-
     // Wrap mutate in a Promise to handle errors properly
     const updateStatusPromise = new Promise((resolve, reject) => {
       updateApplicationStatus(
         {
           id: `${tutorToEdit.id}/`,
           data,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         },
         {
           onSuccess: () => {
@@ -245,7 +190,7 @@ const TutorApplication = () => {
     dispatch(fetchTutors({ page: newPage, pageSize: pagination.pageSize }));
   };
 
-  console.log(selectedStatus, "zzzz");
+  console.log(fetchedTutors, "zzzz", tutors);
   return (
     <div className="relative">
       {/* Header */}
@@ -294,7 +239,7 @@ const TutorApplication = () => {
                     <th className=" border px-4 py-2">
                       Highest Qualification{" "}
                     </th>
-                    <th className=" border px-4 py-2">Professional Bio</th>
+                    <th className=" border px-4 py-2">Years of Experience</th>
                     <th className=" border px-4 py-2">Application Status</th>
                     <th className=" border px-4 py-2">Action</th>
                   </tr>
@@ -315,7 +260,7 @@ const TutorApplication = () => {
                         {tutor.highest_qualification}
                       </td>
                       <td className="border px-4 py-2">
-                        {tutor.professional_bio}
+                        {tutor.years_of_experience}
                       </td>
                       <td className="border px-4 py-2">
                         <td className="border px-4 py-2">
@@ -335,13 +280,19 @@ const TutorApplication = () => {
                       </td>
                       <td className="border px-4 py-2">
                         <div className="flex gap-2">
-                          {/* View Button */}
-                          <button
-                            className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition"
-                            onClick={() => handleViewTutor(tutor)}
+                          {/* <span
+                            className="text-blue-600 hover:underline cursor-pointer"
+                            onClick={() => handleEditTutorBtn(tutor)}
                           >
-                            View
-                          </button>
+                            Edit
+                          </span> */}
+                          {/* <span
+                            className="text-red-600 hover:underline cursor-pointer"
+                            onClick={() => deleteTutor(tutor.id)}
+                          >
+                            {" "}
+                            Delete
+                          </span> */}
                           <button
                             className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 ${
                               tutor.is_active
@@ -489,149 +440,6 @@ const TutorApplication = () => {
                   {isLoading ? "Loading..." : "Confirm"}
                 </button>
               </div>
-            </div>
-          </section>
-        )}
-
-        {isViewModalOpen && selectedTutor && (
-          <section className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-            <div className="bg-white w-[500px] rounded p-4">
-              {/* Header */}
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-bold">Tutor Details</h2>
-                <button
-                  className="text-red-600 hover:text-blue-600 transition-all duration-300"
-                  onClick={() => setIsViewModalOpen(false)}
-                >
-                  Close
-                </button>
-              </div>
-              <Divider />
-
-              {/* Tutor Details */}
-              <div className="py-4">
-                <table className="w-full border-collapse border border-gray-300">
-                  <tbody>
-                    <tr className="bg-gray-100">
-                      <td className="border px-4 py-2 font-semibold">Name</td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.first_name} {selectedTutor.last_name}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-4 py-2 font-semibold">Email</td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.email}
-                      </td>
-                    </tr>
-                    <tr className="bg-gray-100">
-                      <td className="border px-4 py-2 font-semibold">Gender</td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.gender}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-4 py-2 font-semibold">
-                        Qualification
-                      </td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.highest_qualification}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-4 py-2 font-semibold">
-                        Country
-                      </td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.country}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-4 py-2 font-semibold">
-                        Date of Birth
-                      </td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.date_of_birth}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-4 py-2 font-semibold">
-                        Marital Status
-                      </td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.marital_status}
-                      </td>
-                    </tr>
-                    <tr className="bg-gray-100">
-                      <td className="border px-4 py-2 font-semibold">
-                        Experience
-                      </td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.years_of_experience || "-"} years
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-4 py-2 font-semibold">
-                        Professional Bio
-                      </td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.professional_bio}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-4 py-2 font-semibold">
-                        Additional Info
-                      </td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.additional_info}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Application Status Update */}
-              <form onSubmit={handleStatusUpdate2}>
-                <label className="block font-medium">Update Status:</label>
-                {selectedStatus === "PENDING" ? (
-                  <select
-                    ref={tutorApplicationStatusRef}
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="w-full p-2 border rounded mt-2"
-                  >
-                    <option value="PENDING">Pending</option>
-                    <option value="ACCEPTED">Accepted</option>
-                    <option value="REJECTED">Rejected</option>
-                  </select>
-                ) : (
-                  <select
-                    ref={tutorApplicationStatusRef}
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="w-full p-2 border rounded mt-2"
-                    disabled
-                  >
-                    <option value={selectedStatus}>{selectedStatus}</option>
-                  </select>
-                )}
-
-                {selectedStatus === "REJECTED" && (
-                  <textarea
-                    value={rejectionReason}
-                    onChange={(e) => setRejectionReason(e.target.value)}
-                    className="w-full p-2 border rounded mt-2"
-                    placeholder="Enter rejection reason"
-                  />
-                )}
-
-                <button
-                  type="submit"
-                  className="bg-red-600 text-white px-4 py-2 rounded w-full mt-4"
-                >
-                  {isLoading ? "Updating..." : "Update Status"}
-                </button>
-              </form>
             </div>
           </section>
         )}

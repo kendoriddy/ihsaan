@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
@@ -7,7 +8,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ADMINDASHBOARD, IMAGES } from "@/constants";
 import Link from "next/link";
 import WavingHandIcon from "@mui/icons-material/WavingHand";
@@ -21,7 +22,14 @@ import { toast } from "react-toastify";
 function AdminDashboardHeader({ toggleSidebar }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const user = useSelector(currentlyLoggedInUser);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      setUser(JSON.parse(userString));
+    }
+  }, []);
   const open = Boolean(anchorEl);
   const dispatch = useDispatch();
   const router = useRouter();
@@ -38,7 +46,7 @@ function AdminDashboardHeader({ toggleSidebar }) {
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
   };
-
+  console.log(user, "oooo");
   const handleLogOut = () => {
     dispatch(logoutUser());
     router.push("/");
@@ -55,7 +63,7 @@ function AdminDashboardHeader({ toggleSidebar }) {
       {/* Logo */}
 
       <div className="text-sm my-3">
-        Welcome <span className="text-lg">{user}</span>{" "}
+        Welcome <span className="text-lg">{user?.name}</span>{" "}
         <WavingHandIcon sx={{ color: "blue", fontSize: "2rem" }} />
       </div>
 

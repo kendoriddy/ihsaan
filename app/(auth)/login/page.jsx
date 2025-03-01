@@ -33,16 +33,36 @@ const LogIn = () => {
     onSuccess: (response) => {
       const { data } = response;
       console.log(data, "data sent");
-      const roles = data && data?.roles;
 
-      dispatch(loginUserSuccess({ payload: data })); // Wrap data in payload
+      dispatch(loginUserSuccess({ payload: data }));
+      localStorage.setItem("token", data.access);
+      localStorage.setItem("refresh-token", data.refresh);
+      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("roles", JSON.stringify(data.roles));
+      router.push("/admin/dashboard");
       toast.success("Logged in successfully");
       router.push("/dashboard");
     },
     onError: (error) => {
-      toast.error(error.response.data.message);
+      console.log(error, "Error occurred");
+
+      // Check if error.response exists
+      if (error.response) {
+        const errorMessage =
+          error.response.data?.message || "An unexpected error occurred";
+        toast.error(errorMessage);
+      } else if (error.request) {
+        // Network error (request was made but no response received)
+        toast.error("Network error: Please check your internet connection");
+      } else {
+        // Some other error occurred
+        toast.error("An unknown error occurred");
+      }
+
+      toast.error("You do not have the necessary role to login");
     },
   });
+
   const handleSubmit = (values) => {
     mutate(values);
   };
