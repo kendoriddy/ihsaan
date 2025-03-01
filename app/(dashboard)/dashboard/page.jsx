@@ -65,7 +65,7 @@ function Page() {
             </div>
 
             <div className="text-sm my-3">
-              Welcome <span className="text-lg">{user}</span>{" "}
+              Welcome <span className="text-lg">{user.name}</span>{" "}
               <WavingHandIcon sx={{ color: "blue", fontSize: "2rem" }} />
             </div>
 
@@ -73,7 +73,7 @@ function Page() {
           </div>
         </section>
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </RequireAuth>
   );
 }

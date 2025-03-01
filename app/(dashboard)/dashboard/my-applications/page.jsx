@@ -9,36 +9,50 @@ import { allPossibleQualifications } from "@/utils/utilFunctions";
 import { WavingHand } from "@mui/icons-material";
 import { Modal, Box, TextField, Button } from "@mui/material";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 const Page = () => {
   const currentRoute = usePathname();
   const user = useSelector(currentlyLoggedInUser);
   const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    id: "44e8de60-47f1-4295-9f45-f3943121b871",
-    first_name: "Ihsaan",
-    last_name: "Admin",
-    email: "ihsaanuser2@grr.la",
-    roles: ["TUTOR", "USER"],
-    total_years_experience: null,
-    country: "nigeria",
-    professional_bio: "",
-    additional_info: "A lot, starting with htis and ending with that",
-    skills: "",
-    highest_qualification: "diploma",
-    religion: "muslim",
-    gender: "male",
-    marital_status: "married",
-    date_of_birth: "2025-02-01",
-    preferred_mentee_gender: "",
-    mentorship_areas: "everywhere",
-    tutor_application_status: "REJECTED",
-    reason: "YOUR APPLICATION WAS REJECTED BECAUSE YOU DID NOT LIST ANY SKILLS",
-    is_active: true,
-  });
+  const fetchApplicationData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        "https://ihsaanlms.onrender.com/api/tutor/application/update/",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setFormData(response.data);
+    } catch (error) {
+      console.error("Error fetching application data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchApplicationData();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleEditApplicationBtn = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const qualificationsList = allPossibleQualifications.map((qualification) => {
     return {
@@ -67,7 +81,7 @@ const Page = () => {
     },
     email: { editable: false, visible: true, label: "Email", type: "text" },
     country: { editable: false, visible: true, label: "Country", type: "text" },
-    total_years_experience: {
+    years_of_experience: {
       editable: true,
       visible: true,
       label: "Total Years of Experience",
@@ -92,27 +106,30 @@ const Page = () => {
       visible: true,
       label: "Highest Qualification",
       type: "select",
-      options: qualificationsList.map((qualification) => qualification.key),
+      options: qualificationsList.map((qualification) =>
+        qualification.key.toLowerCase()
+      ),
     },
     religion: {
       editable: true,
       visible: true,
       label: "Religion",
-      type: "text",
+      type: "select",
+      options: ["islam", "christain", "others"],
     },
     gender: {
       editable: false,
       visible: true,
       label: "Gender",
       type: "select",
-      options: ["Male", "Female", "Other"],
+      options: ["male", "female", "others"],
     },
     marital_status: {
       editable: true,
       visible: true,
       label: "Marital Status",
       type: "select",
-      options: ["Single", "Married", "Divorced", "Widowed"],
+      options: ["single", "married", "divorced", "widowed"],
     },
     date_of_birth: {
       editable: true,
@@ -135,12 +152,12 @@ const Page = () => {
     },
     tutor_application_status: {
       editable: false,
-      visible: true,
+      visible: false,
       label: "Tutor Application Status",
       type: "select",
       options: ["PENDING", "APPROVED", "REJECTED"],
     },
-    reason: {
+    tutor_rejection_reason: {
       editable: false,
       visible: true,
       label: "Reason for Rejection",
@@ -154,18 +171,30 @@ const Page = () => {
     },
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
-  };
-
-  const handleEditApplicationBtn = () => setOpen(true);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleSubmit = () => {
-    console.log("Updated Application Data:", formData);
-    handleClose();
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.put(
+        "https://ihsaanlms.onrender.com/api/tutor/application/update/",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Application updated successfully:", response.data);
+      fetchApplicationData();
+      handleClose();
+    } catch (error) {
+      console.error(
+        "Error updating application:",
+        error.response?.data || error
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -178,7 +207,7 @@ const Page = () => {
           <div className="px-4  w-full py-8 lg:py-0">
             {/* Waving Hand */}
             <div className="text-sm my-3">
-              Welcome <span className="text-lg">{user}</span>{" "}
+              Welcome <span className="text-lg">{user.name}</span>{" "}
               <WavingHand sx={{ color: "blue", fontSize: "2rem" }} />
             </div>
 
@@ -199,106 +228,114 @@ const Page = () => {
                     <th className=" border px-4 py-2">Action</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr className="even:bg-gray-100 hover:bg-gray-200">
-                    <td className="border px-4 py-2">1</td>
-                    <td className="border px-4 py-2">Tutor application</td>
-                    <td className="border px-4 py-2">ihsaanuser2@grr.la </td>
-                    <td className="border px-4 py-2">Male</td>
-                    <td className="border px-4 py-2">Masters degree</td>
-                    <td className="border px-4 py-2">5 years</td>
-                    <td className="border px-4 py-2">
-                      <button
-                        className={`${
-                          formData.tutor_application_status === "ACCEPTED"
-                            ? "bg-green-500"
-                            : formData.tutor_application_status === "REJECTED"
-                            ? "bg-red-500"
-                            : "bg-yellow-500"
-                        } text-white px-4 py-2 rounded-full`}
-                      >
-                        {formData.tutor_application_status}
-                      </button>
-                    </td>
-                    <td className="border px-4 py-2">
-                      <button
-                        className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]`}
-                        onClick={handleEditApplicationBtn}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
+                {formData && (
+                  <tbody>
+                    <tr className="even:bg-gray-100 hover:bg-gray-200">
+                      <td className="border px-4 py-2">1</td>
+                      <td className="border px-4 py-2">Tutor application</td>
+                      <td className="border px-4 py-2">{formData.email}</td>
+                      <td className="border px-4 py-2">{formData.gender}</td>
+                      <td className="border px-4 py-2">
+                        {formData.highest_qualification.toUpperCase() || "N/A"}
+                      </td>
+                      <td className="border px-4 py-2">
+                        {formData.years_of_experience || "N/A"}
+                      </td>
+                      <td className="border px-4 py-2">
+                        <button
+                          className={`${
+                            formData.tutor_application_status === "ACCEPTED"
+                              ? "bg-green-500"
+                              : formData.tutor_application_status === "REJECTED"
+                              ? "bg-red-500"
+                              : "bg-yellow-500"
+                          } text-white px-4 py-2 rounded-full`}
+                        >
+                          {formData.tutor_application_status}
+                        </button>
+                      </td>
+                      <td className="border px-4 py-2">
+                        <button
+                          className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]`}
+                          onClick={handleEditApplicationBtn}
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                )}
               </table>
             </div>
           </div>
         </section>
       </main>
-      <Footer />
+      {/* <Footer /> */}
 
       {/* Modal */}
       <Modal open={open} onClose={handleClose}>
         <Box className="bg-white p-6 rounded-lg overflow-scroll md:w-[60%] h-[90%] mx-auto mt-20">
           <h2 className="text-lg font-semibold mb-4">Edit Application</h2>
 
-          <div className="space-y-4">
-            {Object.entries(fieldConfig)
-              .filter(([key, config]) => config.visible)
-              .map(([key, config]) => (
-                <div key={key}>
-                  <label className="block text-sm font-medium text-gray-700">
-                    {config.label}
-                  </label>
+          {formData && (
+            <div className="space-y-4">
+              {Object.entries(fieldConfig)
+                .filter(([key, config]) => config.visible)
+                .map(([key, config]) => (
+                  <div key={key}>
+                    <label className="block text-sm font-medium text-gray-700">
+                      {config.label}
+                    </label>
 
-                  {config.type === "text" ||
-                  config.type === "number" ||
-                  config.type === "date" ? (
-                    <input
-                      type={config.type}
-                      name={key}
-                      value={formData[key] || ""}
-                      onChange={handleChange}
-                      className="mt-1 block w-full p-2 border rounded-md"
-                      readOnly={!config.editable}
-                    />
-                  ) : config.type === "textarea" ? (
-                    <textarea
-                      name={key}
-                      value={formData[key] || ""}
-                      onChange={handleChange}
-                      className="mt-1 block w-full p-2 border rounded-md"
-                      rows="3"
-                      readOnly={!config.editable}
-                    />
-                  ) : config.type === "select" ? (
-                    <select
-                      name={key}
-                      value={formData[key] || ""}
-                      onChange={handleChange}
-                      className="mt-1 block w-full p-2 border rounded-md"
-                      readOnly={!config.editable}
-                    >
-                      <option value="">Select...</option>
-                      {config.options.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  ) : config.type === "checkbox" ? (
-                    <input
-                      type="checkbox"
-                      name={key}
-                      checked={formData[key] || false}
-                      onChange={handleChange}
-                      className="mt-1"
-                      readOnly={!config.editable}
-                    />
-                  ) : null}
-                </div>
-              ))}
-          </div>
+                    {config.type === "text" ||
+                    config.type === "number" ||
+                    config.type === "date" ? (
+                      <input
+                        type={config.type}
+                        name={key}
+                        value={formData[key] || ""}
+                        onChange={handleChange}
+                        className="mt-1 block w-full p-2 border rounded-md"
+                        readOnly={!config.editable}
+                      />
+                    ) : config.type === "textarea" ? (
+                      <textarea
+                        name={key}
+                        value={formData[key] || ""}
+                        onChange={handleChange}
+                        className="mt-1 block w-full p-2 border rounded-md"
+                        rows="3"
+                        readOnly={!config.editable}
+                      />
+                    ) : config.type === "select" ? (
+                      <select
+                        name={key}
+                        value={formData[key] || ""}
+                        onChange={handleChange}
+                        className="mt-1 block w-full p-2 border rounded-md"
+                        readOnly={!config.editable}
+                      >
+                        <option value="">Select...</option>
+                        {config.options.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    ) : config.type === "checkbox" ? (
+                      <input
+                        type="checkbox"
+                        name={key}
+                        checked={formData[key] || false}
+                        onChange={handleChange}
+                        className="mt-1"
+                        readOnly={!config.editable}
+                      />
+                    ) : null}
+                  </div>
+                ))}
+            </div>
+          )}
 
           <div className="flex justify-end mt-4">
             <button
@@ -311,7 +348,7 @@ const Page = () => {
               onClick={handleSubmit}
               className="px-4 py-2 bg-blue-600 text-white rounded-md"
             >
-              Save
+              {isLoading ? "Saving..." : "Save"}
             </button>
           </div>
         </Box>

@@ -24,7 +24,7 @@ function Page() {
           <div className="px-4  w-full py-8 lg:py-0">
             {/* Waving Hand */}
             <div className="text-sm my-3">
-              Welcome <span className="text-lg">{user}</span>{" "}
+              Welcome <span className="text-lg">{user.name}</span>{" "}
               <WavingHandIcon sx={{ color: "blue", fontSize: "2rem" }} />
             </div>
             {/*  Table */}
@@ -39,7 +39,6 @@ function Page() {
                     <th className=" border px-4 py-2">Item Type</th>
                     <th className=" border px-4 py-2">Order Type</th>
                     <th className=" border px-4 py-2">Order Status</th>
-                   
                   </tr>
                 </thead>
                 <tbody>

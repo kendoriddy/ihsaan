@@ -72,8 +72,7 @@ function Header() {
       authenticatedUsersPayload?.preferred_mentee_gender || "",
     mentorship_areas: authenticatedUsersPayload?.mentorship_areas || "",
     councelling_areas: authenticatedUsersPayload?.councelling_areas || "",
-    total_years_experience:
-      authenticatedUsersPayload?.total_years_experience || "",
+    years_of_experience: authenticatedUsersPayload?.years_of_experience || "",
     student_application_status:
       authenticatedUsersPayload?.student_application_status || "",
     is_active: authenticatedUsersPayload?.is_active || "",
@@ -143,7 +142,7 @@ function Header() {
       password,
       confirm_password,
       country,
-      professional_bio,
+      // professional_bio,
       additional_info,
       skills,
       highest_qualification,
@@ -154,17 +153,16 @@ function Header() {
       preferred_mentee_gender,
       councelling_areas,
       mentorship_areas,
-      total_years_experience,
+      years_of_experience,
     } = values;
     const payload = {
       first_name: first_name,
       last_name: last_name,
       email: email,
       password: password,
-      confirm_password: confirm_password,
       roles: type === "student" ? ["USER", "STUDENT"] : ["USER", "TUTOR"],
       country: country,
-      professional_bio: professional_bio,
+      // professional_bio: professional_bio,
       skills: skills,
       highest_qualification: highest_qualification,
       additional_info: additional_info,
@@ -174,8 +172,7 @@ function Header() {
       date_of_birth: date_of_birth,
       preferred_mentee_gender: preferred_mentee_gender,
       mentorship_areas: mentorship_areas,
-      councelling_areas: councelling_areas,
-      // total_years_experience: total_years_experience,
+      years_of_experience: years_of_experience,
       tutor_application_status: "PENDING",
       student_application_status: "PENDING",
       is_active: true,
@@ -219,7 +216,7 @@ function Header() {
   ];
 
   const religion = [
-    { key: "Islam", value: "muslim" },
+    { key: "Islam", value: "islam" },
     { key: "Christanity", value: "christain" },
     { key: "Others", value: "others" },
   ];
@@ -249,7 +246,7 @@ function Header() {
         </div>
         {/* Desktop menu */}
         <div className="hidden lg:flex-1 lg:flex justify-end">
-          <ul className="flex gap-2 items-center text-[15px] font-bold">
+          <ul className="flex gap-2 items-center text-[12px] font-semibold">
             <li>
               <Link
                 href="/"
@@ -269,7 +266,7 @@ function Header() {
               </Link>
             </li>
             <div className="relative text-slate-50 rounded group cursor-pointer">
-              <h3 className="text-[15px] font-bold text-black">
+              <h3 className="text-[12px] font-semibold text-black">
                 Qur&apos;an Tutors
               </h3>
               <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
@@ -303,7 +300,7 @@ function Header() {
             </div>
 
             <div className="relative text-slate-50 rounded group cursor-pointer">
-              <h3 className="text-[15px] font-bold text-black">Courses</h3>
+              <h3 className="text-[12px] font-semibold text-black">Courses</h3>
               <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
                 <div className="bg-slate-500 px-1 py-2 hover:bg-primary transition-all duration-300">
                   <Link href="/courses" className="block w-full h-full">
@@ -516,7 +513,7 @@ function Header() {
                           </div>
                           <div>
                             <FormikControl
-                              name="total_years_experience"
+                              name="years_of_experience"
                               options={yearsOfExperienceOptions}
                               control={"select"}
                               placeholder="Select your years of experience"

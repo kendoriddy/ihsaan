@@ -61,7 +61,7 @@ export const authSlice = createSlice({
 
 export const { loginUserSuccess, logoutUser } = authSlice.actions;
 
-export const currentlyLoggedInUser = (state) => state.auth.first_name;
+export const currentlyLoggedInUser = (state) => state.auth;
 export const userRole = (state) => state.auth.roles;
 export const currentlyLoggedInUserEmail = (state) => state.auth.email;
 export const selectCurrentToken = (state) => state.auth.authToken;

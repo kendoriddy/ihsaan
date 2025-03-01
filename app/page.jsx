@@ -28,14 +28,14 @@ function Page() {
   const [FAQs, setFAQs] = useState([]);
   const [courses, setCourses] = useState([]);
   const [suggestedCourses, setSuggestedCourses] = useState([]);
-  const { data: quotesList, isLoading } = useFetch("quotes", `/quotes`);
+  // const { data: quotesList, isLoading } = useFetch("quotes", `/quotes`);
   const [quotes, setQuotes] = useState(null);
-  useEffect(() => {
-    if (quotesList?.data?.length) {
-      const randomIndex = Math.floor(Math.random() * quotesList?.data?.length);
-      setQuotes(quotesList?.data[randomIndex]);
-    }
-  }, [quotesList]);
+  // useEffect(() => {
+  //   if (quotesList?.data?.length) {
+  //     const randomIndex = Math.floor(Math.random() * quotesList?.data?.length);
+  //     setQuotes(quotesList?.data[randomIndex]);
+  //   }
+  // }, [quotesList]);
 
   const slides = [
     <div key="1" className="p-0 text-left">

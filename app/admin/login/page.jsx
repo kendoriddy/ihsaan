@@ -34,7 +34,12 @@ const LogIn = () => {
       const roles = data && data?.roles;
 
       if (roles?.includes("ADMIN") || roles?.includes("SUPERADMIN")) {
+        console.log(data, "data111");
         dispatch(loginUserSuccess(data));
+        localStorage.setItem("token", data.access);
+        localStorage.setItem("refresh-token", data.refresh);
+        localStorage.setItem("user", JSON.stringify(data));
+        localStorage.setItem("roles", JSON.stringify(data.roles));
         router.push("/admin/dashboard");
         toast.success("Logged in successfully");
       } else {
