@@ -16,9 +16,11 @@ const TutorApplication = () => {
   const currentRoute = usePathname();
   const dispatch = useDispatch();
 
-  const { tutors: fetchedTutors, pagination } = useSelector(
-    (state) => state.tutor
-  );
+  const {
+    tutors: fetchedTutors,
+    pagination,
+    status,
+  } = useSelector((state) => state.tutor);
 
   const [tutors, setTutors] = useState([]);
   const [selectedTab, setSelectedTab] = useState("all");
@@ -295,7 +297,9 @@ const TutorApplication = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tutors.length === 0 ? (
+                  {status ? (
+                    <h4 className="mt-4">Loading...</h4>
+                  ) : tutors.length === 0 ? (
                     <h4 className="mt-4">No data available at the moment</h4>
                   ) : (
                     tutors.map((tutor, index) => (
