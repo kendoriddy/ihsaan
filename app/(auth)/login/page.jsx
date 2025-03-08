@@ -61,7 +61,7 @@ const LogIn = () => {
         toast.error("An unknown error occurred");
       }
 
-      toast.error("You do not have the necessary role to login");
+      toast.error("Invalid email or password");
     },
   });
 

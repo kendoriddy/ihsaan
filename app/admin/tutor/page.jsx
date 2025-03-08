@@ -297,7 +297,7 @@ const TutorApplication = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {status ? (
+                  {status === "loading" ? (
                     <h4 className="mt-4">Loading...</h4>
                   ) : tutors.length === 0 ? (
                     <h4 className="mt-4">No data available at the moment</h4>

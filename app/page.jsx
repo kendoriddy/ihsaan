@@ -156,36 +156,8 @@ function Page() {
     autoplaySpeed: 7000,
     fade: true,
   };
-  // Fetch suggested courses
-  // const fetchSuggestedCourses = async () => {
-  //   const courseResponse = await fetch(
-  //     `https://yrms-api.onrender.com/api/courses`
-  //   );
-  //   const course = await courseResponse.json();
-  //   setSuggestedCourses(course.results);
-  // };
-  // Fetch Data
-  const fetchData = async () => {
-    try {
-      // Courses
-      const coursesResponse = await fetch(
-        "https://yrms-api.onrender.com/api/courses"
-      );
-      const courses = await coursesResponse.json();
-      setCourses(courses.result);
-      // FAQs
-      const FAQsResponse = await fetch(
-        "https://yrms-api.onrender.com/api/faqs"
-      );
-      const FAQs = await FAQsResponse.json();
-      setFAQs(FAQs.results);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
   useEffect(() => {
-    // Fetch data
-    fetchData();
     // fetchSuggestedCourses();
     // Log out after 6 hours
     logoutAfterSixHours();
