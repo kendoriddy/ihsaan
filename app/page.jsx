@@ -157,13 +157,13 @@ function Page() {
     fade: true,
   };
   // Fetch suggested courses
-  const fetchSuggestedCourses = async () => {
-    const courseResponse = await fetch(
-      `https://yrms-api.onrender.com/api/courses`
-    );
-    const course = await courseResponse.json();
-    setSuggestedCourses(course.results);
-  };
+  // const fetchSuggestedCourses = async () => {
+  //   const courseResponse = await fetch(
+  //     `https://yrms-api.onrender.com/api/courses`
+  //   );
+  //   const course = await courseResponse.json();
+  //   setSuggestedCourses(course.results);
+  // };
   // Fetch Data
   const fetchData = async () => {
     try {
@@ -186,16 +186,16 @@ function Page() {
   useEffect(() => {
     // Fetch data
     fetchData();
-    fetchSuggestedCourses();
+    // fetchSuggestedCourses();
     // Log out after 6 hours
     logoutAfterSixHours();
   }, []);
   useEffect(() => {
-    if (searchVariable.length >= 3) {
-      fetchSuggestedCourses(searchVariable);
-    } else {
-      setSuggestedCourses([]);
-    }
+    // if (searchVariable.length >= 3) {
+    //   fetchSuggestedCourses(searchVariable);
+    // } else {
+    //   setSuggestedCourses([]);
+    // }
   }, [searchVariable]);
   const handleSearchChange = (e) => {
     setSearchVariable(e.target.value);
@@ -211,12 +211,12 @@ function Page() {
         <Header />
 
         {/* main */}
-        <main className="max-w-full md:max-w-[90%] mx-auto px-2 md:px-6 py-10 overflow-hidden">
+        <main className="max-w-full md:max-w-[96%] mx-auto px-2 md:px-6 py-10 overflow-hidden">
           {/* Hero */}
           <section className="flex flex-col lg:flex-row items-center gap-6 px-0 md:px-8 md:pr-0 lg:px-12 py-0 md:py-8">
             {/* Hero Left */}
             <div className="flex-1 text-center lg:text-left w-full">
-              <div className="text-2xl sm:text-3xl md:text-[40px] font-extrabold text-neutral-800 w-[83%] m-auto lg:mt-4 lg:max-w-[600px]">
+              <div className="text-2xl sm:text-3xl md:text-[40px] font-extrabold text-neutral-800 w-[100%] m-auto lg:mt-4">
                 <Slider
                   {...settings}
                   className="max-w-2xl mx-auto"
@@ -225,9 +225,9 @@ function Page() {
                 >
                   {slides.map((slide, index) => (
                     <div key={index} className="slide">
-                      <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+                      <div className="text-lg sm:text-xl md:text-2xl font-semibold">
                         {slide}
-                      </h2>
+                      </div>
                     </div>
                   ))}
                 </Slider>

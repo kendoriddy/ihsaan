@@ -76,6 +76,22 @@ export const usePut = (url, options) => {
   };
 };
 
+export const usePut2 = (options) => {
+  const { mutate, isLoading } = useMutation(async ({ url, data }) => {
+    try {
+      const response = await http.put(url, data);
+      return response.data;
+    } catch (error) {
+      throw error; // Ensure error is thrown
+    }
+  }, options);
+
+  return {
+    mutate,
+    isLoading,
+  };
+};
+
 export const useProfileUpdate = (url, options) => {
   const { mutate, isLoading } = useMutation(
     (data) => http.put(url, data),

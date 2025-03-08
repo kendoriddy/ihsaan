@@ -19,7 +19,6 @@ function DashboardSidebar({ currentRoute }) {
 
   const [isOpen, setIsOpen] = useState(false);
 
-
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
@@ -31,21 +30,22 @@ function DashboardSidebar({ currentRoute }) {
   };
 
   return (
-    <section
-      className="flex relative md:w-64">
+    <section className="flex relative md:w-64">
       {/* Mobile Hamburger Menu */}
       <div className="absolute top-4 left-4 md:hidden z-50">
         <button
           onClick={toggleSidebar}
-          className="p-2 focus:outline-none bg-gray-800 text-white rounded-md">
+          className="p-2 focus:outline-none bg-gray-800 text-white rounded-md"
+        >
           {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
         </button>
       </div>
 
       <div
-        className={`absolute top-0 left-0 min-h-screen h-full w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out z-40 py-4 rounded-r-lg ${
+        className={`absolute top-0 left-0 min-h-screen h-full w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out z-40 py-4 rounded-r-lg overflow-scroll ${
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}>
+        }`}
+      >
         {/* Left Top */}
         <div className="flex flex-col items-center text-center">
           <div className="w-[100px] h-[100px] relative rounded-full overflow-hidden p-3 shadow-md">
@@ -88,7 +88,8 @@ function DashboardSidebar({ currentRoute }) {
                     } ${
                       currentRoute !== item.path &&
                       "hover:bg-gray-100 hover:pr-3 text-black"
-                    }`}>
+                    }`}
+                  >
                     <div className="flex items-center">
                       <item.icon className="mr-2" />
                       <span>{item.name}</span>
@@ -105,7 +106,8 @@ function DashboardSidebar({ currentRoute }) {
                       } ${
                         currentRoute !== item.path &&
                         "hover:bg-gray-100 hover:pr-3"
-                      }`}>
+                      }`}
+                    >
                       <div className="flex items-center">
                         <item.icon className="mr-2" />
                         <span>{item.name}</span>

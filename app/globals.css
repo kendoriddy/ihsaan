@@ -41,6 +41,11 @@ input[type="number"] {
   background-color: rgb(126 26 11);
 }
 
+.slick-list {
+  width: 90% !important;
+  margin: auto !important;
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

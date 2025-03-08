@@ -59,7 +59,8 @@ const logoutAfterSixHours = () => {
 
 // Is the user logged in?
 const isLoggedIn = () => {
-  const loggedInTime = typeof window !== "undefined" ? localStorage.getItem("loggedInTime") : null;
+  const loggedInTime =
+    typeof window !== "undefined" ? localStorage.getItem("loggedInTime") : null;
   if (loggedInTime) {
     return true;
   } else {
@@ -288,6 +289,41 @@ const allPossibleQualifications = [
   "Specialization Certificate",
 ];
 
+const countriesList = countryNames.map((country) => {
+  return { key: country, value: country.toLowerCase().replace(/\s+/g, "-") };
+});
+const qualificationsList = allPossibleQualifications.map((qualification) => {
+  return {
+    key: qualification,
+    value: qualification.toLowerCase().replace(/\s+/g, "-"),
+  };
+});
+// Create an array of numbers from 1 to 100
+const yearsOfExperienceOptions = Array.from({ length: 100 }, (_, i) => ({
+  value: i + 1,
+  label: `${i + 1} year${i + 1 > 1 ? "s" : ""}`,
+}));
+const gender = [
+  { key: "Male", value: "male" },
+  { key: "Female", value: "female" },
+];
+const menteeGender = [
+  { key: "Male", value: "male" },
+  { key: "Female", value: "female" },
+  { key: "Both", value: "both" },
+];
+
+const religion = [
+  { key: "Islam", value: "islam" },
+  { key: "Christanity", value: "christain" },
+  { key: "Others", value: "others" },
+];
+const maritalStatus = [
+  { key: "Single", value: "single" },
+  { key: "Married", value: "married" },
+  { key: "Others", value: "others" },
+];
+
 export {
   formatDate,
   serverDateFormat,
@@ -296,4 +332,11 @@ export {
   isLoggedIn,
   countryNames,
   allPossibleQualifications,
+  countriesList,
+  qualificationsList,
+  yearsOfExperienceOptions,
+  gender,
+  menteeGender,
+  religion,
+  maritalStatus,
 };

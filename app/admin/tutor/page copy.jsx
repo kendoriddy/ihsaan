@@ -10,7 +10,6 @@ import { fetchTutors } from "@/utils/redux/slices/tutorSlice";
 import { useDelete, usePost, usePut, usePut2 } from "@/hooks/useHttp/useHttp";
 import { toast } from "react-toastify";
 import Pagination from "@mui/material/Pagination";
-import { Tabs, Tab } from "@mui/material";
 
 const TutorApplication = () => {
   const currentRoute = usePathname();
@@ -21,7 +20,6 @@ const TutorApplication = () => {
   );
 
   const [tutors, setTutors] = useState([]);
-  const [selectedTab, setSelectedTab] = useState("all");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSubMenuIndex, setOpenSubMenuIndex] = useState(null);
   const [isModalClose, setIsModalClose] = useState(true);
@@ -42,28 +40,6 @@ const TutorApplication = () => {
     setSelectedStatus(tutor.tutor_application_status);
     setIsViewModalOpen(true);
   };
-
-  // Function to fetch tutors based on status
-  const fetchTutorsByStatus = (status) => {
-    let statusFilter;
-
-    if (status === "pending") statusFilter = "PENDING";
-    else if (status === "approved") statusFilter = "APPROVED";
-    else if (status === "declined") statusFilter = "REJECTED";
-
-    const params = { page: 1, pageSize: 10 };
-
-    if (statusFilter !== "all") {
-      params.status = statusFilter;
-    }
-
-    dispatch(fetchTutors(params));
-  };
-
-  // Fetch tutors on tab change
-  useEffect(() => {
-    fetchTutorsByStatus(selectedTab);
-  }, [selectedTab]);
 
   const tutorApplicationStatusRef = useRef();
 
@@ -219,8 +195,6 @@ const TutorApplication = () => {
       console.error("Caught error:", error);
     } finally {
       setIsLoading(false);
-      setRejectionReason("");
-      setSelectedStatus("");
     }
   };
 
@@ -264,18 +238,6 @@ const TutorApplication = () => {
                 Add A Tutor
               </div>
             </div> */}
-
-            {/* Tabs */}
-            <Tabs
-              value={selectedTab}
-              onChange={(e, newValue) => setSelectedTab(newValue)}
-            >
-              <Tab label="All" value="all" />
-              <Tab label="Pending" value="pending" />
-              <Tab label="Approved" value="approved" />
-              <Tab label="Declined" value="declined" />
-            </Tabs>
-
             {/* Table */}
             <div className="mt-4 flex-1 overflow-y-scroll relative py-4">
               <div className="p-2 font-bold  bg-white">Tutor List</div>
@@ -295,57 +257,49 @@ const TutorApplication = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tutors.length === 0 ? (
-                    <h4 className="mt-4">No data available at the moment</h4>
-                  ) : (
-                    tutors.map((tutor, index) => (
-                      <tr
-                        key={tutor.id}
-                        className="even:bg-gray-100 hover:bg-gray-200"
-                      >
-                        <td className="border px-4 py-2">{index + 1}</td>
+                  {tutors.map((tutor, index) => (
+                    <tr
+                      key={tutor.id}
+                      className="even:bg-gray-100 hover:bg-gray-200"
+                    >
+                      <td className="border px-4 py-2">{index + 1}</td>
+                      <td className="border px-4 py-2">
+                        {tutor.first_name + " " + tutor.last_name}
+                      </td>
+                      <td className="border px-4 py-2">{tutor.email}</td>
+                      <td className="border px-4 py-2">{tutor.gender}</td>
+                      <td className="border px-4 py-2">
+                        {tutor.highest_qualification}
+                      </td>
+                      <td className="border px-4 py-2">
+                        {tutor.professional_bio}
+                      </td>
+                      <td className="border px-4 py-2">
                         <td className="border px-4 py-2">
-                          {tutor.user_details.first_name +
-                            " " +
-                            tutor.user_details.last_name}
+                          <button
+                            onClick={() => handleEditTutorBtn(tutor)}
+                            className={`${
+                              tutor.tutor_application_status === "ACCEPTED"
+                                ? "bg-green-500"
+                                : tutor.tutor_application_status === "REJECTED"
+                                ? "bg-red-500"
+                                : "bg-yellow-500"
+                            } text-white px-4 py-2 rounded-full`}
+                          >
+                            {tutor.tutor_application_status}
+                          </button>
                         </td>
-                        <td className="border px-4 py-2">
-                          {tutor.user_details.email}
-                        </td>
-                        <td className="border px-4 py-2">{tutor.gender}</td>
-                        <td className="border px-4 py-2">
-                          {tutor.highest_qualification}
-                        </td>
-                        <td className="border px-4 py-2">
-                          {tutor.professional_bio}
-                        </td>
-                        <td className="border px-4 py-2">
-                          <td className="border px-4 py-2">
-                            <button
-                              onClick={() => handleEditTutorBtn(tutor)}
-                              className={`${
-                                tutor.tutor_application_status === "APPROVED"
-                                  ? "bg-green-500"
-                                  : tutor.tutor_application_status ===
-                                    "REJECTED"
-                                  ? "bg-red-500"
-                                  : "bg-yellow-500"
-                              } text-white px-4 py-2 rounded-full`}
-                            >
-                              {tutor.tutor_application_status}
-                            </button>
-                          </td>
-                        </td>
-                        <td className="border px-4 py-2">
-                          <div className="flex gap-2">
-                            {/* View Button */}
-                            <button
-                              className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition"
-                              onClick={() => handleViewTutor(tutor)}
-                            >
-                              View
-                            </button>
-                            {/* <button
+                      </td>
+                      <td className="border px-4 py-2">
+                        <div className="flex gap-2">
+                          {/* View Button */}
+                          <button
+                            className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition"
+                            onClick={() => handleViewTutor(tutor)}
+                          >
+                            View
+                          </button>
+                          {/* <button
                             className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 ${
                               tutor.is_active
                                 ? "bg-green-600 hover:bg-green-700"
@@ -355,11 +309,10 @@ const TutorApplication = () => {
                           >
                             {tutor.is_active ? "Active" : "Inactive"}
                           </button> */}
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
               {/* Pagination Component */}
@@ -436,7 +389,7 @@ const TutorApplication = () => {
                     {tutorToEdit?.tutor_application_status === "PENDING" ? (
                       <>
                         <option value="PENDING">Pending</option>
-                        <option value="APPROVED">Approved</option>
+                        <option value="ACCEPTED">Accepted</option>
                         <option value="REJECTED">Rejected</option>
                       </>
                     ) : (
@@ -533,16 +486,6 @@ const TutorApplication = () => {
                       </td>
                       <td className="border px-4 py-2">{selectedStatus}</td>
                     </tr>
-                    {selectedTutor.tutor_application_status && (
-                      <tr>
-                        <td className="border px-4 py-2 font-semibold">
-                          Reason for rejection
-                        </td>
-                        <td className="border px-4 py-2">
-                          {selectedTutor.tutor_rejection_reason}
-                        </td>
-                      </tr>
-                    )}
                     <tr className="bg-gray-100">
                       <td className="border px-4 py-2 font-semibold">Name</td>
                       <td className="border px-4 py-2">
