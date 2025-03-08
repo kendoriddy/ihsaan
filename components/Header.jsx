@@ -142,7 +142,7 @@ function Header() {
       password,
       confirm_password,
       country,
-      // professional_bio,
+      professional_bio,
       additional_info,
       skills,
       highest_qualification,
@@ -162,7 +162,7 @@ function Header() {
       password: password,
       roles: type === "student" ? ["USER", "STUDENT"] : ["USER", "TUTOR"],
       country: country,
-      // professional_bio: professional_bio,
+      professional_bio: professional_bio,
       skills: skills,
       highest_qualification: highest_qualification,
       additional_info: additional_info,
@@ -230,7 +230,10 @@ function Header() {
     refetch();
   }, [createNewaccounts]);
   return (
-    <header className="sticky top-0 text-sm z-20 bg-white py-3 px-2 md:px-24 max-w-[100vw]">
+    <header
+      className="sticky top-0 text-sm z-20 bg-white py-3 px-2 md:px-12 max-w-[100vw]"
+      style={{ zIndex: "200" }}
+    >
       <div className="flex justify-between items-center py-2 px-0 sm:px-4">
         {/* Logo */}
         <div className="text-lg font-bold">
@@ -246,7 +249,7 @@ function Header() {
         </div>
         {/* Desktop menu */}
         <div className="hidden lg:flex-1 lg:flex justify-end">
-          <ul className="flex gap-2 items-center text-[12px] font-semibold">
+          <ul className="flex gap-5 items-center text-[16px] font-semibold">
             <li>
               <Link
                 href="/"
@@ -266,7 +269,7 @@ function Header() {
               </Link>
             </li>
             <div className="relative text-slate-50 rounded group cursor-pointer">
-              <h3 className="text-[12px] font-semibold text-black">
+              <h3 className="text-[16px] font-semibold text-black">
                 Qur&apos;an Tutors
               </h3>
               <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
@@ -300,7 +303,7 @@ function Header() {
             </div>
 
             <div className="relative text-slate-50 rounded group cursor-pointer">
-              <h3 className="text-[12px] font-semibold text-black">Courses</h3>
+              <h3 className="text-[16px] font-semibold text-black">Courses</h3>
               <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
                 <div className="bg-slate-500 px-1 py-2 hover:bg-primary transition-all duration-300">
                   <Link href="/courses" className="block w-full h-full">
@@ -483,16 +486,6 @@ function Header() {
                           </div>
                           {type === "tutor" && (
                             <div>
-                              <FormikControl
-                                name="professional_bio"
-                                placeholder="Enter professional bio"
-                                multiline
-                                minRows={3}
-                              />
-                            </div>
-                          )}
-                          {type === "tutor" && (
-                            <div>
                               <div>
                                 <FormikControl
                                   name="additional_info"
@@ -583,6 +576,14 @@ function Header() {
                               placeholder="Which gender of mentee do you prefer?"
                             />
                           </div> */}
+                          <div>
+                            <FormikControl
+                              name="professional_bio"
+                              placeholder="Enter professional bio"
+                              multiline
+                              minRows={3}
+                            />
+                          </div>
                           <div>
                             <FormikControl
                               name="mentorship_areas"

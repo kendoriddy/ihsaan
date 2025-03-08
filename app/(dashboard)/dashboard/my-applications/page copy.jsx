@@ -7,24 +7,11 @@ import Header from "@/components/Header";
 import { currentlyLoggedInUser } from "@/utils/redux/slices/auth.reducer";
 import { allPossibleQualifications } from "@/utils/utilFunctions";
 import { WavingHand } from "@mui/icons-material";
-import {
-  Modal,
-  Box,
-  TextField,
-  Button,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Menu,
-  MenuItem,
-} from "@mui/material";
+import { Modal, Box, TextField, Button } from "@mui/material";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { baseurl } from "@/hooks/useHttp/api";
-import EditApplication from "@/components/my-applications/EditApplication";
-import TutorForm from "@/components/my-applications/TutorForm";
 
 const Page = () => {
   const currentRoute = usePathname();
@@ -37,36 +24,18 @@ const Page = () => {
   const [formData, setFormData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [formOpen, setFormOpen] = useState(false);
-  const [applicationType, setApplicationType] = useState("");
-  const [userApplications, setUserApplications] = useState([]);
-  const [selectedApplication, setSelectedApplication] = useState();
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
-
-  const handleFormClose = () => {
-    setFormOpen(false);
-    setApplicationType("");
-  };
-
-  const handleApplicationTypeSelect = (applicationType) => {
-    setApplicationType(applicationType);
-    // setFormData({});
-    setFormOpen(true);
-  };
-
   const fetchApplicationData = async () => {
     try {
       setIsLoading(true);
-      const response = await baseurl.get(`/tutor/applications/list/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      console.log(response.data, "user data:");
-      setUserApplications(response.data.results);
+      const response = await axios.get(
+        "https://ihsaanlms.onrender.com/api/tutor/application/update/",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setFormData(response.data);
     } catch (error) {
       console.error("Error fetching application data:", error);
     } finally {
@@ -86,11 +55,7 @@ const Page = () => {
     }));
   };
 
-  const handleEditApplicationBtn = (application) => {
-    console.log(application, "user application:");
-    setSelectedApplication(application);
-    setOpen(true);
-  };
+  const handleEditApplicationBtn = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const qualificationsList = allPossibleQualifications.map((qualification) => {
@@ -255,35 +220,12 @@ const Page = () => {
                 <WavingHand sx={{ color: "blue", fontSize: "2rem" }} />
               </div>
               <div>
-                <Button
-                  aria-controls="application-menu"
-                  aria-haspopup="true"
-                  onClick={handleMenuOpen}
-                  className="px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]"
+                <button
+                  className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]`}
+                  onClick={handleCreateNewApplication}
                 >
                   Create new application
-                </Button>
-                <Menu
-                  id="application-menu"
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                >
-                  <MenuItem
-                    onClick={() =>
-                      handleApplicationTypeSelect("Tutor Application")
-                    }
-                  >
-                    Tutor Application
-                  </MenuItem>
-                  {/* <MenuItem
-                    onClick={() =>
-                      handleApplicationTypeSelect("Other Application")
-                    }
-                  >
-                    Other Application
-                  </MenuItem> */}
-                </Menu>
+                </button>
               </div>
             </div>
 
@@ -294,7 +236,7 @@ const Page = () => {
                   <tr className="border text-red-600">
                     <th className=" border px-4 py-2">#</th>
                     <th className=" border px-4 py-2">Application type</th>
-                    <th className=" border px-4 py-2">Name</th>
+                    <th className=" border px-4 py-2">Email</th>
                     <th className=" border px-4 py-2">Gender </th>
                     <th className=" border px-4 py-2">
                       Highest Qualification{" "}
@@ -304,53 +246,41 @@ const Page = () => {
                     <th className=" border px-4 py-2">Action</th>
                   </tr>
                 </thead>
-                {userApplications && (
+                {formData && (
                   <tbody>
-                    {userApplications.map((application, index) => (
-                      <tr
-                        key={application.id}
-                        className="even:bg-gray-100 hover:bg-gray-200"
-                      >
-                        <td className="border px-4 py-2">{index + 1}</td>
-                        <td className="border px-4 py-2">Tutor application</td>
-                        <td className="border px-4 py-2">{user.first_name}</td>
-                        <td className="border px-4 py-2">
-                          {application.gender}
-                        </td>
-                        <td className="border px-4 py-2">
-                          {application.highest_qualification.toUpperCase() ||
-                            "N/A"}
-                        </td>
-                        <td className="border px-4 py-2">
-                          {application.years_of_experience || "N/A"}
-                        </td>
-                        <td className="border px-4 py-2">
-                          <button
-                            className={`${
-                              application.tutor_application_status ===
-                              "ACCEPTED"
-                                ? "bg-green-500"
-                                : application.tutor_application_status ===
-                                  "REJECTED"
-                                ? "bg-red-500"
-                                : "bg-yellow-500"
-                            } text-white px-4 py-2 rounded-full`}
-                          >
-                            {application.tutor_application_status}
-                          </button>
-                        </td>
-                        <td className="border px-4 py-2">
-                          <button
-                            className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]`}
-                            onClick={() =>
-                              handleEditApplicationBtn(application)
-                            }
-                          >
-                            View Details
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    <tr className="even:bg-gray-100 hover:bg-gray-200">
+                      <td className="border px-4 py-2">1</td>
+                      <td className="border px-4 py-2">Tutor application</td>
+                      <td className="border px-4 py-2">{formData.email}</td>
+                      <td className="border px-4 py-2">{formData.gender}</td>
+                      <td className="border px-4 py-2">
+                        {formData.highest_qualification.toUpperCase() || "N/A"}
+                      </td>
+                      <td className="border px-4 py-2">
+                        {formData.years_of_experience || "N/A"}
+                      </td>
+                      <td className="border px-4 py-2">
+                        <button
+                          className={`${
+                            formData.tutor_application_status === "ACCEPTED"
+                              ? "bg-green-500"
+                              : formData.tutor_application_status === "REJECTED"
+                              ? "bg-red-500"
+                              : "bg-yellow-500"
+                          } text-white px-4 py-2 rounded-full`}
+                        >
+                          {formData.tutor_application_status}
+                        </button>
+                      </td>
+                      <td className="border px-4 py-2">
+                        <button
+                          className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]`}
+                          onClick={handleEditApplicationBtn}
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
                   </tbody>
                 )}
               </table>
@@ -358,23 +288,87 @@ const Page = () => {
           </div>
         </section>
       </main>
+      {/* <Footer /> */}
 
       {/* Modal */}
       <Modal open={open} onClose={handleClose}>
-        <EditApplication
-          selectedApplication={selectedApplication}
-          handleClose={handleClose}
-        />
-      </Modal>
+        <Box className="bg-white p-6 rounded-lg overflow-scroll md:w-[60%] h-[90%] mx-auto mt-20">
+          <h2 className="text-lg font-semibold mb-4">Edit Application</h2>
 
-      {/* Modal for form submission */}
-      <Modal open={formOpen} onClose={handleFormClose}>
-        <Box className="modal-box bg-white w-full md:w-[60vw] m-auto h-[90%] overflow-scroll mt-5 md:mt-[50px] rounded">
-          <TutorForm
-            fetchApplicationData={fetchApplicationData}
-            handleFormClose={handleFormClose}
-            handleMenuClose={handleMenuClose}
-          />
+          {formData && (
+            <div className="space-y-4">
+              {Object.entries(fieldConfig)
+                .filter(([key, config]) => config.visible)
+                .map(([key, config]) => (
+                  <div key={key}>
+                    <label className="block text-sm font-medium text-gray-700">
+                      {config.label}
+                    </label>
+
+                    {config.type === "text" ||
+                    config.type === "number" ||
+                    config.type === "date" ? (
+                      <input
+                        type={config.type}
+                        name={key}
+                        value={formData[key] || ""}
+                        onChange={handleChange}
+                        className="mt-1 block w-full p-2 border rounded-md"
+                        readOnly={!config.editable}
+                      />
+                    ) : config.type === "textarea" ? (
+                      <textarea
+                        name={key}
+                        value={formData[key] || ""}
+                        onChange={handleChange}
+                        className="mt-1 block w-full p-2 border rounded-md"
+                        rows="3"
+                        readOnly={!config.editable}
+                      />
+                    ) : config.type === "select" ? (
+                      <select
+                        name={key}
+                        value={formData[key] || ""}
+                        onChange={handleChange}
+                        className="mt-1 block w-full p-2 border rounded-md"
+                        readOnly={!config.editable}
+                      >
+                        <option value="">Select...</option>
+                        {config.options.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    ) : config.type === "checkbox" ? (
+                      <input
+                        type="checkbox"
+                        name={key}
+                        checked={formData[key] || false}
+                        onChange={handleChange}
+                        className="mt-1"
+                        readOnly={!config.editable}
+                      />
+                    ) : null}
+                  </div>
+                ))}
+            </div>
+          )}
+
+          <div className="flex justify-end mt-4">
+            <button
+              onClick={handleClose}
+              className="mr-2 px-4 py-2 border rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md"
+            >
+              {isLoading ? "Saving..." : "Save"}
+            </button>
+          </div>
         </Box>
       </Modal>
     </RequireAuth>

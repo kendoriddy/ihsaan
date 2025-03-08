@@ -24,7 +24,7 @@
     "formik": "^2.4.6",
     "html-react-parser": "^5.1.10",
     "libphonenumber-js": "^1.11.4",
-    "lottie-react": "^2.4.0",
+    "lottie-react": "^2.4.1",
     "next": "14.0.4",
     "pdfjs-dist": "^4.3.136",
     "react": "^18",

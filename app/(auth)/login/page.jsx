@@ -41,7 +41,9 @@ const LogIn = () => {
       localStorage.setItem("roles", JSON.stringify(data.roles));
       router.push("/admin/dashboard");
       toast.success("Logged in successfully");
-      router.push("/dashboard");
+      data.roles?.includes("ADMIN")
+        ? router.push("/admin/dashboard")
+        : router.push("/dashboard");
     },
     onError: (error) => {
       console.log(error, "Error occurred");
