@@ -63,6 +63,8 @@ const TutorForm = ({
     } finally {
       setIsCreating(false);
       setSubmitting(false);
+      handleMenuClose();
+      handleFormClose();
     }
   };
 
