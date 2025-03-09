@@ -4,7 +4,7 @@ import http, { apiLink } from "@/hooks/axios/axios";
 console.log(apiLink, "apiLink");
 export const fetchTutors = createAsyncThunk(
   "tutors/fetchTutors",
-  async ({ page = 1, pageSize = 10, status }) => {
+  async ({ page = 1, pageSize = 10, status, endpoint }) => {
     const queryParams = new URLSearchParams({
       page: page.toString(),
       page_size: pageSize.toString(),
@@ -13,9 +13,7 @@ export const fetchTutors = createAsyncThunk(
     if (status) {
       queryParams.append("status", status);
     }
-    const response = await http.get(
-      `/admin/all-tutor-applications/?${queryParams.toString()}`
-    );
+    const response = await http.get(`${endpoint}?${queryParams.toString()}`);
 
     return response.data;
   }

@@ -48,18 +48,23 @@ const TutorApplication = () => {
   // Function to fetch tutors based on status
   const fetchTutorsByStatus = (status) => {
     let statusFilter;
+    let endpoint = "/admin/all-tutor-applications/";
 
     if (status === "pending") statusFilter = "PENDING";
     else if (status === "approved") statusFilter = "APPROVED";
     else if (status === "declined") statusFilter = "REJECTED";
+    else if (status === "recuring") {
+      endpoint = "/admin/recuring-tutors-application/";
+      statusFilter = null;
+    }
 
     const params = { page: 1, pageSize: 10 };
 
-    if (statusFilter !== "all") {
+    if (statusFilter && statusFilter !== "all") {
       params.status = statusFilter;
     }
 
-    dispatch(fetchTutors(params));
+    dispatch(fetchTutors({ ...params, endpoint }));
   };
 
   // Fetch tutors on tab change
@@ -276,6 +281,7 @@ const TutorApplication = () => {
               <Tab label="Pending" value="pending" />
               <Tab label="Approved" value="approved" />
               <Tab label="Declined" value="declined" />
+              <Tab label="Recuring" value="recuring" />
             </Tabs>
 
             {/* Table */}
