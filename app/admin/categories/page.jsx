@@ -142,7 +142,8 @@ function Page() {
             "@media (minWidth: 1024px)": {
               width: "calc(100vw - 250px)",
             },
-          }}>
+          }}
+        >
           <div className="p-4">
             {/* Top */}
             <div className="flex justify-between items-center">
@@ -152,7 +153,8 @@ function Page() {
                 onClick={() => {
                   setCategoryMode("create");
                   setOpen(true);
-                }}>
+                }}
+              >
                 Add Category
               </div>
             </div>
@@ -181,7 +183,8 @@ function Page() {
                                 setToEditCategory(category);
                                 setCategoryMode("edit");
                                 setOpen(true);
-                              }}>
+                              }}
+                            >
                               Edit
                             </div>
                             <div
@@ -189,7 +192,8 @@ function Page() {
                               onClick={() => {
                                 setDeleteCategory(true);
                                 setDeletingCategory(category);
-                              }}>
+                              }}
+                            >
                               Delete
                             </div>
                           </div>
@@ -213,11 +217,13 @@ function Page() {
         <Modal
           isOpen={open}
           handleClose={handleClose}
-          title={CategoryMode === "create" ? "Add Category" : "Edit Category"}>
+          title={CategoryMode === "create" ? "Add Category" : "Edit Category"}
+        >
           <Formik
             initialValues={CategoryInitialValues}
             validationSchema={catSchema}
-            onSubmit={handleSubmit}>
+            onSubmit={handleSubmit}
+          >
             <Form className="flex flex-col gap-2">
               <FormikControl
                 control="input"
@@ -243,7 +249,8 @@ function Page() {
             setDeleteCategory(false);
             setDeletingCategory(null);
           }}
-          title="Delete Category">
+          title="Delete Category"
+        >
           <div>
             <div>Are you sure you want to delete this category?</div>
           </div>
@@ -255,7 +262,8 @@ function Page() {
                 textTransform: "initial",
                 backgroundColor: "darkred !important",
                 color: "white !important",
-              }}>
+              }}
+            >
               {isDeletingCategory ? "deleting" : "confirm"}
             </Button>
           </div>

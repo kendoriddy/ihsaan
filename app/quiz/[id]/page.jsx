@@ -20,9 +20,8 @@ const QuizPageId = () => {
   const fetchQuestions = async (page, id) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `https://ihsaanlms.onrender.com/assessment/mcquestions/${id}/?page=${page}`
-      );
+      const response = await fetch();
+      // `https://ihsaanlms.onrender.com/assessment/mcquestions/${id}/?page=${page}`
       const data = await response.json();
       setQuestions(data.results || []);
       setTotalPages(Math.ceil(data.count / 10)); // Assuming 10 questions per page
@@ -50,7 +49,11 @@ const QuizPageId = () => {
               <div className="mt-2">
                 {q.options.split(",").map((option, idx) => (
                   <label key={idx} className="block cursor-pointer">
-                    <input type="checkbox" className="mr-2" name={`question_${q.id}`} />
+                    <input
+                      type="checkbox"
+                      className="mr-2"
+                      name={`question_${q.id}`}
+                    />
                     {option.trim()}
                   </label>
                 ))}
@@ -60,7 +63,9 @@ const QuizPageId = () => {
           <div className="flex justify-between mt-4">
             <button
               disabled={currentPage === 1}
-              onClick={() => window.location.search = `?page=${currentPage - 1}`}
+              onClick={() =>
+                (window.location.search = `?page=${currentPage - 1}`)
+              }
               className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
             >
               Previous
@@ -70,7 +75,9 @@ const QuizPageId = () => {
             </span>
             <button
               disabled={currentPage === totalPages}
-              onClick={() => window.location.search = `?page=${currentPage + 1}`}
+              onClick={() =>
+                (window.location.search = `?page=${currentPage + 1}`)
+              }
               className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
             >
               Next

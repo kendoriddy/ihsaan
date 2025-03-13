@@ -32,7 +32,7 @@ const Button = ({
       text: "text-gray-500 hover:bg-gray-50 active:bg-gray-100",
     },
     secondary: {
-      contained: "bg-blue-600 hover:bg-blue-600 active:bg-blue-700",
+      contained: "bg-blue-600 hover:bg-blue-600 active:bg-blue-700 rounded-md",
       outlined:
         "border-blue-500 text-blue-500 hover:bg-blue-50 active:bg-blue-100",
       text: "text-blue-500 hover:bg-blue-50 active:bg-blue-100",
@@ -92,7 +92,8 @@ const Button = ({
           handleRipple(e);
           if (onClick) onClick(e);
         }
-      }}>
+      }}
+    >
       {children}
       <span className="absolute inset-0 overflow-hidden">
         {ripples.map((ripple) => (

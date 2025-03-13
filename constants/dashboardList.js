@@ -9,6 +9,9 @@ import QuizIcon from "@mui/icons-material/Quiz";
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 
+const roles = localStorage.getItem("roles");
+const parsedRoles = JSON.parse(roles);
+
 const DASHBOARD_LIST = {
   mentor: [
     { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
@@ -44,9 +47,9 @@ const DASHBOARD_LIST = {
     },
     {
       id: 6,
-      name: "Counsellor Manual",
+      name: parsedRoles?.includes("TUTOR") ? "Set Quiz" : "Take Quiz",
       icon: QuizIcon,
-      path: "/dashboard/counsellor-manual",
+      path: "/quiz",
     },
     {
       id: 7,
