@@ -13,7 +13,7 @@ const QuizList = ({ setCurrentScreen }) => {
   const [selectedQuiz, setSelectedQuiz] = useState(null);
 
   return (
-    <div className="w-full max-w-4xl px-4">
+    <div className="w-full px-4">
       <h2 className="text-2xl font-semibold mb-6">Quiz List</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {quizzes.map((quiz) => (
