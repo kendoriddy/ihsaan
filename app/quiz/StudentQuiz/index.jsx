@@ -1,31 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import QuizQuestion from "./components/QuizQuestions";
 import QuizInstructions from "./components/QuizInstruction";
 import QuizList from "./components/QuizList";
 
-// const questions = [
-//   {
-//     id: "1",
-//     text: "Who is Muhammad?",
-//     options: [
-//       "A. An ordinary man",
-//       "B. A man from Africa",
-//       "C. The last Messenger of Allah",
-//       "D. The first Prophet of Allah",
-//     ],
-//   },
-//   {
-//     id: "2",
-//     text: "What is the capital of France?",
-//     options: ["A. London", "B. Berlin", "C. Paris", "D. Madrid"],
-//   },
-//   // Add more questions as needed
-// ];
-
 const StudentQuiz = () => {
   const [currentScreen, setCurrentScreen] = useState("list");
+  const [fetchAll, setFetchAll] = useState(false);
+  const [totalQuestions, setTotalQuestions] = useState(10);
 
   const {
     isLoading,
@@ -34,10 +17,19 @@ const StudentQuiz = () => {
     refetch,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/`
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/?page_size=${
+      fetchAll ? totalQuestions : 10
+    }`,
+    (data) => {
+      if (data?.total && !fetchAll) {
+        setTotalQuestions(data.total);
+        setFetchAll(true);
+        refetch();
+      }
+    }
   );
 
-  const Questions = QuestionsList && QuestionsList?.data?.results;
+  const Questions = QuestionsList && QuestionsList?.data;
 
   return (
     <div>
@@ -50,7 +42,9 @@ const StudentQuiz = () => {
           setCurrentScreen={setCurrentScreen}
         />
       )}
-      {currentScreen === "quiz" && <QuizQuestion questions={Questions} />}
+      {currentScreen === "quiz" && (
+        <QuizQuestion questions={Questions?.results} />
+      )}
     </div>
   );
 };

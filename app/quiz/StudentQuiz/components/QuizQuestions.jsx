@@ -57,19 +57,41 @@ const QuizQuestion = ({ questions }) => {
 
   const handleNext = () => {
     if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setCurrentQuestionIndex((prev) => {
+        const nextIndex = prev + 1;
+        scrollToTracker(nextIndex);
+        return nextIndex;
+      });
       setSelectedOption(answers[currentQuestionIndex + 1]);
     }
   };
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setCurrentQuestionIndex((prev) => {
+        const prevIndex = prev - 1;
+        scrollToTracker(prevIndex);
+        return prevIndex;
+      });
       setSelectedOption(answers[currentQuestionIndex - 1]);
     }
   };
 
+  const scrollToTracker = (index) => {
+    const element = document.getElementById(`tracker-${index}`);
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  };
+
   const handleSubmit = () => {
+    if (answers.includes(null)) {
+      alert("Please answer all questions before submitting!");
+      return;
+    }
     alert("Quiz submitted! Answers: " + JSON.stringify(answers));
   };
 
@@ -98,7 +120,6 @@ const QuizQuestion = ({ questions }) => {
 
   return (
     <div className="w-full px-4 flex">
-      {/* Main Quiz Area */}
       <div className="flex-1">
         <div className="flex justify-between mb-4">
           <Box
@@ -146,10 +167,10 @@ const QuizQuestion = ({ questions }) => {
           </Box>
         </div>
         <div className="border border-gray-300 rounded-md p-6 shadow-sm">
-          <p className="text-lg font-medium mb-4">
+          <p className="text-lg text-center font-semibold mb-4">
             Question {currentQuestionIndex + 1}
           </p>
-          <p className="text-lg font-medium mb-4">
+          <p className="text-lg text-center font-medium mb-4">
             {currentQuestion?.question_text}
           </p>
           <div className="space-y-3">
@@ -165,7 +186,7 @@ const QuizQuestion = ({ questions }) => {
                     value={option}
                     checked={selectedOption === option}
                     onChange={() => handleOptionSelect(option)}
-                    className="w-5 h-5 text-purple-600 border-gray-300 focus:ring-purple-600 mr-2"
+                    className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-600 mr-2"
                   />
                   {option}
                 </label>
@@ -197,11 +218,15 @@ const QuizQuestion = ({ questions }) => {
         </div>
       </div>
 
-      <div className="w-1/4 pl-4">
+      <div className="w-1/4 pl-4 sticky top-10 max-h-[85vh] overflow-y-auto">
         <h3 className="text-lg font-medium mb-4">Track Questions</h3>
         <div className="space-y-2">
           {questions.map((_, index) => (
-            <div key={index} className="flex items-center">
+            <div
+              key={index}
+              id={`tracker-${index}`}
+              className="flex items-center transition-all duration-300"
+            >
               <input
                 type="checkbox"
                 checked={answers[index] !== null}
@@ -217,7 +242,9 @@ const QuizQuestion = ({ questions }) => {
               >
                 {index + 1}
               </span>
-              <span className="ml-2 text-sm">QUE {index + 1}</span>
+              <span className="ml-2 text-sm text-nowrap">
+                {answers[index] ? "Answered" : "Unanswered"}
+              </span>
             </div>
           ))}
         </div>

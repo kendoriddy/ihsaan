@@ -121,11 +121,13 @@ export const useFetch = (
     refetch,
     isInitialLoading,
   } = useQuery(
-    [key],
+    [key, url],
     async () =>
       http.get(url.startsWith("http") ? url : `${http.defaults.baseURL}${url}`),
     {
-      onSuccess: success,
+      onSuccess: (data) => {
+        if (success) success(data?.data);
+      },
       onError: errorfn,
       enabled,
       refetchInterval,

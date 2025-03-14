@@ -7,7 +7,7 @@ const QuizInstructions = ({ questions, setCurrentScreen }) => {
       <div className="text-center">
         <p className="text-lg font-medium mb-4">Read Carefully</p>
         <p className="text-gray-600 mb-4">
-          This quiz consists of {questions?.length} questions. You will have a
+          This quiz consists of {questions?.total} questions. You will have a
           limited time to complete the quiz. Make sure to read each question
           carefully and select the best answer. You can navigate between
           questions using the "Previous" and "Next" buttons. Once you are ready,
