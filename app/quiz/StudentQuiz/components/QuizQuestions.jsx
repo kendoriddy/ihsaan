@@ -119,7 +119,7 @@ const QuizQuestion = ({ questions }) => {
   ];
 
   return (
-    <div className="w-full px-4 flex">
+    <div className="w-full flex">
       <div className="flex-1">
         <div className="flex justify-between mb-4">
           <Box

@@ -10,7 +10,7 @@ import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstruct
 import StorefrontIcon from "@mui/icons-material/Storefront";
 
 const roles = localStorage.getItem("roles");
-const parsedRoles = JSON.parse(roles);
+const parsedRoles = roles ? JSON.parse(roles) : [];
 
 const DASHBOARD_LIST = {
   mentor: [

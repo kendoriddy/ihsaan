@@ -35,7 +35,7 @@ const QuizPage = () => {
     );
   };
   const roles = localStorage.getItem("roles");
-  const parsedRoles = JSON.parse(roles);
+  const parsedRoles = roles ? JSON.parse(roles) : [];
   return (
     <Layout>
       {parsedRoles?.includes("TUTOR") ? "" : <StudentQuiz />}
