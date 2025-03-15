@@ -1,4 +1,5 @@
 import { string, object, array, number, mixed, bool, ref } from "yup";
+import * as Yup from "yup";
 
 export const LoginSchema = object({
   email: string().email("Enter  Valid Email").required("Required"),
@@ -86,4 +87,28 @@ export const ChangePasswordSchema = object({
   confirm_password: string()
     .oneOf([ref("password"), null], "Passwords must match")
     .required("Password is required"),
+});
+
+export const addQuizSchema = Yup.object().shape({
+  course_id: Yup.string().required("Course is required"),
+  questions: Yup.array().of(
+    Yup.object().shape({
+      question_text: Yup.string().required("Question text is required"),
+      options: Yup.object().test(
+        "at-least-two-options",
+        "At least two options are required",
+        (options) => Object.values(options).filter(Boolean).length >= 2
+      ),
+      correct_answer: Yup.string()
+        .test(
+          "match-options",
+          "Correct answer must be one of the available options",
+          function (value) {
+            const options = this.parent.options;
+            return value && options[value] !== undefined;
+          }
+        )
+        .required("Correct answer is required"),
+    })
+  ),
 });

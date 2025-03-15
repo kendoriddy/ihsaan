@@ -1,22 +1,43 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import { useFetch } from "@/hooks/useHttp/useHttp";
 import Button from "@/components/Button";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CardActionArea from "@mui/material/CardActionArea";
-import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
-const QuizQuestion = ({ questions }) => {
+const QuizQuestion = ({ questions, setCurrentScreen }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [answers, setAnswers] = useState(Array(questions?.length).fill(null));
-
-  const currentQuestion = questions[currentQuestionIndex];
-  const totalQuestions = questions.length;
-  const answeredQuestions = answers.filter((answer) => answer !== null).length;
-  const pendingQuestions = totalQuestions - answeredQuestions;
-
   const [timeLeft, setTimeLeft] = useState(30 * 60 * 1000);
+
+  const course_id = localStorage.getItem("selectedCourse");
+  const {
+    isLoading,
+    data: QuestionsList,
+    isFetching,
+    refetch,
+  } = useFetch(
+    "questions",
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?assessment_type=TEST&page_size=20&course_id=${course_id}`,
+    (data) => {
+      localStorage.removeItem("selectedCourse");
+    },
+    (error) => {
+      toast.error(
+        error.error ||
+          "Failed to load questions, make sure you're eligible for the quiz"
+      );
+      setCurrentScreen("list");
+    }
+  );
+
+  const Questions = QuestionsList && QuestionsList?.data?.results;
+
   useEffect(() => {
     if (timeLeft <= 0) {
       alert("Time's up!");
@@ -35,6 +56,32 @@ const QuizQuestion = ({ questions }) => {
 
     return () => clearInterval(timer);
   }, [timeLeft]);
+
+  // Handle loading state
+  if (isLoading || isFetching) {
+    return (
+      <div className="flex justify-center items-center h-[80vh]">
+        <p className="text-lg font-semibold text-gray-600">
+          Loading questions...
+        </p>
+      </div>
+    );
+  }
+
+  if (!Questions.length) {
+    return (
+      <div className="flex justify-center items-center h-[80vh]">
+        <p className="text-lg font-semibold text-gray-600">
+          No questions available for this course.
+        </p>
+      </div>
+    );
+  }
+
+  const currentQuestion = Questions[currentQuestionIndex];
+  const totalQuestions = Questions.length;
+  const answeredQuestions = answers.filter((answer) => answer !== null).length;
+  const pendingQuestions = totalQuestions - answeredQuestions;
 
   const formatTime = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
@@ -221,7 +268,7 @@ const QuizQuestion = ({ questions }) => {
       <div className="w-1/4 pl-4 sticky top-10 max-h-[85vh] overflow-y-auto">
         <h3 className="text-lg font-medium mb-4">Track Questions</h3>
         <div className="space-y-2">
-          {questions.map((_, index) => (
+          {Questions.map((_, index) => (
             <div
               key={index}
               id={`tracker-${index}`}

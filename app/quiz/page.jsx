@@ -1,47 +1,32 @@
 "use client";
+import { useState } from "react";
+import QuizQuestion from "./components/QuizQuestions";
+import QuizInstructions from "./components/QuizInstruction";
+import QuizList from "./components/QuizList";
 import Layout from "@/components/Layout";
-import { useState, useEffect } from "react";
-import StudentQuiz from "./StudentQuiz";
 
-const QuizPage = () => {
-  const [questions, setQuestions] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
+const StudentQuiz = () => {
+  const [currentScreen, setCurrentScreen] = useState("list");
 
-  // useEffect(() => {
-  //   fetchQuestions(currentPage);
-  // }, [currentPage]);
-
-  // const fetchQuestions = async (page) => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await fetch(
-  //       `https://ihsaanlms.onrender.com/assessment/mcquestions/`
-  //     );
-  //     const data = await response.json();
-  //     setQuestions(data.results || []);
-  //     setTotalPages(Math.ceil(data.count / 10)); // Assuming 10 questions per page
-  //   } catch (error) {
-  //     console.error("Error fetching questions:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  const handleDeleteSuccess = (deletedId) => {
-    setQuestions((prevQuestions) =>
-      prevQuestions.filter((q) => q.id !== deletedId)
-    );
-  };
-  const roles = localStorage.getItem("roles");
-  const parsedRoles = roles ? JSON.parse(roles) : [];
   return (
     <Layout>
-      {parsedRoles?.includes("TUTOR") ? "" : <StudentQuiz />}
-      <StudentQuiz />
+      <div>
+        {currentScreen === "list" && (
+          <QuizList setCurrentScreen={setCurrentScreen} />
+        )}
+        {currentScreen === "instructions" && (
+          <QuizInstructions
+            // questions={Questions}
+            setCurrentScreen={setCurrentScreen}
+          />
+        )}
+        {currentScreen === "quiz" && (
+          <QuizQuestion setCurrentScreen={setCurrentScreen} />
+          // questions={Questions?.results}
+        )}
+      </div>
     </Layout>
   );
 };
 
-export default QuizPage;
+export default StudentQuiz;
