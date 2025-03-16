@@ -163,6 +163,22 @@ export const usePost = (url, options) => {
   };
 };
 
+export const usePatch = (url, options) => {
+  const { mutate, isLoading } = useMutation(
+    (postData) =>
+      http.patch(
+        url.startsWith("http") ? url : `${http.defaults.baseURL}${url}`,
+        postData
+      ),
+    options
+  );
+
+  return {
+    mutate,
+    isLoading,
+  };
+};
+
 export const useDelete = (url, options) => {
   const { mutate, isLoading } = useMutation(
     (id) =>

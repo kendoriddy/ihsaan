@@ -92,7 +92,7 @@ const AddingQuiz = () => {
   };
 
   return (
-    <div className="w-full px-4">
+    <div className="">
       <h2 className="text-2xl font-semibold mb-6 text-center">
         Set Quiz Question(s)
       </h2>
