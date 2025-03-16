@@ -11,6 +11,7 @@ import { useDelete, usePost, usePut, usePut2 } from "@/hooks/useHttp/useHttp";
 import { toast } from "react-toastify";
 import Pagination from "@mui/material/Pagination";
 import { Tabs, Tab } from "@mui/material";
+import { formatQualification } from "@/utils/utilFunctions";
 
 const TutorApplication = () => {
   const currentRoute = usePathname();
@@ -44,7 +45,6 @@ const TutorApplication = () => {
     setSelectedStatus(tutor.tutor_application_status);
     setIsViewModalOpen(true);
   };
-
   // Function to fetch tutors based on status
   const fetchTutorsByStatus = (status) => {
     let statusFilter;
@@ -142,12 +142,12 @@ const TutorApplication = () => {
   });
 
   const { mutate: updateApplicationStatus } = usePut2({
-    onSuccess: () => dispatch(fetchTutors({ page: 1, pageSize: 10 })),
+    onSuccess: () => fetchTutorsByStatus(selectedTab),
   });
 
-  useEffect(() => {
-    dispatch(fetchTutors({ page: 1, pageSize: 10 }));
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchTutors({ page: 1, pageSize: 10 }));
+  // }, [dispatch]);
 
   useEffect(() => {
     if (fetchedTutors) {
@@ -186,10 +186,12 @@ const TutorApplication = () => {
       data.tutor_rejection_reason = rejectionReason;
     }
 
-    const token = localStorage.getItem("token");
-    console.log(selectedTutor, "selected Tutor:");
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+    }
 
     const updateStatusPromise = new Promise((resolve, reject) => {
+      const token = localStorage.getItem("token");
       updateApplicationStatus(
         {
           url: `https://ihsaanlms.onrender.com/api/admin/tutor/application/${tutorToEdit?.id}/update/`,
@@ -324,7 +326,7 @@ const TutorApplication = () => {
                         </td>
                         <td className="border px-4 py-2">{tutor.gender}</td>
                         <td className="border px-4 py-2">
-                          {tutor.highest_qualification}
+                          {formatQualification(tutor.highest_qualification)}
                         </td>
                         <td className="border px-4 py-2">
                           {tutor.professional_bio}
@@ -556,13 +558,14 @@ const TutorApplication = () => {
                     <tr className="bg-gray-100">
                       <td className="border px-4 py-2 font-semibold">Name</td>
                       <td className="border px-4 py-2">
-                        {selectedTutor.first_name} {selectedTutor.last_name}
+                        {selectedTutor.user_details.first_name}{" "}
+                        {selectedTutor.user_details.last_name}
                       </td>
                     </tr>
                     <tr>
                       <td className="border px-4 py-2 font-semibold">Email</td>
                       <td className="border px-4 py-2">
-                        {selectedTutor.email}
+                        {selectedTutor.user_details.email}
                       </td>
                     </tr>
                     <tr className="bg-gray-100">

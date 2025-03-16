@@ -324,6 +324,16 @@ const maritalStatus = [
   { key: "Others", value: "others" },
 ];
 
+// utils/utilFunctions.js
+export function formatQualification(qualification) {
+  if (!qualification) return "N/A"; // Handle null or undefined
+
+  return qualification
+    .split("-") // Split the string by hyphens
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+    .join(" "); // Join the words back together with spaces
+}
+
 export {
   formatDate,
   serverDateFormat,

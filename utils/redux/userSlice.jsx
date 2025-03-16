@@ -7,6 +7,7 @@ const initialState = {
     email: null,
     first_name: null,
     cartItems: [],
+    roles: [],
   },
 };
 
@@ -20,9 +21,26 @@ export const userSlice = createSlice({
     addCartItem: (state, action) => {
       state.user.cartItems = [...state.user.cartItems, action.payload];
     },
+    removeCartItem: (state, action) => {
+      state.user.cartItems = state.user.cartItems.filter(
+        (item) => item.id !== action.payload
+      );
+    },
+    setUserRoles: (state, action) => {
+      state.user.roles = action.payload;
+    },
+    clearUserRoles: (state) => {
+      state.user.roles = [];
+    },
   },
 });
 
-export const { setUser, addCartItem } = userSlice.actions;
+export const {
+  setUser,
+  addCartItem,
+  removeCartItem,
+  setUserRoles,
+  clearUserRoles,
+} = userSlice.actions;
 
 export default userSlice.reducer;

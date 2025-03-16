@@ -49,6 +49,7 @@ function AdminDashboardHeader({ toggleSidebar }) {
   console.log(user, "oooo");
   const handleLogOut = () => {
     dispatch(logoutUser());
+    setAnchorEl(null);
     router.push("/");
     toast.info("Logged out successfully");
   };

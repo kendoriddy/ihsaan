@@ -11,13 +11,16 @@ import { logoutUser } from "@/utils/redux/slices/auth.reducer";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { setUserRoles } from "@/utils/redux/userSlice";
 
 function DashboardSidebar({ currentRoute }) {
   const dispatch = useDispatch();
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [roles, setRoles] = useState([]);
+  const [dashboardItems, setDashboardItems] = useState([]);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -28,6 +31,31 @@ function DashboardSidebar({ currentRoute }) {
     toast.info("Logged out successfully");
     router.push("/login");
   };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userRoles = JSON.parse(localStorage.getItem("roles"));
+      if (!userRoles) {
+        router.push("/login");
+        toast.info("Login to continue");
+      } else {
+        dispatch(setUserRoles(userRoles));
+        setRoles(userRoles);
+      }
+    }
+  }, [dispatch, router]);
+
+  useEffect(() => {
+    if (roles.includes("STUDENT")) {
+      setDashboardItems(DASHBOARD_LIST.student);
+    } else if (roles.includes("TUTOR")) {
+      setDashboardItems(DASHBOARD_LIST.tutor);
+    } else if (roles.includes("MENTOR")) {
+      setDashboardItems(DASHBOARD_LIST.mentor);
+    } else {
+      setDashboardItems([]);
+    }
+  }, [roles]);
 
   return (
     <section className="flex relative md:w-64">
@@ -78,7 +106,7 @@ function DashboardSidebar({ currentRoute }) {
         {/* Left list */}
         <div>
           <ul className="px-4">
-            {DASHBOARD_LIST.mentor.map((item) => (
+            {dashboardItems.map((item) => (
               <li key={item.id}>
                 {item.name === "Logout" ? (
                   <div
@@ -87,7 +115,7 @@ function DashboardSidebar({ currentRoute }) {
                       currentRoute === item.path && "bg-blue-600 text-white"
                     } ${
                       currentRoute !== item.path &&
-                      "hover:bg-gray-100 hover:pr-3 text-black"
+                      "hover:bg-gray-100 hover:pr-3 text-primary"
                     }`}
                   >
                     <div className="flex items-center">

@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import http, { apiLink } from "@/hooks/axios/axios";
 
-export const fetchTutors = createAsyncThunk(
-  "tutors/fetchTutors",
+export const fetchStudents = createAsyncThunk(
+  "students/fetchStudents",
   async ({ page = 1, pageSize = 10, status, endpoint }) => {
     const queryParams = new URLSearchParams({
       page: page.toString(),
@@ -13,15 +13,16 @@ export const fetchTutors = createAsyncThunk(
       queryParams.append("status", status);
     }
     const response = await http.get(`${endpoint}?${queryParams.toString()}`);
+    console.log(response, "come on:");
 
     return response.data;
   }
 );
 
-const tutorSlice = createSlice({
-  name: "tutors",
+const studentSlice = createSlice({
+  name: "students",
   initialState: {
-    tutors: [],
+    students: [],
     status: "idle",
     error: null,
     pagination: {
@@ -34,12 +35,12 @@ const tutorSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTutors.pending, (state) => {
+      .addCase(fetchStudents.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchTutors.fulfilled, (state, action) => {
+      .addCase(fetchStudents.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.tutors = action.payload.results;
+        state.students = action.payload.results;
         state.pagination = {
           total: action.payload.total,
           totalPages: action.payload.total_pages,
@@ -47,11 +48,11 @@ const tutorSlice = createSlice({
           pageSize: action.payload.page_size,
         };
       })
-      .addCase(fetchTutors.rejected, (state, action) => {
+      .addCase(fetchStudents.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       });
   },
 });
 
-export default tutorSlice.reducer;
+export default studentSlice.reducer;
