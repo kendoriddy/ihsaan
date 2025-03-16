@@ -1,7 +1,8 @@
+import { formatQualification } from "@/utils/utilFunctions";
 import { Box } from "@mui/material";
 import React from "react";
 
-const EditApplication = ({ selectedApplication, handleClose }) => {
+const EditApplication = ({ selectedApplication, handleClose, userRoles }) => {
   return (
     <div>
       {" "}
@@ -34,19 +35,24 @@ const EditApplication = ({ selectedApplication, handleClose }) => {
               </tr> */}
               <tr className="bg-gray-100">
                 <td className="border px-4 py-2 font-semibold">
-                  Tutor Application Status
+                  Application Status
                 </td>
                 <td className="border px-4 py-2">
-                  {selectedApplication.tutor_application_status}
+                  {userRoles?.includes("TUTOR")
+                    ? selectedApplication.tutor_application_status
+                    : selectedApplication.student_application_status}
                 </td>
               </tr>
-              {selectedApplication.tutor_rejection_reason && (
+              {(selectedApplication.tutor_rejection_reason ||
+                selectedApplication.student_rejection_reason) && (
                 <tr className="bg-gray-100">
                   <td className="border px-4 py-2 font-semibold">
-                    Tutor Rejection Reason
+                    Rejection Reason
                   </td>
                   <td className="border px-4 py-2">
-                    {selectedApplication.tutor_rejection_reason}
+                    {userRoles?.includes("TUTOR")
+                      ? selectedApplication.tutor_rejection_reason
+                      : selectedApplication.student_rejection_reason}
                   </td>
                 </tr>
               )}
@@ -61,7 +67,9 @@ const EditApplication = ({ selectedApplication, handleClose }) => {
                   Qualification
                 </td>
                 <td className="border px-4 py-2">
-                  {selectedApplication.highest_qualification}
+                  {formatQualification(
+                    selectedApplication.highest_qualification
+                  )}
                 </td>
               </tr>
               <tr>
@@ -92,14 +100,16 @@ const EditApplication = ({ selectedApplication, handleClose }) => {
                   {selectedApplication.years_of_experience || "-"} years
                 </td>
               </tr>
-              <tr>
-                <td className="border px-4 py-2 font-semibold">
-                  Professional Bio
-                </td>
-                <td className="border px-4 py-2">
-                  {selectedApplication.professional_bio}
-                </td>
-              </tr>
+              {userRoles?.includes("TUTOR") && (
+                <tr>
+                  <td className="border px-4 py-2 font-semibold">
+                    Professional Bio
+                  </td>
+                  <td className="border px-4 py-2">
+                    {selectedApplication.professional_bio}
+                  </td>
+                </tr>
+              )}
               <tr>
                 <td className="border px-4 py-2 font-semibold">
                   Additional Info
@@ -120,14 +130,16 @@ const EditApplication = ({ selectedApplication, handleClose }) => {
                   {selectedApplication.religion}
                 </td>
               </tr>
-              <tr>
-                <td className="border px-4 py-2 font-semibold">
-                  Area of Specialization
-                </td>
-                <td className="border px-4 py-2">
-                  {selectedApplication.area_of_specialization}
-                </td>
-              </tr>
+              {userRoles?.includes("TUTOR") && (
+                <tr>
+                  <td className="border px-4 py-2 font-semibold">
+                    Area of Specialization
+                  </td>
+                  <td className="border px-4 py-2">
+                    {selectedApplication.area_of_specialization}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

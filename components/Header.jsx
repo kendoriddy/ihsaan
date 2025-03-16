@@ -35,9 +35,20 @@ function Header() {
     data: getAuthUserInformation,
     isLoading,
     refetch,
-  } = useFetch("authUser", `/auth/logged-in-user/`);
+  } = useFetch(
+    "authUser",
+    typeof window !== "undefined" && localStorage.getItem("token")
+      ? `/auth/logged-in-user/`
+      : null
+  );
   const authenticatedUsersPayload =
     getAuthUserInformation && getAuthUserInformation?.data;
+  if (typeof window !== "undefined") {
+    localStorage.setItem(
+      "userFullData",
+      JSON.stringify(getAuthUserInformation?.data)
+    );
+  }
   const isAuth = useSelector(selectIsAuth);
   const signedInUserName = useSelector(currentlyLoggedInUser);
   const dispatch = useDispatch();
@@ -179,7 +190,7 @@ function Header() {
     };
     createNewaccounts(payload);
   };
-  console.log(type, "oooo");
+
   const logOut = () => {
     dispatch(logoutUser());
     router.push("/login");
@@ -576,20 +587,24 @@ function Header() {
                               placeholder="Which gender of mentee do you prefer?"
                             />
                           </div> */}
-                          <div>
-                            <FormikControl
-                              name="professional_bio"
-                              placeholder="Enter professional bio"
-                              multiline
-                              minRows={3}
-                            />
-                          </div>
-                          <div>
-                            <FormikControl
-                              name="mentorship_areas"
-                              placeholder="Areas of expertise"
-                            />
-                          </div>
+                          {type !== "student" && (
+                            <div>
+                              <FormikControl
+                                name="professional_bio"
+                                placeholder="Enter professional bio"
+                                multiline
+                                minRows={3}
+                              />
+                            </div>
+                          )}
+                          {type !== "student" && (
+                            <div>
+                              <FormikControl
+                                name="mentorship_areas"
+                                placeholder="Areas of expertise"
+                              />
+                            </div>
+                          )}
                           {/* <div>
                             <FormikControl
                               name="councelling_areas"
