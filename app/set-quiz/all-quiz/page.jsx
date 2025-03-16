@@ -17,6 +17,8 @@ import { toast } from "react-toastify";
 import Layout from "@/components/Layout";
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
+import Loader from "@/components/Loader";
+import EditQuizQuestion from "../components/EditQuiz";
 
 const AllQuiz = () => {
   const queryClient = useQueryClient();
@@ -53,22 +55,6 @@ const AllQuiz = () => {
     }
   );
 
-  // UPDATE QUESTION
-  const { mutate: updateQuestion, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/${selectedQuestion?.id}/`,
-    {
-      onSuccess: () => {
-        toast.success("Updated successfully");
-        setOpenUpdateModal(false);
-        queryClient.invalidateQueries("questions");
-      },
-      onError: (error) => {
-        toast.error(error.response?.data?.message || "Update failed");
-        console.log("update error", error);
-      },
-    }
-  );
-
   // Handle Page Change
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -80,6 +66,8 @@ const AllQuiz = () => {
       questionDelete(`${selectedQuestion.id}/`);
     }
   };
+
+  const handleOpenUpdateModal = () => {};
 
   return (
     <Layout>
@@ -95,7 +83,12 @@ const AllQuiz = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {isFetching && <p>Getting next page</p>}
+              {isFetching && (
+                <div className="flex flex-col items-center justify-center gap-2 mx-auto w-[60%]">
+                  <Loader />
+                  <p className="animate-pulse">Loading...</p>
+                </div>
+              )}
               {!isFetching && (
                 <>
                   {questions.map((question) => (
@@ -160,37 +153,12 @@ const AllQuiz = () => {
         </CustomModal>
 
         {/* Update Question Modal */}
-        <CustomModal
-          open={openUpdateModal}
-          onClose={() => setOpenUpdateModal(false)}
-          title="Update Question"
-          onConfirm={updateQuestion}
-          confirmText="Update"
-          isLoading={isUpdating}
-        >
-          <TextField
-            fullWidth
-            label="Question"
-            margin="dense"
-            defaultValue={selectedQuestion?.question_text}
-          />
-          {selectedQuestion?.options &&
-            Object.entries(selectedQuestion.options).map(([key, value]) => (
-              <TextField
-                key={key}
-                fullWidth
-                label={`Option ${key}`}
-                margin="dense"
-                defaultValue={value}
-              />
-            ))}
-          <TextField
-            fullWidth
-            label="Correct Answer"
-            margin="dense"
-            defaultValue={selectedQuestion?.correct_answer}
-          />
-        </CustomModal>
+        <EditQuizQuestion
+          openUpdateModal={openUpdateModal}
+          setOpenUpdateModal={setOpenUpdateModal}
+          selectedQuestion={selectedQuestion}
+          refetchQuestions={refetch}
+        />
       </div>
     </Layout>
   );
