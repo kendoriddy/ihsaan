@@ -101,7 +101,7 @@ const AllQuiz = () => {
                   {questions.map((question) => (
                     <TableRow key={question.id}>
                       <TableCell>{question.question_text}</TableCell>
-                      <TableCell>
+                      <TableCell className="flex gap-2 flex-wrap text-nowrap">
                         {Object.entries(question.options).map(
                           ([key, value]) => (
                             <div key={key}>
@@ -111,14 +111,13 @@ const AllQuiz = () => {
                         )}
                       </TableCell>
                       <TableCell>{question.correct_answer}</TableCell>
-                      <TableCell>
+                      <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
                         <Button
                           color="secondary"
                           onClick={() => {
                             setSelectedQuestion(question);
                             setOpenUpdateModal(true);
                           }}
-                          className="mr-2"
                         >
                           Update
                         </Button>
