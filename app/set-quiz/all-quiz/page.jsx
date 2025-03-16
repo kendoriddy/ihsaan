@@ -26,7 +26,7 @@ const AllQuiz = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [totalQuestions, setTotalQuestions] = useState(0);
 
-  const { isLoading, data, refetch } = useFetch(
+  const { isLoading, data, refetch, isFetching } = useFetch(
     "questions",
     `https://ihsaanlms.onrender.com/assessment/mcquestions/?page_size=15&page=${page}`,
     (data) => {
@@ -70,7 +70,7 @@ const AllQuiz = () => {
   );
 
   // Handle Page Change
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (event, newPage) => {
     setPage(newPage);
     refetch();
   };
@@ -95,39 +95,46 @@ const AllQuiz = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {questions.map((question) => (
-                <TableRow key={question.id}>
-                  <TableCell>{question.question_text}</TableCell>
-                  <TableCell>
-                    {Object.entries(question.options).map(([key, value]) => (
-                      <div key={key}>
-                        <strong>{key}:</strong> {value}
-                      </div>
-                    ))}
-                  </TableCell>
-                  <TableCell>{question.correct_answer}</TableCell>
-                  <TableCell>
-                    <Button
-                      color="secondary"
-                      onClick={() => {
-                        setSelectedQuestion(question);
-                        setOpenUpdateModal(true);
-                      }}
-                      className="mr-2"
-                    >
-                      Update
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setSelectedQuestion(question);
-                        setOpenDeleteDialog(true);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {isFetching && <p>Getting next page</p>}
+              {!isFetching && (
+                <>
+                  {questions.map((question) => (
+                    <TableRow key={question.id}>
+                      <TableCell>{question.question_text}</TableCell>
+                      <TableCell>
+                        {Object.entries(question.options).map(
+                          ([key, value]) => (
+                            <div key={key}>
+                              <strong>{key}:</strong> {value}
+                            </div>
+                          )
+                        )}
+                      </TableCell>
+                      <TableCell>{question.correct_answer}</TableCell>
+                      <TableCell>
+                        <Button
+                          color="secondary"
+                          onClick={() => {
+                            setSelectedQuestion(question);
+                            setOpenUpdateModal(true);
+                          }}
+                          className="mr-2"
+                        >
+                          Update
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setSelectedQuestion(question);
+                            setOpenDeleteDialog(true);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
