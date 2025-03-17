@@ -11,7 +11,38 @@ import StorefrontIcon from "@mui/icons-material/Storefront";
 import { Assignment } from "@mui/icons-material";
 
 const DASHBOARD_LIST = {
-  users: [
+  student: [
+    { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
+    {
+      id: 5,
+      name: "Assignment",
+      icon: Assignment,
+      path: "/assignment",
+    },
+    {
+      id: 6,
+      name: "Take Quiz",
+      icon: QuizIcon,
+      path: "/quiz",
+    },{
+      id: 12,
+      name: "Applications",
+      icon: BookmarkIcon,
+      path: "/dashboard/my-applications",
+    },
+    { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },
+  ],
+  tutor: [
+    { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
+    {
+      id: 12,
+      name: "Applications",
+      icon: BookmarkIcon,
+      path: "/dashboard/my-applications",
+    },
+    { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },
+  ],
+  mentor: [
     { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
     {
       id: 12,

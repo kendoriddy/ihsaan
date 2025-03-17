@@ -5,7 +5,10 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { currentlyLoggedInUser } from "@/utils/redux/slices/auth.reducer";
-import { allPossibleQualifications } from "@/utils/utilFunctions";
+import {
+  allPossibleQualifications,
+  formatQualification,
+} from "@/utils/utilFunctions";
 import { WavingHand } from "@mui/icons-material";
 import {
   Modal,
@@ -25,6 +28,7 @@ import axios from "axios";
 import { baseurl } from "@/hooks/useHttp/api";
 import EditApplication from "@/components/my-applications/EditApplication";
 import TutorForm from "@/components/my-applications/TutorForm";
+import StudentForm from "@/components/my-applications/StudentForm";
 
 const Page = () => {
   const currentRoute = usePathname();
@@ -46,6 +50,10 @@ const Page = () => {
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
+  const userRoles = useSelector((state) => state.user.user.roles);
+
+  console.log(userRoles, "user roles:");
+
   const handleFormClose = () => {
     setFormOpen(false);
     setApplicationType("");
@@ -60,7 +68,10 @@ const Page = () => {
   const fetchApplicationData = async () => {
     try {
       setIsLoading(true);
-      const response = await baseurl.get(`/tutor/applications/list/`, {
+      let endpoint = userRoles.includes("TUTOR")
+        ? "/tutor/applications/list/"
+        : "/student/applications/list/";
+      const response = await baseurl.get(endpoint, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -76,7 +87,7 @@ const Page = () => {
 
   useEffect(() => {
     fetchApplicationData();
-  }, []);
+  }, [userRoles]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -104,141 +115,6 @@ const Page = () => {
     value: i + 1,
     label: `${i + 1} year${i + 1 > 1 ? "s" : ""}`,
   }));
-
-  const fieldConfig = {
-    first_name: {
-      editable: false,
-      visible: true,
-      label: "First Name",
-      type: "text",
-    },
-    last_name: {
-      editable: false,
-      visible: true,
-      label: "Last Name",
-      type: "text",
-    },
-    email: { editable: false, visible: true, label: "Email", type: "text" },
-    country: { editable: false, visible: true, label: "Country", type: "text" },
-    years_of_experience: {
-      editable: true,
-      visible: true,
-      label: "Total Years of Experience",
-      type: "select",
-      options: yearsOfExperienceOptions.map((option) => option.value),
-    },
-    professional_bio: {
-      editable: true,
-      visible: true,
-      label: "Professional Bio",
-      type: "textarea",
-    },
-    additional_info: {
-      editable: true,
-      visible: true,
-      label: "Additional Info",
-      type: "textarea",
-    },
-    skills: { editable: true, visible: true, label: "Skills", type: "text" },
-    highest_qualification: {
-      editable: true,
-      visible: true,
-      label: "Highest Qualification",
-      type: "select",
-      options: qualificationsList.map((qualification) =>
-        qualification.key.toLowerCase()
-      ),
-    },
-    religion: {
-      editable: true,
-      visible: true,
-      label: "Religion",
-      type: "select",
-      options: ["islam", "christain", "others"],
-    },
-    gender: {
-      editable: false,
-      visible: true,
-      label: "Gender",
-      type: "select",
-      options: ["male", "female", "others"],
-    },
-    marital_status: {
-      editable: true,
-      visible: true,
-      label: "Marital Status",
-      type: "select",
-      options: ["single", "married", "divorced", "widowed"],
-    },
-    date_of_birth: {
-      editable: true,
-      visible: true,
-      label: "Date of Birth",
-      type: "date",
-    },
-    preferred_mentee_gender: {
-      editable: true,
-      visible: true,
-      label: "Preferred Mentee Gender",
-      type: "select",
-      options: ["Male", "Female", "No Preference"],
-    },
-    mentorship_areas: {
-      editable: true,
-      visible: true,
-      label: "Mentorship Areas",
-      type: "textarea",
-    },
-    tutor_application_status: {
-      editable: false,
-      visible: false,
-      label: "Tutor Application Status",
-      type: "select",
-      options: ["PENDING", "APPROVED", "REJECTED"],
-    },
-    tutor_rejection_reason: {
-      editable: false,
-      visible: true,
-      label: "Reason for Rejection",
-      type: "textarea",
-    },
-    is_active: {
-      editable: false,
-      visible: false,
-      label: "Is Active?",
-      type: "checkbox",
-    },
-  };
-
-  const handleSubmit = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.put(
-        "https://ihsaanlms.onrender.com/api/tutor/application/update/",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Application updated successfully:", response.data);
-      fetchApplicationData();
-      handleClose();
-    } catch (error) {
-      console.error(
-        "Error updating application:",
-        error.response?.data || error
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCreateNewApplication = () => {
-    console.log("clicked");
-  };
 
   return (
     <RequireAuth>
@@ -269,20 +145,24 @@ const Page = () => {
                   open={Boolean(anchorEl)}
                   onClose={handleMenuClose}
                 >
-                  <MenuItem
-                    onClick={() =>
-                      handleApplicationTypeSelect("Tutor Application")
-                    }
-                  >
-                    Tutor Application
-                  </MenuItem>
-                  {/* <MenuItem
-                    onClick={() =>
-                      handleApplicationTypeSelect("Other Application")
-                    }
-                  >
-                    Other Application
-                  </MenuItem> */}
+                  {userRoles?.includes("TUTOR") && (
+                    <MenuItem
+                      onClick={() =>
+                        handleApplicationTypeSelect("Tutor Application")
+                      }
+                    >
+                      Tutor Application
+                    </MenuItem>
+                  )}
+                  {userRoles?.includes("STUDENT") && (
+                    <MenuItem
+                      onClick={() =>
+                        handleApplicationTypeSelect("Student Application")
+                      }
+                    >
+                      Student Application
+                    </MenuItem>
+                  )}
                 </Menu>
               </div>
             </div>
@@ -304,55 +184,75 @@ const Page = () => {
                     <th className=" border px-4 py-2">Action</th>
                   </tr>
                 </thead>
-                {userApplications && (
-                  <tbody>
-                    {userApplications.map((application, index) => (
-                      <tr
-                        key={application.id}
-                        className="even:bg-gray-100 hover:bg-gray-200"
-                      >
-                        <td className="border px-4 py-2">{index + 1}</td>
-                        <td className="border px-4 py-2">Tutor application</td>
-                        <td className="border px-4 py-2">{user.first_name}</td>
-                        <td className="border px-4 py-2">
-                          {application.gender}
-                        </td>
-                        <td className="border px-4 py-2">
-                          {application.highest_qualification.toUpperCase() ||
-                            "N/A"}
-                        </td>
-                        <td className="border px-4 py-2">
-                          {application.years_of_experience || "N/A"}
-                        </td>
-                        <td className="border px-4 py-2">
-                          <button
-                            className={`${
-                              application.tutor_application_status ===
-                              "ACCEPTED"
-                                ? "bg-green-500"
-                                : application.tutor_application_status ===
-                                  "REJECTED"
-                                ? "bg-red-500"
-                                : "bg-yellow-500"
-                            } text-white px-4 py-2 rounded-full`}
+                {isLoading
+                  ? "Loading..."
+                  : userApplications && (
+                      <tbody>
+                        {userApplications.map((application, index) => (
+                          <tr
+                            key={application.id}
+                            className="even:bg-gray-100 hover:bg-gray-200"
                           >
-                            {application.tutor_application_status}
-                          </button>
-                        </td>
-                        <td className="border px-4 py-2">
-                          <button
-                            className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]`}
-                            onClick={() =>
-                              handleEditApplicationBtn(application)
-                            }
-                          >
-                            View Details
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                )}
+                            <td className="border px-4 py-2">
+                              {application.id}
+                            </td>
+                            <td className="border px-4 py-2">
+                              {userRoles?.includes("TUTOR")
+                                ? "Tutor Application"
+                                : "Student Application"}
+                            </td>
+                            <td className="border px-4 py-2">
+                              {application.user_details.first_name +
+                                " " +
+                                application.user_details.last_name}
+                            </td>
+                            <td className="border px-4 py-2">
+                              {application.gender}
+                            </td>
+                            <td className="border px-4 py-2">
+                              {formatQualification(
+                                application.highest_qualification
+                              ) || "N/A"}
+                            </td>
+                            <td className="border px-4 py-2">
+                              {application.years_of_experience || "N/A"}
+                            </td>
+                            <td className="border px-4 py-2">
+                              <button
+                                className={`${
+                                  application.tutor_application_status ===
+                                    "APPROVED" ||
+                                  application.student_application_status ===
+                                    "APPROVED"
+                                    ? "bg-green-500"
+                                    : application.tutor_application_status ===
+                                        "REJECTED" ||
+                                      application.student_application_status ===
+                                        "REJECTED"
+                                    ? "bg-red-500"
+                                    : "bg-yellow-500"
+                                } text-white px-4 py-2 rounded-full`}
+                              >
+                                {userRoles?.includes("TUTOR")
+                                  ? application.tutor_application_status
+                                  : application.student_application_status}
+                              </button>
+                            </td>
+
+                            <td className="border px-4 py-2">
+                              <button
+                                className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]`}
+                                onClick={() =>
+                                  handleEditApplicationBtn(application)
+                                }
+                              >
+                                View Details
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    )}
               </table>
             </div>
           </div>
@@ -364,17 +264,26 @@ const Page = () => {
         <EditApplication
           selectedApplication={selectedApplication}
           handleClose={handleClose}
+          userRoles={userRoles}
         />
       </Modal>
 
       {/* Modal for form submission */}
       <Modal open={formOpen} onClose={handleFormClose}>
         <Box className="modal-box bg-white w-full md:w-[60vw] m-auto h-[90%] overflow-scroll mt-5 md:mt-[50px] rounded">
-          <TutorForm
-            fetchApplicationData={fetchApplicationData}
-            handleFormClose={handleFormClose}
-            handleMenuClose={handleMenuClose}
-          />
+          {applicationType === "Tutor Application" ? (
+            <TutorForm
+              fetchApplicationData={fetchApplicationData}
+              handleFormClose={handleFormClose}
+              handleMenuClose={handleMenuClose}
+            />
+          ) : (
+            <StudentForm
+              fetchApplicationData={fetchApplicationData}
+              handleFormClose={handleFormClose}
+              handleMenuClose={handleMenuClose}
+            />
+          )}
         </Box>
       </Modal>
     </RequireAuth>
