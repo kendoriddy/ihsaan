@@ -142,7 +142,7 @@ const DASHBOARD_LIST = {
     {
       id: 11,
       name: "Set Quiz",
-      path: "/set-quiz",
+      path: "/admin/set-quiz",
     },
     { id: 12, name: "Transactions", path: "/admin/transactions" },
     {
