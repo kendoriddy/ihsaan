@@ -24,7 +24,8 @@ const DASHBOARD_LIST = {
       name: "Take Quiz",
       icon: QuizIcon,
       path: "/quiz",
-    },{
+    },
+    {
       id: 12,
       name: "Applications",
       icon: BookmarkIcon,
@@ -138,18 +139,23 @@ const DASHBOARD_LIST = {
     { id: 8, name: "Courses", path: "/admin/courses" },
     { id: 9, name: "FAQs", path: "/admin/faqs" },
     { id: 10, name: "Quotes", path: "/admin/quotes" },
-    { id: 11, name: "Transactions", path: "/admin/transactions" },
     {
-      id: 12,
+      id: 11,
+      name: "Set Quiz",
+      path: "/set-quiz",
+    },
+    { id: 12, name: "Transactions", path: "/admin/transactions" },
+    {
+      id: 13,
       name: "Reports",
       path: "#",
       subMenu: [
         { id: 1, name: "Invoice Reports", path: "/admin/invoice-reports" },
       ],
     },
-    { id: 13, name: "My Profile", path: "/admin/profile" },
+    { id: 14, name: "My Profile", path: "/admin/profile" },
     {
-      id: 14,
+      id: 15,
       name: "Blog",
       path: "/admin/blog",
     },
