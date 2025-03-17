@@ -3,6 +3,7 @@ import CustomModal from "@/components/CustomModal";
 import React, { useState, useEffect } from "react";
 import { usePatch } from "@/hooks/useHttp/useHttp";
 import { TextField } from "@mui/material";
+import { toast } from "react-toastify";
 
 const EditQuizQuestion = ({
   setOpenUpdateModal,
@@ -21,7 +22,7 @@ const EditQuizQuestion = ({
     `https://ihsaanlms.onrender.com/assessment/mcquestions/${selectedQuestion?.id}/`,
     {
       onSuccess: () => {
-        toast.success("Updated successfully");
+        toast.success("Quiz question Updated successfully");
         setOpenUpdateModal(false);
         refetchQuestions();
       },
@@ -48,7 +49,6 @@ const EditQuizQuestion = ({
       options: editedQuestion.options,
       correct_answer: editedQuestion.correct_answer,
     });
-    setOpenUpdateModal(false);
   };
 
   // Handle input changes

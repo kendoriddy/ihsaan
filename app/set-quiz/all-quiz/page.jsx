@@ -84,7 +84,7 @@ const AllQuiz = () => {
             </TableHead>
             <TableBody>
               {isFetching && (
-                <div className="flex flex-col items-center justify-center gap-2 mx-auto w-[60%]">
+                <div className="flex pl-6 py-3 items-center justify-center gap-2">
                   <Loader />
                   <p className="animate-pulse">Loading...</p>
                 </div>
@@ -157,7 +157,7 @@ const AllQuiz = () => {
           openUpdateModal={openUpdateModal}
           setOpenUpdateModal={setOpenUpdateModal}
           selectedQuestion={selectedQuestion}
-          refetchQuestions={refetch}
+          refetchQuestions={() => refetch()}
         />
       </div>
     </Layout>
