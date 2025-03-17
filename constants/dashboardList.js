@@ -8,11 +8,23 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import QuizIcon from "@mui/icons-material/Quiz";
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
 import StorefrontIcon from "@mui/icons-material/Storefront";
+import { Assignment } from "@mui/icons-material";
 
 const DASHBOARD_LIST = {
   student: [
     { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
     {
+      id: 5,
+      name: "Assignment",
+      icon: Assignment,
+      path: "/assignment",
+    },
+    {
+      id: 6,
+      name: "Take Quiz",
+      icon: QuizIcon,
+      path: "/quiz",
+    },{
       id: 12,
       name: "Applications",
       icon: BookmarkIcon,
@@ -58,15 +70,15 @@ const DASHBOARD_LIST = {
     },
     {
       id: 5,
-      name: "Mentees Instruction",
-      icon: MenuBookIcon,
-      path: "/dashboard/mentees-instruction",
+      name: "Assignment",
+      icon: Assignment,
+      path: "/assignment",
     },
     {
       id: 6,
-      name: "Counsellor Manual",
+      name: "Take Quiz",
       icon: QuizIcon,
-      path: "/dashboard/counsellor-manual",
+      path: "/quiz",
     },
     {
       id: 7,

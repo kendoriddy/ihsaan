@@ -53,16 +53,28 @@ http.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const newToken = await refreshToken();
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
-        return http(originalRequest); // Retry original request with new token
-      } catch (refreshError) {
-        return Promise.reject(refreshError);
+      // originalRequest._retry = true;
+      if (originalRequest._retryCount === 5) {
+        try {
+          const newToken = await refreshToken();
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return http(originalRequest); // Retry original request with new token
+        } catch (refreshError) {
+          // return Promise.reject(refreshError);
+        }
       }
+
+      // try {
+      //   const newToken = await refreshToken();
+      //   originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+      //   return http(originalRequest); // Retry original request with new token
+      // } catch (refreshError) {
+      //   return Promise.reject(refreshError);
+      // }
+      localStorage.removeItem("token");
+      localStorage.removeItem("refresh-token");
+      window.location.href = "/login";
     }
 
     return Promise.reject(error);

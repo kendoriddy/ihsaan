@@ -106,6 +106,7 @@ function DashboardSidebar({ currentRoute }) {
         {/* Left list */}
         <div>
           <ul className="px-4">
+
             {dashboardItems.map((item) => (
               <li key={item.id}>
                 {item.name === "Logout" ? (
