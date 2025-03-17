@@ -8,9 +8,10 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import QuizIcon from "@mui/icons-material/Quiz";
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
 import StorefrontIcon from "@mui/icons-material/Storefront";
+import { Assignment } from "@mui/icons-material";
 
 const DASHBOARD_LIST = {
-  mentor: [
+  users: [
     { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
     {
       id: 12,
@@ -38,9 +39,9 @@ const DASHBOARD_LIST = {
     },
     {
       id: 5,
-      name: "Mentees Instruction",
-      icon: MenuBookIcon,
-      path: "/dashboard/mentees-instruction",
+      name: "Assignment",
+      icon: Assignment,
+      path: "/assignment",
     },
     {
       id: 6,

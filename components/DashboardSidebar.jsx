@@ -78,7 +78,7 @@ function DashboardSidebar({ currentRoute }) {
         {/* Left list */}
         <div>
           <ul className="px-4">
-            {DASHBOARD_LIST.mentor.map((item) => (
+            {DASHBOARD_LIST.users.map((item) => (
               <li key={item.id}>
                 {item.name === "Logout" ? (
                   <div
