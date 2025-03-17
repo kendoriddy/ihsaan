@@ -200,9 +200,8 @@ const QuizQuestion = ({ questions, setCurrentScreen }) => {
                   }}
                 >
                   {cards.map((card, index) => (
-                    <Card>
+                    <Card key={index}>
                       <CardActionArea
-                        key={index}
                         sx={{
                           height: "100%",
                           "&[data-active]": {
