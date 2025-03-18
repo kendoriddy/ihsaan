@@ -112,3 +112,26 @@ export const addQuizSchema = Yup.object().shape({
     })
   ),
 });
+
+export const addAssignmentSchema = Yup.object({
+  title: Yup.string().required("Title is required"),
+  description: Yup.string().required("Description is required"),
+  type: Yup.string()
+    .oneOf(["INDIVIDUAL", "GROUP"])
+    .required("Type is required"),
+  question_type: Yup.string()
+    .oneOf(["MCQ", "ESSAY"])
+    .required("Question type is required"),
+  max_score: Yup.number()
+    .min(0, "Max score must be positive")
+    .required("Max score is required"),
+  passing_score: Yup.number()
+    .min(0, "Passing score must be at least 0")
+    .max(100, "Passing score cannot exceed 100")
+    .required("Passing score is required"),
+  course: Yup.number().required("Course is required"),
+  term: Yup.number().required("Term is required"),
+  max_attempts: Yup.number()
+    .min(1, "Must allow at least 1 attempt")
+    .required("Max attempts is required"),
+});

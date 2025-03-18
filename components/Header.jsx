@@ -41,6 +41,7 @@ function Header() {
       ? `/auth/logged-in-user/`
       : null
   );
+  localStorage.setItem("userId", getAuthUserInformation?.data.id);
   const authenticatedUsersPayload =
     getAuthUserInformation && getAuthUserInformation?.data;
   if (typeof window !== "undefined") {
@@ -49,6 +50,7 @@ function Header() {
       JSON.stringify(getAuthUserInformation?.data)
     );
   }
+
   const isAuth = useSelector(selectIsAuth);
   const signedInUserName = useSelector(currentlyLoggedInUser);
   const dispatch = useDispatch();

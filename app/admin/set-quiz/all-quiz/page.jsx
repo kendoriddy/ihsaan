@@ -67,8 +67,6 @@ const AllQuiz = () => {
     }
   };
 
-  const handleOpenUpdateModal = () => {};
-
   return (
     <Layout>
       <div>

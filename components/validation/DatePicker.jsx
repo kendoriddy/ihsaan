@@ -9,12 +9,12 @@ import { Grid } from "@mui/material";
 
 function BasicDatePicker(props) {
   const { name, value, placeholder } = props;
-  const [selectedDate, setSelectedDate] = useState(dayjs(value));
+  // const [selectedDate, setSelectedDate] = useState(dayjs(value));
 
-  const { setFieldValue } = useFormikContext();
+  const { values, setFieldValue } = useFormikContext();
 
   const handleDateChange = (newValue) => {
-    setSelectedDate(newValue);
+    // setSelectedDate(newValue);
     // Format and set the field value with both date and time
     setFieldValue(name, newValue ? newValue.format("YYYY-MM-DD") : "");
   };
@@ -24,7 +24,7 @@ function BasicDatePicker(props) {
       <DatePicker
         onChange={handleDateChange}
         label={placeholder}
-        value={selectedDate}
+        value={values[name] ? dayjs(values[name]) : null}
       />
     </LocalizationProvider>
   );
