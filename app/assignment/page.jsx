@@ -35,45 +35,6 @@ const statusColors = {
   Pending: "bg-blue-600 rounded-md text-white py-2 px-[1.25rem]",
 };
 
-const assignments = [
-  {
-    id: 1,
-    title: "Individual Assignment",
-    creator: "John Doe",
-    course: "Mathematics 101",
-    type: "Individual",
-    mark: "15.00",
-    status: "Submitted",
-    start: "01/03/24",
-    end: "10/04/24",
-    file: "--",
-  },
-  {
-    id: 2,
-    title: "Group Project",
-    creator: "Jane Smith",
-    course: "Physics 201",
-    type: "Group",
-    mark: "10.00",
-    status: "Pending",
-    start: "05/03/24",
-    end: "12/04/24",
-    file: "--",
-  },
-  {
-    id: 3,
-    title: "Research Paper",
-    creator: "Mark Lee",
-    course: "History 102",
-    type: "Individual",
-    mark: "20.00",
-    status: "Closed",
-    start: "12/02/24",
-    end: "15/03/24",
-    file: "--",
-  },
-];
-
 const AssignmentTable = () => {
   const router = useRouter();
   const [fetchAll, setFetchAll] = useState(false);
@@ -125,12 +86,23 @@ const AssignmentTable = () => {
                 <TableRow key={assignment.id}>
                   <TableCell>{assignment.title}</TableCell>
                   <TableCell>{assignment.tutor_name}</TableCell>
-                  <TableCell>{assignment.course}</TableCell>
-                  <TableCell>{assignment.type}</TableCell>
+                  <TableCell>{assignment.course_code}</TableCell>
+                  <TableCell className="capitalize">
+                    {assignment.type.toLowerCase()}
+                  </TableCell>
                   <TableCell>{assignment.max_score}</TableCell>
                   <TableCell className="p-3">
-                    <span className={statusColors[assignment.status]}>
+                    {/* <span className={statusColors[assignment.status]}>
                       {assignment.status}
+                    </span> */}
+                    <span
+                      className={`${
+                        assignment.isOpen
+                          ? "bg-green-600 rounded-md text-white py-2 px-3"
+                          : "bg-red-600 rounded-md text-white py-2 px-[1.4rem]"
+                      }`}
+                    >
+                      {assignment.isOpen ? "Open" : "Closed"}
                     </span>
                   </TableCell>
                   <TableCell>{formatDate(assignment.start_date)}</TableCell>
@@ -143,9 +115,9 @@ const AssignmentTable = () => {
                       onClick={() =>
                         router.push(
                           `/assignment/${
-                            assignment.type === "Group"
-                              ? "group-assignment"
-                              : "individual-assignment"
+                            assignment.type === "INDIVIDUAL"
+                              ? "individual-assignment"
+                              : "group-assignment"
                           }/${assignment.id}`
                         )
                       }
