@@ -120,7 +120,7 @@ export const addAssignmentSchema = Yup.object({
     .oneOf(["INDIVIDUAL", "GROUP"])
     .required("Type is required"),
   question_type: Yup.string()
-    .oneOf(["MCQ", "ESSAY"])
+    .oneOf(["FILE_UPLOAD", ""])
     .required("Question type is required"),
   max_score: Yup.number()
     .min(0, "Max score must be positive")

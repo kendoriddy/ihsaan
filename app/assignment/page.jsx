@@ -107,7 +107,9 @@ const AssignmentTable = () => {
                   </TableCell>
                   <TableCell>{formatDate(assignment.start_date)}</TableCell>
                   <TableCell>{formatDate(assignment.end_date)}</TableCell>
-                  <TableCell>{assignment.file}</TableCell>
+                  <TableCell>
+                    {assignment.question_type === "FILE_UPLOAD" ? "Yes" : "No"}
+                  </TableCell>
                   <TableCell>
                     <Button
                       color="secondary"

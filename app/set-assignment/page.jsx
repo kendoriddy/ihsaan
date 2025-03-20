@@ -1,240 +1,158 @@
 "use client";
-
-import { Formik, Form, Field } from "formik";
+import React, { useState } from "react";
+import { useFetch, useDelete } from "@/hooks/useHttp/useHttp";
+import { useQueryClient } from "@tanstack/react-query";
 import {
-  TextField,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Pagination,
 } from "@mui/material";
-import { addAssignmentSchema } from "@/components/validationSchemas/ValidationSchema";
-import Button from "@/components/Button";
-import Layout from "@/components/Layout";
-import DatePickers from "@/components/validation/DatePicker";
-import { useState, useEffect } from "react";
-import { usePost, useFetch } from "@/hooks/useHttp/useHttp";
 import { toast } from "react-toastify";
+import Layout from "@/components/Layout";
+import Button from "@/components/Button";
+import CustomModal from "@/components/CustomModal";
+import Loader from "@/components/Loader";
+import EditAssignmentQuestion from "./components/EditAssignment";
 
-const SetAssignment = () => {
-  const [tutorId, setTutorId] = useState("");
-  const [fetchAll, setFetchAll] = useState(false);
-  const [totalCourses, setTotalCourses] = useState(10);
+const AllAssignment = () => {
+  const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [totalAssignments, setTotalAssignments] = useState(0);
 
-  const fetchTutorId = () => {
-    const storedTutorId = localStorage.getItem("userId");
-    console.log("tutorIdStored", storedTutorId);
-    if (storedTutorId) {
-      setTutorId(storedTutorId);
-    }
-  };
-
-  useEffect(() => {
-    fetchTutorId();
-  });
-  // Fetch courses
-  const {
-    isLoading,
-    data: CoursesList,
-    refetch,
-  } = useFetch(
-    "courses",
-    `https://ihsaanlms.onrender.com/course/courses/?page_size=${
-      fetchAll ? totalCourses : 10
-    }`,
+  const { isLoading, data, refetch, isFetching } = useFetch(
+    "assignments",
+    `https://ihsaanlms.onrender.com/assessment/base/?page_size=15&page=${page}`,
     (data) => {
-      if (data?.total && !fetchAll) {
-        setTotalCourses(data.total);
-        setFetchAll(true);
-        refetch();
+      if (data?.total) {
+        setTotalAssignments(data.total);
       }
     }
   );
 
-  const Courses = CoursesList?.data?.results || [];
+  const assignments = data?.data?.results || [];
 
-  // usePost for form submission
-  const { mutate: submitAssignment, isLoading: submittingAssignment } = usePost(
-    "https://ihsaanlms.onrender.com/assessment/base/"
-  );
-
-  const initialValues = {
-    title: "",
-    description: "",
-    type: "INDIVIDUAL",
-    question_type: "MCQ",
-    max_score: "",
-    passing_score: "",
-    tutor: tutorId,
-    course: "",
-    term: "",
-    max_attempts: "",
-    start_date: "",
-    end_date: "",
-    grade_release_date: "",
-  };
-
-  // Submit function
-  const handleSubmit = (values, { resetForm }) => {
-    console.log("tutorId", tutorId);
-    submitAssignment(values, {
+  // DELETE QUESTION
+  const { mutate: questionDelete, isLoading: isDeleting } = useDelete(
+    `https://ihsaanlms.onrender.com/assessment/base`,
+    {
       onSuccess: () => {
-        toast.success("Assignment created successfully");
-        resetForm(); // Reset the form only when successful
-        fetchTutorId();
+        toast.success("Assignment deleted successfully");
+        queryClient.invalidateQueries("assignments");
+        setOpenDeleteDialog(false);
       },
       onError: (error) => {
-        toast.error(error.response?.data?.message || "Failed to submit quiz");
+        toast.error(error.response?.data?.message || "Failed to delete");
       },
-    });
+    }
+  );
+
+  // Handle Page Change
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+    refetch();
+  };
+
+  const handleDelete = () => {
+    if (selectedAssignment?.id) {
+      questionDelete(`${selectedAssignment.id}/`);
+    }
   };
 
   return (
     <Layout>
-      <Formik
-        enableReinitialize
-        initialValues={initialValues}
-        validationSchema={addAssignmentSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ errors, touched }) => (
-          <Form>
-            {/* Title */}
-            <Field
-              as={TextField}
-              fullWidth
-              margin="normal"
-              label="Title"
-              name="title"
-              error={touched.title && Boolean(errors.title)}
-              helperText={touched.title && errors.title}
-            />
+      <div>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell className="text-nowrap">Assignment Title</TableCell>
+                <TableCell className="text-nowrap">Description</TableCell>
+                <TableCell className="text-nowrap">Assignment Type</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isFetching && (
+                <div className="flex pl-6 py-3 items-center justify-center gap-2">
+                  <Loader />
+                  <p className="animate-pulse">Loading...</p>
+                </div>
+              )}
+              {!isFetching && (
+                <>
+                  {assignments.map((assignment) => (
+                    <TableRow key={assignment.id}>
+                      <TableCell>{assignment.title}</TableCell>
+                      <TableCell>{assignment.description}</TableCell>
+                      <TableCell className="capitalize">
+                        {assignment.type.toLowerCase()}
+                      </TableCell>
+                      <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
+                        <Button
+                          color="secondary"
+                          onClick={() => {
+                            setSelectedAssignment(assignment);
+                            setOpenUpdateModal(true);
+                          }}
+                        >
+                          Update
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setSelectedAssignment(assignment);
+                            setOpenDeleteDialog(true);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-            {/* Description */}
-            <Field
-              as={TextField}
-              fullWidth
-              multiline
-              rows={3}
-              margin="normal"
-              label="Description"
-              name="description"
-              error={touched.description && Boolean(errors.description)}
-              helperText={touched.description && errors.description}
-            />
+        {/* Pagination */}
+        <Pagination
+          count={Math.ceil(totalAssignments / 15)}
+          page={page}
+          onChange={handlePageChange}
+          color="primary"
+          sx={{ mt: 2, display: "flex", justifyContent: "center" }}
+        />
 
-            {/* Type */}
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Type</InputLabel>
-              <Field as={Select} name="type">
-                <MenuItem value="INDIVIDUAL">Individual</MenuItem>
-                {/* <MenuItem value="GROUP">Group</MenuItem> */}
-              </Field>
-            </FormControl>
+        {/* Delete Confirmation Modal */}
+        <CustomModal
+          open={openDeleteDialog}
+          onClose={() => setOpenDeleteDialog(false)}
+          title="Confirm Delete"
+          onConfirm={handleDelete}
+          confirmText="Delete"
+          isLoading={isDeleting}
+        >
+          <p>Are you sure you want to delete this question?</p>
+        </CustomModal>
 
-            {/* Question Type */}
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Question Type</InputLabel>
-              <Field as={Select} name="question_type">
-                <MenuItem value="MCQ">MCQ</MenuItem>
-                {/* <MenuItem value="ESSAY">Essay</MenuItem> */}
-              </Field>
-            </FormControl>
-
-            {/* Max Score */}
-            <Field
-              as={TextField}
-              fullWidth
-              margin="normal"
-              label="Max Score"
-              name="max_score"
-              type="number"
-              error={touched.max_score && Boolean(errors.max_score)}
-              helperText={touched.max_score && errors.max_score}
-            />
-
-            {/* Passing Score */}
-            <Field
-              as={TextField}
-              fullWidth
-              margin="normal"
-              label="Passing Score"
-              name="passing_score"
-              type="number"
-              error={touched.passing_score && Boolean(errors.passing_score)}
-              helperText={touched.passing_score && errors.passing_score}
-            />
-
-            {/* Course Selection */}
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Select Course</InputLabel>
-              <Field as={Select} name="course">
-                {Courses.length > 0 ? (
-                  Courses.map((course) => (
-                    <MenuItem key={course.id} value={course.id}>
-                      {course.name}
-                    </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled>No courses available</MenuItem>
-                )}
-              </Field>
-            </FormControl>
-
-            {/* Term */}
-            <Field
-              as={TextField}
-              fullWidth
-              margin="normal"
-              label="Term"
-              name="term"
-              type="number"
-              error={touched.term && Boolean(errors.term)}
-              helperText={touched.term && errors.term}
-            />
-
-            {/* Max Attempts */}
-            <Field
-              as={TextField}
-              fullWidth
-              margin="normal"
-              label="Max Attempts"
-              name="max_attempts"
-              type="number"
-              error={touched.max_attempts && Boolean(errors.max_attempts)}
-              helperText={touched.max_attempts && errors.max_attempts}
-            />
-
-            {/* Date Pickers */}
-            <FormControl
-              fullWidth
-              margin="normal"
-              className="grid grid-cols-1 gap-3 md:grid-cols-3"
-            >
-              <DatePickers name="start_date" placeholder="Start Date" />
-              <DatePickers name="end_date" placeholder="End Date" />
-              <DatePickers
-                name="grade_release_date"
-                placeholder="Grade Release Date"
-              />
-            </FormControl>
-
-            {/* Submit Button */}
-            <div className="flex justify-center">
-              <Button
-                type="submit"
-                color="secondary"
-                disabled={submittingAssignment}
-                size="large"
-              >
-                {submittingAssignment ? "Submitting..." : "Submit"}
-              </Button>
-            </div>
-          </Form>
-        )}
-      </Formik>
+        {/* Update Question Modal */}
+        <EditAssignmentQuestion
+          openUpdateModal={openUpdateModal}
+          setOpenUpdateModal={setOpenUpdateModal}
+          selectedAssignment={selectedAssignment}
+          refetchQuestions={() => refetch()}
+        />
+      </div>
     </Layout>
   );
 };
 
-export default SetAssignment;
+export default AllAssignment;
