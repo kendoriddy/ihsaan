@@ -94,6 +94,8 @@ import {
   FormControl,
 } from "@mui/material";
 import { toast } from "react-toastify";
+import DatePickers from "@/components/validation/DatePicker";
+import { Form, Formik } from "formik";
 
 const EditAssignmentQuestion = ({
   setOpenUpdateModal,
@@ -206,163 +208,167 @@ const EditAssignmentQuestion = ({
         confirmText={isUpdating ? "Updating..." : "Update"}
         isLoading={isUpdating}
       >
-        <div className="space-y-4 mt-2">
-          {/* Title */}
-          <TextField
-            label="Title"
-            name="title"
-            value={editedAssignment.title}
-            onChange={handleInputChange}
-            fullWidth
-            variant="outlined"
-            disabled={isUpdating}
-          />
+        <Formik>
+          <Form>
+            <div className="space-y-4 mt-2">
+              {/* Title */}
+              <TextField
+                label="Title"
+                name="title"
+                value={editedAssignment.title}
+                onChange={handleInputChange}
+                fullWidth
+                variant="outlined"
+                disabled={isUpdating}
+              />
 
-          {/* Description */}
-          <TextField
-            label="Description"
-            name="description"
-            value={editedAssignment.description}
-            onChange={handleInputChange}
-            fullWidth
-            variant="outlined"
-            multiline
-            rows={3}
-            disabled={isUpdating}
-          />
+              {/* Description */}
+              <TextField
+                label="Description"
+                name="description"
+                value={editedAssignment.description}
+                onChange={handleInputChange}
+                fullWidth
+                variant="outlined"
+                multiline
+                rows={3}
+                disabled={isUpdating}
+              />
 
-          {/* Type Dropdown */}
-          <FormControl fullWidth variant="outlined">
-            <InputLabel>Type</InputLabel>
-            <Select
-              label="Type"
-              name="type"
-              value={editedAssignment.type}
-              onChange={handleInputChange}
-              disabled={isUpdating}
-            >
-              {typeOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              {/* Type Dropdown */}
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Type</InputLabel>
+                <Select
+                  label="Type"
+                  name="type"
+                  value={editedAssignment.type}
+                  onChange={handleInputChange}
+                  disabled={isUpdating}
+                >
+                  {typeOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-          {/* Question Type Dropdown */}
-          <FormControl fullWidth variant="outlined">
-            <InputLabel>Question Type</InputLabel>
-            <Select
-              label="Question Type"
-              name="question_type"
-              value={editedAssignment.question_type}
-              onChange={handleInputChange}
-              disabled={isUpdating}
-            >
-              {questionTypeOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              {/* Question Type Dropdown */}
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Question Type</InputLabel>
+                <Select
+                  label="Question Type"
+                  name="question_type"
+                  value={editedAssignment.question_type}
+                  onChange={handleInputChange}
+                  disabled={isUpdating}
+                >
+                  {questionTypeOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-          {/* Max Score */}
-          <TextField
-            label="Max Score"
-            name="max_score"
-            type="number"
-            value={editedAssignment.max_score}
-            onChange={handleInputChange}
-            fullWidth
-            variant="outlined"
-            disabled={isUpdating}
-          />
+              {/* Max Score */}
+              <TextField
+                label="Max Score"
+                name="max_score"
+                type="number"
+                value={editedAssignment.max_score}
+                onChange={handleInputChange}
+                fullWidth
+                variant="outlined"
+                disabled={isUpdating}
+              />
 
-          {/* Course Dropdown */}
-          <FormControl fullWidth variant="outlined">
-            <InputLabel>Course</InputLabel>
-            <Select
-              label="Course"
-              name="course"
-              value={editedAssignment.course}
-              onChange={handleInputChange}
-              disabled={isUpdating || isLoadingCourses || isFetchingCourses}
-            >
-              <MenuItem value="">
-                <em>Select a course</em>
-              </MenuItem>
-              {Courses.map((course) => (
-                <MenuItem key={course.id} value={course.id}>
-                  {course.name || course.title}{" "}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              {/* Course Dropdown */}
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Course</InputLabel>
+                <Select
+                  label="Course"
+                  name="course"
+                  value={editedAssignment.course}
+                  onChange={handleInputChange}
+                  disabled={isUpdating || isLoadingCourses || isFetchingCourses}
+                >
+                  <MenuItem value="">
+                    <em>Select a course</em>
+                  </MenuItem>
+                  {Courses.map((course) => (
+                    <MenuItem key={course.id} value={course.id}>
+                      {course.name || course.title}{" "}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-          {/* Max Attempts */}
-          <TextField
-            label="Max Attempts"
-            name="max_attempts"
-            type="number"
-            value={editedAssignment.max_attempts}
-            onChange={handleInputChange}
-            fullWidth
-            variant="outlined"
-            disabled={isUpdating}
-          />
+              {/* Max Attempts */}
+              <TextField
+                label="Max Attempts"
+                name="max_attempts"
+                type="number"
+                value={editedAssignment.max_attempts}
+                onChange={handleInputChange}
+                fullWidth
+                variant="outlined"
+                disabled={isUpdating}
+              />
 
-          {/* Passing Score */}
-          <TextField
-            label="Passing Score"
-            name="passing_score"
-            type="number"
-            value={editedAssignment.passing_score}
-            onChange={handleInputChange}
-            fullWidth
-            variant="outlined"
-            disabled={isUpdating}
-          />
+              {/* Passing Score */}
+              <TextField
+                label="Passing Score"
+                name="passing_score"
+                type="number"
+                value={editedAssignment.passing_score}
+                onChange={handleInputChange}
+                fullWidth
+                variant="outlined"
+                disabled={isUpdating}
+              />
 
-          {/* Start Date */}
-          <TextField
-            label="Start Date"
-            name="start_date"
-            type="datetime-local"
-            value={editedAssignment.start_date}
-            onChange={handleInputChange}
-            fullWidth
-            variant="outlined"
-            InputLabelProps={{ shrink: true }}
-            disabled={isUpdating}
-          />
+              {/* Start Date */}
+              <DatePickers
+                name="start_date"
+                placeholder="Start Date"
+                value={editedAssignment.start_date}
+                onChange={(newDate) =>
+                  setEditedAssignment((prev) => ({
+                    ...prev,
+                    start_date: newDate,
+                  }))
+                }
+              />
 
-          {/* End Date */}
-          <TextField
-            label="End Date"
-            name="end_date"
-            type="datetime-local"
-            value={editedAssignment.end_date}
-            onChange={handleInputChange}
-            fullWidth
-            variant="outlined"
-            InputLabelProps={{ shrink: true }}
-            disabled={isUpdating}
-          />
+              {/* End Date */}
+              <DatePickers
+                name="end_date"
+                placeholder="End Date"
+                value={editedAssignment.end_date}
+                onChange={(newDate) =>
+                  setEditedAssignment((prev) => ({
+                    ...prev,
+                    end_date: newDate,
+                  }))
+                }
+              />
 
-          {/* Grade Release Date */}
-          <TextField
-            label="Grade Release Date"
-            name="grade_release_date"
-            type="datetime-local"
-            value={editedAssignment.grade_release_date}
-            onChange={handleInputChange}
-            fullWidth
-            variant="outlined"
-            InputLabelProps={{ shrink: true }}
-            disabled={isUpdating}
-          />
-        </div>
+              {/* Grade Release Date */}
+              <DatePickers
+                name="grade_release_date"
+                placeholder="Grade Release Date"
+                value={editedAssignment.grade_release_date}
+                onChange={(newDate) =>
+                  setEditedAssignment((prev) => ({
+                    ...prev,
+                    grade_release_date: newDate,
+                  }))
+                }
+              />
+            </div>
+          </Form>
+        </Formik>
       </CustomModal>
     </div>
   );

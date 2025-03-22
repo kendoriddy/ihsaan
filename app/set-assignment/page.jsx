@@ -69,58 +69,62 @@ const AllAssignment = () => {
   return (
     <Layout>
       <div>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell className="text-nowrap">Assignment Title</TableCell>
-                <TableCell className="text-nowrap">Description</TableCell>
-                <TableCell className="text-nowrap">Assignment Type</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {isFetching && (
-                <div className="flex pl-6 py-3 items-center justify-center gap-2">
-                  <Loader />
-                  <p className="animate-pulse">Loading...</p>
-                </div>
-              )}
-              {!isFetching && (
-                <>
-                  {assignments.map((assignment) => (
-                    <TableRow key={assignment.id}>
-                      <TableCell>{assignment.title}</TableCell>
-                      <TableCell>{assignment.description}</TableCell>
-                      <TableCell className="capitalize">
-                        {assignment.type.toLowerCase()}
-                      </TableCell>
-                      <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
-                        <Button
-                          color="secondary"
-                          onClick={() => {
-                            setSelectedAssignment(assignment);
-                            setOpenUpdateModal(true);
-                          }}
-                        >
-                          Update
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setSelectedAssignment(assignment);
-                            setOpenDeleteDialog(true);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div>
+          <TableContainer component={Paper} className="overflow-x-scroll">
+            <Table className="overflow-x-scroll">
+              <TableHead>
+                <TableRow>
+                  <TableCell className="text-nowrap">
+                    Assignment Title
+                  </TableCell>
+                  <TableCell className="text-nowrap">Description</TableCell>
+                  <TableCell className="text-nowrap">Assignment Type</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {isFetching && (
+                  <div className="flex pl-6 py-3 items-center justify-center gap-2">
+                    <Loader />
+                    <p className="animate-pulse">Loading...</p>
+                  </div>
+                )}
+                {!isFetching && (
+                  <>
+                    {assignments.map((assignment) => (
+                      <TableRow key={assignment.id}>
+                        <TableCell>{assignment.title}</TableCell>
+                        <TableCell>{assignment.description}</TableCell>
+                        <TableCell className="capitalize">
+                          {assignment.type.toLowerCase()}
+                        </TableCell>
+                        <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
+                          <Button
+                            color="secondary"
+                            onClick={() => {
+                              setSelectedAssignment(assignment);
+                              setOpenUpdateModal(true);
+                            }}
+                          >
+                            Update
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setSelectedAssignment(assignment);
+                              setOpenDeleteDialog(true);
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
 
         {/* Pagination */}
         <Pagination
