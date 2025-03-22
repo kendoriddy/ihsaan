@@ -33,6 +33,7 @@ const QuizQuestion = ({ questions, setCurrentScreen }) => {
         error.error ||
           "Failed to load questions, make sure you're eligible for the quiz"
       );
+      localStorage.removeItem("selectedCourse");
       setCurrentScreen("list");
     }
   );

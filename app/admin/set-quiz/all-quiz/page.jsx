@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useFetch, useDelete, usePatch } from "@/hooks/useHttp/useHttp";
+import { useFetch, useDelete } from "@/hooks/useHttp/useHttp";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Table,
@@ -11,7 +11,6 @@ import {
   TableRow,
   Paper,
   Pagination,
-  TextField,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import Layout from "@/components/Layout";
@@ -66,8 +65,6 @@ const AllQuiz = () => {
       questionDelete(`${selectedQuestion.id}/`);
     }
   };
-
-  const handleOpenUpdateModal = () => {};
 
   return (
     <Layout>

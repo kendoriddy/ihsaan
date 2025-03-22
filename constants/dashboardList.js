@@ -8,7 +8,7 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import QuizIcon from "@mui/icons-material/Quiz";
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
 import StorefrontIcon from "@mui/icons-material/Storefront";
-import { Assignment } from "@mui/icons-material";
+import { Assignment, AssignmentInd } from "@mui/icons-material";
 
 const DASHBOARD_LIST = {
   student: [
@@ -36,10 +36,16 @@ const DASHBOARD_LIST = {
   tutor: [
     { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
     {
-      id: 12,
+      id: 2,
       name: "Applications",
       icon: BookmarkIcon,
       path: "/dashboard/my-applications",
+    },
+    {
+      id: 3,
+      name: "Assignment",
+      icon: AssignmentInd,
+      path: "/set-assignment",
     },
     { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },
   ],

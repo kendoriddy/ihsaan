@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import Button from "@/components/Button";
 import Layout from "@/components/Layout";
+import { useFetch } from "@/hooks/useHttp/useHttp";
+import { formatDate } from "@/utils/utilFunctions";
 
 const tableHeaders = [
   { id: "title", label: "Title" },
@@ -33,52 +35,32 @@ const statusColors = {
   Pending: "bg-blue-600 rounded-md text-white py-2 px-[1.25rem]",
 };
 
-const assignments = [
-  {
-    id: 1,
-    title: "Individual Assignment",
-    creator: "John Doe",
-    course: "Mathematics 101",
-    type: "Individual",
-    mark: "15.00",
-    status: "Submitted",
-    start: "01/03/24",
-    end: "10/04/24",
-    file: "--",
-  },
-  {
-    id: 2,
-    title: "Group Project",
-    creator: "Jane Smith",
-    course: "Physics 201",
-    type: "Group",
-    mark: "10.00",
-    status: "Pending",
-    start: "05/03/24",
-    end: "12/04/24",
-    file: "--",
-  },
-  {
-    id: 3,
-    title: "Research Paper",
-    creator: "Mark Lee",
-    course: "History 102",
-    type: "Individual",
-    mark: "20.00",
-    status: "Closed",
-    start: "12/02/24",
-    end: "15/03/24",
-    file: "--",
-  },
-];
-
 const AssignmentTable = () => {
   const router = useRouter();
+  const [fetchAll, setFetchAll] = useState(false);
   const [page, setPage] = useState(1);
+  const [totalAssignments, setTotalAssignments] = useState(10);
   const rowsPerPage = 5;
+
+  const {
+    isLoading,
+    data: AssignmentsList,
+    refetch,
+  } = useFetch(
+    "courses",
+    `https://ihsaanlms.onrender.com/assessment/base/?page_size=15&page=${page}`,
+    (data) => {
+      if (data?.total) {
+        setTotalAssignments(data.total);
+      }
+    }
+  );
+
+  const Assignments = AssignmentsList?.data?.results || [];
 
   const handlePageChange = (event, value) => {
     setPage(value);
+    refetch();
   };
 
   return (
@@ -100,48 +82,59 @@ const AssignmentTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {assignments
-                .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-                .map((assignment) => (
-                  <TableRow key={assignment.id}>
-                    <TableCell>{assignment.title}</TableCell>
-                    <TableCell>{assignment.creator}</TableCell>
-                    <TableCell>{assignment.course}</TableCell>
-                    <TableCell>{assignment.type}</TableCell>
-                    <TableCell>{assignment.mark}</TableCell>
-                    <TableCell className="p-3">
-                      <span className={statusColors[assignment.status]}>
-                        {assignment.status}
-                      </span>
-                    </TableCell>
-                    <TableCell>{assignment.start}</TableCell>
-                    <TableCell>{assignment.end}</TableCell>
-                    <TableCell>{assignment.file}</TableCell>
-                    <TableCell>
-                      <Button
-                        color="secondary"
-                        variant="text"
-                        onClick={() =>
-                          router.push(
-                            `/assignment/${
-                              assignment.type === "Group"
-                                ? "group-assignment"
-                                : "individual-assignment"
-                            }/${assignment.id}`
-                          )
-                        }
-                      >
-                        View
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+              {Assignments.map((assignment) => (
+                <TableRow key={assignment.id}>
+                  <TableCell>{assignment.title}</TableCell>
+                  <TableCell>{assignment.tutor_name}</TableCell>
+                  <TableCell>{assignment.course_code}</TableCell>
+                  <TableCell className="capitalize">
+                    {assignment.type.toLowerCase()}
+                  </TableCell>
+                  <TableCell>{assignment.max_score}</TableCell>
+                  <TableCell className="p-3">
+                    {/* <span className={statusColors[assignment.status]}>
+                      {assignment.status}
+                    </span> */}
+                    <span
+                      className={`${
+                        assignment.isOpen
+                          ? "bg-green-600 rounded-md text-white py-2 px-3"
+                          : "bg-red-600 rounded-md text-white py-2 px-[1.4rem]"
+                      }`}
+                    >
+                      {assignment.isOpen ? "Open" : "Closed"}
+                    </span>
+                  </TableCell>
+                  <TableCell>{formatDate(assignment.start_date)}</TableCell>
+                  <TableCell>{formatDate(assignment.end_date)}</TableCell>
+                  <TableCell>
+                    {assignment.question_type === "FILE_UPLOAD" ? "Yes" : "No"}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      color="secondary"
+                      variant="text"
+                      onClick={() =>
+                        router.push(
+                          `/assignment/${
+                            assignment.type === "INDIVIDUAL"
+                              ? "individual-assignment"
+                              : "group-assignment"
+                          }/${assignment.id}`
+                        )
+                      }
+                    >
+                      View
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
         <div className="flex justify-center mt-4">
           <Pagination
-            count={Math.ceil(assignments.length / rowsPerPage)}
+            count={Math.ceil(totalAssignments / 15)}
             page={page}
             onChange={handlePageChange}
             color="primary"

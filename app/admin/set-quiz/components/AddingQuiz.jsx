@@ -65,7 +65,6 @@ const AddingQuiz = () => {
   const handleSubmit = (values, { resetForm }) => {
     createQuestions(values);
     resetForm();
-    console.log("payload", values);
   };
 
   // Handle course selection
