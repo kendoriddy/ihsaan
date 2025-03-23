@@ -5,9 +5,9 @@ export const apiLink = "https://ihsaanlms.onrender.com/api";
 // Create Axios instance without initial auth header
 const http = axios.create({
   baseURL: apiLink,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  // headers: {
+  //   "Content-Type": "application/json",
+  // },
 });
 
 // Function to get token dynamically
@@ -20,6 +20,9 @@ http.interceptors.request.use(
     const token = getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (!(config.data instanceof FormData)) {
+      config.headers["Content-Type"] = "application/json";
     }
     return config;
   },

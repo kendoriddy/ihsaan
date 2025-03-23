@@ -114,15 +114,15 @@ const AssignmentTable = () => {
                     <Button
                       color="secondary"
                       variant="text"
-                      onClick={() =>
+                      onClick={() => {
                         router.push(
                           `/assignment/${
                             assignment.type === "INDIVIDUAL"
                               ? "individual-assignment"
                               : "group-assignment"
                           }/${assignment.id}`
-                        )
-                      }
+                        );
+                      }}
                     >
                       View
                     </Button>
