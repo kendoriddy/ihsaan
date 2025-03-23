@@ -8,6 +8,7 @@ import StatusAreaChart from "@/components/StatusAreaChart";
 import RevenueAreaChart from "@/components/RevenueAreaChart";
 import AdminDashboardHeader from "@/components/AdminDashboardHeader";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
+import DashboardTab from "@/components/dashboard-components/DashboardTab";
 
 function Page() {
   const currentRoute = usePathname();
@@ -75,6 +76,9 @@ function Page() {
                 })}
               </div>
             </div>
+
+            {/* Create tab to display the following: Programme type, Classes, Students, Teachers, Parents, Levels */}
+            <DashboardTab />
 
             {/* Mid - Chart */}
             <div className="flex flex-wrap  overflow-x-scroll  p-4">
