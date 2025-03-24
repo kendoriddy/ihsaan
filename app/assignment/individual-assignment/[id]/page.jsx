@@ -3,7 +3,7 @@ import Layout from "@/components/Layout";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { formatDate } from "@/utils/utilFunctions";
 import AssignmentSubmission from "../components/AssignmentSubmission";
 import AssignmentSubmitted from "../components/AssignmentSubmitted";
