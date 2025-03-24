@@ -36,61 +36,69 @@ const AssignmentSubmission = ({ assignmentId, refetchSubmission }) => {
     }
   );
 
-  // Yup Validation Schema
   const validationSchema = Yup.object().shape({
     submission_notes: Yup.string().test(
       "response-or-file",
       "Please provide a response or upload a file",
       function (value) {
-        return value || this.parent.file; // At least one must be provided
+        return value?.trim() || this.parent.file;
       }
     ),
-    file: Yup.mixed().test(
-      "fileType",
-      "Invalid file type (only mp4, jpeg, jpg, doc, docx, pdf allowed)",
-      (file) => {
-        if (!file) return true; // File is optional
-        return [
-          "video/mp4",
-          "image/jpeg",
-          "image/jpg",
-          "application/pdf",
-          "application/msword",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ].includes(file.type);
-      }
-    ),
+    file: Yup.mixed()
+      .nullable()
+      .test(
+        "fileType",
+        "Invalid file type (only mp4, jpeg, jpg, doc, docx, pdf allowed)",
+        (file) => {
+          if (!file) return true;
+          return [
+            "video/mp4",
+            "image/jpeg",
+            "image/jpg",
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          ].includes(file.type);
+        }
+      ),
   });
 
   async function handleSubmit(values, { resetForm }) {
     const formData = new FormData();
-    const resourceData = new FormData();
-    resourceData.append("file", values.file);
-    resourceData.append("title", values.file.name);
-    resourceData.append(
-      "type",
-      getFileType(values.file.type) // Utility function to determine the type
-    );
 
     try {
-      // Step 1: Upload the file to get its ID
-      const resourceResponse = await new Promise((resolve, reject) => {
-        uploadFile(resourceData, {
-          onSuccess: resolve,
-          onError: reject,
+      let fileResourceId = null;
+
+      // Check if a file is provided before attempting upload
+      if (values.file) {
+        const resourceData = new FormData();
+        resourceData.append("file", values.file);
+        resourceData.append("title", values.file.name);
+        resourceData.append("type", getFileType(values.file.type));
+
+        // Step 1: Upload the file to get its ID
+        const resourceResponse = await new Promise((resolve, reject) => {
+          uploadFile(resourceData, {
+            onSuccess: resolve,
+            onError: reject,
+          });
         });
-      });
 
-      const fileResourceId = resourceResponse?.data?.id;
+        fileResourceId = resourceResponse?.data?.id;
 
-      if (!fileResourceId) {
-        throw new Error("Failed to upload file.");
+        if (!fileResourceId) {
+          throw new Error("Failed to upload file.");
+        }
       }
 
-      // Step 2: Submit the assignment with the file ID
+      // Step 2: Submit the assignment (with or without file)
       formData.append("assessment", assignmentId);
       formData.append("submission_notes", values.submission_notes);
-      formData.append("file_resource_ids", [fileResourceId]);
+
+      // Only append `file_resource_ids` if there is a file
+      if (fileResourceId) {
+        formData.append("file_resource_ids", [fileResourceId]);
+      }
 
       submitAssignment(formData);
 
