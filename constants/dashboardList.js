@@ -1,7 +1,6 @@
 import HomeIcon from "@mui/icons-material/Home";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import CastForEducationIcon from "@mui/icons-material/CastForEducation";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
 import Person2Icon from "@mui/icons-material/Person2";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ScheduleIcon from "@mui/icons-material/Schedule";
@@ -47,10 +46,11 @@ const DASHBOARD_LIST = {
       name: "Assignment",
       icon: AssignmentInd,
       path: "/set-assignment",
-    },{
+    },
+    {
       id: 3,
       name: "Grading",
-      icon: <GradingOutlined />,
+      icon: GradingOutlined,
       path: "/manual-grading",
     },
     { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },

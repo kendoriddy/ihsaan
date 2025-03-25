@@ -3,7 +3,7 @@ import Layout from "@/components/Layout";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { formatDate } from "@/utils/utilFunctions";
 import AssignmentSubmission from "../components/AssignmentSubmission";
 import AssignmentSubmitted from "../components/AssignmentSubmitted";
@@ -12,6 +12,7 @@ import AssignmentClosed from "../components/AssignmentClosed";
 const IndividualAssignmentPage = () => {
   const { id } = useParams();
   const assignmentId = id ? String(id) : null;
+  const [studentId, setStudentId] = useState("");
 
   // Fetch assignment data
   const {
@@ -43,21 +44,27 @@ const IndividualAssignmentPage = () => {
   } = useFetch(
     `submission-${assignmentId}`,
     assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/base/${assignmentId}/`
+      ? `https://ihsaanlms.onrender.com/assessment/uploads/` //${assignmentId}/
       : null,
     (data) => {
       toast.success("Submission fetched successfully");
     },
     (error) => {
-      toast.error(error.response?.data?.message || "No submission found");
+      // toast.error(error.response?.data?.message || "No submission found");
     }
   );
 
-  // Log the data to debug
+  const fetchStudentId = () => {
+    const storedStudentId = localStorage.getItem("userId");
+    console.log("storedStudentId", storedStudentId);
+    if (storedStudentId) {
+      setStudentId(storedStudentId);
+    }
+  };
+
   useEffect(() => {
-    console.log("Assignment data:", AssignmentData);
-    console.log("Submission data:", SubmissionData);
-  }, [AssignmentData, SubmissionData]);
+    fetchStudentId();
+  });
 
   // Determine if the assignment is closed based on the due date
   const dueDate = AssignmentData?.data?.end_date
@@ -66,7 +73,7 @@ const IndividualAssignmentPage = () => {
   const isAssignmentClosed = dueDate ? new Date() > dueDate : false;
 
   // Determine the state of the assignment
-  const hasSubmitted = SubmissionData?.data?.submitted || false;
+  const hasSubmitted = SubmissionData?.data?.student === studentId;
   const showSubmissionForm = !hasSubmitted && !isAssignmentClosed;
   const showSubmittedView = hasSubmitted && !isAssignmentClosed;
   const showClosedView = isAssignmentClosed;
@@ -85,11 +92,11 @@ const IndividualAssignmentPage = () => {
     );
   }
 
-  if (assignmentError || submissionError) {
+  if (assignmentError) {
     return (
       <Layout>
         <div className="text-center py-10 text-red-500">
-          Error: {assignmentError?.message || submissionError?.message}
+          Error: {assignmentError?.message}
         </div>
       </Layout>
     );

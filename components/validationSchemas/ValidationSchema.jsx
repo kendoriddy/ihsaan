@@ -135,3 +135,10 @@ export const addAssignmentSchema = Yup.object({
     .min(1, "Must allow at least 1 attempt")
     .required("Max attempts is required"),
 });
+
+export const manualGradingSchema = Yup.object({
+  level: Yup.string().required("Level is required"),
+  course: Yup.string().required("Course is required"),
+  student_name: Yup.string().required("Student name is required"),
+  reason: Yup.string().required("Reason is require"),
+});
