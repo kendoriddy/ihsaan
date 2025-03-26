@@ -29,18 +29,16 @@ const tableHeaders = [
   { id: "view", label: "View" },
 ];
 
-const statusColors = {
-  Submitted: "bg-green-600 rounded-md text-white py-2 px-3",
-  Closed: "bg-red-600 rounded-md text-white py-2 px-[1.4rem]",
-  Pending: "bg-blue-600 rounded-md text-white py-2 px-[1.25rem]",
-};
+// const statusColors = {
+//   Submitted: "bg-green-600 rounded-md text-white py-2 px-3",
+//   Closed: "bg-red-600 rounded-md text-white py-2 px-[1.4rem]",
+//   Pending: "bg-blue-600 rounded-md text-white py-2 px-[1.25rem]",
+// };
 
 const AssignmentTable = () => {
   const router = useRouter();
-  const [fetchAll, setFetchAll] = useState(false);
   const [page, setPage] = useState(1);
   const [totalAssignments, setTotalAssignments] = useState(10);
-  const rowsPerPage = 5;
 
   const {
     isLoading,
