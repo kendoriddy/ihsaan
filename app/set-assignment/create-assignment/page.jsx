@@ -218,12 +218,6 @@ const CreateAssignment = () => {
               margin="normal"
               className="grid grid-cols-1 gap-3 md:grid-cols-3"
             >
-              {/* <DatePickers name="start_date" placeholder="Start Date" />
-              <DatePickers name="end_date" placeholder="End Date" />
-              <DatePickers
-                name="grade_release_date"
-                placeholder="Grade Release Date"
-              /> */}
               <DatePickers
                 name="start_date"
                 placeholder="Start Date"
