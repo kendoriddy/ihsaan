@@ -63,6 +63,10 @@ const AssignmentTable = () => {
     refetch();
   };
 
+  const filteredAssignments = Assignments.filter(
+    (assignment) => assignment.question_type !== "MANUAL"
+  );
+
   return (
     <Layout>
       <div className="p-6 bg-white shadow-lg rounded-lg">
@@ -82,7 +86,7 @@ const AssignmentTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {Assignments.map((assignment) => (
+              {filteredAssignments.map((assignment) => (
                 <TableRow key={assignment.id}>
                   <TableCell>{assignment.title}</TableCell>
                   <TableCell>{assignment.tutor_name}</TableCell>

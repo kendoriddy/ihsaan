@@ -44,7 +44,7 @@ const IndividualAssignmentPage = () => {
   } = useFetch(
     `submission-${assignmentId}`,
     assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/uploads/` //${assignmentId}/
+      ? `https://ihsaanlms.onrender.com/assessment/base/${assignmentId}/student_submissions/` //
       : null,
     (data) => {
       toast.success("Submission fetched successfully");

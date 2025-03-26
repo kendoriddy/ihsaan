@@ -191,7 +191,10 @@ const EditAssignmentQuestion = ({
   };
 
   // Options for dropdowns
-  const questionTypeOptions = [{ value: "FILE_UPLOAD", label: "File Upload" }];
+  const questionTypeOptions = [
+    { value: "FILE_UPLOAD", label: "File Upload" },
+    { value: "MANUAL", label: "Manual Grading" },
+  ];
 
   const typeOptions = [
     { value: "INDIVIDUAL", label: "Individual" },

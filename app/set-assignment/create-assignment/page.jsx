@@ -15,6 +15,7 @@ import DatePickers from "@/components/validation/DatePicker";
 import { useState, useEffect } from "react";
 import { usePost, useFetch } from "@/hooks/useHttp/useHttp";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 const CreateAssignment = () => {
   const [tutorId, setTutorId] = useState("");
@@ -61,8 +62,8 @@ const CreateAssignment = () => {
   const initialValues = {
     title: "",
     description: "",
-    type: "INDIVIDUAL",
-    question_type: "Select a Type",
+    type: "",
+    question_type: "",
     max_score: "",
     passing_score: "",
     tutor: tutorId,
@@ -91,13 +92,16 @@ const CreateAssignment = () => {
 
   return (
     <Layout>
+      <Link href="/set-assignment" className="my-4">
+        <Button>Back</Button>
+      </Link>
       <Formik
         enableReinitialize
         initialValues={initialValues}
         validationSchema={addAssignmentSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched }) => (
+        {({ errors, touched, values, setFieldValue }) => (
           <Form>
             {/* Title */}
             <Field
@@ -127,6 +131,8 @@ const CreateAssignment = () => {
             <FormControl fullWidth margin="normal">
               <InputLabel>Type</InputLabel>
               <Field as={Select} name="type">
+                {" "}
+                <MenuItem value="">Select an option</MenuItem>
                 <MenuItem value="INDIVIDUAL">Individual</MenuItem>
                 <MenuItem value="GROUP">Group</MenuItem>
               </Field>
@@ -136,9 +142,9 @@ const CreateAssignment = () => {
             <FormControl fullWidth margin="normal">
               <InputLabel>Question Type</InputLabel>
               <Field as={Select} name="question_type">
-                {/* <MenuItem value="MCQ">MCQ</MenuItem> */}
+                <MenuItem value="">Select an option</MenuItem>
+                <MenuItem value="MANUAL">Manual Grading</MenuItem>
                 <MenuItem value="FILE_UPLOAD">File Upload</MenuItem>
-                {/* <MenuItem value="DIRECT_TYPING">Essay</MenuItem> */}
               </Field>
             </FormControl>
 
@@ -212,11 +218,29 @@ const CreateAssignment = () => {
               margin="normal"
               className="grid grid-cols-1 gap-3 md:grid-cols-3"
             >
-              <DatePickers name="start_date" placeholder="Start Date" />
+              {/* <DatePickers name="start_date" placeholder="Start Date" />
               <DatePickers name="end_date" placeholder="End Date" />
               <DatePickers
                 name="grade_release_date"
                 placeholder="Grade Release Date"
+              /> */}
+              <DatePickers
+                name="start_date"
+                placeholder="Start Date"
+                value={values.start_date}
+                onChange={(value) => setFieldValue("start_date", value)}
+              />
+              <DatePickers
+                name="end_date"
+                placeholder="End Date"
+                value={values.end_date}
+                onChange={(value) => setFieldValue("end_date", value)}
+              />
+              <DatePickers
+                name="grade_release_date"
+                placeholder="Grade Release Date"
+                value={values.grade_release_date}
+                onChange={(value) => setFieldValue("grade_release_date", value)}
               />
             </FormControl>
 
