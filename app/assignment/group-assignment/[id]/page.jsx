@@ -1,13 +1,13 @@
 "use client";
 import Layout from "@/components/Layout";
-import { useParams } from "next/navigation";
+// import { useParams } from "next/navigation";
 
 const GroupAssignment = () => {
-  const { id } = useParams();
+  // const { id } = useParams();
 
   return (
     <Layout>
-      <div>Group Assignment ID: {id}</div>
+      <div>Group Assignment</div>
     </Layout>
   );
 };

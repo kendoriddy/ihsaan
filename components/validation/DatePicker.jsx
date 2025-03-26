@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import { Grid, TextField } from "@mui/material";
 
 function BasicDatePicker(props) {
-  const { name, value, placeholder, onChange } = props;
+  const { value, placeholder, onChange } = props;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -26,7 +26,6 @@ function BasicDatePicker(props) {
 const DatePickers = ({ name, ...rest }) => {
   return (
     <Grid container direction="row">
-      {/* <BasicDatePicker name={name} {...rest} /> */}
       <Field name={name} {...rest} as={BasicDatePicker} />
       <ErrorMessage name={name} component={TextError} />
     </Grid>
