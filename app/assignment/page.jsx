@@ -29,18 +29,16 @@ const tableHeaders = [
   { id: "view", label: "View" },
 ];
 
-const statusColors = {
-  Submitted: "bg-green-600 rounded-md text-white py-2 px-3",
-  Closed: "bg-red-600 rounded-md text-white py-2 px-[1.4rem]",
-  Pending: "bg-blue-600 rounded-md text-white py-2 px-[1.25rem]",
-};
+// const statusColors = {
+//   Submitted: "bg-green-600 rounded-md text-white py-2 px-3",
+//   Closed: "bg-red-600 rounded-md text-white py-2 px-[1.4rem]",
+//   Pending: "bg-blue-600 rounded-md text-white py-2 px-[1.25rem]",
+// };
 
 const AssignmentTable = () => {
   const router = useRouter();
-  const [fetchAll, setFetchAll] = useState(false);
   const [page, setPage] = useState(1);
   const [totalAssignments, setTotalAssignments] = useState(10);
-  const rowsPerPage = 5;
 
   const {
     isLoading,
@@ -63,6 +61,10 @@ const AssignmentTable = () => {
     refetch();
   };
 
+  const filteredAssignments = Assignments.filter(
+    (assignment) => assignment.question_type !== "MANUAL"
+  );
+
   return (
     <Layout>
       <div className="p-6 bg-white shadow-lg rounded-lg">
@@ -82,7 +84,7 @@ const AssignmentTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {Assignments.map((assignment) => (
+              {filteredAssignments.map((assignment) => (
                 <TableRow key={assignment.id}>
                   <TableCell>{assignment.title}</TableCell>
                   <TableCell>{assignment.tutor_name}</TableCell>
@@ -114,15 +116,15 @@ const AssignmentTable = () => {
                     <Button
                       color="secondary"
                       variant="text"
-                      onClick={() =>
+                      onClick={() => {
                         router.push(
                           `/assignment/${
                             assignment.type === "INDIVIDUAL"
                               ? "individual-assignment"
                               : "group-assignment"
                           }/${assignment.id}`
-                        )
-                      }
+                        );
+                      }}
                     >
                       View
                     </Button>

@@ -41,13 +41,13 @@ function Header() {
       ? `/auth/logged-in-user/`
       : null
   );
-  localStorage.setItem("userId", getAuthUserInformation?.data.id);
   const authenticatedUsersPayload =
     getAuthUserInformation && getAuthUserInformation?.data;
   if (typeof window !== "undefined") {
     localStorage.setItem(
       "userFullData",
-      JSON.stringify(getAuthUserInformation?.data)
+      JSON.stringify(getAuthUserInformation?.data),
+      localStorage.setItem("userId", getAuthUserInformation?.data.id)
     );
   }
 

@@ -18,6 +18,7 @@ import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
 import EditAssignmentQuestion from "./components/EditAssignment";
+import Link from "next/link";
 
 const AllAssignment = () => {
   const queryClient = useQueryClient();
@@ -68,10 +69,19 @@ const AllAssignment = () => {
 
   return (
     <Layout>
-      <div>
-        <div>
-          <TableContainer component={Paper} className="overflow-x-scroll">
-            <Table className="overflow-x-scroll">
+      <div className="max-w-full">
+        <div className="w-full">
+          <Link
+            href="/set-assignment/create-assignment"
+            className="flex justify-end mb-6"
+          >
+            <Button color="secondary">Create new Assignment</Button>
+          </Link>
+          <TableContainer
+            component={Paper}
+            className="overflow-x-auto max-w-full"
+          >
+            <Table className="table-auto">
               <TableHead>
                 <TableRow>
                   <TableCell className="text-nowrap">
