@@ -73,7 +73,14 @@ const IndividualAssignmentPage = () => {
   const isAssignmentClosed = dueDate ? new Date() > dueDate : false;
 
   // Determine the state of the assignment
-  const hasSubmitted = SubmissionData?.data?.student === studentId;
+  // const hasSubmitted = SubmissionData?.data?.file_submissions.map(
+  //   (file) => file.student === studentId
+  // );
+  const hasSubmitted = SubmissionData?.data?.file_submissions.some(
+    (submission) =>
+      submission.assessment === assignmentId && submission.student === studentId
+  );
+
   const showSubmissionForm = !hasSubmitted && !isAssignmentClosed;
   const showSubmittedView = hasSubmitted && !isAssignmentClosed;
   const showClosedView = isAssignmentClosed;
@@ -153,11 +160,11 @@ const IndividualAssignmentPage = () => {
                 Submission & Comments
               </h3>
             )}{" "}
-            <p className="text-red-600">
+            {/* <p className="text-red-600">
               <strong className="text-blue-600 ml-2">Ends:</strong>
               {formatDate(AssignmentData.data?.end_date) ||
                 "No end date available"}
-            </p>
+            </p> */}
           </div>
           {showSubmissionForm && (
             <AssignmentSubmission
