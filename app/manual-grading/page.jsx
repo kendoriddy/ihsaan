@@ -53,8 +53,8 @@ const ManualGrading = () => {
   const Courses = CoursesList?.data?.results || [];
 
   // usePost for form submission
-  const { mutate: submitAssignment, isLoading: submittingAssignment } = usePost(
-    "https://ihsaanlms.onrender.com/assessment//"
+  const { mutate: submitGrade, isLoading: submittingGrade } = usePost(
+    "https://ihsaanlms.onrender.com/assessment/grades/"
   );
 
   const initialValues = {
@@ -62,20 +62,22 @@ const ManualGrading = () => {
     level: "",
     course: "",
     student_name: "",
-    reason: "",
+    feedback: "",
   };
 
   // Submit function
   const handleSubmit = (values, { resetForm }) => {
     console.log("tutorId", tutorId);
-    submitAssignment(values, {
+    submitGrade(values, {
       onSuccess: () => {
-        toast.success("Assignment created successfully");
+        toast.success("Assignment graded successfully");
         resetForm(); // Reset the form only when successful
         fetchTutorId();
       },
       onError: (error) => {
-        toast.error(error.response?.data?.message || "Failed to submit quiz");
+        toast.error(
+          error.response?.data?.message || "Failed to submit grading"
+        );
       },
     });
   };
@@ -132,10 +134,10 @@ const ManualGrading = () => {
               fullWidth
               margin="normal"
               label="Reason for Grading"
-              name="reason"
+              name="feedback"
               type="number"
-              error={touched.reason && Boolean(errors.reason)}
-              helperText={touched.reason && errors.reason}
+              error={touched.feedback && Boolean(errors.feedback)}
+              helperText={touched.feedback && errors.feedback}
             />
 
             {/* Submit Button */}
@@ -143,10 +145,10 @@ const ManualGrading = () => {
               <Button
                 type="submit"
                 color="secondary"
-                disabled={submittingAssignment}
+                disabled={submittingGrade}
                 size="large"
               >
-                {submittingAssignment ? "Submitting..." : "Submit"}
+                {submittingGrade ? "Grading..." : "Grade"}
               </Button>
             </div>
           </Form>
