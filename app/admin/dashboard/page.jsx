@@ -43,7 +43,7 @@ function Page() {
 
           {/* Main Body */}
           <section
-            className=" lg:ml-[250px] w-screen px-2"
+            className="mb-6 lg:ml-[250px] w-screen px-2"
             style={{
               "@media (min-width: 1024px)": {
                 width: "calc(100vw - 250px)",
@@ -81,14 +81,14 @@ function Page() {
             <DashboardTab />
 
             {/* Mid - Chart */}
-            <div className="flex flex-wrap  overflow-x-scroll  p-4">
+            {/* <div className="flex flex-wrap  overflow-x-scroll  p-4">
               <div>
                 <RevenueAreaChart />
               </div>
               <div>
                 <StatusAreaChart />
               </div>
-            </div>
+            </div> */}
           </section>
         </main>
       </div>
