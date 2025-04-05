@@ -201,10 +201,10 @@ const DashboardTab = () => {
       setIsLoading(true);
 
       // Convert class_number to a Number before sending the payload
+      console.log(classForm, "classForm:");
       const payload = {
         ...classForm,
         level: Number(classForm.level),
-        class_number: Number(classForm.class_number), // Ensure it's a number
       };
 
       if (editClassMode) {
@@ -256,7 +256,6 @@ const DashboardTab = () => {
       const payload = {
         ...levelForm,
         level: Number(levelForm.level),
-        class_number: Number(levelForm.class_number), // Ensure it's a number
       };
 
       if (editClassMode) {
@@ -905,9 +904,10 @@ const DashboardTab = () => {
               <option value="" disabled>
                 Select a level
               </option>
-              {classes.map((classItem) => (
-                <option key={classItem.id} value={classItem.id}>
-                  {classItem.display_name}
+
+              {levels.map((level) => (
+                <option key={level.id} value={level.id}>
+                  {level.level}
                 </option>
               ))}
             </select>
@@ -946,7 +946,7 @@ const DashboardTab = () => {
             </label>
             <input
               type="text"
-              name="class_number"
+              name="order"
               value={levelForm.order}
               onChange={handleLevelInputChange}
               className="mt-1 block w-full p-2 border rounded-md"
@@ -959,7 +959,7 @@ const DashboardTab = () => {
             </label>
             <select
               name="level"
-              value={classForm.level}
+              value={levelForm.level}
               onChange={handleLevelInputChange}
               className="mt-1 block w-full p-2 border rounded-md"
               required
@@ -967,9 +967,9 @@ const DashboardTab = () => {
               <option value="" disabled>
                 Select a level
               </option>
-              {classes.map((classItem) => (
-                <option key={classItem.id} value={classItem.id}>
-                  {classItem.display_name}
+              {levels.map((level) => (
+                <option key={level.id} value={level.id}>
+                  {level.level}
                 </option>
               ))}
             </select>
