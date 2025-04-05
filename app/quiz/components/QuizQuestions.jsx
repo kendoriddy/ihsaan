@@ -10,13 +10,14 @@ import CardActionArea from "@mui/material/CardActionArea";
 import { toast } from "react-toastify";
 import Loader from "@/components/Loader";
 
-const QuizQuestion = ({ questions, setCurrentScreen }) => {
+const QuizQuestion = ({ setCurrentScreen }) => {
+  const course_id = localStorage.getItem("selectedCourse");
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [answers, setAnswers] = useState(Array(questions?.length).fill(null));
+  const [answers, setAnswers] = useState([]);
   const [timeLeft, setTimeLeft] = useState(30 * 60 * 1000);
 
-  const course_id = localStorage.getItem("selectedCourse");
   const {
     isLoading,
     data: QuestionsList,
@@ -25,9 +26,7 @@ const QuizQuestion = ({ questions, setCurrentScreen }) => {
   } = useFetch(
     "questions",
     `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?assessment_type=TEST&page_size=20&course_id=${course_id}`,
-    (data) => {
-      localStorage.removeItem("selectedCourse");
-    },
+    (data) => {},
     (error) => {
       toast.error(
         error.error ||
@@ -37,8 +36,6 @@ const QuizQuestion = ({ questions, setCurrentScreen }) => {
       setCurrentScreen("list");
     }
   );
-
-  const Questions = QuestionsList && QuestionsList?.data?.results;
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -61,11 +58,12 @@ const QuizQuestion = ({ questions, setCurrentScreen }) => {
 
   // Mutation to submit quiz questions
   const { mutate: submitQuiz, isLoading: submittingQuiz } = usePost(
-    "https://ihsaanlms.onrender.com/assessment/mcquestions/submit-answers/",
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/submit-answers/?assessment_id=${course_id}`,
     {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");
         setCurrentScreen("list");
+        localStorage.removeItem("selectedCourse");
       },
       onError: (error) => {
         toast.error(error.response?.data?.message || "Failed to submit quiz");
@@ -73,9 +71,30 @@ const QuizQuestion = ({ questions, setCurrentScreen }) => {
     }
   );
 
-  if (!Questions.length) {
+  const Questions = QuestionsList && QuestionsList?.data;
+
+  useEffect(() => {
+    if (Questions?.length > 0) {
+      setAnswers(Array(Questions.length).fill(null));
+    }
+  }, [Questions]);
+
+  console.log("Questions are available", QuestionsList);
+
+  if (isLoading || isFetching || !Questions) {
     return (
-      <div className="flex justify-center items-center h-[80vh]">
+      <div className="">
+        <p className="text-lg font-semibold text-gray-600">
+          Loading questions...
+        </p>
+        <Loader />
+      </div>
+    );
+  }
+
+  if (!Questions || Questions.length === 0) {
+    return (
+      <div className="">
         <p className="text-lg font-semibold text-gray-600">
           No questions available for this course.
         </p>
@@ -100,10 +119,10 @@ const QuizQuestion = ({ questions, setCurrentScreen }) => {
     );
   };
 
-  const handleOptionSelect = (option) => {
-    setSelectedOption(option);
+  const handleOptionSelect = (key) => {
+    setSelectedOption(key);
     const newAnswers = [...answers];
-    newAnswers[currentQuestionIndex] = option;
+    newAnswers[currentQuestionIndex] = key;
     setAnswers(newAnswers);
   };
 
@@ -149,6 +168,8 @@ const QuizQuestion = ({ questions, setCurrentScreen }) => {
       return acc;
     }, {});
 
+    console.log("answers is", formattedAnswers);
+
     submitQuiz({ answers: formattedAnswers });
   };
 
@@ -176,154 +197,136 @@ const QuizQuestion = ({ questions, setCurrentScreen }) => {
   ];
 
   return (
-    <>
-      {isLoading ||
-        (isFetching && (
-          <div className="flex justify-center items-center h-[80vh]">
-            <p className="text-lg font-semibold text-gray-600">
-              Loading questions...
-            </p>
-            <Loader />
-          </div>
-        ))}
-      {!isLoading ||
-        (!isFetching && (
-          <div className="w-full flex">
-            <div className="flex-1">
-              <div className="flex justify-between mb-4">
-                <Box
+    <div className="w-full flex">
+      <div className="flex-1">
+        <div className="flex justify-between mb-4">
+          <Box
+            sx={{
+              width: "100%",
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fill, minmax(min(150px, 100%), 1fr))",
+              gap: 2,
+            }}
+          >
+            {cards.map((card, index) => (
+              <Card key={index}>
+                <CardActionArea
                   sx={{
-                    width: "100%",
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(min(150px, 100%), 1fr))",
-                    gap: 2,
+                    height: "100%",
+                    "&[data-active]": {
+                      backgroundColor: "action.selected",
+                      "&:hover": {
+                        backgroundColor: "action.selectedHover",
+                      },
+                    },
                   }}
                 >
-                  {cards.map((card, index) => (
-                    <Card key={index}>
-                      <CardActionArea
-                        sx={{
-                          height: "100%",
-                          "&[data-active]": {
-                            backgroundColor: "action.selected",
-                            "&:hover": {
-                              backgroundColor: "action.selectedHover",
-                            },
-                          },
-                        }}
-                      >
-                        <CardContent sx={{ height: "100%" }}>
-                          <Typography
-                            variant="h5"
-                            component="div"
-                            className="text-center"
-                          >
-                            {card.title}
-                          </Typography>
-                          <Typography
-                            variant="h6"
-                            color="text.secondary"
-                            className="text-center"
-                          >
-                            {card.description}
-                          </Typography>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  ))}
-                </Box>
-              </div>
-              <div className="border border-gray-300 rounded-md p-6 shadow-sm">
-                <p className="text-lg text-center font-semibold mb-4">
-                  Question {currentQuestionIndex + 1}
-                </p>
-                <p className="text-lg text-center font-medium mb-4">
-                  {currentQuestion?.question_text}
-                </p>
-                <div className="space-y-3">
-                  {currentQuestion?.options &&
-                    Object.entries(currentQuestion.options).map(
-                      ([key, option]) => (
-                        <label
-                          key={key}
-                          className="flex items-center p-2 border border-gray-200 rounded-md cursor-pointer hover:border-purple-600"
-                        >
-                          <input
-                            type="radio"
-                            name={`question-${currentQuestion.id}`}
-                            value={option}
-                            checked={selectedOption === option}
-                            onChange={() => handleOptionSelect(option)}
-                            className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-600 mr-2"
-                          />
-                          {option}
-                        </label>
-                      )
-                    )}
-                </div>
-                <div className="flex justify-between mt-6">
-                  <Button
-                    onClick={handlePrevious}
-                    disabled={currentQuestionIndex === 0}
-                    className={`px-4 py-2 rounded-md ${
-                      currentQuestionIndex === 0
-                        ? "bg-gray-300 cursor-not-allowed"
-                        : "bg-gray-600 text-white hover:bg-gray-700"
-                    } transition-colors duration-300`}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    onClick={
-                      currentQuestionIndex === totalQuestions - 1
-                        ? handleSubmit
-                        : handleNext
-                    }
-                    color="secondary"
-                  >
-                    {currentQuestionIndex === totalQuestions - 1
-                      ? "Submit"
-                      : "Next"}
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="w-1/4 pl-4 sticky top-10 max-h-[85vh] overflow-y-auto">
-              <h3 className="text-lg font-medium mb-4">Track Questions</h3>
-              <div className="space-y-2">
-                {Questions.map((_, index) => (
-                  <div
-                    key={index}
-                    id={`tracker-${index}`}
-                    className="flex items-center transition-all duration-300"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={answers[index] !== null}
-                      readOnly
-                      className="hidden"
-                    />
-                    <span
-                      className={`w-6 h-6 flex items-center justify-center border rounded-md ${
-                        answers[index]
-                          ? "bg-green-500 text-white border-green-500"
-                          : "bg-red-500 text-white border-red-500"
-                      }`}
+                  <CardContent sx={{ height: "100%" }}>
+                    <Typography
+                      variant="h5"
+                      component="div"
+                      className="text-center"
                     >
-                      {index + 1}
-                    </span>
-                    <span className="ml-2 text-sm text-nowrap">
-                      {answers[index] ? "Answered" : "Unanswered"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+                      {card.title}
+                    </Typography>
+                    <Typography
+                      variant="h6"
+                      color="text.secondary"
+                      className="text-center"
+                    >
+                      {card.description}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            ))}
+          </Box>
+        </div>
+        <div className="border border-gray-300 rounded-md p-6 shadow-sm">
+          <p className="text-lg text-center font-semibold mb-4">
+            Question {currentQuestionIndex + 1}
+          </p>
+          <p className="text-lg text-center font-medium mb-4">
+            {currentQuestion?.question_text}
+          </p>
+          <div className="space-y-3">
+            {currentQuestion?.options &&
+              Object.entries(currentQuestion.options).map(([key, option]) => (
+                <label
+                  key={key}
+                  className="flex items-center p-2 border border-gray-200 rounded-md cursor-pointer hover:border-purple-600"
+                >
+                  <input
+                    type="radio"
+                    name={`question-${currentQuestion.id}`}
+                    value={key}
+                    checked={selectedOption === key}
+                    onChange={() => handleOptionSelect(key)}
+                    className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-600 mr-2"
+                  />
+                  {option}
+                </label>
+              ))}
           </div>
-        ))}
-    </>
+          <div className="flex justify-between mt-6">
+            <Button
+              onClick={handlePrevious}
+              disabled={currentQuestionIndex === 0}
+              className={`px-4 py-2 rounded-md ${
+                currentQuestionIndex === 0
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-gray-600 text-white hover:bg-gray-700"
+              } transition-colors duration-300`}
+            >
+              Previous
+            </Button>
+            <Button
+              onClick={
+                currentQuestionIndex === totalQuestions - 1
+                  ? handleSubmit
+                  : handleNext
+              }
+              color="secondary"
+            >
+              {currentQuestionIndex === totalQuestions - 1 ? "Submit" : "Next"}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-1/4 pl-4 sticky top-10 max-h-[85vh] overflow-y-auto">
+        <h3 className="text-lg font-medium mb-4">Track Questions</h3>
+        <div className="space-y-2">
+          {Questions.map((_, index) => (
+            <div
+              key={index}
+              id={`tracker-${index}`}
+              className="flex items-center transition-all duration-300"
+            >
+              <input
+                type="checkbox"
+                checked={answers[index] !== null}
+                readOnly
+                className="hidden"
+              />
+              <span
+                className={`w-6 h-6 flex items-center justify-center border rounded-md ${
+                  answers[index]
+                    ? "bg-green-500 text-white border-green-500"
+                    : "bg-red-500 text-white border-red-500"
+                }`}
+              >
+                {index + 1}
+              </span>
+              <span className="ml-2 text-sm text-nowrap">
+                {answers[index] ? "Answered" : "Unanswered"}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 
