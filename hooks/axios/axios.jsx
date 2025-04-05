@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export const apiLink = "https://ihsaanlms.onrender.com/api";
+export const apiLink2 = "https://ihsaanlms.onrender.com";
 
 // Create Axios instance without initial auth header
 const http = axios.create({
@@ -8,6 +9,13 @@ const http = axios.create({
   // headers: {
   //   "Content-Type": "application/json",
   // },
+});
+
+export const http2 = axios.create({
+  baseURL: apiLink2,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Function to get token dynamically
@@ -23,6 +31,17 @@ http.interceptors.request.use(
     }
     if (!(config.data instanceof FormData)) {
       config.headers["Content-Type"] = "application/json";
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+http2.interceptors.request.use(
+  (config) => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -78,6 +97,28 @@ http.interceptors.response.use(
       localStorage.removeItem("token");
       localStorage.removeItem("refresh-token");
       window.location.href = "/login";
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+http2.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const newToken = await refreshToken();
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+        return http2(originalRequest); // Retry original request with new token
+      } catch (refreshError) {
+        return Promise.reject(refreshError);
+      }
     }
 
     return Promise.reject(error);
