@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import Loader from "@/components/Loader";
 
 const QuizQuestion = ({ setCurrentScreen }) => {
-  const course_id = localStorage.getItem("selectedCourse");
+  const quizData = JSON.parse(localStorage.getItem("selectedQuiz"));
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -25,7 +25,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     refetch,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?assessment_type=TEST&page_size=20&course_id=${course_id}`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?assessment_type=TEST&page_size=20&assessment_id=${quizData.id}&term=${quizData.term}`,
     (data) => {},
     (error) => {
       toast.error(
@@ -58,12 +58,12 @@ const QuizQuestion = ({ setCurrentScreen }) => {
 
   // Mutation to submit quiz questions
   const { mutate: submitQuiz, isLoading: submittingQuiz } = usePost(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/submit-answers/?assessment_id=${course_id}`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/submit-answers/?assessment_id=${quizData.id}`,
     {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");
         setCurrentScreen("list");
-        localStorage.removeItem("selectedCourse");
+        localStorage.removeItem("selectedQuiz");
       },
       onError: (error) => {
         toast.error(error.response?.data?.message || "Failed to submit quiz");
@@ -71,7 +71,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     }
   );
 
-  const Questions = QuestionsList && QuestionsList?.data;
+  const Questions = QuestionsList && QuestionsList?.data?.questions;
 
   useEffect(() => {
     if (Questions?.length > 0) {

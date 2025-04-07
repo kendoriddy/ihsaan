@@ -143,6 +143,7 @@ const CreateAssignment = () => {
               <InputLabel>Question Type</InputLabel>
               <Field as={Select} name="question_type">
                 <MenuItem value="">Select an option</MenuItem>
+                <MenuItem value="MCQ">Quiz</MenuItem>
                 <MenuItem value="MANUAL">Manual Grading</MenuItem>
                 <MenuItem value="FILE_UPLOAD">File Upload</MenuItem>
               </Field>
