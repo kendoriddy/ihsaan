@@ -66,7 +66,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
         localStorage.removeItem("selectedQuiz");
       },
       onError: (error) => {
-        toast.error(error.response?.data?.message || "Failed to submit quiz");
+        toast.error(error.error || "Failed to submit quiz");
       },
     }
   );
