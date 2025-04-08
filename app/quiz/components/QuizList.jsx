@@ -32,7 +32,9 @@ const QuizList = ({ setCurrentScreen }) => {
 
   const filteredQuizes = Quizes?.filter(
     (quiz) =>
-      quiz.question_type === "MCQ" && new Date(quiz.end_date) > new Date()
+      quiz.question_type === "MCQ" &&
+      new Date(quiz.end_date) > new Date() &&
+      quiz.is_open === true
   );
   console.log("courses", filteredQuizes);
 
