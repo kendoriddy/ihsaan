@@ -34,11 +34,11 @@ const ManualGrading = () => {
   // Fetch courses
   const {
     isLoading,
-    data: CoursesList,
+    data: AssessmentsList,
     refetch,
   } = useFetch(
     "courses",
-    `https://ihsaanlms.onrender.com/course/courses/?page_size=${
+    `https://ihsaanlms.onrender.com/assessment/base/?page_size=${
       fetchAll ? totalCourses : 10
     }`,
     (data) => {
@@ -50,7 +50,11 @@ const ManualGrading = () => {
     }
   );
 
-  const Courses = CoursesList?.data?.results || [];
+  const Assessments = AssessmentsList?.data?.results || [];
+
+  const filteredAssessment = Assessments.filter(
+    (assessment) => assessment.question_type !== "MCQ"
+  );
 
   // usePost for form submission
   const { mutate: submitGrade, isLoading: submittingGrade } = usePost(
@@ -59,9 +63,10 @@ const ManualGrading = () => {
 
   const initialValues = {
     tutor: tutorId,
-    level: "",
-    course: "",
-    student_name: "",
+    score: "",
+    assessment: "",
+    student: "",
+    group: "",
     feedback: "",
   };
 
@@ -71,7 +76,7 @@ const ManualGrading = () => {
     submitGrade(values, {
       onSuccess: () => {
         toast.success("Assignment graded successfully");
-        resetForm(); // Reset the form only when successful
+        resetForm();
         fetchTutorId();
       },
       onError: (error) => {
@@ -92,42 +97,40 @@ const ManualGrading = () => {
       >
         {({ errors, touched }) => (
           <Form>
-            {/* level */}
             <FormControl fullWidth margin="normal">
-              <InputLabel>Level</InputLabel>
-              <Field as={Select} name="type">
-                <MenuItem value="Pry1">Primary One</MenuItem>
-                <MenuItem value="GROUP">Group</MenuItem>
-              </Field>
-            </FormControl>
-
-            {/* Course Selection */}
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Select Course</InputLabel>
+              <InputLabel>Select Assessment</InputLabel>
               <Field as={Select} name="course">
-                {Courses.length > 0 ? (
-                  Courses.map((course) => (
-                    <MenuItem key={course.id} value={course.id}>
-                      {course.name}
+                {filteredAssessment.length > 0 ? (
+                  filteredAssessment.map((assessment) => (
+                    <MenuItem key={assessment.id} value={assessment.id}>
+                      {assessment.title}
                     </MenuItem>
                   ))
                 ) : (
                   <MenuItem disabled>No courses available</MenuItem>
                 )}
               </Field>
-            </FormControl>
-
+            </FormControl>{" "}
+            <Field
+              as={TextField}
+              fullWidth
+              margin="normal"
+              label="Score"
+              name="score"
+              type="number"
+              error={touched.score && Boolean(errors.score)}
+              helperText={touched.score && errors.score}
+            />
             {/* student */}
             <Field
               as={TextField}
               fullWidth
               margin="normal"
               label="Student Name"
-              name="student_name"
+              name="student"
               error={touched.student_name && Boolean(errors.student_name)}
               helperText={touched.student_name && errors.student_name}
             />
-
             {/* Reason */}
             <Field
               as={TextField}
@@ -135,11 +138,10 @@ const ManualGrading = () => {
               margin="normal"
               label="Reason for Grading"
               name="feedback"
-              type="number"
+              type="text"
               error={touched.feedback && Boolean(errors.feedback)}
               helperText={touched.feedback && errors.feedback}
             />
-
             {/* Submit Button */}
             <div className="flex justify-center">
               <Button
