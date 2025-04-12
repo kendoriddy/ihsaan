@@ -14,7 +14,6 @@ const IndividualAssignmentPage = () => {
   const assignmentId = id ? String(id) : null;
   const [studentId, setStudentId] = useState("");
 
-  // Fetch assignment data
   const {
     isLoading: isLoadingAssignment,
     data: AssignmentData,
@@ -34,7 +33,6 @@ const IndividualAssignmentPage = () => {
     }
   );
 
-  // Fetch submission data (to check if the user has submitted)
   const {
     isLoading: isLoadingSubmission,
     data: SubmissionData,
@@ -66,21 +64,14 @@ const IndividualAssignmentPage = () => {
     fetchStudentId();
   });
 
-  // Determine if the assignment is closed based on the due date
   const dueDate = AssignmentData?.data?.end_date
     ? new Date(AssignmentData.data.end_date)
     : null;
   const isAssignmentClosed = dueDate ? new Date() > dueDate : false;
-
-  // Determine the state of the assignment
-  // const hasSubmitted = SubmissionData?.data?.file_submissions.map(
-  //   (file) => file.student === studentId
-  // );
   const hasSubmitted = SubmissionData?.data?.file_submissions.some(
     (submission) =>
       submission.assessment === assignmentId && submission.student === studentId
   );
-
   const showSubmissionForm = !hasSubmitted && !isAssignmentClosed;
   const showSubmittedView = hasSubmitted && !isAssignmentClosed;
   const showClosedView = isAssignmentClosed;

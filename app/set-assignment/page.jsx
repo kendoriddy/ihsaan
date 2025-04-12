@@ -75,7 +75,7 @@ const AllAssignment = () => {
             href="/set-assignment/create-assignment"
             className="flex justify-end mb-6"
           >
-            <Button color="secondary">Create new Assignment</Button>
+            <Button color="secondary">Create new Assignment/Quiz</Button>
           </Link>
           <TableContainer
             component={Paper}

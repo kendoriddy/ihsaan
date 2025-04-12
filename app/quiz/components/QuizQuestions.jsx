@@ -9,14 +9,18 @@ import Typography from "@mui/material/Typography";
 import CardActionArea from "@mui/material/CardActionArea";
 import { toast } from "react-toastify";
 import Loader from "@/components/Loader";
+import { Modal } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 const QuizQuestion = ({ setCurrentScreen }) => {
-  const course_id = localStorage.getItem("selectedCourse");
-
+  const quizData = JSON.parse(localStorage.getItem("selectedQuiz"));
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [showResponse, setShowResponse] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [timeLeft, setTimeLeft] = useState(30 * 60 * 1000);
+  const router = useRouter();
 
   const {
     isLoading,
@@ -25,7 +29,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     refetch,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?assessment_type=TEST&page_size=20&course_id=${course_id}`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?assessment_type=TEST&page_size=20&assessment_id=${quizData.id}&term=${quizData.term}`,
     (data) => {},
     (error) => {
       toast.error(
@@ -56,30 +60,27 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  // Mutation to submit quiz questions
   const { mutate: submitQuiz, isLoading: submittingQuiz } = usePost(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/submit-answers/?assessment_id=${course_id}`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/submit-answers/?assessment_id=${quizData.id}`,
     {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");
-        setCurrentScreen("list");
-        localStorage.removeItem("selectedCourse");
+        setShowModal(true);
+        setShowResponse(response);
       },
       onError: (error) => {
-        toast.error(error.response?.data?.message || "Failed to submit quiz");
+        toast.error(error.error || "Failed to submit quiz");
       },
     }
   );
 
-  const Questions = QuestionsList && QuestionsList?.data;
+  const Questions = QuestionsList && QuestionsList?.data?.questions;
 
   useEffect(() => {
     if (Questions?.length > 0) {
       setAnswers(Array(Questions.length).fill(null));
     }
   }, [Questions]);
-
-  console.log("Questions are available", QuestionsList);
 
   if (isLoading || isFetching || !Questions) {
     return (
@@ -167,9 +168,6 @@ const QuizQuestion = ({ setCurrentScreen }) => {
       acc[question.id] = answers[index];
       return acc;
     }, {});
-
-    console.log("answers is", formattedAnswers);
-
     submitQuiz({ answers: formattedAnswers });
   };
 
@@ -195,6 +193,23 @@ const QuizQuestion = ({ setCurrentScreen }) => {
       description: formatTime(timeLeft),
     },
   ];
+
+  const handleGoToDashboard = () => {
+    localStorage.removeItem("selectedQuiz");
+    router.push("/dashboard");
+  };
+
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
+  };
 
   return (
     <div className="w-full flex">
@@ -296,7 +311,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
       </div>
 
       <div className="w-1/4 pl-4 sticky top-10 max-h-[85vh] overflow-y-auto">
-        <h3 className="text-lg font-medium mb-4">Track Questions</h3>
+        <h3 className="text-lg font-medium mb-4">Questions Tracking</h3>
         <div className="space-y-2">
           {Questions.map((_, index) => (
             <div
@@ -326,6 +341,42 @@ const QuizQuestion = ({ setCurrentScreen }) => {
           ))}
         </div>
       </div>
+      <Modal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Quiz Result
+          </Typography>
+          <Typography id="modal-modal-description" className="">
+            <p>
+              <strong>Passing score:</strong>
+              {showResponse?.pass_percentage}
+            </p>
+            <p>
+              <strong>Your text score:</strong>
+              {showResponse?.student_score}
+            </p>{" "}
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
+            <Button color="secondary" onClick={handleGoToDashboard}>
+              Go to Dashboard
+            </Button>
+            <Button
+              color="secondary"
+              onClick={() => {
+                localStorage.removeItem("selectedQuiz");
+                setCurrentScreen("list");
+              }}
+            >
+              Take Another Quiz
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </div>
   );
 };

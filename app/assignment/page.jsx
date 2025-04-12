@@ -62,7 +62,7 @@ const AssignmentTable = () => {
   };
 
   const filteredAssignments = Assignments.filter(
-    (assignment) => assignment.question_type !== "MANUAL"
+    (assignment) => !["MANUAL", "MCQ"].includes(assignment.question_type)
   );
 
   return (

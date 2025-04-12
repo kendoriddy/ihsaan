@@ -43,7 +43,7 @@ const DASHBOARD_LIST = {
     },
     {
       id: 3,
-      name: "Assignment",
+      name: "Assignment and Quiz",
       icon: AssignmentInd,
       path: "/set-assignment",
     },
