@@ -137,8 +137,15 @@ export const addAssignmentSchema = Yup.object({
 });
 
 export const manualGradingSchema = Yup.object({
-  level: Yup.string().required("Level is required"),
-  course: Yup.string().required("Course is required"),
-  student_name: Yup.string().required("Student name is required"),
+  assessment: Yup.string().required("Level is required"),
+  student: Yup.string().required("Course is required"),
+  group: Yup.string(),
+  score: Yup.string(),
   feedback: Yup.string().required("Reason is require"),
-});
+}).test(
+  "student-or-group",
+  "Either student or group is required",
+  function (value) {
+    return !!value.student || !!value.group;
+  }
+);
