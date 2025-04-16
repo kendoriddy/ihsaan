@@ -117,7 +117,7 @@ export const addAssignmentSchema = Yup.object({
   title: Yup.string().required("Title is required"),
   description: Yup.string().required("Description is required"),
   type: Yup.string()
-    .oneOf(["INDIVIDUAL", "GROUP"])
+    .oneOf(["INDIVIDUAL", "GROUP", "TEST", "EXAMINATION"])
     .required("Type is required"),
   question_type: Yup.string()
     .oneOf(["FILE_UPLOAD", "MANUAL", "MCQ"])
@@ -134,6 +134,14 @@ export const addAssignmentSchema = Yup.object({
   max_attempts: Yup.number()
     .min(1, "Must allow at least 1 attempt")
     .required("Max attempts is required"),
+  mcq_question_count: Yup.number().when("question_type", {
+    is: "MCQ",
+    then: (schema) =>
+      schema
+        .min(3, "You must allow at least three questions")
+        .required("Number of questions is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 export const manualGradingSchema = Yup.object({

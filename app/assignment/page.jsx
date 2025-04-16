@@ -99,12 +99,12 @@ const AssignmentTable = () => {
                     </span> */}
                     <span
                       className={`${
-                        assignment.isOpen
+                        assignment.is_open
                           ? "bg-green-600 rounded-md text-white py-2 px-3"
                           : "bg-red-600 rounded-md text-white py-2 px-[1.4rem]"
                       }`}
                     >
-                      {assignment.isOpen ? "Open" : "Closed"}
+                      {assignment.is_open ? "Open" : "Closed"}
                     </span>
                   </TableCell>
                   <TableCell>{formatDate(assignment.start_date)}</TableCell>

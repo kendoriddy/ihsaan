@@ -1,6 +1,7 @@
 "use client";
 import Button from "@/components/Button";
 import { useFetch } from "@/hooks/useHttp/useHttp";
+import { formatDate } from "@/utils/utilFunctions";
 import { Pagination } from "@mui/material";
 import { useState } from "react";
 
@@ -61,8 +62,15 @@ const QuizList = ({ setCurrentScreen }) => {
                 <p className="text-sm text-gray-500">
                   {filteredQuiz.course_code}
                 </p>
-                <p className="text-sm font-medium text-gray-500">
-                  Tutor: {filteredQuiz.tutor_name}
+                <p className="text-sm text-gray-500">
+                  Start:
+                  {formatDate(filteredQuiz?.start_date) ||
+                    "No start date available"}
+                </p>
+                <p className="text-sm text-gray-500">
+                  End:
+                  {formatDate(filteredQuiz?.end_date) ||
+                    "No end date available"}
                 </p>
               </div>
               <Button
@@ -81,14 +89,14 @@ const QuizList = ({ setCurrentScreen }) => {
               </Button>
             </div>
           ))}
-        <div className="flex justify-center mt-4">
-          <Pagination
-            count={Math.ceil(totalQuiz / 15)}
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-          />
-        </div>
+      </div>
+      <div className="flex justify-center mt-4">
+        <Pagination
+          count={Math.ceil(totalQuiz / 15)}
+          page={page}
+          onChange={handlePageChange}
+          color="primary"
+        />
       </div>
     </div>
   );
