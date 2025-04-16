@@ -29,7 +29,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     refetch,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?assessment_type=TEST&page_size=20&assessment_id=${quizData.id}&term=${quizData.term}`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?page_size=20&assessment_id=${quizData.id}&term=${quizData.term}`,
     (data) => {},
     (error) => {
       toast.error(

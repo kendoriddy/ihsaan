@@ -9,6 +9,7 @@ import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstruct
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import { Assignment, AssignmentInd } from "@mui/icons-material";
 import GradingOutlined from "@mui/icons-material/GradingOutlined";
+import { TbActivity } from "react-icons/tb";
 
 const DASHBOARD_LIST = {
   student: [
@@ -24,6 +25,12 @@ const DASHBOARD_LIST = {
       name: "Take Quiz",
       icon: QuizIcon,
       path: "/quiz",
+    },
+    {
+      id: 6,
+      name: "Activities",
+      icon: TbActivity,
+      path: "/activities",
     },
     {
       id: 12,
