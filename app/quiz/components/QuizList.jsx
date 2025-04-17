@@ -62,12 +62,12 @@ const QuizList = ({ setCurrentScreen }) => {
                   {filteredQuiz.course_code}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Start:
+                  <strong className="text-green-600">Start:</strong>{" "}
                   {formatDate(filteredQuiz?.start_date) ||
                     "No start date available"}
                 </p>
                 <p className="text-sm text-gray-500">
-                  End:
+                  <strong className="text-red-600">End:</strong>{" "}
                   {formatDate(filteredQuiz?.end_date) ||
                     "No end date available"}
                 </p>

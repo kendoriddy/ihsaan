@@ -82,6 +82,11 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     }
   }, [Questions]);
 
+  useEffect(() => {
+    const selected = answers[currentQuestionIndex];
+    setSelectedOption(selected);
+  }, [currentQuestionIndex, answers]);
+
   if (isLoading || isFetching || !Questions) {
     return (
       <div className="">
@@ -208,12 +213,12 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     bgcolor: "background.paper",
     border: "2px solid #000",
     boxShadow: 24,
-    p: 4,
+    p: 8,
   };
 
   return (
     <div className="w-full flex">
-      <div className="flex-1 w-full">
+      <div className="flex-1">
         <div className="flex justify-between mb-4">
           <Box
             sx={{
@@ -270,6 +275,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
               Object.entries(currentQuestion.options).map(([key, option]) => (
                 <label
                   key={key}
+                  id={`question-${currentQuestionIndex}`}
                   className="flex items-center p-2 border border-gray-200 rounded-md cursor-pointer hover:border-purple-600"
                 >
                   <input
@@ -284,7 +290,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
                 </label>
               ))}
           </div>
-          <div className="flex justify-between mt-6">
+          {/* <div className="flex justify-between mt-6">
             <Button
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
@@ -306,6 +312,40 @@ const QuizQuestion = ({ setCurrentScreen }) => {
             >
               {currentQuestionIndex === totalQuestions - 1 ? "Submit" : "Next"}
             </Button>
+          </div> */}
+          <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-between items-center mt-6">
+            {/* Previous Button - Left */}
+            <Button
+              onClick={handlePrevious}
+              disabled={currentQuestionIndex === 0}
+              className={`px-4 py-2 rounded-md ${
+                currentQuestionIndex === 0
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-gray-600 text-white hover:bg-gray-700"
+              } transition-colors duration-300`}
+            >
+              Previous
+            </Button>
+
+            {/* Submit Button - Center */}
+            <div className="flex-1 flex justify-center">
+              <Button
+                onClick={handleSubmit}
+                color="secondary"
+                className="px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300"
+              >
+                Submit
+              </Button>
+            </div>
+
+            {/* Next Button - Right */}
+            <Button
+              onClick={handleNext}
+              color="secondary"
+              className="px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300"
+            >
+              Next
+            </Button>
           </div>
         </div>
       </div>
@@ -317,7 +357,9 @@ const QuizQuestion = ({ setCurrentScreen }) => {
             <div
               key={index}
               id={`tracker-${index}`}
-              className="flex items-center transition-all duration-300"
+              className="flex items-center transition-all duration-300 cursor-pointer"
+              onClick={() => setCurrentQuestionIndex(index)}
+              tabIndex={0}
             >
               <input
                 type="checkbox"
