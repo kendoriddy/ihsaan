@@ -65,8 +65,9 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");
+        console.log("response is", response);
         setShowModal(true);
-        setShowResponse(response);
+        setShowResponse(response.data);
       },
       onError: (error) => {
         toast.error(error.error || "Failed to submit quiz");
@@ -209,11 +210,11 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 400,
     bgcolor: "background.paper",
-    border: "2px solid #000",
+    border: "2px solid white",
     boxShadow: 24,
-    p: 8,
+    width: 370,
+    p: 4,
   };
 
   return (
@@ -395,20 +396,40 @@ const QuizQuestion = ({ setCurrentScreen }) => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography
+            className="text-center mb-4 font-extrabold"
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+          >
             Quiz Result
           </Typography>
           <Typography id="modal-modal-description" className="">
             <p>
-              <strong>Passing score:</strong>
-              {showResponse?.pass_percentage}
+              <strong>Number of Questions:</strong>
+              {showResponse?.total_questions}
+            </p>{" "}
+            <p>
+              <strong>Correct Answers:</strong>
+              {showResponse?.correct_answers}
+            </p>
+            <p>
+              <strong>Text score:</strong>
+              {showResponse?.total_score}
             </p>
             <p>
               <strong>Your text score:</strong>
               {showResponse?.student_score}
             </p>{" "}
+            <p>
+              <strong>Pass Accuracy (%):</strong>
+              {showResponse?.pass_percentage}
+            </p>
           </Typography>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
+          <div
+            className="mt-4 flex flex-col gap-3 md:gap-4"
+            sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}
+          >
             <Button color="secondary" onClick={handleGoToDashboard}>
               Go to Dashboard
             </Button>
@@ -421,7 +442,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
             >
               Take Another Quiz
             </Button>
-          </Box>
+          </div>
         </Box>
       </Modal>
     </div>

@@ -32,7 +32,7 @@ const CreateAssignment = () => {
 
   useEffect(() => {
     fetchTutorId();
-  }, []);
+  });
   // Fetch courses
   const {
     isLoading,
@@ -77,14 +77,18 @@ const CreateAssignment = () => {
 
   // Submit function
   const handleSubmit = (values, { resetForm }) => {
+    const cleanedValues = Object.fromEntries(
+      Object.entries(values).filter(([_, value]) => value !== "")
+    );
+
     const payload = {
-      ...values,
+      ...cleanedValues,
       tutor: tutorId,
     };
     console.log("tutorId", tutorId);
     submitAssignment(payload, {
       onSuccess: () => {
-        toast.success("Assignment created successfully");
+        toast.success("Assessment created successfully");
         resetForm(); // Reset the form only when successful
         fetchTutorId();
       },

@@ -71,6 +71,16 @@ const QuizList = ({ setCurrentScreen }) => {
                   {formatDate(filteredQuiz?.end_date) ||
                     "No end date available"}
                 </p>
+                <p>
+                  <strong className="text-yellow-600">Status:</strong>{" "}
+                  {filteredQuiz?.submission_status === "submitted" ? (
+                    <span className="text-green-600">Submitted</span>
+                  ) : filteredQuiz?.is_open ? (
+                    <span className="text-blue-600">Pending</span>
+                  ) : (
+                    <span className="text-red-600">Closed</span>
+                  )}
+                </p>
               </div>
               <Button
                 onClick={() => {
@@ -83,6 +93,7 @@ const QuizList = ({ setCurrentScreen }) => {
                 className="mt-4 px-10 py-2"
                 size="large"
                 color="secondary"
+                disabled={filteredQuiz?.submission_status === "submitted"}
               >
                 Take Quiz
               </Button>
