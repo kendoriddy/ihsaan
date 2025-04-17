@@ -342,7 +342,12 @@ const QuizQuestion = ({ setCurrentScreen }) => {
             <Button
               onClick={handleNext}
               color="secondary"
-              className="px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300"
+              disabled={currentQuestionIndex === totalQuestions - 1}
+              className={`px-6 py-2 rounded-md ${
+                currentQuestionIndex === totalQuestions - 1
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              } transition-colors duration-300`}
             >
               Next
             </Button>
