@@ -37,7 +37,6 @@ const QuizList = ({ setCurrentScreen }) => {
       new Date(quiz.end_date) > new Date() &&
       quiz.is_open === true
   );
-  console.log("courses", filteredQuizes);
 
   return (
     <div className="w-full px-4">

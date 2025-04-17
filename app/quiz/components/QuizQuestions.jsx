@@ -213,7 +213,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
 
   return (
     <div className="w-full flex">
-      <div className="flex-1">
+      <div className="flex-1 w-full">
         <div className="flex justify-between mb-4">
           <Box
             sx={{
