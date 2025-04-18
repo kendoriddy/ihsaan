@@ -11,7 +11,7 @@ const SetQuiz = () => {
     <RequireAuth>
       <Layout>
         <div className="w-full px-4">
-          <Link href="/set-quiz/all-quiz">
+          <Link href="/admin/set-quiz/all-quiz">
             See all Quiz questions, delete and update them
           </Link>
           <AddingQuiz />
