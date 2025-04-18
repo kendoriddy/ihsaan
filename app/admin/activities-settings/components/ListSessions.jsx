@@ -13,7 +13,6 @@ import {
   Pagination,
 } from "@mui/material";
 import { toast } from "react-toastify";
-import Layout from "@/components/Layout";
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
@@ -67,89 +66,87 @@ const AllSessions = () => {
   };
 
   return (
-    <Layout>
-      <div>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Academic Year</TableCell>
-                <TableCell>Start Date</TableCell>
-                <TableCell>End Date</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {isFetching && (
-                <div className="flex pl-6 py-3 items-center justify-center gap-2">
-                  <Loader />
-                  <p className="animate-pulse">Loading...</p>
-                </div>
-              )}
-              {!isFetching && (
-                <>
-                  {Sessions.map((year) => (
-                    <TableRow key={year.id}>
-                      <TableCell>{year.year}</TableCell>
-                      <TableCell>{year.start_date}</TableCell>
-                      <TableCell>{year.end_date}</TableCell>
-                      <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
-                        <Button
-                          color="secondary"
-                          onClick={() => {
-                            setSelectedSession(year);
-                            setOpenUpdateModal(true);
-                          }}
-                        >
-                          Update
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setSelectedSession(year);
-                            setOpenDeleteDialog(true);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+    <div>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Academic Year</TableCell>
+              <TableCell>Start Date</TableCell>
+              <TableCell>End Date</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {isFetching && (
+              <div className="flex pl-6 py-3 items-center justify-center gap-2">
+                <Loader />
+                <p className="animate-pulse">Loading...</p>
+              </div>
+            )}
+            {!isFetching && (
+              <>
+                {Sessions.map((year) => (
+                  <TableRow key={year.id}>
+                    <TableCell>{year.year}</TableCell>
+                    <TableCell>{year.start_date}</TableCell>
+                    <TableCell>{year.end_date}</TableCell>
+                    <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
+                      <Button
+                        color="secondary"
+                        onClick={() => {
+                          setSelectedSession(year);
+                          setOpenUpdateModal(true);
+                        }}
+                      >
+                        Update
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setSelectedSession(year);
+                          setOpenDeleteDialog(true);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-        {/* Pagination */}
-        <Pagination
-          count={Math.ceil(totalSession / 15)}
-          page={page}
-          onChange={handlePageChange}
-          color="primary"
-          sx={{ mt: 2, display: "flex", justifyContent: "center" }}
-        />
+      {/* Pagination */}
+      <Pagination
+        count={Math.ceil(totalSession / 15)}
+        page={page}
+        onChange={handlePageChange}
+        color="primary"
+        sx={{ mt: 2, display: "flex", justifyContent: "center" }}
+      />
 
-        {/* Delete Confirmation Modal */}
-        <CustomModal
-          open={openDeleteDialog}
-          onClose={() => setOpenDeleteDialog(false)}
-          title="Confirm Delete"
-          onConfirm={handleDelete}
-          confirmText="Delete"
-          isLoading={isDeleting}
-        >
-          <p>Are you sure you want to delete this academic session?</p>
-        </CustomModal>
+      {/* Delete Confirmation Modal */}
+      <CustomModal
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+        title="Confirm Delete"
+        onConfirm={handleDelete}
+        confirmText="Delete"
+        isLoading={isDeleting}
+      >
+        <p>Are you sure you want to delete this academic session?</p>
+      </CustomModal>
 
-        {/* Update Question Modal */}
-        <EditSession
-          openUpdateModal={openUpdateModal}
-          setOpenUpdateModal={setOpenUpdateModal}
-          selectedSession={selectedSession}
-          refetchSessions={() => refetch()}
-        />
-      </div>
-    </Layout>
+      {/* Update Question Modal */}
+      <EditSession
+        openUpdateModal={openUpdateModal}
+        setOpenUpdateModal={setOpenUpdateModal}
+        selectedSession={selectedSession}
+        refetchSessions={() => refetch()}
+      />
+    </div>
   );
 };
 

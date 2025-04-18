@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { usePost } from "@/hooks/useHttp/useHttp";
 import Button from "@/components/Button";
 import { academicYearSchema } from "@/components/validationSchemas/ValidationSchema";
-import { FormControl } from "@mui/material";
+import { FormControl, TextField } from "@mui/material";
 import DatePickers from "@/components/validation/DatePicker";
 
 const CreateSession = () => {
@@ -49,16 +49,16 @@ const CreateSession = () => {
         validateOnChange={true}
         validateOnBlur={true}
       >
-        {({ values, setFieldValue, isValid }) => (
-          <Form className="bg-white p-6 rounded-md shadow-md space-y-6">
+        {({ values, setFieldValue, isValid, touched }) => (
+          <Form className="p-6 space-y-6">
             <Field
               as={TextField}
               fullWidth
               margin="normal"
-              label="Title"
-              name="title"
-              error={touched.title && Boolean(errors.title)}
-              helperText={touched.title && errors.title}
+              label="Year"
+              name="year"
+              error={touched.year && Boolean(errors.year)}
+              helperText={touched.year && errors.year}
             />
             <FormControl
               fullWidth
@@ -83,17 +83,9 @@ const CreateSession = () => {
               <Button
                 type="submit"
                 color="secondary"
-                disabled={
-                  isCreatingAcademicSession ||
-                  !isValid ||
-                  isLoading ||
-                  isFetching
-                }
+                disabled={isCreatingAcademicSession || !isValid}
                 className={`w-full px-6 py-2 rounded-md font-medium text-white ${
-                  isCreatingAcademicSession ||
-                  !isValid ||
-                  isLoading ||
-                  isFetching
+                  isCreatingAcademicSession || !isValid
                     ? "bg-gray-400 cursor-not-allowed"
                     : ""
                 } transition-colors duration-300`}

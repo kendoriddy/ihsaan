@@ -5,6 +5,7 @@ import { usePatch } from "@/hooks/useHttp/useHttp";
 import { TextField } from "@mui/material";
 import { toast } from "react-toastify";
 import DatePickers from "@/components/validation/DatePicker";
+import { Formik, Form } from "formik";
 
 const EditSession = ({
   setOpenUpdateModal,
@@ -70,39 +71,45 @@ const EditSession = ({
         confirmText={isUpdating ? "Updating..." : "Update"}
         isLoading={isUpdating}
       >
-        <TextField
-          fullWidth
-          label="Year"
-          name="year"
-          margin="dense"
-          value={editedSession.year}
-          onChange={handleInputChange}
-        />
-        {/* Start Date */}
-        <DatePickers
-          name="start_date"
-          placeholder="Start Date"
-          value={editedSession.start_date}
-          onChange={(newDate) =>
-            setEditedSession((prev) => ({
-              ...prev,
-              start_date: newDate,
-            }))
-          }
-        />
+        <Formik>
+          <Form>
+            <div className="space-y-4 mt-2">
+              <TextField
+                fullWidth
+                label="Year"
+                name="year"
+                margin="dense"
+                value={editedSession.year}
+                onChange={handleInputChange}
+              />
+              {/* Start Date */}
+              <DatePickers
+                name="start_date"
+                placeholder="Start Date"
+                value={editedSession.start_date}
+                onChange={(newDate) =>
+                  setEditedSession((prev) => ({
+                    ...prev,
+                    start_date: newDate,
+                  }))
+                }
+              />
 
-        {/* End Date */}
-        <DatePickers
-          name="end_date"
-          placeholder="End Date"
-          value={editedSession.end_date}
-          onChange={(newDate) =>
-            setEditedSession((prev) => ({
-              ...prev,
-              end_date: newDate,
-            }))
-          }
-        />
+              {/* End Date */}
+              <DatePickers
+                name="end_date"
+                placeholder="End Date"
+                value={editedSession.end_date}
+                onChange={(newDate) =>
+                  setEditedSession((prev) => ({
+                    ...prev,
+                    end_date: newDate,
+                  }))
+                }
+              />
+            </div>
+          </Form>
+        </Formik>
       </CustomModal>
     </div>
   );
