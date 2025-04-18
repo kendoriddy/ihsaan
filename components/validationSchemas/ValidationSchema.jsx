@@ -157,3 +157,9 @@ export const manualGradingSchema = Yup.object({
     return !!value.student || !!value.group;
   }
 );
+
+export const academicYearSchema = Yup.object({
+  year: Yup.string().required("Year is required"),
+  start_date: Yup.date().required("Start date is required"),
+  end_date: Yup.date().required("End date is required"),
+});

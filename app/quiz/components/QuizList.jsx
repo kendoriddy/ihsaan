@@ -32,10 +32,10 @@ const QuizList = ({ setCurrentScreen }) => {
   const Quizes = QuizesList && QuizesList?.data?.results;
 
   const filteredQuizes = Quizes?.filter(
-    (quiz) =>
-      quiz.question_type === "MCQ" &&
-      new Date(quiz.end_date) > new Date() &&
-      quiz.is_open === true
+    (quiz) => quiz.question_type === "MCQ"
+    // &&
+    //   new Date(quiz.end_date) > new Date() &&
+    //   quiz.is_open === true
   );
 
   return (
@@ -93,7 +93,10 @@ const QuizList = ({ setCurrentScreen }) => {
                 className="mt-4 px-10 py-2"
                 size="large"
                 color="secondary"
-                disabled={filteredQuiz?.submission_status === "submitted"}
+                disabled={
+                  filteredQuiz?.submission_status === "submitted" ||
+                  filteredQuiz?.is_open === false
+                }
               >
                 Take Quiz
               </Button>
