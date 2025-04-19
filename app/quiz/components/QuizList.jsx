@@ -3,7 +3,7 @@ import Button from "@/components/Button";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import { formatDate } from "@/utils/utilFunctions";
 import { Pagination } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const QuizList = ({ setCurrentScreen }) => {
   const [totalQuiz, setTotalQuiz] = useState(10);
@@ -37,6 +37,17 @@ const QuizList = ({ setCurrentScreen }) => {
     //   new Date(quiz.end_date) > new Date() &&
     //   quiz.is_open === true
   );
+
+  useEffect(() => {
+    const selectedQuiz = localStorage.getItem("selectedQuiz");
+    if (selectedQuiz) {
+      const quizData = JSON.parse(selectedQuiz);
+      const quizState = localStorage.getItem(`quizState_${quizData.id}`);
+      if (quizState) {
+        setCurrentScreen("quiz");
+      }
+    }
+  }, [setCurrentScreen]);
 
   return (
     <div className="w-full px-4">

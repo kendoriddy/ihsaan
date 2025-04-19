@@ -1,7 +1,18 @@
 "use client";
 import Button from "@/components/Button";
+import { useEffect } from "react";
 
 const QuizInstructions = ({ questions, setCurrentScreen }) => {
+  const quizData = JSON.parse(localStorage.getItem("selectedQuiz"));
+
+  useEffect(() => {
+    if (quizData) {
+      const quizState = localStorage.getItem(`quizState_${quizData.id}`);
+      if (quizState) {
+        setCurrentScreen("quiz");
+      }
+    }
+  }, [setCurrentScreen, quizData]);
   return (
     <div className="w-full px-4">
       <h2 className="text-2xl font-semibold mb-4">Quiz Instructions</h2>
