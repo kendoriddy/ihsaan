@@ -68,6 +68,18 @@ const isLoggedIn = () => {
   }
 };
 
+const formatTime = (ms) => {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return (
+    <div className="font-bold text-red-600">
+      {minutes}:{seconds < 10 ? "0" : ""}
+      {seconds}
+    </div>
+  );
+};
+
 const countryNames = [
   "Afghanistan",
   "Albania",
@@ -349,4 +361,5 @@ export {
   menteeGender,
   religion,
   maritalStatus,
+  formatTime,
 };
