@@ -127,7 +127,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
         console.log("show response", showResponse);
       },
       onError: (error) => {
-        toast.error(error.error || "Failed to submit quiz");
+        // toast.error(error.error || "Failed to submit quiz");
       },
     }
   );
