@@ -4,19 +4,6 @@ import React from "react";
 import { useState } from "react";
 
 const AssignmentSubmitted = ({ submissionData }) => {
-  console.log("submission data", submissionData);
-  if (!submissionData) return null;
-
-  const {
-    marks,
-    total_marks,
-    user,
-    student_name,
-    submitted_at,
-    submission_notes,
-    file_url,
-  } = submissionData[0];
-
   const [dragActive, setDragActive] = useState(false);
 
   const { mutate: uploadFile, isLoading: isUploading } = usePost(
@@ -126,6 +113,19 @@ const AssignmentSubmitted = ({ submissionData }) => {
       return "DOCUMENT";
     return "OTHERS";
   }
+
+  console.log("submission data", submissionData);
+  if (!submissionData) return null;
+
+  const {
+    marks,
+    total_marks,
+    user,
+    student_name,
+    submitted_at,
+    submission_notes,
+    file_url,
+  } = submissionData[0];
   return (
     <div>
       {/* {submissionData?.marks && (
