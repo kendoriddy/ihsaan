@@ -7,26 +7,26 @@ import { toast } from "react-toastify";
 import DatePickers from "@/components/validation/DatePicker";
 import { Formik, Form } from "formik";
 
-const EditSession = ({
+const EditTerm = ({
   setOpenUpdateModal,
   openUpdateModal,
-  selectedSession,
-  refetchSessions,
+  selectedTerm,
+  refetchTerms,
 }) => {
-  const [editedSession, setEditedSession] = useState({
-    year: selectedSession?.year || "",
-    start_date: selectedSession?.start_date || "",
-    end_date: selectedSession?.end_date || "",
+  const [editedTerm, setEditedTerm] = useState({
+    year: selectedTerm?.question_text || "",
+    start_date: selectedTerm?.start_date || "",
+    end_date: selectedTerm?.end_date || "",
   });
 
   // Update function with body
-  const { mutate: updateSession, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/academic-sessions/${selectedSession?.id}/`,
+  const { mutate: updateTerm, isLoading: isUpdating } = usePatch(
+    `https://ihsaanlms.onrender.com/terms/${selectedTerm?.id}/`,
     {
       onSuccess: () => {
         toast.success("Session Updated successfully");
         setOpenUpdateModal(false);
-        refetchSessions();
+        refetchTerms();
       },
       onError: (error) => {
         toast.error(error.response?.data?.message || "Update failed");
@@ -35,27 +35,27 @@ const EditSession = ({
   );
 
   useEffect(() => {
-    if (selectedSession) {
+    if (selectedTerm) {
       setEditedSession({
-        year: selectedSession.year || "",
-        start_date: selectedSession.start_date || "",
-        end_date: selectedSession.end_date || "",
+        year: selectedTerm.year || "",
+        start_date: selectedTerm.start_date || "",
+        end_date: selectedTerm.end_date || "",
       });
     }
-  }, [selectedSession]);
+  }, [selectedTerm]);
 
   // Function to handle form submission
   const handleUpdateSubmit = () => {
-    updateSession({
-      year: editedSession.year,
-      start_date: editedSession.start_date,
-      end_date: editedSession.end_date,
+    updateTerm({
+      year: editedTerm.year,
+      start_date: editedTerm.start_date,
+      end_date: editedTerm.end_date,
     });
   };
 
   // Handle input changes
   const handleInputChange = (e) => {
-    setEditedSession((prev) => ({
+    setEditedTerm((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -86,9 +86,9 @@ const EditSession = ({
               <DatePickers
                 name="start_date"
                 placeholder="Start Date"
-                value={editedSession.start_date}
+                value={editedTerm.start_date}
                 onChange={(newDate) =>
-                  setEditedSession((prev) => ({
+                  setEditedTerm((prev) => ({
                     ...prev,
                     start_date: newDate,
                   }))
@@ -99,9 +99,9 @@ const EditSession = ({
               <DatePickers
                 name="end_date"
                 placeholder="End Date"
-                value={editedSession.end_date}
+                value={editedTerm.end_date}
                 onChange={(newDate) =>
-                  setEditedSession((prev) => ({
+                  setEditedTerm((prev) => ({
                     ...prev,
                     end_date: newDate,
                   }))
@@ -115,4 +115,4 @@ const EditSession = ({
   );
 };
 
-export default EditSession;
+export default EditTerm;

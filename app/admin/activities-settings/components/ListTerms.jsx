@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
-import EditSession from "./EditSession";
+import EditTerm from "./EditTerm";
 
 const ListTerms = () => {
   const queryClient = useQueryClient();
@@ -142,12 +142,12 @@ const ListTerms = () => {
       </CustomModal>
 
       {/* Update Term Modal */}
-      {/* <EditSession
+      <EditTerm
         openUpdateModal={openUpdateModal}
         setOpenUpdateModal={setOpenUpdateModal}
-        selectedSession={selectedSession}
-        refetchSessions={() => refetch()}
-      /> */}
+        selectedTerm={selectedTerm}
+        refetchTerms={() => refetch()}
+      />
     </div>
   );
 };
