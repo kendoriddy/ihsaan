@@ -163,3 +163,10 @@ export const academicYearSchema = Yup.object({
   start_date: Yup.date().required("Start date is required"),
   end_date: Yup.date().required("End date is required"),
 });
+
+export const termSchema = Yup.object({
+  session_id: Yup.number().required("Academic session is required"),
+  name: Yup.string().required("Name is required"),
+  start_date: Yup.date().required("Start date is required"),
+  end_date: Yup.date().required("End date is required"),
+});

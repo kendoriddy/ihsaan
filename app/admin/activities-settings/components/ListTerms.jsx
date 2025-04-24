@@ -18,33 +18,33 @@ import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
 import EditSession from "./EditSession";
 
-const AllSessions = () => {
+const ListTerms = () => {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [selectedSession, setSelectedSession] = useState(null);
+  const [selectedTerm, setSelectedTerm] = useState(null);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [totalSession, setTotalSession] = useState(0);
+  const [totalTerms, setTotalTerms] = useState(0);
 
   const { isLoading, data, refetch, isFetching } = useFetch(
-    "academicSession",
-    `https://ihsaanlms.onrender.com/academic-sessions/?page_size=15&page=${page}`,
+    "terms",
+    `https://ihsaanlms.onrender.com/terms/?page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
-        setTotalSession(data.total);
+        setTotalTerms(data.total);
       }
     }
   );
 
-  const Sessions = data?.data?.results || [];
+  const Terms = data?.data?.results || [];
 
   // DELETE QUESTION
   const { mutate: sessionDelete, isLoading: isDeleting } = useDelete(
-    `https://ihsaanlms.onrender.com/academic-sessions`,
+    `https://ihsaanlms.onrender.com/terms`,
     {
       onSuccess: () => {
         toast.success("Deleted successfully");
-        queryClient.invalidateQueries("academicSession");
+        queryClient.invalidateQueries("terms");
         setOpenDeleteDialog(false);
       },
       onError: (error) => {
@@ -60,8 +60,8 @@ const AllSessions = () => {
   };
 
   const handleDelete = () => {
-    if (selectedSession?.id) {
-      sessionDelete(`${selectedSession.id}/`);
+    if (selectedTerm?.id) {
+      sessionDelete(`${selectedTerm.id}/`);
     }
   };
 
@@ -72,6 +72,7 @@ const AllSessions = () => {
           <TableHead>
             <TableRow>
               <TableCell>Academic Year</TableCell>
+              <TableCell>Term</TableCell>
               <TableCell>Start Date</TableCell>
               <TableCell>End Date</TableCell>
               <TableCell>Actions</TableCell>
@@ -86,16 +87,17 @@ const AllSessions = () => {
             )}
             {!isFetching && (
               <>
-                {Sessions.map((year) => (
-                  <TableRow key={year.id}>
-                    <TableCell>{year.year}</TableCell>
-                    <TableCell>{year.start_date}</TableCell>
-                    <TableCell>{year.end_date}</TableCell>
+                {Terms.map((term) => (
+                  <TableRow key={term.id}>
+                    <TableCell>{term.session.year}</TableCell>
+                    <TableCell>{term.name}</TableCell>
+                    <TableCell>{term.start_date}</TableCell>
+                    <TableCell>{term.end_date}</TableCell>
                     <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
                       <Button
                         color="secondary"
                         onClick={() => {
-                          setSelectedSession(year);
+                          setSelectedTerm(term);
                           setOpenUpdateModal(true);
                         }}
                       >
@@ -103,7 +105,7 @@ const AllSessions = () => {
                       </Button>
                       <Button
                         onClick={() => {
-                          setSelectedSession(year);
+                          setSelectedTerm(term);
                           setOpenDeleteDialog(true);
                         }}
                       >
@@ -120,7 +122,7 @@ const AllSessions = () => {
 
       {/* Pagination */}
       <Pagination
-        count={Math.ceil(totalSession / 15)}
+        count={Math.ceil(totalTerms / 15)}
         page={page}
         onChange={handlePageChange}
         color="primary"
@@ -136,18 +138,18 @@ const AllSessions = () => {
         confirmText="Delete"
         isLoading={isDeleting}
       >
-        <p>Are you sure you want to delete this academic session?</p>
+        <p>Are you sure you want to delete this term?</p>
       </CustomModal>
 
-      {/* Update Session Modal */}
-      <EditSession
+      {/* Update Term Modal */}
+      {/* <EditSession
         openUpdateModal={openUpdateModal}
         setOpenUpdateModal={setOpenUpdateModal}
         selectedSession={selectedSession}
         refetchSessions={() => refetch()}
-      />
+      /> */}
     </div>
   );
 };
 
-export default AllSessions;
+export default ListTerms;
