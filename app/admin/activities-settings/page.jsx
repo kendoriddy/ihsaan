@@ -1,18 +1,16 @@
 "use client";
-// import RequireAuth from "@/app/lib/ReuquireAuth";
-import Layout from "@/components/Layout";
 import Link from "next/link";
 import React, { useState } from "react";
 import AllSessions from "./components/ListSessions";
 import Button from "@/components/Button";
 import ListTerms from "./components/ListTerms";
+import AdminLayout from "@/components/AdminLayout";
 
 const ActivitiesSettings = () => {
-  const [sessionOrTerm, setSessionOrTerm] = useState("term");
+  const [sessionOrTerm, setSessionOrTerm] = useState("session");
 
   return (
-    // <RequireAuth>
-    <Layout>
+    <AdminLayout>
       <div className="w-full px-4">
         <Link
           href="/admin/activities-settings/create-session-or-term"
@@ -20,11 +18,36 @@ const ActivitiesSettings = () => {
         >
           <Button color="secondary">Create new academic session/term</Button>
         </Link>
+
+        <div className="flex justify-center mb-6">
+          <div className="flex gap-4 border-b border-gray-300">
+            <button
+              className={`px-4 py-2 font-medium ${
+                sessionOrTerm === "session"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500"
+              }`}
+              onClick={() => setSessionOrTerm("session")}
+            >
+              Academic Session
+            </button>
+            <button
+              className={`px-4 py-2 font-medium ${
+                sessionOrTerm === "term"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500"
+              }`}
+              onClick={() => setSessionOrTerm("term")}
+            >
+              Academic Term
+            </button>
+          </div>
+        </div>
+
         {sessionOrTerm === "session" && <AllSessions />}
         {sessionOrTerm === "term" && <ListTerms />}
       </div>
-    </Layout>
-    //  </RequireAuth>
+    </AdminLayout>
   );
 };
 

@@ -1,8 +1,14 @@
 "use client";
 import CustomModal from "@/components/CustomModal";
 import React, { useState, useEffect } from "react";
-import { usePatch } from "@/hooks/useHttp/useHttp";
-import { TextField } from "@mui/material";
+import { useFetch, usePatch } from "@/hooks/useHttp/useHttp";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import { toast } from "react-toastify";
 import DatePickers from "@/components/validation/DatePicker";
 import { Formik, Form } from "formik";
@@ -14,11 +20,12 @@ const EditTerm = ({
   refetchTerms,
 }) => {
   const [editedTerm, setEditedTerm] = useState({
-    year: selectedTerm?.question_text || "",
+    session_id: selectedTerm?.session.id || "",
+    name: selectedTerm?.name || "",
     start_date: selectedTerm?.start_date || "",
     end_date: selectedTerm?.end_date || "",
   });
-
+  console.log("term selected", selectedTerm);
   // Update function with body
   const { mutate: updateTerm, isLoading: isUpdating } = usePatch(
     `https://ihsaanlms.onrender.com/terms/${selectedTerm?.id}/`,
@@ -34,10 +41,18 @@ const EditTerm = ({
     }
   );
 
+  const { isLoading, data, refetch, isFetching } = useFetch(
+    "academicSession",
+    `https://ihsaanlms.onrender.com/academic-sessions/`,
+    (data) => {}
+  );
+  const Sessions = data?.data?.results || [];
+
   useEffect(() => {
     if (selectedTerm) {
-      setEditedSession({
-        year: selectedTerm.year || "",
+      setEditedTerm({
+        session_id: selectedTerm.session.name || "",
+        name: selectedTerm.name || "",
         start_date: selectedTerm.start_date || "",
         end_date: selectedTerm.end_date || "",
       });
@@ -47,7 +62,8 @@ const EditTerm = ({
   // Function to handle form submission
   const handleUpdateSubmit = () => {
     updateTerm({
-      year: editedTerm.year,
+      session_id: editedTerm.session_id,
+      name: editedTerm.name,
       start_date: editedTerm.start_date,
       end_date: editedTerm.end_date,
     });
@@ -60,6 +76,12 @@ const EditTerm = ({
       [e.target.name]: e.target.value,
     }));
   };
+
+  const termsOption = [
+    { value: "FIRST", label: "First term" },
+    { value: "SECOND", label: "Second term" },
+    { value: "THIRD", label: "Third term" },
+  ];
 
   return (
     <div>
@@ -74,14 +96,43 @@ const EditTerm = ({
         <Formik>
           <Form>
             <div className="space-y-4 mt-2">
-              <TextField
-                fullWidth
-                label="Year"
-                name="year"
-                margin="dense"
-                value={editedSession.year}
-                onChange={handleInputChange}
-              />
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Terms</InputLabel>
+                <Select
+                  label="Terms"
+                  name="name"
+                  value={editedTerm.name}
+                  onChange={handleInputChange}
+                  disabled={isUpdating}
+                >
+                  {termsOption.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Course Dropdown */}
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Academic Session</InputLabel>
+                <Select
+                  label="Academic Session"
+                  name="session_id"
+                  value={editedTerm.session_id}
+                  onChange={handleInputChange}
+                  disabled={isUpdating || isLoading || isFetching}
+                >
+                  {/* <MenuItem value="">
+                    <em>Select a session</em>
+                  </MenuItem> */}
+                  {Sessions.map((session) => (
+                    <MenuItem key={session.id} value={session.id}>
+                      {session.year}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               {/* Start Date */}
               <DatePickers
                 name="start_date"

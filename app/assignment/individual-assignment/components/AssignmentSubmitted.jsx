@@ -1,11 +1,14 @@
+"use client";
+import CustomModal from "@/components/CustomModal";
 import { usePatch, usePost } from "@/hooks/useHttp/useHttp";
 import { formatDate } from "@/utils/utilFunctions";
 import React from "react";
 import { useState } from "react";
+import * as Yup from "yup";
 
 const AssignmentSubmitted = ({ submissionData }) => {
   const [dragActive, setDragActive] = useState(false);
-
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const { mutate: uploadFile, isLoading: isUploading } = usePost(
     `https://ihsaanlms.onrender.com/resource/assessment-resource/`,
     {
@@ -113,8 +116,6 @@ const AssignmentSubmitted = ({ submissionData }) => {
       return "DOCUMENT";
     return "OTHERS";
   }
-
-  console.log("submission data", submissionData);
   if (!submissionData) return null;
 
   const {
@@ -169,6 +170,14 @@ const AssignmentSubmitted = ({ submissionData }) => {
           </div>
         </div>
       </div>
+      <CustomModal
+        open={openUpdateModal}
+        onClose={() => setOpenUpdateModal(false)}
+        title="Update Question"
+        onConfirm={handleSubmit}
+        confirmText={isUpdating ? "Updating..." : "Update"}
+        isLoading={isUpdating}
+      ></CustomModal>
     </div>
   );
 };
