@@ -346,6 +346,19 @@ export function formatQualification(qualification) {
     .join(" "); // Join the words back together with spaces
 }
 
+function getFileType(mimeType) {
+  if (mimeType.startsWith("video/")) return "VIDEO";
+  if (mimeType.startsWith("image/")) return "IMAGE";
+  if (mimeType === "application/pdf") return "DOCUMENT";
+  if (
+    mimeType === "application/msword" ||
+    mimeType ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  )
+    return "DOCUMENT";
+  return "OTHERS";
+}
+
 export {
   formatDate,
   serverDateFormat,
@@ -362,4 +375,5 @@ export {
   religion,
   maritalStatus,
   formatTime,
+  getFileType,
 };

@@ -37,7 +37,7 @@ function AdminLayout({ children }) {
           />
 
           {/* Main Body */}
-          <section className="lg:ml-[250px] flex md:flex-row w-full p-4 justify-self-center flex-1 min-h-screen">
+          <section className="lg:ml-[250px] flex md:flex-row w-full p-4 justify-center flex-1 min-h-screen">
             {children}
           </section>
         </main>

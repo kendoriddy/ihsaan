@@ -31,7 +31,7 @@ function AdminDashboardSidebar({
     <section
       className={`${!isSidebarOpen && "w-0"} ${
         isSidebarOpen && "w-[250px]"
-      }  lg:w-[250px] h-auto  fixed overflow-hidden transition-all duration-300 py-4 bg-white border-r-2 z-30`}
+      }  lg:w-[250px] h-auto  fixed overflow-y-scroll transition-all duration-300 py-4 bg-white border-r-2 z-30`}
       style={{ height: "calc(100vh - 64px)" }}
     >
       <div className="text-blue-600 flex items-center px-4 gap-4">
