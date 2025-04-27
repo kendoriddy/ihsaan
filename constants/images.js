@@ -32,7 +32,7 @@ import book_8 from "@/assets/images/books/book_8.webp";
 import book_9 from "@/assets/images/books/book_9.webp";
 import book_10 from "@/assets/images/books/book_10.webp";
 import logo from "@/assets/images/main/logo.png";
-import icon from "@/assets/images/main/icon.png";
+import icon from "@/assets/images/main/background _Ihsaan.png";
 
 import time_management from "@/assets/images/others/time_management.jpg";
 import jumiaLogo from "@/assets/images/others/jumia_logo.svg";

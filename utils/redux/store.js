@@ -5,6 +5,11 @@ import authReducer from "./slices/auth.reducer";
 import userReducer from "./userSlice";
 import tutorReducer from "./slices/tutorSlice";
 import studentReducer from "./slices/studentSlice";
+import programmeReducer from "./slices/programmeSlice";
+import programmeTypeReducer from "./slices/programmeTypeSlice";
+import classesReducer from "./slices/classesSlice";
+import levelsReducer from "./slices/levelsSlice";
+import courseReducer from "./slices/courseSlice";
 
 export const store = configureStore({
   reducer: {
@@ -13,5 +18,10 @@ export const store = configureStore({
     auth: authReducer,
     tutor: tutorReducer,
     student: studentReducer,
+    programme: programmeReducer,
+    programmeType: programmeTypeReducer,
+    classes: classesReducer,
+    levels: levelsReducer,
+    course: courseReducer,
   },
 });

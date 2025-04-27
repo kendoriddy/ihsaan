@@ -106,14 +106,13 @@ function DashboardSidebar({ currentRoute }) {
         {/* Left list */}
         <div>
           <ul className="px-4">
-
             {dashboardItems.map((item) => (
               <li key={item.id}>
                 {item.name === "Logout" ? (
                   <div
                     onClick={handleLogout}
                     className={`flex items-center justify-between pl-2 py-2 cursor-pointer transition-all duration-300 rounded ${
-                      currentRoute === item.path && "bg-blue-600 text-white"
+                      currentRoute === item.path && "bg-primary text-white"
                     } ${
                       currentRoute !== item.path &&
                       "hover:bg-gray-100 hover:pr-3 text-primary"
@@ -131,7 +130,7 @@ function DashboardSidebar({ currentRoute }) {
                   <Link href={item.path}>
                     <div
                       className={`flex items-center justify-between pl-2 py-2 cursor-pointer transition-all duration-300 rounded ${
-                        currentRoute === item.path && "bg-blue-600 text-white"
+                        currentRoute === item.path && "bg-primary text-white"
                       } ${
                         currentRoute !== item.path &&
                         "hover:bg-gray-100 hover:pr-3"

@@ -59,7 +59,7 @@ export default function StartQuiz() {
         <button
           disabled={currentQuestionIndex === questions.length - 1}
           onClick={handleAnswerClick}
-          className="px-4 py-2 border rounded bg-blue-600 text-white hover:bg-green-600 disabled:opacity-50"
+          className="px-4 py-2 border rounded bg-primary text-white hover:bg-green-600 disabled:opacity-50"
         >
           Next
         </button>
