@@ -50,7 +50,7 @@ function AdminDashboardSidebar({
                   <span
                     className={`p-2 transition-all duration-300 rounded overflow-y-hidden flex justify-between ${
                       currentRoute === item.path
-                        ? "bg-blue-600 text-white"
+                        ? "bg-primary text-white"
                         : "hover:bg-gray-100 hover:pl-3"
                     } `}
                   >
@@ -79,7 +79,7 @@ function AdminDashboardSidebar({
                           <span
                             className={`py-2 px-4 transition-all duration-300 rounded overflow-y-hidden flex justify-between ${
                               currentRoute === item.path
-                                ? "bg-blue-600 text-white"
+                                ? "bg-primary text-white"
                                 : "hover:bg-gray-100 hover:pl-3"
                             } `}
                           >
@@ -102,7 +102,7 @@ function AdminDashboardSidebar({
                   <span
                     className={`p-2 transition-all duration-300 rounded overflow-y-hidden flex justify-between ${
                       currentRoute === item.path
-                        ? "bg-blue-600 text-white"
+                        ? "bg-primary text-white"
                         : "hover:bg-gray-100 hover:pl-3"
                     } `}
                   >
@@ -131,7 +131,7 @@ function AdminDashboardSidebar({
                           <span
                             className={`py-2 px-4 transition-all duration-300 rounded overflow-y-hidden flex justify-between ${
                               currentRoute === item.path
-                                ? "bg-blue-600 text-white"
+                                ? "bg-primary text-white"
                                 : "hover:bg-gray-100 hover:pl-3"
                             } `}
                           >

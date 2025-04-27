@@ -19,7 +19,7 @@ export const http2 = axios.create({
 });
 
 // Function to get token dynamically
-const getAuthToken = () =>
+export const getAuthToken = () =>
   typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
 // Request interceptor to add the Authorization header dynamically

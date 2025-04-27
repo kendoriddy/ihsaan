@@ -29,7 +29,7 @@ function Page() {
           <div className="px-4  w-full py-8 lg:py-0">
             {/* Top */}
             <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-              <div className="bg-blue-600 text-white w-full lg:w-[220px] h-[75px] flex items-center px-4 rounded">
+              <div className="bg-primary text-white w-full lg:w-[220px] h-[75px] flex items-center px-4 rounded">
                 <div className="flex items-center gap-4 text-md">
                   <div className="text-primary">
                     <GroupsIcon sx={{ fontSize: 40 }} />
@@ -40,7 +40,7 @@ function Page() {
                   </div>
                 </div>
               </div>
-              <div className="bg-blue-600 text-white  w-full lg:w-[220px] h-[75px] flex items-center px-4 rounded">
+              <div className="bg-primary text-white  w-full lg:w-[220px] h-[75px] flex items-center px-4 rounded">
                 <div className="flex items-center gap-4 text-md">
                   <div className="text-primary">
                     <AccessTimeIcon sx={{ fontSize: 40 }} />
@@ -51,7 +51,7 @@ function Page() {
                   </div>
                 </div>
               </div>
-              <div className="bg-blue-600 text-white  w-full lg:w-[220px] h-[75px] flex items-center px-4 rounded">
+              <div className="bg-primary text-white  w-full lg:w-[220px] h-[75px] flex items-center px-4 rounded">
                 <div className="flex items-center gap-4 text-md">
                   <div className="text-primary">
                     <AccountBalanceWalletIcon sx={{ fontSize: 40 }} />

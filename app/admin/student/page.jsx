@@ -353,7 +353,7 @@ const StudentApplication = () => {
                         <td className="border px-4 py-2">
                           <div className="flex gap-2">
                             <button
-                              className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition"
+                              className="bg-primary text-white px-3 py-1 rounded-md hover:bg-blue-700 transition"
                               onClick={() => handleViewStudent(student)}
                             >
                               View
