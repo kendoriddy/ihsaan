@@ -10,7 +10,7 @@ const StudentQuiz = () => {
 
   return (
     <Layout>
-      <div>
+      <div className="w-full">
         {currentScreen === "list" && (
           <QuizList setCurrentScreen={setCurrentScreen} />
         )}

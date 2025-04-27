@@ -66,21 +66,29 @@ const CreateAssignment = () => {
     question_type: "",
     max_score: "",
     passing_score: "",
-    tutor: tutorId,
     course: "",
     term: "",
     max_attempts: "",
     start_date: "",
     end_date: "",
     grade_release_date: "",
+    mcq_question_count: "",
   };
 
   // Submit function
   const handleSubmit = (values, { resetForm }) => {
+    const cleanedValues = Object.fromEntries(
+      Object.entries(values).filter(([_, value]) => value !== "")
+    );
+
+    const payload = {
+      ...cleanedValues,
+      tutor: tutorId,
+    };
     console.log("tutorId", tutorId);
-    submitAssignment(values, {
+    submitAssignment(payload, {
       onSuccess: () => {
-        toast.success("Assignment created successfully");
+        toast.success("Assessment created successfully");
         resetForm(); // Reset the form only when successful
         fetchTutorId();
       },
@@ -131,10 +139,11 @@ const CreateAssignment = () => {
             <FormControl fullWidth margin="normal">
               <InputLabel>Type</InputLabel>
               <Field as={Select} name="type">
-                {" "}
                 <MenuItem value="">Select an option</MenuItem>
                 <MenuItem value="INDIVIDUAL">Individual</MenuItem>
-                <MenuItem value="GROUP">Group</MenuItem>
+                <MenuItem value="GROUP">Group</MenuItem>{" "}
+                <MenuItem value="TEST">Test</MenuItem>{" "}
+                <MenuItem value="EXAMINATION">Examination</MenuItem>
               </Field>
             </FormControl>
 
@@ -148,6 +157,24 @@ const CreateAssignment = () => {
                 <MenuItem value="FILE_UPLOAD">File Upload</MenuItem>
               </Field>
             </FormControl>
+
+            {values.question_type === "MCQ" && (
+              <Field
+                as={TextField}
+                fullWidth
+                margin="normal"
+                label="Number of Questions"
+                name="mcq_question_count"
+                type="number"
+                error={
+                  touched.mcq_question_count &&
+                  Boolean(errors.mcq_question_count)
+                }
+                helperText={
+                  touched.mcq_question_count && errors.mcq_question_count
+                }
+              />
+            )}
 
             {/* Max Score */}
             <Field

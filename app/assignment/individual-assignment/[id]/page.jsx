@@ -164,7 +164,9 @@ const IndividualAssignmentPage = () => {
             />
           )}
           {showSubmittedView && (
-            <AssignmentSubmitted submissionData={SubmissionData?.data} />
+            <AssignmentSubmitted
+              submissionData={SubmissionData?.data?.file_submissions}
+            />
           )}
           {showClosedView && <AssignmentClosed />}
         </div>
