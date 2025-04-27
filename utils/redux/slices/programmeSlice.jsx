@@ -9,7 +9,6 @@ export const fetchProgrammes = createAsyncThunk(
       page_size: pageSize.toString(),
     });
     const response = await http2.get(`programmes?${queryParams.toString()}`);
-    console.log("Call this");
     return response.data;
   }
 );

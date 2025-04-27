@@ -352,7 +352,7 @@ const TutorApplication = () => {
                           <div className="flex gap-2">
                             {/* View Button */}
                             <button
-                              className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition"
+                              className="bg-primary text-white px-3 py-1 rounded-md hover:bg-blue-700 transition"
                               onClick={() => handleViewTutor(tutor)}
                             >
                               View

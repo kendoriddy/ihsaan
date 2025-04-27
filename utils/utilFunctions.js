@@ -68,6 +68,26 @@ const isLoggedIn = () => {
   }
 };
 
+// Helper function to convert duration to seconds
+const convertDurationToSeconds = (duration) => {
+  if (!duration) return 0; // Handle empty or null input
+
+  const parts = duration.split(":").map(Number);
+
+  if (parts.length === 3) {
+    // Format: hh:mm:ss
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  } else if (parts.length === 2) {
+    // Format: mm:ss
+    return parts[0] * 60 + parts[1];
+  } else if (parts.length === 1 && !isNaN(parts[0])) {
+    // Single number (assume it's in minutes)
+    return parts[0] * 60;
+  }
+
+  return 0; // Default to 0 if the format is invalid
+};
+
 const countryNames = [
   "Afghanistan",
   "Albania",
@@ -340,6 +360,7 @@ export {
   logout,
   logoutAfterSixHours,
   isLoggedIn,
+  convertDurationToSeconds,
   countryNames,
   allPossibleQualifications,
   countriesList,
