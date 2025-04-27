@@ -252,13 +252,13 @@ function Header() {
         <div className="text-lg font-bold">
           <div>
             <Link href="/" className="flex items-center gap-2 text-xl">
-              <Image src={IMAGES.icon} alt="logo" width={50} height={50} />
-              <div>IHSAAN ACADEMIA</div>
+              <Image src={IMAGES.icon} alt="logo" width={120} height={50} />
+              <div>Learning Islam Made Easy</div>
             </Link>
           </div>
         </div>
         <div className="ml-1 md:ml-[50px]">
-          <p>Learning Islam Made Easy</p>
+          {/* <p>Learning Islam Made Easy</p> */}
         </div>
         {/* Desktop menu */}
         <div className="hidden lg:flex-1 lg:flex justify-end">

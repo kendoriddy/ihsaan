@@ -249,7 +249,8 @@ function Page() {
             "@media (min-width: 1024px)": {
               width: "calc(100vw - 250px)",
             },
-          }}>
+          }}
+        >
           {/* Content Goes Here */}
           <div className="p-4">
             {/* Top */}
@@ -259,7 +260,6 @@ function Page() {
                 <Button
                   className="bg-red-600 text-white px-3 py-2 rounded hover:bg-blue-600 transition-all duration-300 cursor-pointer"
                   onClick={() => setOpen(true)}
-                  // onClick={() => setIsAddBookModalClose(false)}
                 >
                   Add Book
                 </Button>
@@ -271,7 +271,8 @@ function Page() {
               <form
                 action=""
                 method="post"
-                className="w-full flex justify-center gap-2">
+                className="w-full flex justify-center gap-2"
+              >
                 <input
                   type="text"
                   placeholder="Search books, authors..."
@@ -291,7 +292,8 @@ function Page() {
                 {displayedBooks?.slice(bookIdx[0], bookIdx[1]).map((book) => (
                   <div
                     key={book?.id}
-                    className="group shadow-xl w-[250px] rounded-md overflow-hidden mt-8 bg-gra-100 ">
+                    className="group shadow-xl w-[250px] rounded-md overflow-hidden mt-8 bg-gra-100 "
+                  >
                     <div className=" w-full h-[200px] relative">
                       <Image
                         src={book?.bookimage_url || IMAGES.logo}
@@ -319,12 +321,14 @@ function Page() {
                       <div className="flex justify-between items-center py-2 text-xs">
                         <div
                           className="px-3 py-2 border-2 border-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer transition-all duration-300 rounded "
-                          onClick={() => handleEditBtn(book?.id)}>
+                          onClick={() => handleEditBtn(book?.id)}
+                        >
                           Edit
                         </div>
                         <div
                           className="bg-red-600 px-3 py-2 text-white cursor-pointer hover:bg-red-800 transition-all duration-300 rounded"
-                          onClick={() => deleteBook(book?.id)}>
+                          onClick={() => deleteBook(book?.id)}
+                        >
                           Delete
                         </div>
                       </div>
@@ -358,7 +362,8 @@ function Page() {
         <Modal
           isOpen={open}
           title={"Add Book"}
-          handleClose={() => setOpen(false)}>
+          handleClose={() => setOpen(false)}
+        >
           <form action="#" className="p-4" onSubmit={(e) => addBook(e)}>
             {/* Title */}
             <div className="py-3">
@@ -428,7 +433,8 @@ function Page() {
             <div className="flex justify-center py-4">
               <Button
                 type="submit"
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all duration-300 w-[200px]">
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all duration-300 w-[200px]"
+              >
                 Add Book
               </Button>
             </div>
@@ -439,7 +445,8 @@ function Page() {
         <div
           className={`fixed inset-0 bg-black bg-opacity-50 z-50 ${
             isEditBookModalClose && "hidden"
-          }`}>
+          }`}
+        >
           <div className="w-screen h-screen flex justify-center items-center  p-4  ">
             <div className="bg-white w-4/5 h-4/5 rounded overflow-y-scroll">
               {/* Top */}
@@ -448,7 +455,8 @@ function Page() {
                   <div className="text-lg font-bold">Edit Book</div>
                   <div
                     className="cursor-pointer text-red-600 hover:text-blue-600 transition-all duration-300"
-                    onClick={() => setIsEditBookModalClose(true)}>
+                    onClick={() => setIsEditBookModalClose(true)}
+                  >
                     Close
                   </div>
                 </div>
@@ -458,7 +466,8 @@ function Page() {
               <form
                 action="#"
                 className="p-4"
-                onSubmit={(e) => updateBook(e, bookToEdit?.id)}>
+                onSubmit={(e) => updateBook(e, bookToEdit?.id)}
+              >
                 {/* Title */}
                 <div className="py-3">
                   <input
@@ -531,7 +540,8 @@ function Page() {
                 <div className="flex justify-center py-4">
                   <Button
                     type="submit"
-                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all duration-300 w-[200px]">
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all duration-300 w-[200px]"
+                  >
                     Update Book
                   </Button>
                 </div>
