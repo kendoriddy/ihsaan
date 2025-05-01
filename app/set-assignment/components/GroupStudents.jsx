@@ -89,9 +89,9 @@ const GroupStudents = ({
         "https://ihsaanlms.onrender.com/assessment/groups/auto_split/",
         {
           assessment_id: assessmentId,
-          group_size: groupSize,
+          group_size: groupSize === "" ? 0 : Number(groupSize),
           group_count: groupCount === "" ? 0 : Number(groupCount),
-          group_prefix: groupPrefix === "" ? 0 : Number(groupPrefix),
+          group_prefix: groupPrefix,
         },
         {
           headers: {
