@@ -5,6 +5,7 @@ import { usePost } from "@/hooks/useHttp/useHttp";
 import Button from "@/components/Button";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import { getFileType } from "@/utils/utilFunctions";
 
 const AssignmentSubmission = ({ assignmentId, refetchSubmission }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -104,26 +105,13 @@ const AssignmentSubmission = ({ assignmentId, refetchSubmission }) => {
     }
   }
 
-  function getFileType(mimeType) {
-    if (mimeType.startsWith("video/")) return "VIDEO";
-    if (mimeType.startsWith("image/")) return "IMAGE";
-    if (mimeType === "application/pdf") return "DOCUMENT";
-    if (
-      mimeType === "application/msword" ||
-      mimeType ===
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    )
-      return "DOCUMENT";
-    return "OTHERS";
-  }
-
   return (
     <Formik
       initialValues={{ submission_notes: "", file: null }}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ setFieldValue, values, errors, touched }) => (
+      {({ setFieldValue, values, errors, touched, isSubmitting }) => (
         <Form className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

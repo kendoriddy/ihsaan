@@ -11,17 +11,29 @@ import { toast } from "react-toastify";
 import Loader from "@/components/Loader";
 import { Modal } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { formatTime } from "../../../utils/utilFunctions";
 
 const QuizQuestion = ({ setCurrentScreen }) => {
   const quizData = JSON.parse(localStorage.getItem("selectedQuiz"));
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const [showResponse, setShowResponse] = useState(null);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [answers, setAnswers] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(30 * 60 * 1000);
   const router = useRouter();
 
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() => {
+    const savedState = localStorage.getItem(`quizState_${quizData.id}`);
+    return savedState ? JSON.parse(savedState).currentQuestionIndex : 0;
+  });
+  const [answers, setAnswers] = useState(() => {
+    const savedState = localStorage.getItem(`quizState_${quizData.id}`);
+    return savedState ? JSON.parse(savedState).answers : [];
+  });
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const savedState = localStorage.getItem(`quizState_${quizData.id}`);
+    return savedState ? JSON.parse(savedState).timeLeft : 15 * 60 * 1000;
+  });
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showResponse, setShowResponse] = useState(null);
+
+  // Fetch questions
   const {
     isLoading,
     data: QuestionsList,
@@ -29,7 +41,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     refetch,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?assessment_type=TEST&page_size=20&assessment_id=${quizData.id}&term=${quizData.term}`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?page_size=${quizData?.mcq_question_count}&assessment_id=${quizData?.id}`,
     (data) => {},
     (error) => {
       toast.error(
@@ -37,13 +49,49 @@ const QuizQuestion = ({ setCurrentScreen }) => {
           "Failed to load questions, make sure you're eligible for the quiz"
       );
       localStorage.removeItem("selectedCourse");
+      localStorage.removeItem(`quizState_${quizData.id}`);
       setCurrentScreen("list");
     }
   );
 
+  const Questions = QuestionsList && QuestionsList?.data?.questions;
+
+  useEffect(() => {
+    if (Questions?.length > 0) {
+      const savedState = localStorage.getItem(`quizState_${quizData.id}`);
+      const savedAnswers = savedState ? JSON.parse(savedState).answers : null;
+      setAnswers(savedAnswers || Array(Questions.length).fill(null));
+    }
+  }, [Questions]);
+
+  useEffect(() => {
+    if (Questions?.length > 0) {
+      const quizState = {
+        currentQuestionIndex,
+        answers,
+        timeLeft,
+      };
+      localStorage.setItem(
+        `quizState_${quizData.id}`,
+        JSON.stringify(quizState)
+      );
+    }
+  }, [currentQuestionIndex, answers, timeLeft, Questions]);
+
+  const handleAutoSubmit = () => {
+    const formattedAnswers = Questions?.reduce((acc, question, index) => {
+      if (answers[index] !== null) {
+        acc[question.id] = answers[index];
+      }
+      return acc;
+    }, {});
+    submitQuiz({ answers: formattedAnswers });
+  };
+
+  // Timer logic with auto-submit
   useEffect(() => {
     if (timeLeft <= 0) {
-      alert("Time's up!");
+      handleAutoSubmit();
       return;
     }
 
@@ -51,6 +99,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
       setTimeLeft((prev) => {
         if (prev <= 1000) {
           clearInterval(timer);
+          handleAutoSubmit();
           return 0;
         }
         return prev - 1000;
@@ -60,27 +109,28 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
+  // Update selected option when navigating between questions
+  useEffect(() => {
+    const selected = answers[currentQuestionIndex];
+    setSelectedOption(selected);
+  }, [currentQuestionIndex, answers]);
+
+  // Mutation for submitting the quiz
   const { mutate: submitQuiz, isLoading: submittingQuiz } = usePost(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/submit-answers/?assessment_id=${quizData.id}`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/submit-answers/?assessment_id=${quizData?.id}`,
     {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");
         setShowModal(true);
-        setShowResponse(response);
+        setShowResponse(response.data);
+        console.log("submission response", response);
+        console.log("show response", showResponse);
       },
       onError: (error) => {
-        toast.error(error.error || "Failed to submit quiz");
+        // toast.error(error.error || "Failed to submit quiz");
       },
     }
   );
-
-  const Questions = QuestionsList && QuestionsList?.data?.questions;
-
-  useEffect(() => {
-    if (Questions?.length > 0) {
-      setAnswers(Array(Questions.length).fill(null));
-    }
-  }, [Questions]);
 
   if (isLoading || isFetching || !Questions) {
     return (
@@ -107,18 +157,6 @@ const QuizQuestion = ({ setCurrentScreen }) => {
   const totalQuestions = Questions.length;
   const answeredQuestions = answers.filter((answer) => answer !== null).length;
   const pendingQuestions = totalQuestions - answeredQuestions;
-
-  const formatTime = (ms) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return (
-      <div className="font-bold text-red-600">
-        {minutes}: {seconds < 10 ? "0" : ""}
-        {seconds}
-      </div>
-    );
-  };
 
   const handleOptionSelect = (key) => {
     setSelectedOption(key);
@@ -160,12 +198,23 @@ const QuizQuestion = ({ setCurrentScreen }) => {
   };
 
   const handleSubmit = () => {
-    if (answers.includes(null)) {
-      alert("Please answer all questions before submitting!");
-      return;
+    const unansweredQuestions = answers.filter((answer) => answer === null);
+    // if (unansweredQuestions.length > 0) {
+    //   alert("All questions were not answered, are you sure want to submit?");
+    // }
+    if (unansweredQuestions.length > 0) {
+      const confirmSubmit = window.confirm(
+        "Some questions are unanswered. Are you sure you want to submit?"
+      );
+
+      if (!confirmSubmit) {
+        return;
+      }
     }
     const formattedAnswers = Questions.reduce((acc, question, index) => {
-      acc[question.id] = answers[index];
+      if (answers[index] !== null) {
+        acc[question.id] = answers[index];
+      }
       return acc;
     }, {});
     submitQuiz({ answers: formattedAnswers });
@@ -195,6 +244,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
   ];
 
   const handleGoToDashboard = () => {
+    localStorage.removeItem(`quizState_${quizData.id}`);
     localStorage.removeItem("selectedQuiz");
     router.push("/dashboard");
   };
@@ -204,10 +254,10 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 400,
     bgcolor: "background.paper",
-    border: "2px solid #000",
+    border: "2px solid white",
     boxShadow: 24,
+    width: 370,
     p: 4,
   };
 
@@ -270,6 +320,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
               Object.entries(currentQuestion.options).map(([key, option]) => (
                 <label
                   key={key}
+                  id={`question-${currentQuestionIndex}`}
                   className="flex items-center p-2 border border-gray-200 rounded-md cursor-pointer hover:border-purple-600"
                 >
                   <input
@@ -284,7 +335,8 @@ const QuizQuestion = ({ setCurrentScreen }) => {
                 </label>
               ))}
           </div>
-          <div className="flex justify-between mt-6">
+          <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-between items-center mt-6">
+            {/* Previous Button - Left */}
             <Button
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
@@ -296,15 +348,30 @@ const QuizQuestion = ({ setCurrentScreen }) => {
             >
               Previous
             </Button>
+
+            {/* Submit Button - Center */}
+            <div className="flex-1 flex justify-center">
+              <Button
+                onClick={handleSubmit}
+                color="secondary"
+                className="px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300"
+              >
+                Submit
+              </Button>
+            </div>
+
+            {/* Next Button - Right */}
             <Button
-              onClick={
-                currentQuestionIndex === totalQuestions - 1
-                  ? handleSubmit
-                  : handleNext
-              }
+              onClick={handleNext}
               color="secondary"
+              disabled={currentQuestionIndex === totalQuestions - 1}
+              className={`px-6 py-2 rounded-md ${
+                currentQuestionIndex === totalQuestions - 1
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              } transition-colors duration-300`}
             >
-              {currentQuestionIndex === totalQuestions - 1 ? "Submit" : "Next"}
+              Next
             </Button>
           </div>
         </div>
@@ -317,7 +384,9 @@ const QuizQuestion = ({ setCurrentScreen }) => {
             <div
               key={index}
               id={`tracker-${index}`}
-              className="flex items-center transition-all duration-300"
+              className="flex items-center transition-all duration-300 cursor-pointer"
+              onClick={() => setCurrentQuestionIndex(index)}
+              tabIndex={0}
             >
               <input
                 type="checkbox"
@@ -341,6 +410,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
           ))}
         </div>
       </div>
+
       <Modal
         open={showModal}
         onClose={() => setShowModal(false)}
@@ -348,33 +418,51 @@ const QuizQuestion = ({ setCurrentScreen }) => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography
+            className="text-center mb-4 font-extrabold"
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+          >
             Quiz Result
           </Typography>
           <Typography id="modal-modal-description" className="">
             <p>
-              <strong>Passing score:</strong>
-              {showResponse?.pass_percentage}
+              <strong>Number of Questions:</strong>{" "}
+              {showResponse?.total_questions}
             </p>
             <p>
-              <strong>Your text score:</strong>
-              {showResponse?.student_score}
-            </p>{" "}
+              <strong>Correct Answers:</strong> {showResponse?.correct_answers}
+            </p>
+            <p>
+              <strong>Total Score:</strong> {showResponse?.total_score}
+            </p>
+            <p>
+              <strong>Your Score:</strong> {showResponse?.student_score}
+            </p>
+            <p>
+              <strong>Pass Accuracy (%):</strong>{" "}
+              {showResponse?.pass_percentage}
+            </p>
           </Typography>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
+          <div
+            className="mt-4 flex flex-col gap-3 md:gap-4"
+            sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}
+          >
             <Button color="secondary" onClick={handleGoToDashboard}>
               Go to Dashboard
             </Button>
             <Button
               color="secondary"
               onClick={() => {
+                localStorage.removeItem(`quizState_${quizData.id}`);
                 localStorage.removeItem("selectedQuiz");
                 setCurrentScreen("list");
               }}
             >
               Take Another Quiz
             </Button>
-          </Box>
+          </div>
         </Box>
       </Modal>
     </div>

@@ -1,8 +1,9 @@
 "use client";
 import Button from "@/components/Button";
 import { useFetch } from "@/hooks/useHttp/useHttp";
+import { formatDate } from "@/utils/utilFunctions";
 import { Pagination } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const QuizList = ({ setCurrentScreen }) => {
   const [totalQuiz, setTotalQuiz] = useState(10);
@@ -31,12 +32,22 @@ const QuizList = ({ setCurrentScreen }) => {
   const Quizes = QuizesList && QuizesList?.data?.results;
 
   const filteredQuizes = Quizes?.filter(
-    (quiz) =>
-      quiz.question_type === "MCQ" &&
-      new Date(quiz.end_date) > new Date() &&
-      quiz.is_open === true
+    (quiz) => quiz.question_type === "MCQ"
+    // &&
+    //   new Date(quiz.end_date) > new Date() &&
+    //   quiz.is_open === true
   );
-  console.log("courses", filteredQuizes);
+
+  useEffect(() => {
+    const selectedQuiz = localStorage.getItem("selectedQuiz");
+    if (selectedQuiz) {
+      const quizData = JSON.parse(selectedQuiz);
+      const quizState = localStorage.getItem(`quizState_${quizData.id}`);
+      if (quizState) {
+        setCurrentScreen("quiz");
+      }
+    }
+  }, [setCurrentScreen]);
 
   return (
     <div className="w-full px-4">
@@ -61,8 +72,25 @@ const QuizList = ({ setCurrentScreen }) => {
                 <p className="text-sm text-gray-500">
                   {filteredQuiz.course_code}
                 </p>
-                <p className="text-sm font-medium text-gray-500">
-                  Tutor: {filteredQuiz.tutor_name}
+                <p className="text-sm text-gray-500">
+                  <strong className="text-green-600">Start:</strong>{" "}
+                  {formatDate(filteredQuiz?.start_date) ||
+                    "No start date available"}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <strong className="text-red-600">End:</strong>{" "}
+                  {formatDate(filteredQuiz?.end_date) ||
+                    "No end date available"}
+                </p>
+                <p>
+                  <strong className="text-yellow-600">Status:</strong>{" "}
+                  {filteredQuiz?.submission_status === "submitted" ? (
+                    <span className="text-green-600">Submitted</span>
+                  ) : filteredQuiz?.is_open ? (
+                    <span className="text-blue-600">Pending</span>
+                  ) : (
+                    <span className="text-red-600">Closed</span>
+                  )}
                 </p>
               </div>
               <Button
@@ -76,19 +104,23 @@ const QuizList = ({ setCurrentScreen }) => {
                 className="mt-4 px-10 py-2"
                 size="large"
                 color="secondary"
+                disabled={
+                  filteredQuiz?.submission_status === "submitted" ||
+                  filteredQuiz?.is_open === false
+                }
               >
                 Take Quiz
               </Button>
             </div>
           ))}
-        <div className="flex justify-center mt-4">
-          <Pagination
-            count={Math.ceil(totalQuiz / 15)}
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-          />
-        </div>
+      </div>
+      <div className="flex justify-center mt-4">
+        <Pagination
+          count={Math.ceil(totalQuiz / 15)}
+          page={page}
+          onChange={handlePageChange}
+          color="primary"
+        />
       </div>
     </div>
   );

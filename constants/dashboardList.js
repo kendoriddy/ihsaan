@@ -9,6 +9,7 @@ import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstruct
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import { Assignment, AssignmentInd } from "@mui/icons-material";
 import GradingOutlined from "@mui/icons-material/GradingOutlined";
+import { TbActivity } from "react-icons/tb";
 
 const DASHBOARD_LIST = {
   student: [
@@ -24,6 +25,12 @@ const DASHBOARD_LIST = {
       name: "Take Quiz",
       icon: QuizIcon,
       path: "/quiz",
+    },
+    {
+      id: 6,
+      name: "Activities",
+      icon: TbActivity,
+      path: "/activities",
     },
     {
       id: 12,
@@ -156,18 +163,23 @@ const DASHBOARD_LIST = {
       name: "Set Quiz",
       path: "/admin/set-quiz",
     },
-    { id: 12, name: "Transactions", path: "/admin/transactions" },
     {
-      id: 13,
+      id: 12,
+      name: "Activities Settings",
+      path: "/admin/activities-settings",
+    },
+    { id: 13, name: "Transactions", path: "/admin/transactions" },
+    {
+      id: 14,
       name: "Reports",
       path: "#",
       subMenu: [
         { id: 1, name: "Invoice Reports", path: "/admin/invoice-reports" },
       ],
     },
-    { id: 14, name: "My Profile", path: "/admin/profile" },
+    { id: 15, name: "My Profile", path: "/admin/profile" },
     {
-      id: 15,
+      id: 16,
       name: "Blog",
       path: "/admin/blog",
     },

@@ -22,7 +22,7 @@ const Layout = ({ children }) => {
 
         <section className="flex flex-col md:flex-row w-full p-4 justify-self-center flex-1 min-h-screen">
           {/* Right */}
-          <div className="md:px-4 py-8 lg:py-0 w-full">
+          <div className="md:px-4 w-full py-8 lg:py-0">
             <div className="text-sm my-3">
               Welcome <span className="text-lg">{user.name}</span>{" "}
               <WavingHandIcon sx={{ color: "blue", fontSize: "2rem" }} />
