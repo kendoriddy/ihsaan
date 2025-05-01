@@ -117,7 +117,7 @@ export const addAssignmentSchema = Yup.object({
   title: Yup.string().required("Title is required"),
   description: Yup.string().required("Description is required"),
   type: Yup.string()
-    .oneOf(["INDIVIDUAL", "GROUP"])
+    .oneOf(["INDIVIDUAL", "GROUP", "TEST", "EXAMINATION"])
     .required("Type is required"),
   question_type: Yup.string()
     .oneOf(["FILE_UPLOAD", "MANUAL", "MCQ"])
@@ -134,11 +134,39 @@ export const addAssignmentSchema = Yup.object({
   max_attempts: Yup.number()
     .min(1, "Must allow at least 1 attempt")
     .required("Max attempts is required"),
+  mcq_question_count: Yup.number().when("question_type", {
+    is: "MCQ",
+    then: (schema) =>
+      schema
+        .min(3, "You must allow at least three questions")
+        .required("Number of questions is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 export const manualGradingSchema = Yup.object({
-  level: Yup.string().required("Level is required"),
-  course: Yup.string().required("Course is required"),
-  student_name: Yup.string().required("Student name is required"),
+  assessment: Yup.string().required("Level is required"),
+  student: Yup.string().required("Course is required"),
+  group: Yup.string(),
+  score: Yup.string(),
   feedback: Yup.string().required("Reason is require"),
+}).test(
+  "student-or-group",
+  "Either student or group is required",
+  function (value) {
+    return !!value.student || !!value.group;
+  }
+);
+
+export const academicYearSchema = Yup.object({
+  year: Yup.string().required("Year is required"),
+  start_date: Yup.date().required("Start date is required"),
+  end_date: Yup.date().required("End date is required"),
+});
+
+export const termSchema = Yup.object({
+  session_id: Yup.number().required("Academic session is required"),
+  name: Yup.string().required("Name is required"),
+  start_date: Yup.date().required("Start date is required"),
+  end_date: Yup.date().required("End date is required"),
 });

@@ -68,6 +68,17 @@ const isLoggedIn = () => {
   }
 };
 
+const formatTime = (ms) => {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return (
+    <div className="font-bold text-red-600">
+      {minutes}:{seconds < 10 ? "0" : ""}
+      {seconds}
+    </div>
+  );
+};
 // Helper function to convert duration to seconds
 const convertDurationToSeconds = (duration) => {
   if (!duration) return 0; // Handle empty or null input
@@ -354,6 +365,19 @@ export function formatQualification(qualification) {
     .join(" "); // Join the words back together with spaces
 }
 
+function getFileType(mimeType) {
+  if (mimeType.startsWith("video/")) return "VIDEO";
+  if (mimeType.startsWith("image/")) return "IMAGE";
+  if (mimeType === "application/pdf") return "DOCUMENT";
+  if (
+    mimeType === "application/msword" ||
+    mimeType ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  )
+    return "DOCUMENT";
+  return "OTHERS";
+}
+
 export {
   formatDate,
   serverDateFormat,
@@ -370,4 +394,6 @@ export {
   menteeGender,
   religion,
   maritalStatus,
+  formatTime,
+  getFileType,
 };

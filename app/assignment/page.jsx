@@ -29,11 +29,10 @@ const tableHeaders = [
   { id: "view", label: "View" },
 ];
 
-// const statusColors = {
-//   Submitted: "bg-green-600 rounded-md text-white py-2 px-3",
-//   Closed: "bg-red-600 rounded-md text-white py-2 px-[1.4rem]",
-//   Pending: "bg-blue-600 rounded-md text-white py-2 px-[1.25rem]",
-// };
+const statusColors = {
+  submitted: "bg-green-600 rounded-md text-white py-2 px-3",
+  pending: "bg-blue-600 rounded-md text-white py-2 px-[1.25rem]",
+};
 
 const AssignmentTable = () => {
   const router = useRouter();
@@ -93,20 +92,18 @@ const AssignmentTable = () => {
                     {assignment.type.toLowerCase()}
                   </TableCell>
                   <TableCell>{assignment.max_score}</TableCell>
-                  <TableCell className="p-3">
-                    {/* <span className={statusColors[assignment.status]}>
-                      {assignment.status}
-                    </span> */}
-                    <span
-                      className={`${
-                        assignment.isOpen
-                          ? "bg-green-600 rounded-md text-white py-2 px-3"
-                          : "bg-red-600 rounded-md text-white py-2 px-[1.4rem]"
-                      }`}
-                    >
-                      {assignment.isOpen ? "Open" : "Closed"}
-                    </span>
+                  <TableCell className="p-3 space-x-2">
+                    {assignment.submission_status === "submitted" ? (
+                      <span className={statusColors.submitted}>Submitted</span>
+                    ) : assignment.is_open ? (
+                      <span className={statusColors.pending}>Pending</span>
+                    ) : (
+                      <span className="bg-red-600 rounded-md text-white py-2 px-[1.4rem]">
+                        Closed
+                      </span>
+                    )}
                   </TableCell>
+
                   <TableCell>{formatDate(assignment.start_date)}</TableCell>
                   <TableCell>{formatDate(assignment.end_date)}</TableCell>
                   <TableCell>

@@ -53,7 +53,7 @@ const AllAssignment = () => {
     `https://ihsaanlms.onrender.com/assessment/base`,
     {
       onSuccess: () => {
-        toast.success("Assignment deleted successfully");
+        toast.success("Assessnment deleted successfully");
         queryClient.invalidateQueries("assignments");
         setOpenDeleteDialog(false);
       },

@@ -13,11 +13,11 @@ import {
   Pagination,
 } from "@mui/material";
 import { toast } from "react-toastify";
-import Layout from "@/components/Layout";
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
 import EditQuizQuestion from "../components/EditQuiz";
+import AdminLayout from "@/components/AdminLayout";
 
 const AllQuiz = () => {
   const queryClient = useQueryClient();
@@ -67,7 +67,7 @@ const AllQuiz = () => {
   };
 
   return (
-    <Layout>
+    <AdminLayout>
       <div>
         <TableContainer component={Paper}>
           <Table>
@@ -157,7 +157,7 @@ const AllQuiz = () => {
           refetchQuestions={() => refetch()}
         />
       </div>
-    </Layout>
+    </AdminLayout>
   );
 };
 
