@@ -157,7 +157,7 @@ const GroupStudents = ({
       await axios.post(
         `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/add_members/`,
         {
-          additionalProp1: memberIds,
+          student_ids: memberIds,
         },
         {
           headers: {
@@ -181,7 +181,7 @@ const GroupStudents = ({
       await axios.post(
         `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/remove_members/`,
         {
-          additionalProp1: memberIds,
+          student_ids: memberIds,
         },
         {
           headers: {
@@ -209,150 +209,149 @@ const GroupStudents = ({
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Group Students</DialogTitle>
       <DialogContent>
-        {loading ? (
+        {loading && (
           <div className="flex justify-center items-center">
             <CircularProgress />
           </div>
-        ) : (
-          <>
-            {/* Display Groups Section */}
-            <div className="mb-4">
-              <h3>Existing Groups</h3>
-              {groups.length > 0 ? (
-                <ul>
-                  {groups.map((group) => {
-                    const leaderName =
-                      group.members_detail.find(
-                        (member) => member.id === group.leader
-                      )?.full_name || "Unknown";
-
-                    return (
-                      <li key={group.id} className="mb-2">
-                        <strong>{group.name}</strong> (Leader: {leaderName})
-                        <ul>
-                          {group.members_detail.map((member) => (
-                            <li key={member.id} className="ml-4">
-                              Member: {member.full_name || "Unknown"}{" "}
-                              <Button
-                                onClick={() =>
-                                  handleRemoveMembers(group.id, [member.id])
-                                }
-                                color="secondary"
-                              >
-                                Remove
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                        <FormControl fullWidth margin="normal">
-                          <TextField
-                            label="Search Students"
-                            value={searchValue}
-                            onChange={(e) => {
-                              setSearchValue(e.target.value);
-                              fetchStudents(e.target.value);
-                            }}
-                          />
-                        </FormControl>
-                        <ul>
-                          {students.map((student) => (
-                            <li key={student.id}>
-                              {student.user_fullname}{" "}
-                              <Button
-                                onClick={() =>
-                                  handleAddMembers(group.id, [student.user])
-                                }
-                                color="primary"
-                              >
-                                Add
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p>No groups created yet.</p>
-              )}
-            </div>
-
-            {/* Hide Auto Grouping and Manual Grouping if Groups Exist */}
-            {groups.length === 0 && (
-              <>
-                {/* Auto Grouping Section */}
-                <div className="mb-4">
-                  <h3>Auto Grouping</h3>
-                  <FormControl fullWidth margin="normal">
-                    <TextField
-                      label="Group Size"
-                      type="number"
-                      value={groupSize}
-                      onChange={(e) => setGroupSize(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormControl fullWidth margin="normal">
-                    <TextField
-                      label="Group Count"
-                      type="number"
-                      value={groupCount}
-                      onChange={(e) => setGroupCount(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormControl fullWidth margin="normal">
-                    <TextField
-                      label="Group Prefix"
-                      value={groupPrefix}
-                      onChange={(e) => setGroupPrefix(e.target.value)}
-                    />
-                  </FormControl>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleAutoGroup}
-                    disabled={loading}
-                  >
-                    Auto Group
-                  </Button>
-                </div>
-
-                {/* Manual Grouping Section */}
-                <div className="mb-4">
-                  <h3>Manual Grouping</h3>
-                  <FormControl fullWidth margin="normal">
-                    <TextField
-                      label="Group Name"
-                      value={newGroupName}
-                      onChange={(e) => setNewGroupName(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>Select Leader</InputLabel>
-                    <Select
-                      value={selectedLeader}
-                      onChange={(e) => setSelectedLeader(e.target.value)}
-                    >
-                      {students.map((student) => (
-                        <MenuItem key={student.id} value={student.id}>
-                          {student.user_fullname || "First name"}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleCreateGroup}
-                    disabled={loading}
-                  >
-                    Create Group
-                  </Button>
-                </div>
-              </>
-            )}
-          </>
         )}
+        <>
+          {/* Display Groups Section */}
+          <div className="mb-4">
+            <h3>Existing Groups</h3>
+            {groups.length > 0 ? (
+              <ul>
+                {groups.map((group) => {
+                  const leaderName =
+                    group.members_detail.find(
+                      (member) => member.id === group.leader
+                    )?.full_name || "Unknown";
+
+                  return (
+                    <li key={group.id} className="mb-2">
+                      <strong>{group.name}</strong> (Leader: {leaderName})
+                      <ul>
+                        {group.members_detail.map((member) => (
+                          <li key={member.id} className="ml-4">
+                            Member: {member.full_name || "Unknown"}{" "}
+                            <Button
+                              onClick={() =>
+                                handleRemoveMembers(group.id, [member.id])
+                              }
+                              color="secondary"
+                            >
+                              Remove
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                      <FormControl fullWidth margin="normal">
+                        <TextField
+                          label="Search Students"
+                          value={searchValue}
+                          onChange={(e) => {
+                            setSearchValue(e.target.value);
+                            fetchStudents(e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <ul>
+                        {students.map((student) => (
+                          <li key={student.id}>
+                            {student.user_fullname}{" "}
+                            <Button
+                              onClick={() =>
+                                handleAddMembers(group.id, [student.user])
+                              }
+                              color="primary"
+                            >
+                              Add
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p>No groups created yet.</p>
+            )}
+          </div>
+
+          {/* Hide Auto Grouping and Manual Grouping if Groups Exist */}
+          {groups.length === 0 && (
+            <>
+              {/* Auto Grouping Section */}
+              <div className="mb-4">
+                <h3>Auto Grouping</h3>
+                <FormControl fullWidth margin="normal">
+                  <TextField
+                    label="Group Size"
+                    type="number"
+                    value={groupSize}
+                    onChange={(e) => setGroupSize(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl fullWidth margin="normal">
+                  <TextField
+                    label="Group Count"
+                    type="number"
+                    value={groupCount}
+                    onChange={(e) => setGroupCount(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl fullWidth margin="normal">
+                  <TextField
+                    label="Group Prefix"
+                    value={groupPrefix}
+                    onChange={(e) => setGroupPrefix(e.target.value)}
+                  />
+                </FormControl>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleAutoGroup}
+                  disabled={loading}
+                >
+                  Auto Group
+                </Button>
+              </div>
+
+              {/* Manual Grouping Section */}
+              <div className="mb-4">
+                <h3>Manual Grouping</h3>
+                <FormControl fullWidth margin="normal">
+                  <TextField
+                    label="Group Name"
+                    value={newGroupName}
+                    onChange={(e) => setNewGroupName(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl fullWidth margin="normal">
+                  <InputLabel>Select Leader</InputLabel>
+                  <Select
+                    value={selectedLeader}
+                    onChange={(e) => setSelectedLeader(e.target.value)}
+                  >
+                    {students.map((student) => (
+                      <MenuItem key={student.id} value={student.id}>
+                        {student.user_fullname || "First name"}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCreateGroup}
+                  disabled={loading}
+                >
+                  Create Group
+                </Button>
+              </div>
+            </>
+          )}
+        </>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
