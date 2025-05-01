@@ -73,7 +73,7 @@ const LogIn = () => {
     <>
       <main className="h-screen w-screen flex items-center justify-center bg-blue-100">
         <section className="w-[350px] bg-primary h-[500px] rounded-l-md hidden md:flex items-center justify-center">
-          <Image src={IMAGES.icon} alt="logo" width={100} height={100} />
+          <Image src={IMAGES.logo2} alt="logo" width={100} height={100} />
         </section>
 
         <section className="w-[350px]  h-[500px] rounded-r-md text-center bg-slate-50">
