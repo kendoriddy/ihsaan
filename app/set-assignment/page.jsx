@@ -157,7 +157,7 @@ const AllAssignment = () => {
                             >
                               Delete
                             </MenuItem>
-                            {selectedAssignment?.type === "GROUP" && (
+                            {
                               <MenuItem
                                 onClick={() => {
                                   setOpenGroupModal(true);
@@ -166,7 +166,7 @@ const AllAssignment = () => {
                               >
                                 Group
                               </MenuItem>
-                            )}
+                            }
                           </Menu>
                         </TableCell>
                       </TableRow>
