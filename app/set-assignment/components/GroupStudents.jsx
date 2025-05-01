@@ -90,7 +90,7 @@ const GroupStudents = ({
         {
           assessment_id: assessmentId,
           group_size: groupSize,
-          group_count: groupCount,
+          group_count: groupCount === "" ? 0 : groupCount,
           group_prefix: groupPrefix,
         },
         {
