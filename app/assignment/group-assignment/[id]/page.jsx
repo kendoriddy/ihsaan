@@ -105,13 +105,16 @@ const GroupAssignmentPage = () => {
     ? new Date(AssignmentData.data.end_date)
     : null;
   const isAssignmentClosed = dueDate ? new Date() > dueDate : false;
+  // const hasSubmitted = SubmissionData?.data?.file_submissions.some(
+  //   (submission) =>
+  //     submission.assessment === assignmentId && submission.student === studentId
+  // );
   const hasSubmitted = SubmissionData?.data?.file_submissions.some(
     (submission) =>
-      submission.assessment === assignmentId && submission.student === studentId
+      submission.group === groupId &&
+      submission.assessment === assignmentId &&
+      submission.student === studentId
   );
-  // const hasSubmitted = SubmissionData?.data?.file_submissions.some(
-  //   (submission) => submission.group === groupId
-  // );
 
   const showSubmissionForm =
     isGroupLeader && !hasSubmitted && !isAssignmentClosed;
