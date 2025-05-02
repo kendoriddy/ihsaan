@@ -238,7 +238,7 @@ const GroupStudents = ({
     try {
       const response = await axios.patch(
         `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/`,
-        { name: newName },
+        { name: newName, assessment: assessmentId },
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -461,11 +461,19 @@ const GroupStudents = ({
                                 );
                                 setGroups(updatedGroups);
                               }}
-                              onBlur={() =>
-                                updateGroupName(group.id, group.name)
-                              }
+                              // onBlur={() =>
+                              //   updateGroupName(group.id, group.name)
+                              // }
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
+                            <button
+                              className="bg-[#f34103] text-white px-4 py-2 rounded-md transition ml-1"
+                              onClick={() =>
+                                updateGroupName(group.id, group.name)
+                              }
+                            >
+                              Update
+                            </button>
                           </div>
                           {/* Change Group Leader */}
                           <div className="mb-2">
