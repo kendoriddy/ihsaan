@@ -146,7 +146,7 @@ export const addAssignmentSchema = Yup.object({
 
 export const manualGradingSchema = Yup.object({
   assessment: Yup.string().required("Level is required"),
-  student: Yup.string().required("Course is required"),
+  student: Yup.string(),
   group: Yup.string(),
   score: Yup.string(),
   feedback: Yup.string().required("Reason is require"),

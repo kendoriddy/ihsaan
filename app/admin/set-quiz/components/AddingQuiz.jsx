@@ -42,9 +42,10 @@ const AddingQuiz = () => {
         resetForm();
       },
       onError: (error) => {
-        toast.error(
-          error.response?.data?.message || "Failed to create questions"
-        );
+        toast
+          .error
+          // error.response?.data?.message || "Failed to create questions"
+          ();
       },
     }
   );

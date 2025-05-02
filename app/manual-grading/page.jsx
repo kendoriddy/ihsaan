@@ -16,22 +16,10 @@ import { toast } from "react-toastify";
 import { manualGradingSchema } from "@/components/validationSchemas/ValidationSchema";
 
 const ManualGrading = () => {
-  const [tutorId, setTutorId] = useState("");
   const [selectedAssessmentId, setSelectedAssessmentId] = useState("");
   const [fetchAll, setFetchAll] = useState(false);
   const [totalCourses, setTotalCourses] = useState(10);
-
-  const fetchTutorId = () => {
-    const storedTutorId = localStorage.getItem("userId");
-    console.log("tutorIdStored", storedTutorId);
-    if (storedTutorId) {
-      setTutorId(storedTutorId);
-    }
-  };
-
-  useEffect(() => {
-    fetchTutorId();
-  });
+  const [selectedAssessment, setSelectedAssessment] = useState(null);
 
   useEffect(() => {
     if (selectedAssessmentId) {
@@ -45,15 +33,18 @@ const ManualGrading = () => {
     refetch: refetchStudents,
   } = useFetch(
     "courses",
-    `https://ihsaanlms.onrender.com/course/courses/${selectedAssessmentId}/enrolled_students/?page_size=${
-      fetchAll ? totalCourses : 10
-    }/`,
-    (data) => {
-      if (data?.total && !fetchAll) {
-        setTotalCourses(data.total);
-        setFetchAll(true);
-      }
-    }
+    `https://ihsaanlms.onrender.com/course/courses/${selectedAssessmentId}/enrolled_students/`,
+    (data) => {}
+  );
+
+  const {
+    isLoading: loadingGroup,
+    data: GroupList,
+    refetch: refetchGroup,
+  } = useFetch(
+    "courses",
+    `https://ihsaanlms.onrender.com/assessment/groups/?assessment=${selectedAssessment?.id}`,
+    (data) => {}
   );
 
   const {
@@ -61,7 +52,7 @@ const ManualGrading = () => {
     data: AssessmentsList,
     refetch,
   } = useFetch(
-    "courses",
+    "assessments",
     `https://ihsaanlms.onrender.com/assessment/base/?page_size=${
       fetchAll ? totalCourses : 10
     }`,
@@ -95,12 +86,35 @@ const ManualGrading = () => {
   };
 
   const handleSubmit = (values, { resetForm }) => {
-    console.log("tutorId", tutorId);
-    submitGrade(values, {
+    let payload;
+
+    if (selectedAssessment?.type === "GROUP") {
+      // Find the selected group and its leader
+      const selectedGroup = GroupList?.data?.results?.find(
+        (group) => group.id === values.group
+      );
+      const leaderId = selectedGroup?.leader;
+
+      payload = {
+        score: values.score,
+        assessment: values.assessment,
+        group: values.group,
+        student: leaderId,
+        feedback: values.feedback,
+      };
+    } else {
+      payload = {
+        score: values.score,
+        assessment: values.assessment,
+        student: values.student,
+        feedback: values.feedback,
+      };
+    }
+
+    submitGrade(payload, {
       onSuccess: () => {
         toast.success("Assignment graded successfully");
         resetForm();
-        fetchTutorId();
       },
       onError: (error) => {
         toast.error(
@@ -109,6 +123,8 @@ const ManualGrading = () => {
       },
     });
   };
+  const isGroupAssessment = selectedAssessment?.type === "GROUP";
+  console.log("selected assessment is", selectedAssessment);
 
   return (
     <Layout>
@@ -127,13 +143,13 @@ const ManualGrading = () => {
                 name="assessment"
                 onChange={(e) => {
                   const selectedAssessmentId = e.target.value;
-                  const selectedAssessment = filteredAssessment.find(
+                  const selected = filteredAssessment.find(
                     (a) => a.id === selectedAssessmentId
                   );
-                  setSelectedAssessmentId(selectedAssessment?.course);
+                  console.log("selected is", selected);
+                  setSelectedAssessment(selected);
+                  setSelectedAssessmentId(selected?.course);
                   values.assessment = selectedAssessmentId;
-
-                  console.log("assessment selected", selectedAssessment);
                 }}
               >
                 {filteredAssessment.length > 0 ? (
@@ -147,7 +163,7 @@ const ManualGrading = () => {
                 )}
               </Field>
             </FormControl>{" "}
-            <FormControl fullWidth margin="normal">
+            {/* <FormControl fullWidth margin="normal">
               <InputLabel>Select Student</InputLabel>
               <Field as={Select} name="student">
                 {EnrolledList?.data?.students?.length > 0 ? (
@@ -160,7 +176,39 @@ const ManualGrading = () => {
                   <MenuItem disabled>No students found</MenuItem>
                 )}
               </Field>
-            </FormControl>
+            </FormControl> */}
+            {!isGroupAssessment && (
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Select Student</InputLabel>
+                <Field as={Select} name="student">
+                  {EnrolledList?.data?.students?.length > 0 ? (
+                    EnrolledList.data.students.map((student) => (
+                      <MenuItem key={student.id} value={student.id}>
+                        {student.fullname}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No students found</MenuItem>
+                  )}
+                </Field>
+              </FormControl>
+            )}
+            {isGroupAssessment && (
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Select Group</InputLabel>
+                <Field as={Select} name="group">
+                  {GroupList?.data?.results?.length > 0 ? (
+                    GroupList.data.results.map((group) => (
+                      <MenuItem key={group.id} value={group.id}>
+                        Group {group.id}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No groups found</MenuItem>
+                  )}
+                </Field>
+              </FormControl>
+            )}
             <Field
               as={TextField}
               fullWidth
