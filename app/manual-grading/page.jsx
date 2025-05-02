@@ -7,6 +7,10 @@ import {
   Select,
   InputLabel,
   FormControl,
+  CardContent,
+  Typography,
+  Card,
+  Box,
 } from "@mui/material";
 import Button from "@/components/Button";
 import Layout from "@/components/Layout";
@@ -46,7 +50,7 @@ const ManualGrading = () => {
     `https://ihsaanlms.onrender.com/assessment/groups/?assessment=${selectedAssessment?.id}`,
     (data) => {}
   );
-
+  console.log(GroupList, "group list");
   const {
     isLoading,
     data: AssessmentsList,
@@ -155,7 +159,34 @@ const ManualGrading = () => {
                 {filteredAssessment.length > 0 ? (
                   filteredAssessment.map((assessment) => (
                     <MenuItem key={assessment.id} value={assessment.id}>
-                      {assessment.title}
+                      <Box display="flex" flexDirection="column" width="100%">
+                        <Typography variant="h6" fontWeight="bold">
+                          {assessment.title}
+                        </Typography>
+                        <Card
+                          variant="outlined"
+                          sx={{
+                            mt: 1,
+                            p: 2,
+                            backgroundColor: "#f9f9f9",
+                            borderRadius: "8px",
+                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                          }}
+                        >
+                          <CardContent>
+                            <Typography variant="body2" color="textSecondary">
+                              <strong>Course:</strong> {assessment.course_title}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                              <strong>Max Score:</strong> {assessment.max_score}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                              <strong>Passing Score:</strong>{" "}
+                              {assessment.passing_score}
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      </Box>
                     </MenuItem>
                   ))
                 ) : (
@@ -200,7 +231,7 @@ const ManualGrading = () => {
                   {GroupList?.data?.results?.length > 0 ? (
                     GroupList.data.results.map((group) => (
                       <MenuItem key={group.id} value={group.id}>
-                        Group {group.id}
+                        Group {group.name}
                       </MenuItem>
                     ))
                   ) : (

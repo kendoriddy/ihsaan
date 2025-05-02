@@ -20,12 +20,12 @@ const EditTerm = ({
   refetchTerms,
 }) => {
   const [editedTerm, setEditedTerm] = useState({
-    session_id: selectedTerm?.session.id || "",
+    session_id: selectedTerm?.session?.name || "",
     name: selectedTerm?.name || "",
     start_date: selectedTerm?.start_date || "",
     end_date: selectedTerm?.end_date || "",
   });
-  console.log("term selected", selectedTerm);
+  console.log(editedTerm, "term selected", selectedTerm);
   // Update function with body
   const { mutate: updateTerm, isLoading: isUpdating } = usePatch(
     `https://ihsaanlms.onrender.com/terms/${selectedTerm?.id}/`,
@@ -88,7 +88,7 @@ const EditTerm = ({
       <CustomModal
         open={openUpdateModal}
         onClose={() => setOpenUpdateModal(false)}
-        title="Update Question"
+        title="Update Term"
         onConfirm={handleUpdateSubmit}
         confirmText={isUpdating ? "Updating..." : "Update"}
         isLoading={isUpdating}
