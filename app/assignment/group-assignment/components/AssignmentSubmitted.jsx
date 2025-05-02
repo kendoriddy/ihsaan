@@ -1,42 +1,158 @@
-import React from "react";
+"use client";
+import Button from "@/components/Button";
+import CustomModal from "@/components/CustomModal";
+import { usePatch, usePost } from "@/hooks/useHttp/useHttp";
+import { formatDate, getFileType } from "@/utils/utilFunctions";
+import { Field, Form, Formik } from "formik";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
 
-const AssignmentSubmitted = ({ submissionData }) => {
+const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
+  const [dragActive, setDragActive] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+
+  // Extract assignmentId from submissionData
+  const assignmentId = submissionData?.[0]?.assessment;
+  const groupId = submissionData?.[0]?.group;
+
+  console.log("submitted data", submissionData);
+  const { mutate: uploadFile, isLoading: isUploading } = usePost(
+    `https://ihsaanlms.onrender.com/resource/assessment-resource/`,
+    {
+      onSuccess: () => {
+        toast.success("File uploaded successfully");
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || "Error uploading file");
+      },
+    }
+  );
+
+  const { mutate: updateAssignment, isLoading: isUpdating } = usePatch(
+    `https://ihsaanlms.onrender.com/assessment/uploads/${submissionData?.[0]?.id}/`, // Include the submission ID in the URL
+    {
+      onSuccess: () => {
+        toast.success("Assignment updated successfully");
+        setOpenUpdateModal(false); // Close the modal on success
+        refetchSubmission();
+      },
+      onError: (error) => {
+        toast.error(
+          error.response?.data?.message || "Error updating assignment"
+        );
+      },
+    }
+  );
+
+  const validationSchema = Yup.object().shape({
+    submission_notes: Yup.string().test(
+      "response-or-file",
+      "Please provide a response or upload a file",
+      function (value) {
+        return value?.trim() || this.parent.file;
+      }
+    ),
+    file: Yup.mixed()
+      .nullable()
+      .test(
+        "fileType",
+        "Invalid file type (only mp4, jpeg, jpg, doc, docx, pdf allowed)",
+        (file) => {
+          if (!file) return true;
+          return [
+            "video/mp4",
+            "image/jpeg",
+            "image/jpg",
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          ].includes(file.type);
+        }
+      ),
+  });
+
+  const handleSubmit = async (values, { resetForm }) => {
+    if (!assignmentId) {
+      toast.error("Assignment ID is missing. Cannot update assignment.");
+      return;
+    }
+
+    const formData = new FormData();
+
+    try {
+      let fileResourceId = null;
+
+      if (values.file) {
+        const resourceData = new FormData();
+        resourceData.append("file", values.file);
+        resourceData.append("title", values.file.name);
+        resourceData.append("type", getFileType(values.file.type));
+
+        const resourceResponse = await new Promise((resolve, reject) => {
+          uploadFile(resourceData, {
+            onSuccess: resolve,
+            onError: reject,
+          });
+        });
+
+        fileResourceId = resourceResponse?.data?.id;
+
+        if (!fileResourceId) {
+          throw new Error("Failed to upload file.");
+        }
+      }
+
+      formData.append("assessment", assignmentId);
+      formData.append("group", groupId);
+      formData.append("submission_notes", values.submission_notes);
+
+      if (fileResourceId) {
+        formData.append("file_resource_ids", [fileResourceId]);
+      }
+
+      // Call updateAssignment with the FormData
+      updateAssignment(formData);
+
+      resetForm();
+    } catch (error) {
+      toast.error(error.message || "Error during submission process.");
+    }
+  };
+
+  if (!submissionData || !submissionData[0]) return null;
+
+  const {
+    marks,
+    total_marks,
+    user,
+    student_name,
+    submitted_at,
+    submission_notes,
+    file_url,
+  } = submissionData[0];
+
   return (
     <div>
-      {submissionData?.marks && (
-        <p className="text-blue-600 mb-4">
-          You scored {submissionData.marks} out of {submissionData.total_marks}{" "}
-          marks.
-        </p>
-      )}
       <div className="space-y-4">
         <div className="flex items-start space-x-4">
-          <img
-            src={submissionData?.user?.avatar || "/default-avatar.png"}
-            alt="User avatar"
-            className="w-10 h-10 rounded-full"
-          />
           <div>
-            <p className="font-medium">
-              {submissionData?.user?.name || "Unknown User"}
-            </p>
+            <p className="font-medium">{student_name || "Unknown User"}</p>
             <p className="text-sm text-gray-500">
-              {submissionData?.submission_date || "Unknown date"}
+              {formatDate(submitted_at) || "Unknown date"}
             </p>
-            <p className="mt-2">
-              {submissionData?.response_text || "No response text"}
-            </p>
-            {submissionData?.file_url && (
+            <p className="mt-2">{submission_notes || "No response text"}</p>
+            {file_url && (
               <div className="mt-2 flex space-x-2">
                 <a
-                  href={submissionData.file_url}
+                  href={file_url}
                   download
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
                 >
                   Download
                 </a>
                 <a
-                  href={submissionData.file_url}
+                  href={file_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
@@ -45,9 +161,110 @@ const AssignmentSubmitted = ({ submissionData }) => {
                 </a>
               </div>
             )}
+            <Button
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              onClick={() => setOpenUpdateModal(true)}
+            >
+              Edit Assignment
+            </Button>
           </div>
         </div>
       </div>
+
+      <CustomModal
+        open={openUpdateModal}
+        onClose={() => setOpenUpdateModal(false)}
+        title="Update Assignment"
+        confirmText={isUpdating || isUploading ? "Updating..." : "Update"}
+        isLoading={isUpdating || isUploading}
+      >
+        <Formik
+          initialValues={{
+            submission_notes: submission_notes || "",
+            file: null,
+          }}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ setFieldValue, values, errors, touched, isSubmitting }) => (
+            <Form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Type your response here
+                </label>
+                <Field
+                  as="textarea"
+                  name="submission_notes"
+                  className="w-full p-2 border border-gray-300 rounded-md resize-none outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={5}
+                  placeholder="Your response here"
+                />
+                {touched.submission_notes && errors.submission_notes && (
+                  <p className="text-red-500 text-sm">
+                    {errors.submission_notes}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload a file (mp4, jpeg, jpg, doc, docx, pdf)
+                </label>
+                <div
+                  onDragEnter={() => setDragActive(true)}
+                  onDragLeave={() => setDragActive(false)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragActive(false);
+                    const droppedFile = e.dataTransfer.files[0];
+                    setFieldValue("file", droppedFile);
+                  }}
+                  className={`border-2 border-dashed rounded-md p-6 text-center ${
+                    dragActive
+                      ? "border-blue-300 bg-blue-50"
+                      : "border-gray-300"
+                  }`}
+                >
+                  <p className="text-gray-500">
+                    {values.file
+                      ? values.file.name
+                      : "Drop files here or browse"}
+                  </p>
+                  <input
+                    type="file"
+                    onChange={(e) => setFieldValue("file", e.target.files[0])}
+                    className="hidden"
+                    id="file-upload"
+                    accept=".mp4,.jpeg,.jpg,.doc,.docx,.pdf"
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="mt-2 inline-block px-4 py-2 bg-gray-200 text-gray-700 rounded-md cursor-pointer hover:bg-gray-300"
+                  >
+                    Browse
+                  </label>
+                </div>
+                {touched.file && errors.file && (
+                  <p className="text-red-500 text-sm">{errors.file}</p>
+                )}
+              </div>
+
+              <div className="flex justify-center">
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || isUploading || isUpdating}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
+                >
+                  {isSubmitting || isUploading || isUpdating
+                    ? "Updating..."
+                    : "Update"}
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </CustomModal>
     </div>
   );
 };

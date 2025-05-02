@@ -87,6 +87,12 @@ const GroupAssignmentPage = () => {
     GroupData?.data?.results.map((group) => group.leader) || [];
   const isGroupLeader = groupLeaders.includes(studentId);
 
+  const leaderGroup = GroupData?.data?.results.find(
+    (group) => group.leader === studentId && group.assessment === assignmentId
+  );
+
+  const groupId = leaderGroup?.id || null;
+
   const dueDate = AssignmentData?.data?.end_date
     ? new Date(AssignmentData.data.end_date)
     : null;
@@ -184,11 +190,15 @@ const GroupAssignmentPage = () => {
             {showSubmissionForm && (
               <AssignmentSubmission
                 assignmentId={assignmentId}
+                groupId={groupId}
                 refetchSubmission={refetchSubmission}
               />
             )}
             {showSubmittedView && (
-              <AssignmentSubmitted submissionData={SubmissionData?.data} />
+              <AssignmentSubmitted
+                submissionData={SubmissionData?.data?.file_submissions}
+                refetchSubmission={refetchSubmission}
+              />
             )}
 
             {showClosedView && <AssignmentClosed />}

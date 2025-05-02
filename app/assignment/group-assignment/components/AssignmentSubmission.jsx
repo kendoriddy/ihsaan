@@ -6,7 +6,7 @@ import Button from "@/components/Button";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
-const AssignmentSubmission = ({ assignmentId, refetchSubmission }) => {
+const AssignmentSubmission = ({ assignmentId, groupId, refetchSubmission }) => {
   const [dragActive, setDragActive] = useState(false);
 
   const { mutate: uploadFile, isLoading: isUploading } = usePost(
@@ -90,6 +90,7 @@ const AssignmentSubmission = ({ assignmentId, refetchSubmission }) => {
       }
 
       formData.append("assessment", assignmentId);
+      formData.append("group", groupId);
       formData.append("submission_notes", values.submission_notes);
 
       if (fileResourceId) {
