@@ -83,15 +83,23 @@ const GroupAssignmentPage = () => {
     fetchStudentId();
   });
 
-  const groupLeaders =
-    GroupData?.data?.results.map((group) => group.leader) || [];
-  const isGroupLeader = groupLeaders.includes(studentId);
+  // const groupLeaders =
+  //   GroupData?.data?.results.map((group) => group.leader) || [];
+  // const isGroupLeader = groupLeaders.includes(studentId);
+
+  // const leaderGroup = GroupData?.data?.results.find(
+  //   (group) => group.leader === studentId && group.assessment === assignmentId
+  // );
+
+  // const groupId = leaderGroup?.id || null;
 
   const leaderGroup = GroupData?.data?.results.find(
-    (group) => group.leader === studentId && group.assessment === assignmentId
+    (group) =>
+      group.leader === studentId && String(group.assessment) === assignmentId
   );
 
   const groupId = leaderGroup?.id || null;
+  const isGroupLeader = !!leaderGroup;
 
   const dueDate = AssignmentData?.data?.end_date
     ? new Date(AssignmentData.data.end_date)
@@ -101,6 +109,10 @@ const GroupAssignmentPage = () => {
     (submission) =>
       submission.assessment === assignmentId && submission.student === studentId
   );
+  // const hasSubmitted = SubmissionData?.data?.file_submissions.some(
+  //   (submission) => submission.group === groupId
+  // );
+
   const showSubmissionForm =
     isGroupLeader && !hasSubmitted && !isAssignmentClosed;
   const showSubmittedView =
@@ -172,7 +184,10 @@ const GroupAssignmentPage = () => {
 
         {/* Right Section: Submission Area */}
         {!isGroupLeader && (
-          <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md"></div>
+          <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
+            <p>You are not allowed to perform this action</p>
+            <p>Contact your group leader to submit the assignment</p>
+          </div>
         )}
         {isGroupLeader && (
           <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">

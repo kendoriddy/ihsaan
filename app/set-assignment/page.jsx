@@ -163,6 +163,11 @@ const AllAssignment = () => {
                                   setOpenGroupModal(true);
                                   handleMenuClose();
                                 }}
+                                // className={`${
+                                //   assignment.type === "GROUP"
+                                //     ? "block"
+                                //     : "hidden"
+                                // }`}
                               >
                                 Group
                               </MenuItem>

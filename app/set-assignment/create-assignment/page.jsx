@@ -217,16 +217,15 @@ const CreateAssignment = () => {
             </FormControl>
 
             {/* Term */}
-            <Field
-              as={TextField}
-              fullWidth
-              margin="normal"
-              label="Term"
-              name="term"
-              type="number"
-              error={touched.term && Boolean(errors.term)}
-              helperText={touched.term && errors.term}
-            />
+
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Term</InputLabel>
+              <Field as={Select} name="term">
+                <MenuItem value="">Select term</MenuItem>
+                <MenuItem value="1">First Term</MenuItem>
+                <MenuItem value="2">Second Term</MenuItem>
+              </Field>
+            </FormControl>
 
             {/* Max Attempts */}
             <Field
