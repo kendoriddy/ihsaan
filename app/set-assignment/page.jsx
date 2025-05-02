@@ -11,6 +11,9 @@ import {
   TableRow,
   Paper,
   Pagination,
+  MenuItem,
+  Menu,
+  IconButton,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import Layout from "@/components/Layout";
@@ -19,6 +22,9 @@ import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
 import EditAssignmentQuestion from "./components/EditAssignment";
 import Link from "next/link";
+import { MoreVert } from "@mui/icons-material";
+import GroupStudents from "./components/GroupStudents";
+import { getAuthToken } from "@/hooks/axios/axios";
 
 const AllAssignment = () => {
   const queryClient = useQueryClient();
@@ -26,7 +32,9 @@ const AllAssignment = () => {
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [openGroupModal, setOpenGroupModal] = useState(false);
   const [totalAssignments, setTotalAssignments] = useState(0);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null); // Anchor for the dropdown menu
 
   const { isLoading, data, refetch, isFetching } = useFetch(
     "assignments",
@@ -65,6 +73,18 @@ const AllAssignment = () => {
     if (selectedAssignment?.id) {
       questionDelete(`${selectedAssignment.id}/`);
     }
+  };
+  console.log(selectedAssignment, "assessment:::::");
+
+  // Handle Menu Open
+  const handleMenuOpen = (event, assignment) => {
+    setSelectedAssignment(assignment);
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  // Handle Menu Close
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
   };
 
   return (
@@ -108,24 +128,46 @@ const AllAssignment = () => {
                         <TableCell className="capitalize">
                           {assignment.type.toLowerCase()}
                         </TableCell>
-                        <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
-                          <Button
-                            color="secondary"
-                            onClick={() => {
-                              setSelectedAssignment(assignment);
-                              setOpenUpdateModal(true);
-                            }}
+                        <TableCell>
+                          <IconButton
+                            onClick={(event) =>
+                              handleMenuOpen(event, assignment)
+                            }
                           >
-                            Update
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              setSelectedAssignment(assignment);
-                              setOpenDeleteDialog(true);
-                            }}
+                            <MoreVert />
+                          </IconButton>
+                          <Menu
+                            anchorEl={menuAnchorEl}
+                            open={Boolean(menuAnchorEl)}
+                            onClose={handleMenuClose}
                           >
-                            Delete
-                          </Button>
+                            <MenuItem
+                              onClick={() => {
+                                setOpenUpdateModal(true);
+                                handleMenuClose();
+                              }}
+                            >
+                              Update
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                setOpenDeleteDialog(true);
+                                handleMenuClose();
+                              }}
+                            >
+                              Delete
+                            </MenuItem>
+                            {
+                              <MenuItem
+                                onClick={() => {
+                                  setOpenGroupModal(true);
+                                  handleMenuClose();
+                                }}
+                              >
+                                Group
+                              </MenuItem>
+                            }
+                          </Menu>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -165,6 +207,15 @@ const AllAssignment = () => {
           refetchQuestions={() => refetch()}
         />
       </div>
+
+      {/* Group Students Modal */}
+      <GroupStudents
+        open={openGroupModal}
+        onClose={() => setOpenGroupModal(false)}
+        assessmentId={selectedAssignment?.id}
+        getAuthToken={getAuthToken}
+        assessment={selectedAssignment}
+      />
     </Layout>
   );
 };
