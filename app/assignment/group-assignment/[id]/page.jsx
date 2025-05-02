@@ -34,6 +34,25 @@ const GroupAssignmentPage = () => {
   );
 
   const {
+    isLoading: isLoadingGroups,
+    data: GroupData,
+    refetch: refetchGropus,
+    isFetching: isFetchingGroups,
+    error,
+  } = useFetch(
+    "groups",
+    `https://ihsaanlms.onrender.com/assessment/groups/`,
+    (data) => {
+      toast.success("Assignment fetched successfully");
+    },
+    (error) => {
+      toast.error(error.response?.data?.message || "Error fetching assignment");
+    }
+  );
+
+  console.log("groups", GroupData);
+
+  const {
     isLoading: isLoadingSubmission,
     data: SubmissionData,
     refetch: refetchSubmission,
@@ -64,6 +83,24 @@ const GroupAssignmentPage = () => {
     fetchStudentId();
   });
 
+  // const groupLeaders =
+  //   GroupData?.data?.results.map((group) => group.leader) || [];
+  // const isGroupLeader = groupLeaders.includes(studentId);
+
+  // const leaderGroup = GroupData?.data?.results.find(
+  //   (group) => group.leader === studentId && group.assessment === assignmentId
+  // );
+
+  // const groupId = leaderGroup?.id || null;
+
+  const leaderGroup = GroupData?.data?.results.find(
+    (group) =>
+      group.leader === studentId && String(group.assessment) === assignmentId
+  );
+
+  const groupId = leaderGroup?.id || null;
+  const isGroupLeader = !!leaderGroup;
+
   const dueDate = AssignmentData?.data?.end_date
     ? new Date(AssignmentData.data.end_date)
     : null;
@@ -72,9 +109,15 @@ const GroupAssignmentPage = () => {
     (submission) =>
       submission.assessment === assignmentId && submission.student === studentId
   );
-  const showSubmissionForm = !hasSubmitted && !isAssignmentClosed;
-  const showSubmittedView = hasSubmitted && !isAssignmentClosed;
-  const showClosedView = isAssignmentClosed;
+  // const hasSubmitted = SubmissionData?.data?.file_submissions.some(
+  //   (submission) => submission.group === groupId
+  // );
+
+  const showSubmissionForm =
+    isGroupLeader && !hasSubmitted && !isAssignmentClosed;
+  const showSubmittedView =
+    isGroupLeader && hasSubmitted && !isAssignmentClosed;
+  const showClosedView = isGroupLeader && isAssignmentClosed;
 
   // Render based on loading, error, or data
   if (
@@ -140,30 +183,42 @@ const GroupAssignmentPage = () => {
         </div>
 
         {/* Right Section: Submission Area */}
-        <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
-          <div className="flex justify-between items-center">
-            {showSubmissionForm && showClosedView ? (
-              <h3 className="text-lg font-medium mb-4">
-                Assignment Submission
-              </h3>
-            ) : (
-              <h3 className="text-lg font-medium mb-4">
-                Submission & Comments
-              </h3>
-            )}
+        {!isGroupLeader && (
+          <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
+            <p>You are not allowed to perform this action</p>
+            <p>Contact your group leader to submit the assignment</p>
           </div>
-          {showSubmissionForm && (
-            <AssignmentSubmission
-              assignmentId={assignmentId}
-              refetchSubmission={refetchSubmission}
-            />
-          )}
-          {showSubmittedView && (
-            <AssignmentSubmitted submissionData={SubmissionData?.data} />
-          )}
-          
-          {showClosedView && <AssignmentClosed />}
-        </div>
+        )}
+        {isGroupLeader && (
+          <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
+            <div className="flex justify-between items-center">
+              {showSubmissionForm && showClosedView ? (
+                <h3 className="text-lg font-medium mb-4">
+                  Assignment Submission
+                </h3>
+              ) : (
+                <h3 className="text-lg font-medium mb-4">
+                  Submission & Comments
+                </h3>
+              )}
+            </div>
+            {showSubmissionForm && (
+              <AssignmentSubmission
+                assignmentId={assignmentId}
+                groupId={groupId}
+                refetchSubmission={refetchSubmission}
+              />
+            )}
+            {showSubmittedView && (
+              <AssignmentSubmitted
+                submissionData={SubmissionData?.data?.file_submissions}
+                refetchSubmission={refetchSubmission}
+              />
+            )}
+
+            {showClosedView && <AssignmentClosed />}
+          </div>
+        )}
       </div>
     </Layout>
   );

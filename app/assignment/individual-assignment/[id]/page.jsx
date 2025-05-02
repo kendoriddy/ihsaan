@@ -166,6 +166,7 @@ const IndividualAssignmentPage = () => {
           {showSubmittedView && (
             <AssignmentSubmitted
               submissionData={SubmissionData?.data?.file_submissions}
+              refetchSubmission={refetchSubmission}
             />
           )}
           {showClosedView && <AssignmentClosed />}

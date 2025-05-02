@@ -130,7 +130,7 @@ export const addAssignmentSchema = Yup.object({
     .max(100, "Passing score cannot exceed 100")
     .required("Passing score is required"),
   course: Yup.number().required("Course is required"),
-  term: Yup.number().required("Term is required"),
+  term: Yup.string().required("Term is required"),
   max_attempts: Yup.number()
     .min(1, "Must allow at least 1 attempt")
     .required("Max attempts is required"),
