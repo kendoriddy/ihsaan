@@ -85,7 +85,7 @@ const GroupStudents = ({
   const handleAutoGroup = async () => {
     try {
       setLoading(true);
-      await axios.post(
+      const response = await axios.post(
         "https://ihsaanlms.onrender.com/assessment/groups/auto_split/",
         {
           assessment_id: assessmentId,
@@ -112,6 +112,7 @@ const GroupStudents = ({
       // Update the groups state with the newly created groups
       fetchGroups();
     } catch (error) {
+      console.log(error, "whyyy");
       toast.error("Failed to auto-group students");
     } finally {
       setLoading(false);
@@ -119,6 +120,7 @@ const GroupStudents = ({
   };
   console.log(groups, "groups:::::");
   // Manually create a group
+  const [createGroupLoading, setCreateGroupLoading] = useState(false);
   const handleCreateGroup = async () => {
     if (!newGroupName || !selectedLeader || selectedMembers.length === 0) {
       toast.error("Please provide all required fields for the group");
@@ -126,7 +128,7 @@ const GroupStudents = ({
     }
 
     try {
-      setLoading(true);
+      setCreateGroupLoading(true);
       await axios.post(
         "https://ihsaanlms.onrender.com/assessment/groups/",
         {
@@ -148,16 +150,18 @@ const GroupStudents = ({
       setSelectedLeader("");
       setSelectedMembers([]);
     } catch (error) {
+      console.log(error, "group creation error:::::");
       toast.error("Failed to create group");
     } finally {
-      setLoading(false);
+      setCreateGroupLoading(false);
     }
   };
 
+  const [addLoading, setAddLoading] = useState(false);
   // Add members to a group
   const handleAddMembers = async (groupId, memberIds) => {
     try {
-      setLoading(true);
+      setAddLoading(true);
       await axios.post(
         `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/add_members/`,
         {
@@ -174,14 +178,15 @@ const GroupStudents = ({
     } catch (error) {
       toast.error("Failed to add members");
     } finally {
-      setLoading(false);
+      setAddLoading(false);
     }
   };
 
+  const [removingMemberId, setRemovingMemberId] = useState(null); // Track the member being removed
   // Remove members from a group
   const handleRemoveMembers = async (groupId, memberIds) => {
     try {
-      setLoading(true);
+      setRemovingMemberId(memberIds[0]);
       await axios.post(
         `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/remove_members/`,
         {
@@ -198,7 +203,7 @@ const GroupStudents = ({
     } catch (error) {
       toast.error("Failed to remove members");
     } finally {
-      setLoading(false);
+      setRemovingMemberId(null);
     }
   };
 
@@ -208,6 +213,46 @@ const GroupStudents = ({
       fetchStudents();
     }
   }, [open]);
+
+  // Function to update the group leader
+  const updateGroupLeader = async (groupId, newLeaderId) => {
+    try {
+      await axios.patch(
+        `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/`,
+        { leader: newLeaderId, assessment: assessmentId },
+        {
+          headers: {
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+        }
+      );
+      toast.success("Group leader updated successfully!");
+      fetchGroups(); // Refresh groups to reflect changes
+    } catch (error) {
+      toast.error("Failed to update group leader");
+    }
+  };
+
+  // Function to update the group name
+  const updateGroupName = async (groupId, newName) => {
+    try {
+      const response = await axios.patch(
+        `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/`,
+        { name: newName },
+        {
+          headers: {
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+        }
+      );
+      console.log("qqqq", response.data);
+      toast.success("Group name updated successfully!");
+      fetchGroups(); // Refresh groups to reflect changes
+    } catch (error) {
+      console.log("wwww", error);
+      toast.error("Failed to update group name");
+    }
+  };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -311,11 +356,11 @@ const GroupStudents = ({
                     </div>
                     <div className="flex justify-end space-x-4">
                       <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                        className="bg-[#f34103] text-white px-4 py-2 rounded-md transition"
                         onClick={handleCreateGroup}
                         disabled={loading}
                       >
-                        Create Group
+                        {createGroupLoading ? "Loading..." : "Create Group"}
                       </button>
                       <button
                         className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition"
@@ -401,41 +446,93 @@ const GroupStudents = ({
                       )?.full_name || "Unknown";
 
                     return (
-                      <li key={group.id} className="mb-2">
-                        <strong>{group.name}</strong> (Leader: {leaderName})
-                        <ul>
-                          {group.members_detail.map((member) => (
-                            <li key={member.id} className="ml-4">
-                              Member: {member.full_name || "Unknown"}{" "}
-                              <Button
-                                onClick={() =>
-                                  handleRemoveMembers(group.id, [member.id])
-                                }
-                                color="secondary"
-                              >
-                                Remove
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                        <Autocomplete
-                          options={students}
-                          getOptionLabel={(option) => option.user_fullname}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="Search Students"
-                              variant="outlined"
-                              margin="normal"
+                      <>
+                        <li key={group.id} className="mb-6 border-b pb-4">
+                          {/* Editable Group Name */}
+                          <div className="flex items-center justify-between mb-2">
+                            <input
+                              type="text"
+                              value={group.name}
+                              onChange={(e) => {
+                                const updatedGroups = groups.map((g) =>
+                                  g.id === group.id
+                                    ? { ...g, name: e.target.value }
+                                    : g
+                                );
+                                setGroups(updatedGroups);
+                              }}
+                              onBlur={() =>
+                                updateGroupName(group.id, group.name)
+                              }
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                          )}
-                          onChange={(event, value) => {
-                            if (value) {
-                              handleAddMembers(group.id, [value.user]);
-                            }
-                          }}
-                        />
-                      </li>
+                          </div>
+                          {/* Change Group Leader */}
+                          <div className="mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Group Leader
+                            </label>
+                            <select
+                              value={group.leader}
+                              onChange={(e) =>
+                                updateGroupLeader(group.id, e.target.value)
+                              }
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              {group.members_detail.map((member) => (
+                                <option key={member.id} value={member.id}>
+                                  {member.full_name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {/* Group Members */}
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">
+                              Members
+                            </h4>
+                            <ul className="ml-4">
+                              {group.members_detail.map((member) => (
+                                <li
+                                  key={member.id}
+                                  className="flex items-center justify-between"
+                                >
+                                  <span>{member.full_name || "Unknown"}</span>
+                                  <button
+                                    onClick={() =>
+                                      handleRemoveMembers(group.id, [member.id])
+                                    }
+                                    className="text-red-500 hover:underline"
+                                  >
+                                    {removingMemberId === member.id
+                                      ? "Loading..."
+                                      : "Remove"}
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          {addLoading && "Loading..."}
+                          <Autocomplete
+                            options={students}
+                            getOptionLabel={(option) => option.user_fullname}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                label="Search and add more students"
+                                variant="outlined"
+                                margin="normal"
+                              />
+                            )}
+                            onChange={(event, value) => {
+                              if (value) {
+                                handleAddMembers(group.id, [value.user]);
+                              }
+                            }}
+                          />
+                        </li>
+                      </>
                     );
                   })}
                 </ul>
@@ -488,15 +585,13 @@ const GroupStudents = ({
                       )}
                     />
                   </FormControl>
-                  <Button
-                    variant="contained"
-                    color="primary"
+                  <button
+                    className="bg-[#f34103] text-white px-4 py-2 rounded-md transition"
                     onClick={handleCreateGroup}
                     disabled={loading}
-                    sx={{ color: "#f34103" }}
                   >
-                    Create Group
-                  </Button>
+                    {createGroupLoading ? "Loading..." : "Create Group"}
+                  </button>
                 </div>
               </>
             ) : null}
