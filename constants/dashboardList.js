@@ -135,16 +135,6 @@ const DASHBOARD_LIST = {
       path: "/admin/student",
     },
     {
-      id: 3,
-      name: "Mentor",
-      path: "/admin/mentor",
-    },
-    {
-      id: 4,
-      name: "Mentee",
-      path: "/admin/mentee",
-    },
-    {
       id: 5,
       name: "Booking List",
       path: "/admin/bookings",

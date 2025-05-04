@@ -50,20 +50,20 @@ const NahuProgramme = ({ setOpen }) => {
     <div>
       <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-2xl w-full mx-4">
         {/* Header with decorative Islamic pattern */}
-        <div className="bg-emerald-700 text-white py-4 px-6 flex justify-between items-center">
+        <div className="bg-primary text-white py-4 px-6 flex justify-between items-center">
           <h2 className="text-2xl font-bold">Welcome to Nahu Programme</h2>
         </div>
 
         {/* Decorative divider */}
-        <div className="h-2 bg-gradient-to-r from-emerald-600 via-emerald-400 to-emerald-600"></div>
+        <div className="h-2 bg-gradient-to-r from-primary via-primary to-primary"></div>
 
         {/* Content */}
         <div className="p-6 text-center">
-          <div className="mb-6 text-emerald-800 font-arabic text-xl">
+          <div className="mb-6 text-primary font-arabic text-xl">
             بسم الله الرحمن الرحيم
           </div>
 
-          <h3 className="text-2xl font-semibold text-emerald-700 mb-4">
+          <h3 className="text-2xl font-semibold text-primary mb-4">
             Illuminating Minds Through Classical Arabic Grammar
           </h3>
 
@@ -81,34 +81,34 @@ const NahuProgramme = ({ setOpen }) => {
               methods that have preserved Islamic scholarship for centuries.
             </p>
 
-            <div className="my-6 bg-emerald-50 p-4 rounded-lg border border-emerald-100">
-              <h4 className="font-semibold text-emerald-800 mb-2">
+            <div className="my-6 bg-primary p-4 rounded-lg border border-primary">
+              <h4 className="font-semibold text-white mb-2">
                 Programme Highlights:
               </h4>
               <ul className="text-left space-y-2">
                 <li className="flex items-start">
-                  <span className="text-emerald-600 mr-2">•</span>
-                  <span>
+                  <span className="text-white mr-2">•</span>
+                  <span className="text-white">
                     Master the fundamentals of Arabic grammar (Nahw) essential
                     for Quranic understanding
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-emerald-600 mr-2">•</span>
-                  <span>
+                  <span className="text-white mr-2">•</span>
+                  <span className="text-white">
                     Study classical texts with proper understanding and context
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-emerald-600 mr-2">•</span>
-                  <span>
+                  <span className="text-white mr-2">•</span>
+                  <span className="text-white">
                     Join a supportive community of dedicated students of
                     knowledge
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-emerald-600 mr-2">•</span>
-                  <span>
+                  <span className="text-white mr-2">•</span>
+                  <span className="text-white">
                     Weekly live sessions with opportunities for questions and
                     discussion
                   </span>
@@ -127,7 +127,7 @@ const NahuProgramme = ({ setOpen }) => {
               onClick={() => {
                 setOpen(true);
               }}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-6 rounded-lg font-medium transition-colors shadow-md flex items-center justify-center"
+              className="bg-primary hover:bg-primary text-white py-3 px-6 rounded-lg font-medium transition-colors shadow-md flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -149,10 +149,10 @@ const NahuProgramme = ({ setOpen }) => {
             <button
               onClick={handlePaystackPayment}
               disabled={isProcessingPayment}
-              className={`border-2 border-emerald-600 ${
+              className={`border-2 border-primary ${
                 isProcessingPayment
                   ? "bg-gray-100 text-gray-500"
-                  : "text-emerald-600 hover:bg-emerald-50"
+                  : "text-primary hover:bg-primary"
               } py-3 px-6 rounded-lg font-medium transition-colors flex items-center justify-center`}
             >
               {isProcessingPayment ? (
