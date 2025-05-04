@@ -345,19 +345,39 @@ function Header() {
             <div className="relative text-slate-50 rounded group cursor-pointer">
               <h3 className="text-[15px] font-normal text-black">Programmes</h3>
               <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
-                {!isUserMentor && (
-                  <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                    <div
-                      className="block w-full h-full"
-                      onClick={() => {
-                        handleOpenProgrammeModal("nahu programme");
-                        setType("student");
-                      }}
-                    >
-                      Nahu Programme
-                    </div>
+                <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
+                  <div
+                    className="block w-full h-full"
+                    onClick={() => {
+                      handleOpenProgrammeModal("nahu programme");
+                      setType("student");
+                    }}
+                  >
+                    Nahu Programme
                   </div>
-                )}
+                </div>
+                <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
+                  <div
+                    className="block w-full h-full"
+                    onClick={() => {
+                      handleOpenModal("student");
+                      setType("student");
+                    }}
+                  >
+                    Primary Programmes
+                  </div>
+                </div>
+                <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
+                  <div
+                    className="block w-full h-full"
+                    onClick={() => {
+                      handleOpenModal("student");
+                      setType("student");
+                    }}
+                  >
+                    Secondary Programmes
+                  </div>
+                </div>
               </div>
             </div>
 
