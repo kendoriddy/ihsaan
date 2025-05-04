@@ -26,6 +26,7 @@ import Loader from "./Loader";
 import { useQueryClient } from "@tanstack/react-query";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { IconButton, InputAdornment } from "@mui/material";
+import NahuProgramme from "./NahuProgramme";
 
 function Header() {
   const currentRoute = usePathname();
@@ -56,6 +57,7 @@ function Header() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [programmeOpen, setProgrammeOpen] = useState(false);
   const [type, setType] = useState(null);
   const [userType, setUserType] = useState(null);
   const [showPassword, setShowPassword] = useState(true);
@@ -113,8 +115,17 @@ function Header() {
     setOpen(true);
   };
 
+  const handleOpenProgrammeModal = (mode) => {
+    setProgrammeOpen(true);
+  };
+
   const handleCloseModal = () => {
     setOpen(false);
+    router.push("/dashboard");
+  };
+
+  const handleCloseProgrammeModal = () => {
+    setProgrammeOpen(false);
     router.push("/dashboard");
   };
 
@@ -222,10 +233,10 @@ function Header() {
     { key: "Male", value: "male" },
     { key: "Female", value: "female" },
   ];
-  const menteeGender = [
-    { key: "Male", value: "male" },
-    { key: "Female", value: "female" },
-    { key: "Both", value: "both" },
+  const programme = [
+    { key: "Nahu programme", value: "Nahu programme" },
+    { key: "Primary programmes", value: "Primary programmes" },
+    { key: "Secondary programmes", value: "Secondary programmes" },
   ];
 
   const religion = [
@@ -328,6 +339,25 @@ function Header() {
                     Upload and Sell a Course
                   </Link>
                 </div>
+              </div>
+            </div>
+
+            <div className="relative text-slate-50 rounded group cursor-pointer">
+              <h3 className="text-[15px] font-normal text-black">Programmes</h3>
+              <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
+                {!isUserMentor && (
+                  <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
+                    <div
+                      className="block w-full h-full"
+                      onClick={() => {
+                        handleOpenProgrammeModal("nahu programme");
+                        setType("student");
+                      }}
+                    >
+                      Nahu Programme
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -511,6 +541,14 @@ function Header() {
                           )}
                           <div>
                             <FormikControl
+                              name="years_of_experience"
+                              options={programme}
+                              control={"select"}
+                              placeholder="Select programme you are registering for"
+                            />
+                          </div>
+                          <div>
+                            <FormikControl
                               name="highest_qualification"
                               options={qualificationsList}
                               control={"select"}
@@ -628,6 +666,14 @@ function Header() {
                   }}
                 </Formik>
               </div>
+            </Modal>
+
+            <Modal
+              title="Welcome to Nahu Programme"
+              isOpen={programmeOpen}
+              handleClose={() => setProgrammeOpen(false)}
+            >
+              <NahuProgramme setOpen={setOpen} />
             </Modal>
           </ul>
         </div>
