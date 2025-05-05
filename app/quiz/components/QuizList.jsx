@@ -93,24 +93,35 @@ const QuizList = ({ setCurrentScreen }) => {
                   )}
                 </p>
               </div>
-              <Button
-                onClick={() => {
-                  localStorage.setItem(
-                    "selectedQuiz",
-                    JSON.stringify(filteredQuiz)
-                  );
-                  setCurrentScreen("instructions");
-                }}
-                className="mt-4 px-10 py-2"
-                size="large"
-                color="secondary"
-                disabled={
-                  filteredQuiz?.submission_status === "submitted" ||
-                  filteredQuiz?.is_open === false
-                }
-              >
-                Take Quiz
-              </Button>
+              {filteredQuiz?.submission_status === "submitted" ? (
+                <Button
+                  onClick={() => {}}
+                  className="mt-4 px-10 py-2"
+                  size="large"
+                  color="secondary"
+                >
+                  View Details
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    localStorage.setItem(
+                      "selectedQuiz",
+                      JSON.stringify(filteredQuiz)
+                    );
+                    setCurrentScreen("instructions");
+                  }}
+                  className="mt-4 px-10 py-2"
+                  size="large"
+                  color="secondary"
+                  disabled={
+                    filteredQuiz?.submission_status === "submitted" ||
+                    filteredQuiz?.is_open === false
+                  }
+                >
+                  Take Quiz
+                </Button>
+              )}
             </div>
           ))}
       </div>
