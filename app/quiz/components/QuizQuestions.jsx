@@ -12,6 +12,7 @@ import Loader from "@/components/Loader";
 import { Modal } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { formatTime } from "../../../utils/utilFunctions";
+import parse from "html-react-parser";
 
 const QuizQuestion = ({ setCurrentScreen }) => {
   const quizData = JSON.parse(localStorage.getItem("selectedQuiz"));
@@ -313,7 +314,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
             Question {currentQuestionIndex + 1}
           </p>
           <p className="text-lg text-center font-medium mb-4">
-            {currentQuestion?.question_text}
+            {parse(currentQuestion?.question_text)}
           </p>
           <div className="space-y-3">
             {currentQuestion?.options &&
@@ -331,7 +332,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
                     onChange={() => handleOptionSelect(key)}
                     className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-600 mr-2"
                   />
-                  {option}
+                  {parse(option)}
                 </label>
               ))}
           </div>

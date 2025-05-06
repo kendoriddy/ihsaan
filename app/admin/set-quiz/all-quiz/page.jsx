@@ -18,6 +18,7 @@ import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
 import EditQuizQuestion from "../components/EditQuiz";
 import AdminLayout from "@/components/AdminLayout";
+import parse from "html-react-parser";
 
 const AllQuiz = () => {
   const queryClient = useQueryClient();
@@ -90,12 +91,13 @@ const AllQuiz = () => {
                 <>
                   {questions.map((question) => (
                     <TableRow key={question.id}>
-                      <TableCell>{question.question_text}</TableCell>
-                      <TableCell className="flex gap-2 flex-wrap text-nowrap">
+                      <TableCell>{parse(question.question_text)}</TableCell>
+                      <TableCell className="flex gap-2 flex-wrap">
                         {Object.entries(question.options).map(
                           ([key, value]) => (
-                            <div key={key}>
-                              <strong>{key}:</strong> {value}
+                            <div key={key} className="text-nowrap">
+                              <strong>{key}:</strong>
+                              {parse(value)}
                             </div>
                           )
                         )}
