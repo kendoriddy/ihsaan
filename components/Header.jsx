@@ -27,10 +27,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { IconButton, InputAdornment } from "@mui/material";
 import NahuProgramme from "./NahuProgramme";
+import { getAuthToken } from "@/hooks/axios/axios";
 
 function Header() {
   const currentRoute = usePathname();
   const queryClient = useQueryClient();
+  const token = getAuthToken();
   const [isMobileHeaderOpen, setIsMobileHeaderOpen] = useState(false);
   const {
     data: getAuthUserInformation,
@@ -129,6 +131,8 @@ function Header() {
     router.push("/dashboard");
   };
 
+  console.log(token, "getAuthUserInformation", getAuthUserInformation);
+
   const { mutate: createNewaccounts, isLoading: isCreating } = usePost(
     "/auth/register",
     {
@@ -140,8 +144,6 @@ function Header() {
         handleCloseModal();
       },
       onError: (error) => {
-        console.log(error, "ounda");
-
         if (error.response && error.response.data) {
           const errors = error.response.data;
 
@@ -484,71 +486,79 @@ function Header() {
                         <div className="flex flex-col gap-6">
                           <div>
                             <FormikControl
+                              disabled={token ? true : false}
                               name="first_name"
                               placeholder="First name"
                             />
                           </div>
                           <div>
                             <FormikControl
+                              disabled={token ? true : false}
+                              readOnly={token}
                               name="last_name"
                               placeholder="Last name"
                             />
                           </div>
                           <div>
                             <FormikControl
+                              disabled={token ? true : false}
                               name="email"
                               placeholder="Email address"
                             />
                           </div>
-                          <div>
-                            <FormikControl
-                              name="password"
-                              type={!showPassword ? "text" : "password"}
-                              placeholder="Password"
-                              InputProps={{
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    <IconButton
-                                      aria-label="toggle password visibility"
-                                      onClick={handleClickShowPassword}
-                                      onMouseDown={handleMouseDownPassword}
-                                    >
-                                      {showPassword ? (
-                                        <VisibilityOff />
-                                      ) : (
-                                        <Visibility />
-                                      )}
-                                    </IconButton>
-                                  </InputAdornment>
-                                ),
-                              }}
-                            />
-                          </div>
+                          {!token && (
+                            <div>
+                              <FormikControl
+                                name="password"
+                                type={!showPassword ? "text" : "password"}
+                                placeholder="Password"
+                                InputProps={{
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                      >
+                                        {showPassword ? (
+                                          <VisibilityOff />
+                                        ) : (
+                                          <Visibility />
+                                        )}
+                                      </IconButton>
+                                    </InputAdornment>
+                                  ),
+                                }}
+                              />
+                            </div>
+                          )}
 
-                          <div>
-                            <FormikControl
-                              name="confirm_password"
-                              type={!showPassword ? "text" : "password"}
-                              placeholder="Confirm Password"
-                              InputProps={{
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    <IconButton
-                                      aria-label="toggle password visibility"
-                                      onClick={handleClickShowPassword}
-                                      onMouseDown={handleMouseDownPassword}
-                                    >
-                                      {showPassword ? (
-                                        <VisibilityOff />
-                                      ) : (
-                                        <Visibility />
-                                      )}
-                                    </IconButton>
-                                  </InputAdornment>
-                                ),
-                              }}
-                            />
-                          </div>
+                          {!token && (
+                            <div>
+                              <FormikControl
+                                name="confirm_password"
+                                type={!showPassword ? "text" : "password"}
+                                placeholder="Confirm Password"
+                                InputProps={{
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                      >
+                                        {showPassword ? (
+                                          <VisibilityOff />
+                                        ) : (
+                                          <Visibility />
+                                        )}
+                                      </IconButton>
+                                    </InputAdornment>
+                                  ),
+                                }}
+                              />
+                            </div>
+                          )}
                           {type === "tutor" && (
                             <div>
                               <div>
