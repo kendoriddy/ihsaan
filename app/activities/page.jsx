@@ -23,6 +23,19 @@ const StudentInfoPage = () => {
   const [coursesOrGrade, setCoursesOrGrade] = useState("courses");
   const [selectedSession, setSelectedSession] = useState("");
   const [selectedTerm, setSelectedTerm] = useState("");
+  const [studentId, setStudentId] = useState("");
+
+  const fetchStudentId = () => {
+    const storedStudentId = localStorage.getItem("userId");
+    console.log("tutorIdStored", storedStudentId);
+    if (storedStudentId) {
+      setStudentId(storedStudentId);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudentId();
+  });
 
   const {
     isLoading: loadingSession,
@@ -55,6 +68,43 @@ const StudentInfoPage = () => {
       }
     }
   );
+
+  const {
+    isLoading: loadingGrade,
+    data: Grades,
+    refetch: refetchGrade,
+    isFetching: isFetchingGrades,
+  } = useFetch(
+    ["terms", selectedSession],
+    selectedSession
+      ? `https://ihsaanlms.onrender.com/assessment/grades/?student=${studentId}`
+      : null,
+    (data) => {
+      if (data?.total) {
+        // You can handle data.total here if needed
+      }
+    }
+  );
+
+  const {
+    isLoading: loadingCourses,
+    data: StudentCourses,
+    refetch: refetchCourses,
+    isFetching: isFetchingCourses,
+  } = useFetch(
+    ["terms", selectedSession],
+    selectedSession
+      ? `https://ihsaanlms.onrender.com/course/course-enrollments/?user_id=${studentId}`
+      : null,
+    (data) => {
+      if (data?.total) {
+        // You can handle data.total here if needed
+      }
+    }
+  );
+
+  console.log("student grades", Grades);
+  console.log("student courses", StudentCourses);
 
   const Terms = TermData?.data?.results || [];
 
