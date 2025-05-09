@@ -14,31 +14,51 @@ import {
   CircularProgress,
 } from "@mui/material";
 import Layout from "@/components/Layout";
-
-const sessions = ["2023/2024", "2024/2025"];
-const terms = ["1st Term", "2nd Term", "3rd Term"];
+import { useFetch } from "@/hooks/useHttp/useHttp";
+import { Field } from "formik";
+import CoursesList from "./components/courses-list";
+import GradesArea from "./components/GradesArea";
 
 const StudentInfoPage = () => {
+  const [coursesOrGrade, setCoursesOrGrade] = useState("courses");
   const [selectedSession, setSelectedSession] = useState("");
   const [selectedTerm, setSelectedTerm] = useState("");
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (selectedSession && selectedTerm) {
-      setLoading(true);
-
-      // Simulate fetch
-      setTimeout(() => {
-        setData({
-          course: "Mathematics",
-          group: "Science",
-          subjects: ["Algebra", "Geometry", "Calculus"],
-        });
-        setLoading(false);
-      }, 1000);
+  const {
+    isLoading: loadingSession,
+    data: SessionData,
+    refetch: refetchSession,
+    isFetching: isFetchingSession,
+  } = useFetch(
+    "academicSession",
+    `https://ihsaanlms.onrender.com/academic-sessions/`,
+    (data) => {
+      if (data?.total) {
+        // setTotalSession(data.total);
+      }
     }
-  }, [selectedSession, selectedTerm]);
+  );
+
+  const {
+    isLoading: loadingTerm,
+    data: TermData,
+    refetch: refetchTerm,
+    isFetching: isFetchingTerm,
+  } = useFetch(
+    ["terms", selectedSession],
+    selectedSession
+      ? `https://ihsaanlms.onrender.com/terms/?session_year=${selectedSession}`
+      : null,
+    (data) => {
+      if (data?.total) {
+        // You can handle data.total here if needed
+      }
+    }
+  );
+
+  const Terms = TermData?.data?.results || [];
+
+  const Sessions = SessionData?.data?.results || [];
 
   return (
     <Layout>
@@ -52,14 +72,20 @@ const StudentInfoPage = () => {
             <InputLabel>Session</InputLabel>
             <Select
               value={selectedSession}
-              onChange={(e) => setSelectedSession(e.target.value)}
-              label="Session"
+              onChange={(e) => {
+                setSelectedSession(e.target.value);
+                setSelectedTerm("");
+              }}
             >
-              {sessions.map((session) => (
-                <MenuItem key={session} value={session}>
-                  {session}
-                </MenuItem>
-              ))}
+              {Sessions.length > 0 ? (
+                Sessions.map((session) => (
+                  <MenuItem key={session.id} value={session.year}>
+                    {session.year}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No sessions available</MenuItem>
+              )}
             </Select>
           </FormControl>
 
@@ -68,35 +94,53 @@ const StudentInfoPage = () => {
             <Select
               value={selectedTerm}
               onChange={(e) => setSelectedTerm(e.target.value)}
-              label="Term"
+              disabled={!selectedSession}
             >
-              {terms.map((term) => (
-                <MenuItem key={term} value={term}>
-                  {term}
-                </MenuItem>
-              ))}
+              {Terms.length > 0 ? (
+                Terms.map((term) => (
+                  <MenuItem
+                    className="capitalize"
+                    key={term.id}
+                    value={term.id}
+                  >
+                    {term.name.toLowerCase()}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No terms available</MenuItem>
+              )}
             </Select>
           </FormControl>
         </Box>
       </div>
-      <div>
-        {loading ? (
-          <CircularProgress />
-        ) : data ? (
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Course: {data.course}</Typography>
-              <Typography variant="body1">Group: {data.group}</Typography>
-              <Typography variant="body2">
-                Subjects: {data.subjects.join(", ")}
-              </Typography>
-            </CardContent>
-          </Card>
-        ) : (
-          selectedSession &&
-          selectedTerm && <Typography>No data available.</Typography>
-        )}
-      </div>
+      <>
+        <div className="flex justify- mb-6">
+          <div className="flex gap-4 border-b border-gray-300">
+            <button
+              className={`px-4 py-2 font-medium ${
+                coursesOrGrade === "courses"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500"
+              }`}
+              onClick={() => setCoursesOrGrade("courses")}
+            >
+              Courses
+            </button>
+            <button
+              className={`px-4 py-2 font-medium ${
+                coursesOrGrade === "grades"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500"
+              }`}
+              onClick={() => setCoursesOrGrade("grades")}
+            >
+              Grades
+            </button>
+          </div>
+        </div>
+        {coursesOrGrade === "courses" && <CoursesList />}
+        {coursesOrGrade === "grades" && <GradesArea />}
+      </>
     </Layout>
   );
 };
