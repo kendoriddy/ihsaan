@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { usePost } from "@/hooks/useHttp/useHttp";
 import Button from "@/components/Button";
 import { addQuizSchema } from "@/components/validationSchemas/ValidationSchema";
+import Editor from "@/components/Editor";
 
 const AddingQuiz = () => {
   const [fetchAll, setFetchAll] = useState(false);
@@ -148,11 +149,11 @@ const AddingQuiz = () => {
                     >
                       Question Text
                     </label>
-                    <Field
+                    <Editor
                       type="text"
                       id={`questions[${index}].question_text`}
                       name={`questions[${index}].question_text`}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                      className="w-full h-40 mb-24 md:mb-12 p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-600"
                     />
                     <ErrorMessage
                       name={`questions[${index}].question_text`}
@@ -171,11 +172,17 @@ const AddingQuiz = () => {
                           className="flex items-center"
                         >
                           <span className="mr-2">{key}</span>
-                          <Field
+                          {/* <Field
                             type="text"
                             id={`questions[${index}].options.${key}`}
                             name={`questions[${index}].options.${key}`}
                             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                          /> */}
+                          <Editor
+                            type="text"
+                            id={`questions[${index}].options.${key}`}
+                            name={`questions[${index}].options.${key}`}
+                            className="w-full -mb-4 p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-600"
                           />
                         </label>
                         <ErrorMessage

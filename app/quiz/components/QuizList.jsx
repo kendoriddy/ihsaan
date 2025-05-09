@@ -24,6 +24,25 @@ const QuizList = ({ setCurrentScreen }) => {
     }
   );
 
+ const {
+    isLoading: isLoadingQuizData,
+    data: QuizData,
+    refetch: refetchQuizData,
+    isFetching: isFetchingQuizData,
+    error
+  } = useFetch(
+    `submission-${assignmentId}`,
+    assignmentId
+      ? `https://ihsaanlms.onrender.com/assessment/grades/`
+      : null,
+    (data) => {
+    },
+    (error) => {
+    }
+  );
+
+  console.log('grades', QuizData)
+
   const handlePageChange = (event, value) => {
     setPage(value);
     refetch();
@@ -93,24 +112,35 @@ const QuizList = ({ setCurrentScreen }) => {
                   )}
                 </p>
               </div>
-              <Button
-                onClick={() => {
-                  localStorage.setItem(
-                    "selectedQuiz",
-                    JSON.stringify(filteredQuiz)
-                  );
-                  setCurrentScreen("instructions");
-                }}
-                className="mt-4 px-10 py-2"
-                size="large"
-                color="secondary"
-                disabled={
-                  filteredQuiz?.submission_status === "submitted" ||
-                  filteredQuiz?.is_open === false
-                }
-              >
-                Take Quiz
-              </Button>
+              {filteredQuiz?.submission_status === "submitted" ? (
+                <Button
+                  onClick={() => {}}
+                  className="mt-4 px-10 py-2"
+                  size="large"
+                  color="secondary"
+                >
+                  View Details
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    localStorage.setItem(
+                      "selectedQuiz",
+                      JSON.stringify(filteredQuiz)
+                    );
+                    setCurrentScreen("instructions");
+                  }}
+                  className="mt-4 px-10 py-2"
+                  size="large"
+                  color="secondary"
+                  disabled={
+                    filteredQuiz?.submission_status === "submitted" ||
+                    filteredQuiz?.is_open === false
+                  }
+                >
+                  Take Quiz
+                </Button>
+              )}
             </div>
           ))}
       </div>

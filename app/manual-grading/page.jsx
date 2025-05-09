@@ -150,7 +150,6 @@ const ManualGrading = () => {
                   const selected = filteredAssessment.find(
                     (a) => a.id === selectedAssessmentId
                   );
-                  console.log("selected is", selected);
                   setSelectedAssessment(selected);
                   setSelectedAssessmentId(selected?.course);
                   values.assessment = selectedAssessmentId;
@@ -193,21 +192,8 @@ const ManualGrading = () => {
                   <MenuItem disabled>No courses available</MenuItem>
                 )}
               </Field>
-            </FormControl>{" "}
-            {/* <FormControl fullWidth margin="normal">
-              <InputLabel>Select Student</InputLabel>
-              <Field as={Select} name="student">
-                {EnrolledList?.data?.students?.length > 0 ? (
-                  EnrolledList.data.students.map((student) => (
-                    <MenuItem key={student.id} value={student.id}>
-                      {student.fullname}
-                    </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled>No students found</MenuItem>
-                )}
-              </Field>
-            </FormControl> */}
+            </FormControl>
+
             {!isGroupAssessment && (
               <FormControl fullWidth margin="normal">
                 <InputLabel>Select Student</InputLabel>

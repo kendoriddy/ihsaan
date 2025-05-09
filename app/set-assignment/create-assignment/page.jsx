@@ -101,7 +101,7 @@ const CreateAssignment = () => {
   return (
     <Layout>
       <Link href="/set-assignment" className="my-4">
-        <Button>Back</Button>
+        <Button variant="outlined">Back</Button>
       </Link>
       <Formik
         enableReinitialize

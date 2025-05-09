@@ -45,7 +45,7 @@ const AssignmentTable = () => {
     refetch,
   } = useFetch(
     "courses",
-    `https://ihsaanlms.onrender.com/assessment/base/?page_size=15&page=${page}`,
+    `https://ihsaanlms.onrender.com/assessment/base/?question_type=FILE_UPLOAD&page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
         setTotalAssignments(data.total);
@@ -59,10 +59,6 @@ const AssignmentTable = () => {
     setPage(value);
     refetch();
   };
-
-  const filteredAssignments = Assignments.filter(
-    (assignment) => !["MANUAL", "MCQ"].includes(assignment.question_type)
-  );
 
   return (
     <Layout>
@@ -83,7 +79,7 @@ const AssignmentTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredAssignments.map((assignment) => (
+              {Assignments.map((assignment) => (
                 <TableRow key={assignment.id}>
                   <TableCell>{assignment.title}</TableCell>
                   <TableCell>{assignment.tutor_name}</TableCell>

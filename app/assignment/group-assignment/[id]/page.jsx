@@ -8,6 +8,8 @@ import { formatDate } from "@/utils/utilFunctions";
 import AssignmentSubmission from "../components/AssignmentSubmission";
 import AssignmentSubmitted from "../components/AssignmentSubmitted";
 import AssignmentClosed from "../components/AssignmentClosed";
+import Link from "next/link";
+import Button from "@/components/Button";
 
 const GroupAssignmentPage = () => {
   const { id } = useParams();
@@ -83,16 +85,6 @@ const GroupAssignmentPage = () => {
     fetchStudentId();
   });
 
-  // const groupLeaders =
-  //   GroupData?.data?.results.map((group) => group.leader) || [];
-  // const isGroupLeader = groupLeaders.includes(studentId);
-
-  // const leaderGroup = GroupData?.data?.results.find(
-  //   (group) => group.leader === studentId && group.assessment === assignmentId
-  // );
-
-  // const groupId = leaderGroup?.id || null;
-
   const leaderGroup = GroupData?.data?.results.find(
     (group) =>
       group.leader === studentId && String(group.assessment) === assignmentId
@@ -158,6 +150,9 @@ const GroupAssignmentPage = () => {
 
   return (
     <Layout>
+      <Link href="/assignment" className="my-4 p-6">
+        <Button variant="outlined">Back</Button>
+      </Link>
       <div className="flex flex-col md:flex-row gap-6 p-6">
         {/* Left Section: Assignment Details */}
         <div className="md:w-1/3 bg-white p-4 rounded-md shadow-md">

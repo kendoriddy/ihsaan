@@ -8,6 +8,8 @@ import { formatDate } from "@/utils/utilFunctions";
 import AssignmentSubmission from "../components/AssignmentSubmission";
 import AssignmentSubmitted from "../components/AssignmentSubmitted";
 import AssignmentClosed from "../components/AssignmentClosed";
+import Link from "next/link";
+import Button from "@/components/Button";
 
 const IndividualAssignmentPage = () => {
   const { id } = useParams();
@@ -112,6 +114,9 @@ const IndividualAssignmentPage = () => {
 
   return (
     <Layout>
+      <Link href="/assignment" className="my-4 p-6">
+        <Button variant="outlined">Back</Button>
+      </Link>
       <div className="flex flex-col md:flex-row gap-6 p-6">
         {/* Left Section: Assignment Details */}
         <div className="md:w-1/3 bg-white p-4 rounded-md shadow-md">
