@@ -24,24 +24,24 @@ const QuizList = ({ setCurrentScreen }) => {
     }
   );
 
- const {
-    isLoading: isLoadingQuizData,
-    data: QuizData,
-    refetch: refetchQuizData,
-    isFetching: isFetchingQuizData,
-    error
-  } = useFetch(
-    `submission-${assignmentId}`,
-    assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/grades/`
-      : null,
-    (data) => {
-    },
-    (error) => {
-    }
-  );
+//  const {
+//     isLoading: isLoadingQuizData,
+//     data: QuizData,
+//     refetch: refetchQuizData,
+//     isFetching: isFetchingQuizData,
+//     error
+//   } = useFetch(
+//     `submission-${assignmentId}`,
+//     assignmentId
+//       ? `https://ihsaanlms.onrender.com/assessment/grades/`
+//       : null,
+//     (data) => {
+//     },
+//     (error) => {
+//     }
+//   );
 
-  console.log('grades', QuizData)
+  // console.log('grades', QuizData)
 
   const handlePageChange = (event, value) => {
     setPage(value);
