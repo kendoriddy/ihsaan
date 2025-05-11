@@ -5,9 +5,10 @@ import Person2Icon from "@mui/icons-material/Person2";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import QuizIcon from "@mui/icons-material/Quiz";
+
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
 import StorefrontIcon from "@mui/icons-material/Storefront";
-import { Assignment, AssignmentInd } from "@mui/icons-material";
+import { Assignment, AssignmentInd, BookSharp } from "@mui/icons-material";
 import GradingOutlined from "@mui/icons-material/GradingOutlined";
 import { TbActivity } from "react-icons/tb";
 
@@ -27,7 +28,13 @@ const DASHBOARD_LIST = {
       path: "/quiz",
     },
     {
-      id: 6,
+      id: 8,
+      name: "View Courses",
+      icon: BookSharp,
+      path: "/courses/view-courses",
+    },
+    {
+      id: 7,
       name: "Activities",
       icon: TbActivity,
       path: "/activities",
@@ -101,6 +108,12 @@ const DASHBOARD_LIST = {
       path: "/quiz",
     },
     {
+      id: 8,
+      name: "View Courses",
+      icon: BookSharp,
+      path: "/courses/view-courses",
+    },
+    {
       id: 7,
       name: "Counsellor Instruction",
       icon: IntegrationInstructionsIcon,
@@ -134,17 +147,12 @@ const DASHBOARD_LIST = {
       name: "Student Application",
       path: "/admin/student",
     },
-    {
-      id: 5,
-      name: "Booking List",
-      path: "/admin/bookings",
-    },
-    {
-      id: 6,
-      name: "Categories",
-      path: "/admin/categories",
-    },
-    { id: 7, name: "Books", path: "/admin/books" },
+    // {
+    //   id: 6,
+    //   name: "Categories",
+    //   path: "/admin/categories",
+    // },
+    // { id: 7, name: "Books", path: "/admin/books" },
     { id: 8, name: "Courses", path: "/admin/courses" },
     { id: 9, name: "FAQs", path: "/admin/faqs" },
     { id: 10, name: "Quotes", path: "/admin/quotes" },
@@ -158,21 +166,21 @@ const DASHBOARD_LIST = {
       name: "Activities Settings",
       path: "/admin/activities-settings",
     },
-    { id: 13, name: "Transactions", path: "/admin/transactions" },
-    {
-      id: 14,
-      name: "Reports",
-      path: "#",
-      subMenu: [
-        { id: 1, name: "Invoice Reports", path: "/admin/invoice-reports" },
-      ],
-    },
+    // { id: 13, name: "Transactions", path: "/admin/transactions" },
+    // {
+    //   id: 14,
+    //   name: "Reports",
+    //   path: "#",
+    //   subMenu: [
+    //     { id: 1, name: "Invoice Reports", path: "/admin/invoice-reports" },
+    //   ],
+    // },
     { id: 15, name: "My Profile", path: "/admin/profile" },
-    {
-      id: 16,
-      name: "Blog",
-      path: "/admin/blog",
-    },
+    // {
+    //   id: 16,
+    //   name: "Blog",
+    //   path: "/admin/blog",
+    // },
   ],
 };
 
