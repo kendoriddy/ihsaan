@@ -16,7 +16,7 @@ function Page() {
   const [courseData, setCourseData] = useState({
     title: "",
     description: "",
-    order: "",
+    image_url: "",
     name: "",
     code: "",
     programme: "",
@@ -68,7 +68,7 @@ function Page() {
       console.log("Upload result:", response);
       toast.success("Image uploaded successfully!");
       setImageUploadSuccessful(true);
-
+      setPreviewImage(response.data.media_url);
       return response.data.media_url;
     } catch (error) {
       console.error("Image upload error:", error.message);
@@ -86,11 +86,10 @@ function Page() {
 
         // Show preview immediately
         const localPreviewUrl = URL.createObjectURL(file);
-        setPreviewImage(localPreviewUrl);
 
         // Upload image to Cloudinary
         const mediaUrl = await uploadImageToCloudinary(file);
-        setCourseData({ ...courseData, media_url: mediaUrl });
+        setCourseData({ ...courseData, image_url: mediaUrl });
 
         // Revoke the preview URL after upload (optional, for memory cleanup)
         URL.revokeObjectURL(localPreviewUrl);
@@ -138,6 +137,16 @@ function Page() {
       );
     } finally {
       setIsLoading(false);
+      setPreviewImage("");
+      setImageUploadSuccessful(false);
+      setCourseData({
+        title: "",
+        description: "",
+        image_url: "",
+        name: "",
+        code: "",
+        programme: "",
+      });
     }
   };
 
