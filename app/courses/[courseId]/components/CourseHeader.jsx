@@ -1,25 +1,31 @@
 import { ChevronDown, Share2, MoreVertical } from "lucide-react";
 import Image from "next/image";
+import { IMAGES } from "@/constants";
 
-export default function CourseHeader() {
+const CourseHeader = ({ title, programmeName }) => {
   return (
     <div className="flex items-center justify-between w-full bg-black text-white px-4 py-2">
       <div className="flex items-center">
         <Image
-          src="/placeholder.svg?height=30&width=80"
-          alt="Udemy"
+          src={IMAGES.logo2}
+          alt="Ihsaan"
           width={80}
           height={30}
           className="mr-4"
         />
         <h1 className="text-sm md:text-base font-medium truncate">
-          DevOps Beginners to Advanced with Projects
+          {title || "Course Title"}
         </h1>
+        {programmeName && (
+          <p className="text-sm text-gray-300 mt-1">
+            Programme: {programmeName}
+          </p>
+        )}
       </div>
       <div className="flex items-center space-x-2">
         <div className="flex items-center">
           <Image
-            src="/placeholder.svg?height=32&width=32"
+            src={IMAGES.logo2}
             alt="User"
             width={32}
             height={32}
@@ -40,4 +46,6 @@ export default function CourseHeader() {
       </div>
     </div>
   );
-}
+};
+
+export default CourseHeader;

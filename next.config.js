@@ -7,6 +7,7 @@ const nextConfig = {
       "cdn.sanity.io",
       "images.unsplash.com",
       "encrypted-tbn0.gstatic.com",
+      "via.placeholder.com",
     ],
   },
 };

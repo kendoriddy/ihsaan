@@ -28,16 +28,16 @@ const DASHBOARD_LIST = {
       path: "/quiz",
     },
     {
-      id: 8,
-      name: "View Courses",
-      icon: BookSharp,
-      path: "/courses/view-courses",
-    },
-    {
       id: 7,
       name: "Activities",
       icon: TbActivity,
       path: "/activities",
+    },
+    {
+      id: 13,
+      name: "My Courses",
+      icon: BookSharp,
+      path: "/courses/my-courses",
     },
     {
       id: 12,
