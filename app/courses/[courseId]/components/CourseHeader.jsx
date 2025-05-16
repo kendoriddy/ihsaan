@@ -1,11 +1,18 @@
-import { ChevronDown, Share2, MoreVertical } from "lucide-react";
+import { ChevronDown, Share2, MoreVertical, ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { IMAGES } from "@/constants";
 
 const CourseHeader = ({ title, programmeName }) => {
   return (
-    <div className="flex items-center justify-between w-full bg-black text-white px-4 py-2">
+    <div className="flex items-center justify-between w-full bg-primary text-white px-4 py-2">
       <div className="flex items-center">
+        <Link
+          href="/courses/my-courses"
+          className="mr-4 hover:opacity-80 transition-opacity"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
         <Image
           src={IMAGES.logo2}
           alt="Ihsaan"
@@ -13,13 +20,13 @@ const CourseHeader = ({ title, programmeName }) => {
           height={30}
           className="mr-4"
         />
-        <h1 className="text-sm md:text-base font-medium truncate">
+        <h1 className="text-sm md:text-base font-medium truncate mr-4">
           {title || "Course Title"}
         </h1>
         {programmeName && (
-          <p className="text-sm text-gray-300 mt-1">
+          <h3 className="text-sm text-gray-300 mt-1">
             Programme: {programmeName}
-          </p>
+          </h3>
         )}
       </div>
       <div className="flex items-center space-x-2">

@@ -6,6 +6,7 @@ import Image from "next/image";
 import axios from "axios";
 import Layout from "@/components/Layout"; // Assuming Layout component path
 import { getAuthToken } from "@/hooks/axios/axios"; // Assuming token utility path
+import { IMAGES } from "@/constants";
 
 // TODO: How to get current student's user ID?
 // const getCurrentStudentId = () => { /* ... logic to get student ID ... */ return "some-student-id"; };
@@ -119,9 +120,12 @@ const MyCoursesPage = () => {
                         objectFit="cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <span>No Image Available</span>
-                      </div>
+                      <Image
+                        src={IMAGES.logo}
+                        alt={course.title || "Course image"}
+                        layout="fill"
+                        objectFit="cover"
+                      />
                     )}
                   </div>
                   <div className="p-6">
@@ -132,7 +136,7 @@ const MyCoursesPage = () => {
                       {course.description || "No description available."}
                     </p>
                     <div className="mt-4 text-right">
-                      <span className="inline-block bg-primary group-hover:bg-primary text-primary group-hover:text-white text-sm font-medium py-1 px-3 rounded-full transition-colors">
+                      <span className="inline-block bg-primary group-hover:bg-primary text-white group-hover:text-white text-sm font-medium py-1 px-3 rounded-full transition-colors">
                         View Course
                       </span>
                     </div>
