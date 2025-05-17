@@ -51,7 +51,6 @@ const AddingQuiz = () => {
     }
   );
 
-  // Initial form values
   const initialValues = {
     course_id: "",
     questions: [
@@ -59,27 +58,26 @@ const AddingQuiz = () => {
         question_text: "",
         options: { A: "", B: "", C: "", D: "" },
         correct_answer: "",
+        section: "",
       },
     ],
   };
 
-  // Formik form submission handler
   const handleSubmit = (values, { resetForm }) => {
     createQuestions(values);
     resetForm();
   };
 
-  // Handle course selection
   const handleCourseChange = (e, setFieldValue) => {
     setFieldValue("course_id", e.target.value);
   };
 
-  // Handle adding a new question
   const handleQuestionChange = (setFieldValue, values) => {
     const newQuestion = {
       question_text: "",
       options: { A: "", B: "", C: "", D: "" },
       correct_answer: "",
+      section: "",
     };
     setFieldValue("questions", [...values.questions, newQuestion]);
   };
@@ -172,12 +170,6 @@ const AddingQuiz = () => {
                           className="flex items-center"
                         >
                           <span className="mr-2">{key}</span>
-                          {/* <Field
-                            type="text"
-                            id={`questions[${index}].options.${key}`}
-                            name={`questions[${index}].options.${key}`}
-                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-                          /> */}
                           <Editor
                             type="text"
                             id={`questions[${index}].options.${key}`}
@@ -203,6 +195,24 @@ const AddingQuiz = () => {
                       Add Option
                     </Button>
                   </div>
+                  <div>
+                    <label
+                      htmlFor={`questions[${index}].section`}
+                      className="block md:text-lg font-medium"
+                    >
+                      Question Chapter or Section
+                    </label>
+                    <Field
+                      id={`questions[${index}].section`}
+                      name={`questions[${index}].section`}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                    />
+                    <ErrorMessage
+                      name={`questions[${index}].section`}
+                      component="p"
+                      className="text-red-500 text-sm mt-1"
+                    />
+                  </div>{" "}
                   <div>
                     <label
                       htmlFor={`questions[${index}].correct_answer`}

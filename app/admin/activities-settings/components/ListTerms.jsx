@@ -17,6 +17,7 @@ import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
 import EditTerm from "./EditTerm";
+import { Delete, Edit } from "@mui/icons-material";
 
 const ListTerms = () => {
   const queryClient = useQueryClient();
@@ -101,7 +102,7 @@ const ListTerms = () => {
                           setOpenUpdateModal(true);
                         }}
                       >
-                        Update
+                        <Edit />
                       </Button>
                       <Button
                         onClick={() => {
@@ -109,7 +110,7 @@ const ListTerms = () => {
                           setOpenDeleteDialog(true);
                         }}
                       >
-                        Delete
+                        <Delete />
                       </Button>
                     </TableCell>
                   </TableRow>

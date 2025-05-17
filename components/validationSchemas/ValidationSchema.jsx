@@ -94,6 +94,7 @@ export const addQuizSchema = Yup.object().shape({
   questions: Yup.array().of(
     Yup.object().shape({
       question_text: Yup.string().required("Question text is required"),
+      section: Yup.string().required("Question chapter or section is required"),
       options: Yup.object().test(
         "at-least-two-options",
         "At least two options are required",
@@ -149,6 +150,7 @@ export const manualGradingSchema = Yup.object({
   student: Yup.string(),
   group: Yup.string(),
   score: Yup.string(),
+  is_published: Yup.boolean().required("Publishing status required"),
   feedback: Yup.string().required("Reason is require"),
 }).test(
   "student-or-group",

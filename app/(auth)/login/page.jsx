@@ -147,20 +147,20 @@ const LogIn = () => {
               </h1>
             </div>
             <div className="text-gray-400">
-              <h1>
+             {/*  <h1>
                 Dont have an account ?{" "}
                 <Link href={"/register"}>
                   <span className="mr-2 cursor-pointer hover:text-blue-500">
                     Register
                   </span>
-                </Link>
-                <p>or</p>
+                </Link> */}
+                {/* <p>or</p> 
                 <Link href={"/"}>
                   <span className="ml-2 cursor-pointer hover:text-blue-500">
                     Go Home
                   </span>
                 </Link>
-              </h1>
+              </h1>*/}
             </div>
           </div>
         </section>

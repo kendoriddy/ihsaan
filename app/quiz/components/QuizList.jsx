@@ -8,6 +8,8 @@ import { useState, useEffect } from "react";
 const QuizList = ({ setCurrentScreen }) => {
   const [totalQuiz, setTotalQuiz] = useState(10);
   const [page, setPage] = useState(1);
+  const [quizId, setQuizId] = useState(null);
+  const [studentId, setStudentId] = useState("");
 
   const {
     isLoading,
@@ -24,24 +26,22 @@ const QuizList = ({ setCurrentScreen }) => {
     }
   );
 
-//  const {
-//     isLoading: isLoadingQuizData,
-//     data: QuizData,
-//     refetch: refetchQuizData,
-//     isFetching: isFetchingQuizData,
-//     error
-//   } = useFetch(
-//     `submission-${assignmentId}`,
-//     assignmentId
-//       ? `https://ihsaanlms.onrender.com/assessment/grades/`
-//       : null,
-//     (data) => {
-//     },
-//     (error) => {
-//     }
-//   );
+  const {
+    isLoading: isLoadingQuizData,
+    data: QuizData,
+    refetch: refetchQuizData,
+    isFetching: isFetchingQuizData,
+    error,
+  } = useFetch(
+    `submission-${quizId}`,
+    quizId
+      ? `https://ihsaanlms.onrender.com/assessment/mcq-responses/?assessment=${quizId}&student=${studentId}`
+      : null,
+    (data) => {},
+    (error) => {}
+  );
 
-  // console.log('grades', QuizData)
+  console.log("quiz response", QuizData);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -67,6 +67,18 @@ const QuizList = ({ setCurrentScreen }) => {
       }
     }
   }, [setCurrentScreen]);
+
+  const fetchStudentId = () => {
+    const storedStudentId = localStorage.getItem("userId");
+    console.log("storedStudentId", storedStudentId);
+    if (storedStudentId) {
+      setStudentId(storedStudentId);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudentId();
+  });
 
   return (
     <div className="w-full px-4">
@@ -114,7 +126,9 @@ const QuizList = ({ setCurrentScreen }) => {
               </div>
               {filteredQuiz?.submission_status === "submitted" ? (
                 <Button
-                  onClick={() => {}}
+                  onClick={() => {
+                    setQuizId(filteredQuiz?.id);
+                  }}
                   className="mt-4 px-10 py-2"
                   size="large"
                   color="secondary"
@@ -138,7 +152,9 @@ const QuizList = ({ setCurrentScreen }) => {
                     filteredQuiz?.is_open === false
                   }
                 >
-                  Take Quiz
+                  {filteredQuiz?.is_open === false
+                    ? "Quiz Closed"
+                    : "Take Quiz"}
                 </Button>
               )}
             </div>
