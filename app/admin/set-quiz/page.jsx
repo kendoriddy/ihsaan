@@ -10,8 +10,8 @@ const SetQuiz = () => {
   return (
     <AdminLayout>
       <div className="w-full px-4">
-        <Link href="/admin/set-quiz/all-quiz">
-          <Button> See all Quiz questions, delete and update them</Button>
+        <Link href="/admin/set-quiz/all-quiz" className="mb-4">
+          <Button> See all Quiz questions</Button>
         </Link>
         <AddingQuiz />
       </div>

@@ -19,6 +19,7 @@ import Loader from "@/components/Loader";
 import EditQuizQuestion from "../components/EditQuiz";
 import AdminLayout from "@/components/AdminLayout";
 import parse from "html-react-parser";
+import { Delete, Edit } from "@mui/icons-material";
 
 const AllQuiz = () => {
   const queryClient = useQueryClient();
@@ -111,7 +112,7 @@ const AllQuiz = () => {
                             setOpenUpdateModal(true);
                           }}
                         >
-                          Update
+                          <Edit />
                         </Button>
                         <Button
                           onClick={() => {
@@ -119,7 +120,7 @@ const AllQuiz = () => {
                             setOpenDeleteDialog(true);
                           }}
                         >
-                          Delete
+                          <Delete />
                         </Button>
                       </TableCell>
                     </TableRow>

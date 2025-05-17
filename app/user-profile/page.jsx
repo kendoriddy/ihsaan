@@ -20,7 +20,15 @@ const UserProfile = () => {
 
   useEffect(() => {
     fetchUserData();
-  });
+  }, []);
+
+  if (!userData) {
+    return (
+      <Layout>
+        <div className="p-6 text-gray-600">Loading profile...</div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -29,7 +37,9 @@ const UserProfile = () => {
 
         <div className="space-y-3">
           <div>
-            <label className="text-sm text-gray-600">Full Name</label>
+            <label className="text-base md:text-lg font-medium text-gray-600">
+              Full Name
+            </label>
             <input
               type="text"
               value={userData?.last_name + " " + userData?.first_name || ""}
@@ -39,7 +49,9 @@ const UserProfile = () => {
           </div>
 
           <div>
-            <label className="text-sm text-gray-600">Email</label>
+            <label className="text-base md:text-lg font-medium text-gray-600">
+              Email
+            </label>
             <input
               type="text"
               value={userData?.email || ""}
@@ -49,12 +61,36 @@ const UserProfile = () => {
           </div>
 
           <div>
-            <label className="text-sm text-gray-600">Phone Number</label>
+            <label className="text-base md:text-lg font-medium text-gray-600">
+              Phone Number
+            </label>
             <input
               type="text"
               value={userData?.phone_number || ""}
               readOnly
               className="w-full border border-gray-300 rounded-md px-4 py-2 bg-gray-100 text-gray-700"
+            />
+          </div>
+          <div>
+            <label className="text-base md:text-lg font-medium text-gray-600">
+              Religion
+            </label>
+            <input
+              type="text"
+              value={userData?.religion || ""}
+              readOnly
+              className="w-full capitalize border border-gray-300 rounded-md px-4 py-2 bg-gray-100 text-gray-700"
+            />
+          </div>
+          <div>
+            <label className="text-base md:text-lg font-medium text-gray-600">
+              Highest Qualification
+            </label>
+            <input
+              type="text"
+              value={userData?.highest_qualification || ""}
+              readOnly
+              className="w-full capitalize border border-gray-300 rounded-md px-4 py-2 bg-gray-100 text-gray-700"
             />
           </div>
         </div>

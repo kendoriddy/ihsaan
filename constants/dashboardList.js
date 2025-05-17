@@ -15,25 +15,25 @@ const DASHBOARD_LIST = {
   student: [
     { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
     {
-      id: 5,
+      id: 2,
       name: "Assignment",
       icon: Assignment,
       path: "/assignment",
     },
     {
-      id: 6,
+      id: 3,
       name: "Take Quiz",
       icon: QuizIcon,
       path: "/quiz",
     },
     {
-      id: 6,
+      id: 4,
       name: "Activities",
       icon: TbActivity,
       path: "/activities",
     },
     {
-      id: 12,
+      id: 5,
       name: "Applications",
       icon: BookmarkIcon,
       path: "/dashboard/my-applications",
@@ -55,7 +55,7 @@ const DASHBOARD_LIST = {
       path: "/set-assignment",
     },
     {
-      id: 3,
+      id: 4,
       name: "Grading",
       icon: GradingOutlined,
       path: "/manual-grading",
