@@ -31,7 +31,7 @@ import book_7 from "@/assets/images/books/book_7.webp";
 import book_8 from "@/assets/images/books/book_8.webp";
 import book_9 from "@/assets/images/books/book_9.webp";
 import book_10 from "@/assets/images/books/book_10.webp";
-import logo from "@/assets/images/main/logo.png";
+import logo from "@/assets/images/main/background _ Ihsaan4.png";
 import logo2 from "@/assets/images/main/background _ Ihsaan3.png";
 import icon from "@/assets/images/main/background _Ihsaan.png";
 

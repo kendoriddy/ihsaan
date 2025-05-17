@@ -59,24 +59,37 @@ function EditCoursePage() {
 
   const [courseMaterials, setCourseMaterials] = useState([]);
   const [newMaterialTitle, setNewMaterialTitle] = useState("");
+  const [newMaterialData, setNewMaterialData] = useState({
+    title: "",
+    section: "",
+    order: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
   const [imageUploadSuccessful, setImageUploadSuccessful] = useState(false);
   const [openSubMenuIndex, setOpenSubMenuIndex] = useState(null);
 
+  const [courseSections, setCourseSections] = useState([]);
+  const [newSectionData, setNewSectionData] = useState({
+    title: "",
+    description: "",
+    order: "",
+  });
+
   const [enrolledStudents, setEnrolledStudents] = useState([]);
-  const [allStudents, setAllStudents] = useState([]); // List of all students
-  const [selectedStudents, setSelectedStudents] = useState([]); // Students to enroll
-  const [terms, setTerms] = useState([]); // List of terms
-  const [selectedTerm, setSelectedTerm] = useState(""); // Selected term
-  const [isEnrollLoading, setIsEnrollLoading] = useState(false); // Loading state for enrollment
+  const [allStudents, setAllStudents] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [terms, setTerms] = useState([]);
+  const [selectedTerm, setSelectedTerm] = useState("");
+  const [isEnrollLoading, setIsEnrollLoading] = useState(false);
 
   const [sections, setSections] = useState({
     courseDetails: true,
     courseMaterials: false,
     courseVideos: false,
     courseEnrollment: false,
+    courseSections: false,
   });
 
   useEffect(() => {
@@ -102,11 +115,10 @@ function EditCoursePage() {
   useEffect(() => {
     if (courseId) {
       fetchCourse();
-      fetchCourseMaterials();
-      fetchCourseVideos();
       fetchEnrolledStudents();
       fetchTerms();
       fetchAllStudents();
+      fetchCourseSections();
     }
   }, [courseId]);
 
@@ -127,7 +139,7 @@ function EditCoursePage() {
           },
         }
       );
-      setAllStudents(response.data.results); // Populate allStudents state
+      setAllStudents(response.data.results);
     } catch (error) {
       toast.error("Failed to fetch all students");
     }
@@ -187,8 +199,8 @@ function EditCoursePage() {
       );
 
       toast.success("Students enrolled successfully!");
-      setSelectedStudents([]); // Clear selected students
-      fetchEnrolledStudents(); // Refresh enrolled students list
+      setSelectedStudents([]);
+      fetchEnrolledStudents();
     } catch (error) {
       toast.error("Failed to enroll students");
     } finally {
@@ -249,40 +261,6 @@ function EditCoursePage() {
     }
   };
 
-  const fetchCourseMaterials = async () => {
-    try {
-      console.log("werh", courseId);
-      const response = await axios.get(
-        `https://ihsaanlms.onrender.com/course/courses/course-materials/?course_id=${courseId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-          },
-        }
-      );
-      console.log("material response", response.data);
-      setCourseMaterials(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch course materials");
-    }
-  };
-
-  const fetchCourseVideos = async () => {
-    try {
-      const response = await axios.get(
-        `https://ihsaanlms.onrender.com/course/course-videos/?course=${courseId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-          },
-        }
-      );
-      setCourseVideos(response.data.results);
-    } catch (error) {
-      toast.error("Failed to fetch course videos");
-    }
-  };
-
   const [videoToCloudinaryLoading, setVideoToCloudinaryLoading] =
     useState(false);
   const [videoToCloudinaryError, setVideoToCloudinaryError] = useState(null);
@@ -311,7 +289,7 @@ function EditCoursePage() {
 
       setVideoToCloudinaryLoading(false);
       setVideoToCloudinaryError(null);
-      return response.data.id; // Return the video resource ID
+      return response.data.id;
     } catch (error) {
       toast.error("Failed to upload video");
       setVideoToCloudinaryLoading(false);
@@ -325,8 +303,17 @@ function EditCoursePage() {
   const handleAddVideo = async (e) => {
     e.preventDefault();
 
-    if (!newVideoData.title || !videoFile) {
-      toast.error("Please provide all required fields and upload a video file");
+    if (
+      !newVideoData.title ||
+      !videoFile ||
+      !newVideoData.section ||
+      !newVideoData.video_no ||
+      !newVideoData.order ||
+      !newVideoData.duration
+    ) {
+      toast.error(
+        "Please provide title, section, video number, order, duration, and upload a video file"
+      );
       return;
     }
 
@@ -334,7 +321,6 @@ function EditCoursePage() {
       setVideoUploadLoading(true);
       const videoResourceId = await uploadVideoToCloudinary(videoFile);
 
-      // Convert duration to seconds before sending
       const durationInSeconds = convertDurationToSeconds(newVideoData.duration);
       console.log(
         "video response here:",
@@ -346,9 +332,12 @@ function EditCoursePage() {
         "https://ihsaanlms.onrender.com/course/course-videos/",
         {
           ...newVideoData,
-          course: courseId,
+          course: parseInt(courseId),
+          section: parseInt(newVideoData.section),
           video_resource_id: videoResourceId,
           duration: durationInSeconds,
+          order: parseInt(newVideoData.order),
+          video_no: parseInt(newVideoData.video_no),
         },
         {
           headers: {
@@ -368,7 +357,7 @@ function EditCoursePage() {
         order: "",
       });
       setVideoFile(null);
-      fetchCourseVideos();
+      fetchCourseSections();
     } catch (error) {
       toast.error("Failed to add video");
     } finally {
@@ -455,8 +444,14 @@ function EditCoursePage() {
   const handleAddMaterial = async (e) => {
     e.preventDefault();
 
-    if (!newMaterialTitle) {
-      toast.error("Please provide a title for the material");
+    if (
+      !newMaterialData.title ||
+      !newMaterialData.section ||
+      !newMaterialData.order
+    ) {
+      toast.error(
+        "Please provide title, select a section, and set an order for the material"
+      );
       return;
     }
 
@@ -466,6 +461,7 @@ function EditCoursePage() {
       const file = fileInput?.files[0];
       if (!file) {
         toast.error("Please upload a file for the material");
+        setMaterialUploadLoading(false);
         return;
       }
 
@@ -474,9 +470,11 @@ function EditCoursePage() {
       const response = await axios.post(
         "https://ihsaanlms.onrender.com/course/course-materials/",
         {
-          title: newMaterialTitle,
-          course: courseId,
+          course: parseInt(courseId),
+          section: parseInt(newMaterialData.section),
+          title: newMaterialData.title,
           material_resource_id: materialResourceId,
+          order: parseInt(newMaterialData.order),
         },
         {
           headers: {
@@ -487,12 +485,12 @@ function EditCoursePage() {
       );
       console.log("material_response", response.data);
       toast.success("Material added successfully!");
-      // setCourseMaterials((prev) => [...prev, response.data]);
-      setNewMaterialTitle("");
-      fileInput.value = ""; // Clear the file input
-      fetchCourseMaterials();
+      setNewMaterialData({ title: "", section: "", order: "" });
+      if (fileInput) fileInput.value = "";
+      fetchCourseSections();
     } catch (error) {
       toast.error("Failed to add material");
+      console.error("Error adding material:", error.response?.data || error);
     } finally {
       setMaterialUploadLoading(false);
     }
@@ -515,7 +513,7 @@ function EditCoursePage() {
       );
 
       toast.success("Video deleted successfully!");
-      setCourseVideos((prev) => prev.filter((video) => video.id !== videoId)); // Remove the deleted video from the state
+      fetchCourseSections();
     } catch (error) {
       toast.error("Failed to delete video");
     }
@@ -538,9 +536,7 @@ function EditCoursePage() {
       );
 
       toast.success("Material deleted successfully!");
-      setCourseMaterials((prev) =>
-        prev.filter((material) => material.id !== materialId)
-      ); // Remove the deleted material from the state
+      fetchCourseSections();
     } catch (error) {
       toast.error("Failed to delete material");
     }
@@ -575,12 +571,66 @@ function EditCoursePage() {
     }
   };
 
+  const fetchCourseSections = async () => {
+    if (!courseId) return;
+    try {
+      const response = await axios.get(
+        `https://ihsaanlms.onrender.com/course/course-sections/?course=${courseId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+        }
+      );
+      setCourseSections(response.data.results || response.data);
+      console.log("Course sections fetched: ", response.data);
+    } catch (error) {
+      toast.error("Failed to fetch course sections");
+      console.error("Error fetching course sections:", error);
+    }
+  };
+
+  const handleAddSection = async (e) => {
+    e.preventDefault();
+    if (!newSectionData.title || !newSectionData.order) {
+      toast.error("Please provide title and order for the section.");
+      return;
+    }
+    setIsLoading(true); // Use a general loading state or create a new one for sections
+    try {
+      const response = await axios.post(
+        "https://ihsaanlms.onrender.com/course/course-sections/",
+        {
+          ...newSectionData,
+          course: parseInt(courseId), // Ensure courseId is an integer
+          order: parseInt(newSectionData.order), // Ensure order is an integer
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+        }
+      );
+      toast.success("Section added successfully!");
+      setCourseSections((prev) => [...prev, response.data]);
+      setNewSectionData({ title: "", description: "", order: "" }); // Reset form
+      fetchCourseSections(); // Re-fetch to get the latest list with IDs
+    } catch (error) {
+      toast.error(
+        error.response?.data?.detail || error.message || "Failed to add section"
+      );
+      console.error("Error adding section:", error.response?.data || error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="relative">
       <AdminDashboardHeader toggleSidebar={toggleSidebar} />
 
       <main className="flex relative">
-        {/* Sidebar */}
         <AdminDashboardSidebar
           isSidebarOpen={isSidebarOpen}
           toggleOption={toggleOption}
@@ -597,7 +647,6 @@ function EditCoursePage() {
             />
           </div>
 
-          {/* Course Details Section */}
           <div className="mb-6">
             <div
               className="flex justify-between items-center cursor-pointer"
@@ -733,10 +782,278 @@ function EditCoursePage() {
             )}
           </div>
 
+          {/* Course Sections Section */}
+          <div className="my-6 pt-4 border-t border-gray-300">
+            <div
+              className="flex justify-between items-center cursor-pointer mb-4"
+              onClick={() => toggleSection("courseSections")}
+            >
+              <h2 className="text-xl font-semibold">Course Sections</h2>
+              {sections.courseSections ? <FaChevronUp /> : <FaChevronDown />}
+            </div>
+            {sections.courseSections && (
+              <div className="space-y-6">
+                {/* Add Section Form */}
+                <form
+                  onSubmit={handleAddSection}
+                  className="p-4 border rounded-md shadow-sm space-y-4 bg-gray-50"
+                >
+                  <h3 className="text-lg font-medium text-gray-800">
+                    Add New Section
+                  </h3>
+                  <div>
+                    <label
+                      htmlFor="section_title"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Section Title
+                    </label>
+                    <input
+                      type="text"
+                      id="section_title"
+                      value={newSectionData.title}
+                      onChange={(e) =>
+                        setNewSectionData({
+                          ...newSectionData,
+                          title: e.target.value,
+                        })
+                      }
+                      required
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="section_description"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Section Description
+                    </label>
+                    <textarea
+                      id="section_description"
+                      value={newSectionData.description}
+                      onChange={(e) =>
+                        setNewSectionData({
+                          ...newSectionData,
+                          description: e.target.value,
+                        })
+                      }
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      rows="3"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="section_order"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Order
+                    </label>
+                    <input
+                      type="number"
+                      id="section_order"
+                      value={newSectionData.order}
+                      onChange={(e) =>
+                        setNewSectionData({
+                          ...newSectionData,
+                          order: e.target.value,
+                        })
+                      }
+                      required
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition-colors duration-200 ease-in-out"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Adding..." : "Add Section"}
+                  </button>
+                </form>
+
+                {/* Display Course Sections */}
+                <div className="mt-6">
+                  <h3 className="text-lg font-medium text-gray-800 mb-2">
+                    Available Sections
+                  </h3>
+                  {courseSections && courseSections.length > 0 ? (
+                    <ul className="space-y-3">
+                      {courseSections.map((section) => (
+                        <li
+                          key={section.id}
+                          className="p-4 border rounded-lg bg-white shadow-md mb-6"
+                        >
+                          <div className="mb-3 pb-2 border-b">
+                            <h4 className="text-xl font-semibold text-indigo-700">
+                              {section.title}
+                            </h4>
+                            {section.description && (
+                              <p className="text-sm text-gray-600 mt-1">
+                                {section.description}
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-500 mt-1">
+                              Order: {section.order}
+                            </p>
+                          </div>
+
+                          {/* Display Videos for this section */}
+                          <div className="mb-4">
+                            <h5 className="text-md font-semibold text-gray-700 mb-2">
+                              Videos in this section:
+                            </h5>
+                            {section.videos && section.videos.length > 0 ? (
+                              <ul className="divide-y divide-gray-200 border rounded-md">
+                                {section.videos.map((video) => (
+                                  <li
+                                    key={video.id}
+                                    className="p-3 flex items-center justify-between hover:bg-gray-50"
+                                  >
+                                    <div className="flex items-center">
+                                      {video.video_resource?.media_url && (
+                                        <div
+                                          onClick={() =>
+                                            window.open(
+                                              video.video_resource.media_url,
+                                              "_blank"
+                                            )
+                                          }
+                                          className="cursor-pointer mr-3 rounded overflow-hidden shadow-sm flex-shrink-0"
+                                        >
+                                          <video
+                                            width={100}
+                                            height={60}
+                                            className="border rounded"
+                                            controls={false}
+                                            muted
+                                          >
+                                            <source
+                                              src={
+                                                video.video_resource.media_url
+                                              }
+                                              type="video/mp4"
+                                            />
+                                            Your browser does not support the
+                                            video tag.
+                                          </video>
+                                        </div>
+                                      )}
+                                      <div className="flex flex-col">
+                                        <h6 className="text-sm font-medium text-gray-800">
+                                          {video.title} (Order: {video.order})
+                                        </h6>
+                                        <p className="text-xs text-gray-500">
+                                          Video No: {video.video_no} | Duration:{" "}
+                                          {video.duration}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteVideo(video.id)
+                                      }
+                                      className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 ml-2"
+                                    >
+                                      Delete
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="px-3 py-2 text-xs text-gray-500 italic bg-gray-50 rounded-md">
+                                No videos in this section.
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Display Materials for this section */}
+                          <div>
+                            <h5 className="text-md font-semibold text-gray-700 mb-2">
+                              Materials in this section:
+                            </h5>
+                            {section.materials &&
+                            section.materials.length > 0 ? (
+                              <ul className="divide-y divide-gray-200 border rounded-md">
+                                {section.materials.map((material) => (
+                                  <li
+                                    key={material.id}
+                                    className="p-3 flex items-center justify-between hover:bg-gray-50"
+                                  >
+                                    <div className="flex items-center">
+                                      {material.material_resource?.media_url ? (
+                                        <div
+                                          onClick={() =>
+                                            window.open(
+                                              material.material_resource
+                                                .media_url,
+                                              "_blank"
+                                            )
+                                          }
+                                          className="cursor-pointer mr-3 flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                                        >
+                                          {material.material_resource.media_url.endsWith(
+                                            ".pdf"
+                                          ) ? (
+                                            <FaFilePdf className="w-6 h-6 text-red-500" />
+                                          ) : material.material_resource.media_url.match(
+                                              /\.(docx?|odt)$/i
+                                            ) ? (
+                                            <FaFileWord className="w-6 h-6 text-blue-500" />
+                                          ) : material.material_resource.media_url.match(
+                                              /\.(xlsx?|ods)$/i
+                                            ) ? (
+                                            <FaFileExcel className="w-6 h-6 text-green-500" />
+                                          ) : (
+                                            <FaFile className="w-6 h-6 text-gray-400" />
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <FaFile className="w-6 h-6 text-gray-400 mr-3 flex-shrink-0" />
+                                      )}
+                                      <div className="flex flex-col">
+                                        <h6 className="text-sm font-medium text-gray-800">
+                                          {material.title} (Order:{" "}
+                                          {material.order})
+                                        </h6>
+                                        <p className="text-xs text-gray-500 italic">
+                                          Click icon to download/view
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteMaterial(material.id)
+                                      }
+                                      className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 ml-2"
+                                    >
+                                      Delete
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="px-3 py-2 text-xs text-gray-500 italic bg-gray-50 rounded-md">
+                                No materials in this section.
+                              </p>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-gray-500 italic">
+                      No sections added yet.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
           <hr className="my-6 border-t-4 border-blue-600 shadow-md" />
-          {/* Course Materials Section */}
+
           <div className="mt-10 rounded-lg shadow-lg overflow-hidden bg-white">
-            {/* Course Materials Section */}
             <div className="border-b">
               <button
                 className="flex justify-between items-center w-full p-6 cursor-pointer focus:outline-none transition-colors duration-300 ease-in-out hover:bg-gray-50"
@@ -772,10 +1089,68 @@ function EditCoursePage() {
                         <input
                           type="text"
                           id="material_title"
-                          value={newMaterialTitle}
-                          onChange={(e) => setNewMaterialTitle(e.target.value)}
+                          value={newMaterialData.title}
+                          onChange={(e) =>
+                            setNewMaterialData({
+                              ...newMaterialData,
+                              title: e.target.value,
+                            })
+                          }
                           required
                           className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        />
+                      </div>
+                      {/* Select Section Dropdown */}
+                      <div>
+                        <label
+                          htmlFor="material_section"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Section
+                        </label>
+                        <select
+                          id="material_section"
+                          value={newMaterialData.section}
+                          onChange={(e) =>
+                            setNewMaterialData({
+                              ...newMaterialData,
+                              section: e.target.value,
+                            })
+                          }
+                          required
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        >
+                          <option value="" disabled>
+                            Select a section
+                          </option>
+                          {courseSections.map((sec) => (
+                            <option key={sec.id} value={sec.id}>
+                              {sec.title} (Order: {sec.order})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      {/* Material Order Input */}
+                      <div>
+                        <label
+                          htmlFor="material_order"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Order in Section
+                        </label>
+                        <input
+                          type="number"
+                          id="material_order"
+                          value={newMaterialData.order}
+                          onChange={(e) =>
+                            setNewMaterialData({
+                              ...newMaterialData,
+                              order: e.target.value,
+                            })
+                          }
+                          required
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          placeholder="e.g., 1, 2, 3..."
                         />
                       </div>
                       <div>
@@ -797,6 +1172,7 @@ function EditCoursePage() {
                         <button
                           type="submit"
                           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors duration-200 ease-in-out"
+                          disabled={materialUploadLoading}
                         >
                           {materialUploadLoading
                             ? "Uploading..."
@@ -805,90 +1181,6 @@ function EditCoursePage() {
                       </div>
                     </form>
                   </div>
-
-                  {/* Display Course Materials */}
-                  <div className="mt-6">
-                    <h3 className="text-md font-semibold text-gray-700 mb-4">
-                      Available Materials
-                    </h3>
-                    <div
-                      className="rounded-md border overflow-y-auto"
-                      style={{ maxHeight: "400px" }}
-                    >
-                      {Array.isArray(courseMaterials) &&
-                      courseMaterials.length > 0 ? (
-                        <ul className="divide-y divide-gray-200">
-                          {courseMaterials.map((material) => (
-                            <li
-                              key={material.id}
-                              className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 ease-in-out"
-                            >
-                              <div className="flex items-center">
-                                {/* Material Icon/Preview */}
-                                {material.material_resource?.media_url ? (
-                                  <div
-                                    onClick={() =>
-                                      window.open(
-                                        material.material_resource.media_url,
-                                        "_blank"
-                                      )
-                                    }
-                                    className="cursor-pointer mr-4"
-                                  >
-                                    {/* You might want to display different icons based on file type */}
-                                    {material.material_resource.media_url.endsWith(
-                                      ".pdf"
-                                    ) ? (
-                                      <FaFilePdf className="w-8 h-8 text-red-500" />
-                                    ) : material.material_resource.media_url.match(
-                                        /\.(docx?|odt)$/i
-                                      ) ? (
-                                      <FaFileWord className="w-8 h-8 text-blue-500" />
-                                    ) : material.material_resource.media_url.match(
-                                        /\.(xlsx?|ods)$/i
-                                      ) ? (
-                                      <FaFileExcel className="w-8 h-8 text-green-500" />
-                                    ) : (
-                                      <FaFile className="w-8 h-8 text-gray-500" />
-                                    )}
-                                  </div>
-                                ) : (
-                                  <FaFile className="w-8 h-8 text-gray-500 mr-4" />
-                                )}
-
-                                {/* Material Details */}
-                                <div className="flex flex-col">
-                                  <h4 className="text-sm font-semibold text-gray-800">
-                                    {material.title}
-                                  </h4>
-                                  <p className="text-xs text-gray-600">
-                                    ID: {material.material_resource?.id}
-                                  </p>
-                                  <p className="text-xs text-gray-500 italic">
-                                    Click to download/view
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Delete Button */}
-                              <button
-                                onClick={() =>
-                                  handleDeleteMaterial(material.id)
-                                }
-                                className="bg-red-500 hover:bg-red-700 text-white font-semibold text-xs py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-colors duration-200 ease-in-out"
-                              >
-                                Delete
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="p-4 text-gray-600 italic">
-                          No materials added yet.
-                        </p>
-                      )}
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
@@ -896,9 +1188,7 @@ function EditCoursePage() {
 
           <hr className="my-6 border-t-4 border-blue-600 shadow-md" />
 
-          {/* Course videos section */}
           <div className="mt-10 rounded-lg shadow-lg overflow-hidden bg-white">
-            {/* Course Videos Section */}
             <div className="border-b">
               <button
                 className="flex justify-between items-center w-full p-6 cursor-pointer focus:outline-none transition-colors duration-300 ease-in-out hover:bg-gray-50"
@@ -920,16 +1210,16 @@ function EditCoursePage() {
                       Add New Video
                     </h3>
                     <form onSubmit={handleAddVideo} className="space-y-4">
+                      {/* Select Section Dropdown for Video */}
                       <div>
                         <label
-                          htmlFor="section"
+                          htmlFor="video_section"
                           className="block text-sm font-medium text-gray-700"
                         >
                           Section
                         </label>
-                        <input
-                          type="text"
-                          id="section"
+                        <select
+                          id="video_section"
                           value={newVideoData.section}
                           onChange={(e) =>
                             setNewVideoData({
@@ -939,7 +1229,16 @@ function EditCoursePage() {
                           }
                           required
                           className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        />
+                        >
+                          <option value="" disabled>
+                            Select a section
+                          </option>
+                          {courseSections.map((sec) => (
+                            <option key={sec.id} value={sec.id}>
+                              {sec.title} (Order: {sec.order})
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <label
@@ -1009,7 +1308,7 @@ function EditCoursePage() {
                           htmlFor="order"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Order
+                          Order in Section
                         </label>
                         <input
                           type="number"
@@ -1023,6 +1322,7 @@ function EditCoursePage() {
                           }
                           required
                           className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          placeholder="e.g., 1, 2, 3..."
                         />
                       </div>
                       <div>
@@ -1046,6 +1346,9 @@ function EditCoursePage() {
                         <button
                           type="submit"
                           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors duration-200 ease-in-out"
+                          disabled={
+                            videoToCloudinaryLoading || videoUploadLoading
+                          }
                         >
                           {videoToCloudinaryLoading
                             ? "Uploading video..."
@@ -1061,84 +1364,6 @@ function EditCoursePage() {
                       </div>
                     </form>
                   </div>
-
-                  {/* Display Course Videos */}
-                  <div className="mt-6">
-                    <h3 className="text-md font-semibold text-gray-700 mb-4">
-                      Available Videos
-                    </h3>
-                    <div
-                      className="rounded-md border overflow-y-auto"
-                      style={{ maxHeight: "400px" }}
-                    >
-                      {courseVideos.length > 0 ? (
-                        <ul className="divide-y divide-gray-200">
-                          {courseVideos.map((video) => (
-                            <li
-                              key={video.id}
-                              className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 ease-in-out"
-                            >
-                              <div className="flex items-center">
-                                {/* Video Thumbnail */}
-                                {video.video_resource?.media_url && (
-                                  <div
-                                    onClick={() =>
-                                      window.open(
-                                        video.video_resource.media_url,
-                                        "_blank"
-                                      )
-                                    }
-                                    className="cursor-pointer mr-4 rounded-md overflow-hidden shadow-sm"
-                                  >
-                                    <video
-                                      width={120}
-                                      height={80}
-                                      className="border rounded-md mr-4"
-                                      controls={false}
-                                      muted
-                                    >
-                                      <source
-                                        src={video.video_resource.media_url}
-                                        type="video/mp4"
-                                      />
-                                      Your browser does not support the video
-                                      tag.
-                                    </video>
-                                  </div>
-                                )}
-
-                                {/* Video Details */}
-                                <div className="flex flex-col">
-                                  <h4 className="text-sm font-semibold text-gray-800">
-                                    {video.title}
-                                  </h4>
-                                  <p className="text-xs text-gray-600">
-                                    Section: {video.section}
-                                  </p>
-                                  <p className="text-xs text-gray-600">
-                                    Video No: {video.video_no} | Duration:{" "}
-                                    {video.duration} min
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Delete Button */}
-                              <button
-                                onClick={() => handleDeleteVideo(video.id)}
-                                className="bg-red-500 hover:bg-red-700 text-white font-semibold text-xs py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-colors duration-200 ease-in-out"
-                              >
-                                Delete
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="p-4 text-gray-600 italic">
-                          No videos added yet.
-                        </p>
-                      )}
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
@@ -1146,9 +1371,7 @@ function EditCoursePage() {
 
           <hr className="my-6 border-t-4 border-blue-600 shadow-md" />
 
-          {/* Course Enrollment Section */}
           <div className="mt-10 rounded-lg shadow-lg overflow-hidden bg-white">
-            {/* Course Enrollment Section */}
             <div className="border-b">
               <button
                 className="flex justify-between items-center w-full p-6 cursor-pointer focus:outline-none transition-colors duration-300 ease-in-out hover:bg-gray-50"
@@ -1200,13 +1423,11 @@ function EditCoursePage() {
                     </p>
                   )}
 
-                  {/* Enrollment Form */}
                   <div className="mt-6 border-t pt-6">
                     <h3 className="text-md font-semibold text-gray-700 mb-4">
                       Enroll New Students
                     </h3>
                     <form onSubmit={handleEnrollStudents} className="space-y-4">
-                      {/* Select Term */}
                       <div>
                         <label
                           htmlFor="term"
@@ -1237,7 +1458,6 @@ function EditCoursePage() {
                         </div>
                       </div>
 
-                      {/* Select Students */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
                           Select Students
@@ -1290,7 +1510,6 @@ function EditCoursePage() {
                         </ul>
                       </div>
 
-                      {/* Submit Button */}
                       <div>
                         <button
                           type="submit"
