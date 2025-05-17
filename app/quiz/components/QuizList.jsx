@@ -1,15 +1,18 @@
 "use client";
 import Button from "@/components/Button";
+import CustomModal from "@/components/CustomModal";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import { formatDate } from "@/utils/utilFunctions";
 import { Pagination } from "@mui/material";
 import { useState, useEffect } from "react";
+import QuizSummary from "./QuizSummary";
 
 const QuizList = ({ setCurrentScreen }) => {
   const [totalQuiz, setTotalQuiz] = useState(10);
   const [page, setPage] = useState(1);
   const [quizId, setQuizId] = useState(null);
   const [studentId, setStudentId] = useState("");
+  const [showSummary, setShowSummary] = useState(false);
 
   const {
     isLoading,
@@ -128,6 +131,7 @@ const QuizList = ({ setCurrentScreen }) => {
                 <Button
                   onClick={() => {
                     setQuizId(filteredQuiz?.id);
+                    setShowSummary(true);
                   }}
                   className="mt-4 px-10 py-2"
                   size="large"
@@ -168,6 +172,9 @@ const QuizList = ({ setCurrentScreen }) => {
           color="primary"
         />
       </div>
+      <CustomModal open={showSummary}>
+        <QuizSummary summaryId={QuizData && QuizData?.data?.results[0].id} />
+      </CustomModal>
     </div>
   );
 };
