@@ -31,7 +31,7 @@
 // export default Grades;
 
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -50,9 +50,9 @@ import { useFetch, useDelete } from "@/hooks/useHttp/useHttp";
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
-// import EditGrade from "./EditGrade";
 import { toast } from "react-toastify";
 import { Delete, Edit } from "@mui/icons-material";
+import EditGrade from "./EditGrades";
 
 const Grades = () => {
   const [selectedSession, setSelectedSession] = useState("");
@@ -63,21 +63,18 @@ const Grades = () => {
   const [page, setPage] = useState(1);
   const [totalGrades, setTotalGrades] = useState(0);
 
-  // Fetch Academic Sessions
   const { data: sessionData, isFetching: isFetchingSessions } = useFetch(
     "academicSession",
     `https://ihsaanlms.onrender.com/academic-sessions/`
   );
   const Sessions = sessionData?.data?.results || [];
 
-  // Fetch Terms
   const { data: termData, isFetching: isFetchingTerms } = useFetch(
     "terms",
     `https://ihsaanlms.onrender.com/terms/`
   );
   const Terms = termData?.data?.results || [];
 
-  // Fetch Grades based on selected session and term
   const {
     data: gradeData,
     isFetching: isFetchingGrades,
@@ -94,7 +91,6 @@ const Grades = () => {
 
   const Grades = gradeData?.data?.results || [];
 
-  // Delete hook
   const { mutate: deleteGrade, isLoading: isDeleting } = useDelete(
     "https://ihsaanlms.onrender.com/assessment/grades",
     {
@@ -232,12 +228,12 @@ const Grades = () => {
       </CustomModal>
 
       {/* Edit Grade Modal */}
-      {/* <EditGrade
+      <EditGrade
         open={openEditModal}
         setOpen={setOpenEditModal}
-        grade={selectedGrade}
+        selectedGrade={selectedGrade}
         refetchGrades={refetchGrades}
-      /> */}
+      />
     </div>
   );
 };

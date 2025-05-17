@@ -51,7 +51,6 @@ const AddingQuiz = () => {
     }
   );
 
-  // Initial form values
   const initialValues = {
     course_id: "",
     questions: [
@@ -64,18 +63,15 @@ const AddingQuiz = () => {
     ],
   };
 
-  // Formik form submission handler
   const handleSubmit = (values, { resetForm }) => {
     createQuestions(values);
     resetForm();
   };
 
-  // Handle course selection
   const handleCourseChange = (e, setFieldValue) => {
     setFieldValue("course_id", e.target.value);
   };
 
-  // Handle adding a new question
   const handleQuestionChange = (setFieldValue, values) => {
     const newQuestion = {
       question_text: "",

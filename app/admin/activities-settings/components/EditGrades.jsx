@@ -1,33 +1,29 @@
 "use client";
 import CustomModal from "@/components/CustomModal";
-import React, { useState, useEffect } from "react";
-import { useFetch, usePatch } from "@/hooks/useHttp/useHttp";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import React, { useEffect } from "react";
+import { usePatch } from "@/hooks/useHttp/useHttp";
+import {
+  TextField,
+  MenuItem,
+  FormControl,
+  Select,
+} from "@mui/material";
 import { toast } from "react-toastify";
-import DatePickers from "@/components/validation/DatePicker";
-import { Formik, Form } from "formik";
+import { Formik, Form, Field } from "formik";
 
-const EditTerm = ({
+const EditGrade = ({
   setOpenUpdateModal,
   openUpdateModal,
-  selectedTerm,
-  refetchTerms,
+  selectedGrade,
+  refetchGrades,
 }) => {
-  const [editedTerm, setEditedTerm] = useState({
-    session_id: selectedTerm?.session.id || "",
-    name: selectedTerm?.name || "",
-    start_date: selectedTerm?.start_date || "",
-    end_date: selectedTerm?.end_date || "",
-  });
-  console.log("term selected", selectedTerm);
-
-  const { mutate: updateTerm, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/terms/${selectedTerm?.id}/`,
+  const { mutate: updateGrade, isLoading: isUpdating } = usePatch(
+    `https://ihsaanlms.onrender.com/assessment/grades/${selectedGrade?.id}/`,
     {
       onSuccess: () => {
-        toast.success("Session Updated successfully");
+        toast.success("Grade updated successfully");
         setOpenUpdateModal(false);
-        refetchTerms();
+        refetchGrades();
       },
       onError: (error) => {
         toast.error(error.response?.data?.message || "Update failed");
@@ -35,129 +31,70 @@ const EditTerm = ({
     }
   );
 
-  const { isLoading, data, refetch, isFetching } = useFetch(
-    "academicSession",
-    `https://ihsaanlms.onrender.com/academic-sessions/`,
-    (data) => {}
-  );
-  const Sessions = data?.data?.results || [];
-
-  useEffect(() => {
-    if (selectedTerm) {
-      setEditedTerm({
-        session_id: selectedTerm.session.name || "",
-        name: selectedTerm.name || "",
-        start_date: selectedTerm.start_date || "",
-        end_date: selectedTerm.end_date || "",
-      });
-    }
-  }, [selectedTerm]);
-
-  // Function to handle form submission
-  const handleUpdateSubmit = () => {
-    updateTerm({
-      session_id: editedTerm.session_id,
-      name: editedTerm.name,
-      start_date: editedTerm.start_date,
-      end_date: editedTerm.end_date,
-    });
+  const initialValues = {
+    score: selectedGrade?.score || "",
+    is_published: selectedGrade?.is_published ?? false,
   };
 
-  // Handle input changes
-  const handleInputChange = (e) => {
-    setEditedTerm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  const handleSubmit = (values) => {
+    updateGrade(values);
   };
-
-  const termsOption = [
-    { value: "FIRST", label: "First term" },
-    { value: "SECOND", label: "Second term" },
-    { value: "THIRD", label: "Third term" },
-  ];
 
   return (
-    <div>
-      <CustomModal
-        open={openUpdateModal}
-        onClose={() => setOpenUpdateModal(false)}
-        title="Update Question"
-        onConfirm={handleUpdateSubmit}
-        confirmText={isUpdating ? "Updating..." : "Update"}
-        isLoading={isUpdating}
+    <CustomModal
+      open={openUpdateModal}
+      onClose={() => setOpenUpdateModal(false)}
+      title="Update Grade"
+      showFooter={false}
+    >
+      <Formik
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+        enableReinitialize
       >
-        <Formik>
-          <Form>
-            <div className="space-y-4 mt-2">
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Terms</InputLabel>
-                <Select
-                  label="Terms"
-                  name="name"
-                  value={editedTerm.name}
-                  onChange={handleInputChange}
-                  disabled={isUpdating}
-                >
-                  {termsOption.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {/* Course Dropdown */}
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Academic Session</InputLabel>
-                <Select
-                  label="Academic Session"
-                  name="session_id"
-                  value={editedTerm.session_id}
-                  onChange={handleInputChange}
-                  disabled={isUpdating || isLoading || isFetching}
-                >
-                  {/* <MenuItem value="">
-                    <em>Select a session</em>
-                  </MenuItem> */}
-                  {Sessions.map((session) => (
-                    <MenuItem key={session.id} value={session.id}>
-                      {session.year}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              {/* Start Date */}
-              <DatePickers
-                name="start_date"
-                placeholder="Start Date"
-                value={editedTerm.start_date}
-                onChange={(newDate) =>
-                  setEditedTerm((prev) => ({
-                    ...prev,
-                    start_date: newDate,
-                  }))
-                }
-              />
-
-              {/* End Date */}
-              <DatePickers
-                name="end_date"
-                placeholder="End Date"
-                value={editedTerm.end_date}
-                onChange={(newDate) =>
-                  setEditedTerm((prev) => ({
-                    ...prev,
-                    end_date: newDate,
-                  }))
-                }
+        {({ values, handleChange }) => (
+          <Form className="space-y-4">
+            <div>
+              <label className="block font-medium mb-1">Score</label>
+              <Field
+                as={TextField}
+                name="score"
+                type="number"
+                fullWidth
+                size="small"
+                value={values.score}
+                onChange={handleChange}
               />
             </div>
+
+            <div>
+              <label className="block font-medium mb-1">Is Published</label>
+              <FormControl fullWidth size="small">
+                <Select
+                  name="is_published"
+                  value={values.is_published}
+                  onChange={handleChange}
+                >
+                  <MenuItem value={true}>Yes</MenuItem>
+                  <MenuItem value={false}>No</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="submit"
+                className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark"
+                disabled={isUpdating}
+              >
+                {isUpdating ? "Updating..." : "Update"}
+              </button>
+            </div>
           </Form>
-        </Formik>
-      </CustomModal>
-    </div>
+        )}
+      </Formik>
+    </CustomModal>
   );
 };
 
-export default EditTerm;
+export default EditGrade;
