@@ -73,7 +73,6 @@ const QuizList = ({ setCurrentScreen }) => {
 
   const fetchStudentId = () => {
     const storedStudentId = localStorage.getItem("userId");
-    console.log("storedStudentId", storedStudentId);
     if (storedStudentId) {
       setStudentId(storedStudentId);
     }
@@ -172,7 +171,7 @@ const QuizList = ({ setCurrentScreen }) => {
           color="primary"
         />
       </div>
-      <CustomModal open={showSummary}>
+      <CustomModal open={showSummary} onClose={() => setShowSummary(false)}>
         <QuizSummary summaryId={QuizData && QuizData?.data?.results[0].id} />
       </CustomModal>
     </div>
