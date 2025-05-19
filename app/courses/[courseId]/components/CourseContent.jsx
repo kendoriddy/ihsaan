@@ -132,10 +132,12 @@ const CourseContent = ({ sections, onSelectVideo, selectedVideoId }) => {
             }
             className="w-full flex justify-between items-center p-4 text-left hover:bg-gray-50 focus:outline-none"
           >
-            <span className="font-semibold text-gray-800">
+            <span className="text-gray-800 font-bold">
               {section.order}. {section.title}
             </span>
-            <span>{openSectionIndex === index ? "-" : "+"}</span>
+            <span className="text-gray-800 font-bold">
+              {openSectionIndex === index ? "-" : "+"}
+            </span>
           </button>
           {openSectionIndex === index && (
             <div className="p-4 bg-white border-t">
