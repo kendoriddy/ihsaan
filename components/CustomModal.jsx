@@ -15,15 +15,18 @@ const CustomModal = ({
   onConfirm,
   confirmText,
   isLoading,
+  showCancel = true,
 }) => {
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
-          Cancel
-        </Button>
+        {showCancel && (
+          <Button onClick={onClose} color="secondary">
+            Cancel
+          </Button>
+        )}
         {onConfirm && (
           <Button onClick={onConfirm} color="primary" disabled={isLoading}>
             {isLoading ? "Processing..." : confirmText}

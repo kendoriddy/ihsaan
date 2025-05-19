@@ -79,14 +79,13 @@ const ManualGrading = () => {
     "https://ihsaanlms.onrender.com/assessment/grades/"
   );
 
-  console.log("students", EnrolledList);
-
   const initialValues = {
     score: "",
     assessment: "",
     student: "",
     group: "",
     feedback: "",
+    is_published: false,
   };
 
   const handleSubmit = (values, { resetForm }) => {
@@ -105,6 +104,7 @@ const ManualGrading = () => {
         group: values.group,
         student: leaderId,
         feedback: values.feedback,
+        is_published: values.is_published,
       };
     } else {
       payload = {
@@ -112,6 +112,7 @@ const ManualGrading = () => {
         assessment: values.assessment,
         student: values.student,
         feedback: values.feedback,
+        is_published: values.is_published,
       };
     }
 
@@ -128,7 +129,6 @@ const ManualGrading = () => {
     });
   };
   const isGroupAssessment = selectedAssessment?.type === "GROUP";
-  console.log("selected assessment is", selectedAssessment);
 
   return (
     <Layout>
@@ -247,6 +247,13 @@ const ManualGrading = () => {
               error={touched.feedback && Boolean(errors.feedback)}
               helperText={touched.feedback && errors.feedback}
             />
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Publish grade now?</InputLabel>
+              <Field as={Select} name="is_published">
+                <MenuItem value={true}>Yes</MenuItem>
+                <MenuItem value={false}>No</MenuItem>
+              </Field>
+            </FormControl>
             {/* Submit Button */}
             <div className="flex justify-center">
               <Button

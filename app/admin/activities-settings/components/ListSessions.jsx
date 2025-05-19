@@ -17,6 +17,7 @@ import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
 import EditSession from "./EditSession";
+import { Delete, Edit } from "@mui/icons-material";
 
 const AllSessions = () => {
   const queryClient = useQueryClient();
@@ -99,7 +100,7 @@ const AllSessions = () => {
                           setOpenUpdateModal(true);
                         }}
                       >
-                        Update
+                        <Edit/>
                       </Button>
                       <Button
                         onClick={() => {
@@ -107,7 +108,7 @@ const AllSessions = () => {
                           setOpenDeleteDialog(true);
                         }}
                       >
-                        Delete
+                        <Delete/>
                       </Button>
                     </TableCell>
                   </TableRow>

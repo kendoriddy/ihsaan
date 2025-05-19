@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -188,7 +187,9 @@ const StudentInfoPage = () => {
             </button>
           </div>
         </div>
-        {coursesOrGrade === "courses" && <CoursesList />}
+        {coursesOrGrade === "courses" && (
+          <CoursesList courses={StudentCourses?.data} />
+        )}
         {coursesOrGrade === "grades" && <GradesArea />}
       </>
     </Layout>

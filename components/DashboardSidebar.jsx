@@ -75,28 +75,30 @@ function DashboardSidebar({ currentRoute }) {
         }`}
       >
         {/* Left Top */}
-        <div className="flex flex-col items-center text-center">
-          <div className="w-[100px] h-[100px] relative rounded-full overflow-hidden p-3 shadow-md">
-            <Image
-              src={MENTORS[0].image}
-              alt="mentor"
-              // width={350}
-              // height={350}
-              fill
-              className="rounded-full p-1"
-            />
+        <Link href="/user-profile">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-[100px] h-[100px] relative rounded-full overflow-hidden p-3 shadow-md">
+              <Image
+                src={MENTORS[0].image}
+                alt="mentor"
+                // width={350}
+                // height={350}
+                fill
+                className="rounded-full p-1"
+              />
+            </div>
+            <div className="py-2">
+              <Rating
+                name="read-only"
+                value={MENTORS[0].rating}
+                readOnly
+                precision={0.5}
+                size="small"
+              />
+              <div className="text-gray-500">{MENTORS[0].title}</div>
+            </div>
           </div>
-          <div className="py-2">
-            <Rating
-              name="read-only"
-              value={MENTORS[0].rating}
-              readOnly
-              precision={0.5}
-              size="small"
-            />
-            <div className="text-gray-500">{MENTORS[0].title}</div>
-          </div>
-        </div>
+        </Link>
 
         {/* Left Middle */}
         <div className="px-4 py-12">

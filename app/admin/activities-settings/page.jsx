@@ -5,6 +5,7 @@ import AllSessions from "./components/ListSessions";
 import Button from "@/components/Button";
 import ListTerms from "./components/ListTerms";
 import AdminLayout from "@/components/AdminLayout";
+import Grades from "./components/Grades";
 
 const ActivitiesSettings = () => {
   const [sessionOrTerm, setSessionOrTerm] = useState("session");
@@ -41,11 +42,22 @@ const ActivitiesSettings = () => {
             >
               Academic Term
             </button>
+            <button
+              className={`px-4 py-2 font-medium ${
+                sessionOrTerm === "grades"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500"
+              }`}
+              onClick={() => setSessionOrTerm("grades")}
+            >
+              Academic Grades
+            </button>
           </div>
         </div>
 
         {sessionOrTerm === "session" && <AllSessions />}
         {sessionOrTerm === "term" && <ListTerms />}
+        {sessionOrTerm === "grades" && <Grades />}
       </div>
     </AdminLayout>
   );
