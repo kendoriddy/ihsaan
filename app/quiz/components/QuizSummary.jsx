@@ -1,64 +1,9 @@
-// import { useFetch } from "@/hooks/useHttp/useHttp";
-// import React from "react";
-
-// const QuizSummary = ({ summaryId }) => {
-//   const {
-//     isLoading: isLoadingQuizData,
-//     data: QuizSummary,
-//     refetch: refetchQuizData,
-//     isFetching: isFetchingQuizData,
-//     error,
-//   } = useFetch(
-//     `summary`,
-//     summaryId
-//       ? `https://ihsaanlms.onrender.com/assessment/mcq-responses/${summaryId}/`
-//       : null,
-//     (data) => {},
-//     (error) => {}
-//   );
-
-//   const QuizSummaryResult = QuizSummary?.data;
-
-//   return (
-//     <>
-//       {isLoadingQuizData ? (
-//         <p className="py-8 font-bold text-lg animate-pulse">
-//           Loading quiz details...
-//         </p>
-//       ) : (
-//         <div className="w-[15rem] md:w-[32rem] no-scrollbar">
-//           <h1 className="text-center font-bold text-xl md:text-3xl">
-//             {QuizSummaryResult?.assessment_title}
-//           </h1>
-//           <p className="flex justify-between">
-//             <strong className="text-end">Number of Questions:</strong>
-//             {QuizSummaryResult?.summary?.total_questions}
-//           </p>
-//           <p className="flex justify-between">
-//             <strong className="text-end">Questions answered correctly:</strong>
-//             {QuizSummaryResult?.summary?.correct_answers}
-//           </p>
-//           <p className="flex justify-between">
-//             <strong className="text-end">Obtainable Score:</strong>
-//             {QuizSummaryResult?.summary?.assessment_max_score}
-//           </p>
-//           <p className="flex justify-between">
-//             <strong className="text-end">Your Score:</strong>
-//             {QuizSummaryResult?.summary?.score}
-//           </p>
-//         </div>
-//       )}
-//     </>
-//   );
-// };
-
-// export default QuizSummary;
-
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import React from "react";
 import clsx from "clsx"; // Optional: for cleaner class merging
+import { formatDate } from "../../../utils/utilFunctions";
 
-const QuizSummary = ({ summaryId }) => {
+const QuizSummary = ({ summaryId, startDate, endDate, duration }) => {
   const { isLoading: isLoadingQuizData, data: QuizSummary } = useFetch(
     `summary`,
     summaryId
@@ -94,7 +39,10 @@ const QuizSummary = ({ summaryId }) => {
               </div>
               <div className="flex justify-between">
                 <strong>Wrong Answers:</strong>
-                <span>{QuizSummaryResult?.summary?.total_questions - QuizSummaryResult?.summary?.correct_answers}</span>
+                <span>
+                  {QuizSummaryResult?.summary?.total_questions -
+                    QuizSummaryResult?.summary?.correct_answers}
+                </span>
               </div>
               <div className="flex justify-between">
                 <strong>Obtainable Score:</strong>
@@ -105,8 +53,20 @@ const QuizSummary = ({ summaryId }) => {
                 <span>{QuizSummaryResult?.summary?.score}</span>
               </div>
               <div className="flex justify-between">
+                <strong>Quiz Start Date:</strong>
+                <span>{startDate}</span>
+              </div>
+              <div className="flex justify-between">
+                <strong>Quiz End Date:</strong>
+                <span>{endDate}</span>
+              </div>
+              <div className="flex justify-between">
+                <strong>Quiz Duration:</strong>
+                <span>{duration}</span>
+              </div>
+              <div className="flex justify-between">
                 <strong>You submitted on:</strong>
-                <span>{QuizSummaryResult?.summary?.score}</span>
+                <span>{formatDate(QuizSummaryResult?.submission_date)}</span>
               </div>
             </div>
           </div>
