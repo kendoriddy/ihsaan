@@ -2,7 +2,7 @@
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import { useFetch } from "@/hooks/useHttp/useHttp";
-import { formatDate } from "@/utils/utilFunctions";
+import { formatDate, formatDuration } from "@/utils/utilFunctions";
 import { Pagination } from "@mui/material";
 import { useState, useEffect } from "react";
 import QuizSummary from "./QuizSummary";
@@ -43,8 +43,6 @@ const QuizList = ({ setCurrentScreen }) => {
     (data) => {},
     (error) => {}
   );
-
-  console.log("quiz response", QuizData);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -116,6 +114,11 @@ const QuizList = ({ setCurrentScreen }) => {
                     {formatDate(filteredQuiz?.end_date) ||
                       "No end date available"}
                   </p>
+                  <p className="text-sm text-gray-500">
+                    <strong className="">Duration:</strong>{" "}
+                    {formatDuration(filteredQuiz.mcq_duration) ||
+                      "No duration available"}
+                  </p>
                   <p>
                     <strong className="text-yellow-600">Status:</strong>{" "}
                     {filteredQuiz?.submission_status === "submitted" ? (
@@ -170,7 +173,7 @@ const QuizList = ({ setCurrentScreen }) => {
                   summaryId={QuizData && QuizData?.data?.results[0].id}
                   startDate={formatDate(filteredQuiz?.start_date)}
                   endDate={formatDate(filteredQuiz?.end_date)}
-                  duration={filteredQuiz?.duration}
+                  duration={formatDuration(filteredQuiz?.mcq_duration)}
                 />
               </CustomModal>
             </>

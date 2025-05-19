@@ -378,6 +378,20 @@ function getFileType(mimeType) {
   return "OTHERS";
 }
 
+const timeStringToMs = (timeString) => {
+  const [hours, minutes, seconds] = timeString.split(":").map(Number);
+  return ((hours * 60 + minutes) * 60 + seconds) * 1000;
+};
+
+const formatDuration = (duration) => {
+  if (!duration) return null;
+  const [hh, mm, ss] = duration.split(":");
+  const h = parseInt(hh);
+  const m = parseInt(mm);
+  if (h) return `${h}h ${m}m`;
+  return `${m} minutes`;
+};
+
 export {
   formatDate,
   serverDateFormat,
@@ -396,4 +410,6 @@ export {
   maritalStatus,
   formatTime,
   getFileType,
+  timeStringToMs,
+  formatDuration,
 };

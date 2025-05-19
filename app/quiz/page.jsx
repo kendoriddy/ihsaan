@@ -15,10 +15,7 @@ const StudentQuiz = () => {
           <QuizList setCurrentScreen={setCurrentScreen} />
         )}
         {currentScreen === "instructions" && (
-          <QuizInstructions
-            // questions={Questions}
-            setCurrentScreen={setCurrentScreen}
-          />
+          <QuizInstructions setCurrentScreen={setCurrentScreen} />
         )}
         {currentScreen === "quiz" && (
           <QuizQuestion setCurrentScreen={setCurrentScreen} />

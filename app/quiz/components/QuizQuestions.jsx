@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import Loader from "@/components/Loader";
 import { Modal } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { formatTime } from "../../../utils/utilFunctions";
+import { formatTime, timeStringToMs } from "../../../utils/utilFunctions";
 import parse from "html-react-parser";
 
 const QuizQuestion = ({ setCurrentScreen }) => {
@@ -28,7 +28,9 @@ const QuizQuestion = ({ setCurrentScreen }) => {
   });
   const [timeLeft, setTimeLeft] = useState(() => {
     const savedState = localStorage.getItem(`quizState_${quizData.id}`);
-    return savedState ? JSON.parse(savedState).timeLeft : 15 * 60 * 1000;
+    return savedState
+      ? JSON.parse(savedState).timeLeft
+      : timeStringToMs(quizData.mcq_duration);
   });
   const [selectedOption, setSelectedOption] = useState(null);
   const [showModal, setShowModal] = useState(false);
