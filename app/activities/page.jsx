@@ -74,7 +74,7 @@ const StudentInfoPage = () => {
     refetch: refetchGrade,
     isFetching: isFetchingGrades,
   } = useFetch(
-    ["terms", selectedSession],
+    ["grades", selectedSession],
     selectedSession
       ? `https://ihsaanlms.onrender.com/assessment/grades/?student=${studentId}`
       : null,

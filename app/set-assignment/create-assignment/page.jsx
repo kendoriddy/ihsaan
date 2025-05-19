@@ -68,11 +68,12 @@ const CreateAssignment = () => {
     passing_score: "",
     course: "",
     term: "",
-    max_attempts: "",
+    max_attempts: 1,
     start_date: "",
     end_date: "",
     grade_release_date: "",
     mcq_question_count: "",
+    mcq_duration: "",
   };
 
   // Submit function
@@ -159,21 +160,41 @@ const CreateAssignment = () => {
             </FormControl>
 
             {values.question_type === "MCQ" && (
-              <Field
-                as={TextField}
-                fullWidth
-                margin="normal"
-                label="Number of Questions"
-                name="mcq_question_count"
-                type="number"
-                error={
-                  touched.mcq_question_count &&
-                  Boolean(errors.mcq_question_count)
-                }
-                helperText={
-                  touched.mcq_question_count && errors.mcq_question_count
-                }
-              />
+              <>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  margin="normal"
+                  label="Number of Questions"
+                  name="mcq_question_count"
+                  type="number"
+                  error={
+                    touched.mcq_question_count &&
+                    Boolean(errors.mcq_question_count)
+                  }
+                  helperText={
+                    touched.mcq_question_count && errors.mcq_question_count
+                  }
+                />
+
+                <Field
+                  as={TextField}
+                  select
+                  fullWidth
+                  margin="normal"
+                  label="Duration (In minutes)"
+                  name="mcq_duration"
+                  error={touched.mcq_duration && Boolean(errors.mcq_duration)}
+                  helperText={touched.mcq_duration && errors.mcq_duration}
+                >
+                  <MenuItem value="00:05:00">5 minutes</MenuItem>
+                  <MenuItem value="00:10:00">10 minutes</MenuItem>
+                  <MenuItem value="00:15:00">15 minutes</MenuItem>
+                  <MenuItem value="00:30:00">30 minutes</MenuItem>
+                  <MenuItem value="00:45:00">45 minutes</MenuItem>
+                  <MenuItem value="01:00:00">1 hour</MenuItem>
+                </Field>
+              </>
             )}
 
             {/* Max Score */}
@@ -228,7 +249,7 @@ const CreateAssignment = () => {
             </FormControl>
 
             {/* Max Attempts */}
-            <Field
+            {/* <Field
               as={TextField}
               fullWidth
               margin="normal"
@@ -237,7 +258,7 @@ const CreateAssignment = () => {
               type="number"
               error={touched.max_attempts && Boolean(errors.max_attempts)}
               helperText={touched.max_attempts && errors.max_attempts}
-            />
+            /> */}
 
             {/* Date Pickers */}
             <FormControl

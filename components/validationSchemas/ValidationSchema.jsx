@@ -143,6 +143,11 @@ export const addAssignmentSchema = Yup.object({
         .required("Number of questions is required"),
     otherwise: (schema) => schema.notRequired(),
   }),
+  mcq_duration: Yup.string().when("question_type", {
+    is: "MCQ",
+    then: (schema) => schema.required("Quiz duration is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 export const manualGradingSchema = Yup.object({
