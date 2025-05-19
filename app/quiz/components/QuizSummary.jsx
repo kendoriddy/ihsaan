@@ -93,11 +93,19 @@ const QuizSummary = ({ summaryId }) => {
                 <span>{QuizSummaryResult?.summary?.correct_answers}</span>
               </div>
               <div className="flex justify-between">
+                <strong>Wrong Answers:</strong>
+                <span>{QuizSummaryResult?.summary?.total_questions - QuizSummaryResult?.summary?.correct_answers}</span>
+              </div>
+              <div className="flex justify-between">
                 <strong>Obtainable Score:</strong>
                 <span>{QuizSummaryResult?.summary?.assessment_max_score}</span>
               </div>
               <div className="flex justify-between">
                 <strong>Your Score:</strong>
+                <span>{QuizSummaryResult?.summary?.score}</span>
+              </div>
+              <div className="flex justify-between">
+                <strong>You submitted on:</strong>
                 <span>{QuizSummaryResult?.summary?.score}</span>
               </div>
             </div>
