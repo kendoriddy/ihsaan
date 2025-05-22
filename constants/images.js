@@ -6,7 +6,7 @@ import user1 from "@/assets/images/user1.webp";
 import user2 from "@/assets/images/user2.webp";
 import user3 from "@/assets/images/user3.webp";
 import banner1 from "@/assets/images/banner1.png";
-import intro from "@/assets/images/main/intro.webp";
+import intro from "@/assets/images/main/ihsaan_cover.png";
 import aboutImg1 from "@/assets/images/about-img1.png";
 import aboutImg2 from "@/assets/images/about-img2.png";
 import aboutImg3 from "@/assets/images/about-img3.png";

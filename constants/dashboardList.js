@@ -35,7 +35,7 @@ const DASHBOARD_LIST = {
     },
     {
       id: 13,
-      name: "My Courses",
+      name: "Courses",
       icon: BookSharp,
       path: "/courses/my-courses",
     },
