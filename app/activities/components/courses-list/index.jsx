@@ -11,7 +11,7 @@ const CoursesList = ({ courses }) => {
 
         return (
           <div key={id} className="border rounded-lg shadow-md bg-white">
-            <h2 className="text-xl font-semibold mb-1 p-4">
+            <h2 className="text-xl font-semibold mb-1 p-4 border-b border-b-gray-300">
               {title} - {code}
             </h2>
             <div>
