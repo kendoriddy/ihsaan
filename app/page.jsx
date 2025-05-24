@@ -281,7 +281,7 @@ function Page() {
             </div>
             <div className="flex justify-center">
               <div className="border-4 border-[#ff6600] rounded-lg overflow-hidden shadow-lg w-full max-w-3xl">
-                <VideoModal url={"videos/intro.mp4"} />
+                <VideoModal url="https://youtu.be/ITZSkY1Lbpk" />
               </div>
             </div>
           </section>
