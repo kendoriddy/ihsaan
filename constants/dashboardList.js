@@ -5,6 +5,7 @@ import Person2Icon from "@mui/icons-material/Person2";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import QuizIcon from "@mui/icons-material/Quiz";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
 import StorefrontIcon from "@mui/icons-material/Storefront";
@@ -45,6 +46,12 @@ const DASHBOARD_LIST = {
       icon: BookmarkIcon,
       path: "/dashboard/my-applications",
     },
+    {
+      id: 20,
+      name: "Reports",
+      icon: AssessmentIcon,
+      path: "/reports",
+    },
     { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },
   ],
   tutor: [
@@ -67,69 +74,11 @@ const DASHBOARD_LIST = {
       icon: GradingOutlined,
       path: "/manual-grading",
     },
-    { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },
-  ],
-  mentor: [
-    { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
     {
-      id: 12,
-      name: "Applications",
-      icon: BookmarkIcon,
-      path: "/dashboard/my-applications",
-    },
-    {
-      id: 2,
-      name: "Bookings",
-      icon: BookmarkIcon,
-      path: "/dashboard/my-bookings",
-    },
-    {
-      id: 3,
-      name: "Sessions",
-      icon: ScheduleIcon,
-      path: "/dashboard/sessions",
-    },
-    {
-      id: 4,
-      name: "Mentors Training",
-      icon: CastForEducationIcon,
-      path: "/dashboard/my-mentors",
-    },
-    {
-      id: 5,
-      name: "Assignment",
-      icon: Assignment,
-      path: "/assignment",
-    },
-    {
-      id: 6,
-      name: "Take Quiz",
-      icon: QuizIcon,
-      path: "/quiz",
-    },
-    {
-      id: 8,
-      name: "View Courses",
-      icon: BookSharp,
-      path: "/courses/view-courses",
-    },
-    {
-      id: 7,
-      name: "Counsellor Instruction",
-      icon: IntegrationInstructionsIcon,
-      path: "/dashboard/counsellor-instruction",
-    },
-    {
-      id: 8,
-      name: "Profile Settings",
-      icon: Person2Icon,
-      path: "/dashboard/settings",
-    },
-    {
-      id: 9,
-      name: "Orders",
-      icon: StorefrontIcon,
-      path: "/dashboard/orders",
+      id: 20,
+      name: "Reports",
+      icon: AssessmentIcon,
+      path: "/reports",
     },
     { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },
   ],
@@ -165,6 +114,12 @@ const DASHBOARD_LIST = {
       id: 12,
       name: "Activities Settings",
       path: "/admin/activities-settings",
+    },
+    {
+      id: 17,
+      name: "Reports",
+      icon: AssessmentIcon,
+      path: "/reports",
     },
     // { id: 13, name: "Transactions", path: "/admin/transactions" },
     // {
