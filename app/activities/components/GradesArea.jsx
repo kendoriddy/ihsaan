@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   Table,
@@ -13,24 +14,40 @@ const groupGradesByCourse = (grades) => {
   const grouped = {};
 
   grades.forEach((grade) => {
-    const course = grade.course_title;
-    if (!grouped[course]) {
-      grouped[course] = {
+    const courseTitle = grade?.course_title;
+    const courseCode = grade?.course_code;
+
+    if (!grouped[courseTitle]) {
+      grouped[courseTitle] = {
+        courseCode,
         quizScore: 0,
         quizMax: 0,
-        assignmentScore: 0,
-        assignmentMax: 0,
+        individualAssignmentScore: 0,
+        individualAssignmentMax: 0,
+        groupAssignmentScore: 0,
+        groupAssignmentMax: 0,
       };
     }
 
     if (grade.assessment_question_type === "MCQ") {
-      grouped[course].quizScore += parseFloat(grade.score);
-      grouped[course].quizMax += parseFloat(grade.assessment_max_score);
+      grouped[courseTitle].quizScore += parseFloat(grade.score);
+      grouped[courseTitle].quizMax += parseFloat(grade.assessment_max_score);
     }
 
     if (grade.assessment_question_type === "FILE_UPLOAD") {
-      grouped[course].assignmentScore += parseFloat(grade.score);
-      grouped[course].assignmentMax += parseFloat(grade.assessment_max_score);
+      if (grade.assessment_type === "INDIVIDUAL") {
+        grouped[courseTitle].individualAssignmentScore += parseFloat(
+          grade.score
+        );
+        grouped[courseTitle].individualAssignmentMax += parseFloat(
+          grade.assessment_max_score
+        );
+      } else if (grade.assessment_type === "GROUP") {
+        grouped[courseTitle].groupAssignmentScore += parseFloat(grade.score);
+        grouped[courseTitle].groupAssignmentMax += parseFloat(
+          grade.assessment_max_score
+        );
+      }
     }
   });
 
@@ -38,7 +55,7 @@ const groupGradesByCourse = (grades) => {
 };
 
 const GradesArea = ({ grades }) => {
-  const groupedData = groupGradesByCourse(grades?.results);
+  const groupedData = groupGradesByCourse(grades?.results || []);
   const groupedArray = Object.entries(groupedData);
 
   return (
@@ -48,26 +65,37 @@ const GradesArea = ({ grades }) => {
           <TableHead>
             <TableRow>
               <TableCell className="font-medium md:font-semibold text-lg">
-                Course Name
+                Course Code
+              </TableCell>
+              <TableCell className="font-medium md:font-semibold text-lg">
+                Course Title
               </TableCell>
               <TableCell className="font-medium md:font-semibold text-lg">
                 Quiz
               </TableCell>
               <TableCell className="font-medium md:font-semibold text-lg">
-                Assignment
+                Individual Assignment
+              </TableCell>
+              <TableCell className="font-medium md:font-semibold text-lg">
+                Group Assignment
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {groupedArray.map(([courseTitle, data], index) => (
               <TableRow key={index}>
+                <TableCell>{data.courseCode}</TableCell>
                 <TableCell>{courseTitle}</TableCell>
                 <TableCell className="text-nowrap">
                   {data.quizScore.toFixed(2)} / {data.quizMax.toFixed(2)}
                 </TableCell>
                 <TableCell className="text-nowrap">
-                  {data.assignmentScore.toFixed(2)} /{" "}
-                  {data.assignmentMax.toFixed(2)}
+                  {data.individualAssignmentScore.toFixed(2)} /{" "}
+                  {data.individualAssignmentMax.toFixed(2)}
+                </TableCell>
+                <TableCell className="text-nowrap">
+                  {data.groupAssignmentScore.toFixed(2)} /{" "}
+                  {data.groupAssignmentMax.toFixed(2)}
                 </TableCell>
               </TableRow>
             ))}

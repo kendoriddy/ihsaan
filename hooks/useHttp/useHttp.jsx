@@ -123,7 +123,9 @@ export const useFetch = (
   } = useQuery(
     [key, url],
     async () =>
-      http.get(url.startsWith("http") ? url : `${http.defaults.baseURL}${url}`),
+      http.get(
+        url.startsWith("https") ? url : `${http.defaults.baseURL}${url}`
+      ),
     {
       onSuccess: (data) => {
         if (success) success(data?.data);
