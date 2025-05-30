@@ -21,12 +21,14 @@ const CoursesList = ({ courses }) => {
               {title} - {code}
             </h2>
             <div>
-              <div className="p-4 flex justify-between items-start gap-4">
+              <div className="p-4 flex justify-between md:justify-normal items-start gap-4">
                 <div>
                   <p className="font-semibold">Tutor(s):</p>
-                  <ul className="ml-2 list-none list-inside">
+                  <ul className="list-none list-inside">
                     {tutors?.map((tutor, index) => (
-                      <li key={index}>{tutor.name || tutor.user}</li>
+                      <li key={index} className="font-bold">
+                        {tutor.tutor_full_name || tutor.user}
+                      </li>
                     ))}
                   </ul>
                 </div>
