@@ -6,7 +6,13 @@ const CoursesList = ({ courses }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {courses?.results?.map((courseObj) => {
-        const { id, course_details, course_explanatory_details } = courseObj;
+        const {
+          id,
+          course_details,
+          course_explanatory_details,
+          tutors,
+          groups,
+        } = courseObj;
         const { code, title, programme_name, image_url } = course_details;
 
         return (
@@ -15,10 +21,28 @@ const CoursesList = ({ courses }) => {
               {title} - {code}
             </h2>
             <div>
+              <div className="p-4 flex justify-between items-start gap-4">
+                <div>
+                  <p className="font-semibold">Tutor(s):</p>
+                  <ul className="ml-2 list-none list-inside">
+                    {tutors?.map((tutor, index) => (
+                      <li key={index}>{tutor.name || tutor.user}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">|</span>
+                  <span className="text-nowrap flex items-center gap-1">
+                    <People />{" "}
+                    {course_explanatory_details?.enrolled_users.length}
+                  </span>
+                </div>
+              </div>
               <div className="p-4 flex gap-2">
-                <p className="font-semibold">Tutor:</p> |{" "}
+                <p className="font-semibold">Group:</p> {groups[0]?.name} |
                 <span>
-                  <People /> {course_explanatory_details?.enrolled_users.length}
+                  <People /> {groups[0]?.students.length}
                 </span>
               </div>
               <div className="flex gap-4 rounded-md bg-gray-100 p-4">
