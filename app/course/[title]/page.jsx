@@ -475,7 +475,8 @@ function Page({ params }) {
             {/* Leave a Rating */}
             <div
               onClick={() => setIsModalClose(false)}
-              className="cursor-pointer">
+              className="cursor-pointer"
+            >
               <span className="text-gray-600">
                 <StarIcon />{" "}
               </span>
@@ -502,11 +503,13 @@ function Page({ params }) {
 
             <div
               className={`cursor-pointer text-primary `}
-              title="Download Certficate">
+              title="Download Certficate"
+            >
               <Link
                 href={{
                   pathname: `/course/${params.title}/certificate`,
-                }}>
+                }}
+              >
                 <DownloadIcon />
               </Link>
             </div>
@@ -518,14 +521,15 @@ function Page({ params }) {
               <div className="w-8 h-8">
                 <CircularProgressbarWithChildren
                   value={completedPercentage}
-                  strokeWidth={6}>
+                  strokeWidth={6}
+                >
                   <span className="text-primary">
                     <EmojiEventsIcon />
                   </span>
                 </CircularProgressbarWithChildren>
               </div>
 
-              <div
+              {/* <div
                 className="flex items-center cursor-pointer"
                 aria-describedby={id}
                 variant="contained"
@@ -534,7 +538,7 @@ function Page({ params }) {
                 <span>
                   <KeyboardArrowDownIcon />
                 </span>
-              </div>
+              </div> */}
 
               {/* Popover */}
               <Popover
@@ -545,7 +549,8 @@ function Page({ params }) {
                 anchorOrigin={{
                   vertical: "bottom",
                   horizontal: "left",
-                }}>
+                }}
+              >
                 <div className="text-xs p-4">
                   <div className="font-bold">
                     {completedLessons} of {totalLessons} complete.
@@ -568,12 +573,14 @@ function Page({ params }) {
           <section
             className={`w-screen  ${
               isSidebarHidden ? "" : "lg:w-[calc(100vw-300px)]"
-            }`}>
+            }`}
+          >
             {/* Top */}
             <div
               className={`relative w-full bg-gray-200`}
               style={{ height: `${playerWidth * 0.54333}px` }}
-              ref={playerRef}>
+              ref={playerRef}
+            >
               {/* Absolute BTNS */}
               <div>
                 {/* Couurse content */}
@@ -581,7 +588,8 @@ function Page({ params }) {
                   className={`hidden absolute top-[75px] right-[-120px] border  bg-gray-50 border-r-0 px-2 py-1 text-primary cursor-pointer  items-center gap-2 hover:right-0 transition-all duration-300 z-30 ${
                     isSidebarHidden ? "lg:flex" : "hidden"
                   }`}
-                  onClick={toggleSidebar}>
+                  onClick={toggleSidebar}
+                >
                   <span>
                     <ArrowBackIcon />
                   </span>
@@ -592,13 +600,15 @@ function Page({ params }) {
                 <div
                   className={`absolute top-1/2 left-0 flex justify-between items-center bg-gray-50 z-30 ${
                     isBtnsHovered ? "opacity-100" : "opacity-0"
-                  } `}>
+                  } `}
+                >
                   <div
                     className={`py-1 px-2 border bg-gray-50 border-l-0 cursor-pointer transition-all duration-300  `}
                     title={`Previous`}
                     onMouseEnter={handleMouseEnterBtns}
                     onMouseLeave={handleMouseLeaveBtns}
-                    onClick={previousLesson}>
+                    onClick={previousLesson}
+                  >
                     <span>
                       <KeyboardArrowLeftIcon sx={{ fontSize: 20 }} />
                     </span>
@@ -609,13 +619,15 @@ function Page({ params }) {
                 <div
                   className={`absolute top-1/2 right-0 flex justify-between items-center bg-gray-50 z-30 ${
                     isBtnsHovered ? "opacity-100" : "opacity-0"
-                  }`}>
+                  }`}
+                >
                   <div
                     className={`py-1 px-2 border bg-gray-50 border-l-0 cursor-pointer transition-all duration-300   `}
                     title={`Next`}
                     onMouseEnter={handleMouseEnterBtns}
                     onMouseLeave={handleMouseLeaveBtns}
-                    onClick={nextLesson}>
+                    onClick={nextLesson}
+                  >
                     <span>
                       <KeyboardArrowRightIcon sx={{ fontSize: 20 }} />
                     </span>
@@ -663,7 +675,8 @@ function Page({ params }) {
                         }  ${
                           index === 0 && "lg:hidden"
                         } cursor-pointer hover:text-orange-700 hover:rounded transition-all duration-300`}
-                        onClick={() => handleActiveMenuItem(item)}>
+                        onClick={() => handleActiveMenuItem(item)}
+                      >
                         {item}
                       </div>
                     );
@@ -680,7 +693,8 @@ function Page({ params }) {
                 <div
                   className={` ${
                     activeMenuItem === "Course content" ? "block" : "hidden"
-                  }`}>
+                  }`}
+                >
                   {/* Course Content */}
                   <div>
                     {/* Course section List */}
@@ -695,11 +709,13 @@ function Page({ params }) {
                       return (
                         <div
                           key={sectionIndex}
-                          className="text-md tracking-wide">
+                          className="text-md tracking-wide"
+                        >
                           {/* Section Title */}
                           <div
                             className="flex justify-between items-center bg-gray-100 p-4 border-b"
-                            onClick={() => toggleOpenedSection(sectionIndex)}>
+                            onClick={() => toggleOpenedSection(sectionIndex)}
+                          >
                             <div className="font-bold cursor-pointer">
                               Section {sectionIndex}: {course.section.title}
                             </div>
@@ -709,7 +725,8 @@ function Page({ params }) {
                                 openedSection.includes(sectionIndex)
                                   ? "hidden"
                                   : "block"
-                              }`}>
+                              }`}
+                            >
                               <KeyboardArrowDownIcon sx={{ fontSize: 16 }} />
                             </span>
                             <span
@@ -717,7 +734,8 @@ function Page({ params }) {
                                 !openedSection.includes(sectionIndex)
                                   ? "hidden"
                                   : "block"
-                              }`}>
+                              }`}
+                            >
                               <KeyboardArrowUpIcon sx={{ fontSize: 16 }} />
                             </span>
                           </div>
@@ -728,7 +746,8 @@ function Page({ params }) {
                               openedSection.includes(sectionIndex)
                                 ? "h-auto"
                                 : "h-0"
-                            } overflow-hidden`}>
+                            } overflow-hidden`}
+                          >
                             {course.section.lessons.map(
                               (lesson, lessonIndexInSection) => {
                                 // Calculate the overall lesson index
@@ -742,7 +761,8 @@ function Page({ params }) {
                                     key={lessonIndexInSection}
                                     className={`p-4 cursor-pointer hover:bg-slate-200 ${
                                       lesson === currentLesson && "bg-slate-200"
-                                    } `}>
+                                    } `}
+                                  >
                                     <div className={``}>
                                       {/* Top */}
                                       <div className="flex items-center gap-2">
@@ -758,7 +778,8 @@ function Page({ params }) {
                                         <div
                                           onClick={() =>
                                             handleCurrentLesson(lesson)
-                                          }>
+                                          }
+                                        >
                                           {" "}
                                           {lessonIndex} {"."} {lesson.title}
                                         </div>
@@ -775,7 +796,8 @@ function Page({ params }) {
                                                 toggleOpenedResources(
                                                   lessonIndex
                                                 )
-                                              }>
+                                              }
+                                            >
                                               <div className="relative">
                                                 {" "}
                                                 <span className="text-blue-600">
@@ -788,16 +810,19 @@ function Page({ params }) {
                                                     openedResources.includes(
                                                       lessonIndex
                                                     ) && "h-auto"
-                                                  }`}>
+                                                  }`}
+                                                >
                                                   {lesson.resources.map(
                                                     (resource, index) => (
                                                       <div
                                                         key={index}
-                                                        className="p-2 bg-blue-100 w-[150px] hover:bg-blue-200">
+                                                        className="p-2 bg-blue-100 w-[150px] hover:bg-blue-200"
+                                                      >
                                                         <Link
                                                           href={resource.url}
                                                           target="_blank"
-                                                          className="flex gap-2 items-center">
+                                                          className="flex gap-2 items-center"
+                                                        >
                                                           {resource.type ===
                                                             "pdf" && (
                                                             <BrowserUpdatedIcon
@@ -845,7 +870,8 @@ function Page({ params }) {
                 <div
                   className={`${
                     activeMenuItem === "Overview" ? "block" : "hidden"
-                  }`}>
+                  }`}
+                >
                   {/* By the Numbers */}
                   <div className="py-2 flex flex-col md:flex-row  md:gap-12">
                     <h2 className="text-lg font-bold">Numbers</h2>
@@ -897,7 +923,8 @@ function Page({ params }) {
                           <Link
                             key={course.id}
                             href={course.path}
-                            className="group border w-1/4 min-w-[300px] max-w-[500px] rounded-md overflow-hidden cursor-pointer  shadow-md  hover:bg-neutral-200  transition-all duration-300 lg:mt-4 ">
+                            className="group border w-1/4 min-w-[300px] max-w-[500px] rounded-md overflow-hidden cursor-pointer  shadow-md  hover:bg-neutral-200  transition-all duration-300 lg:mt-4 "
+                          >
                             <div className="h-[200px] w-full overflow-hidden relative">
                               <Image
                                 src={course.image}
@@ -943,7 +970,8 @@ function Page({ params }) {
                 <div
                   className={`${
                     activeMenuItem === "Announcements" ? "block" : "hidden"
-                  }`}>
+                  }`}
+                >
                   <div className="py-2">
                     <p>{COURSES[0].announcements}</p>
                   </div>
@@ -953,7 +981,8 @@ function Page({ params }) {
                 <div
                   className={`${
                     activeMenuItem === "Reviews" ? "block" : "hidden"
-                  }`}>
+                  }`}
+                >
                   {/* Ratings */}
                   <div>
                     <div className="text-xl font-bold py-2">
@@ -986,7 +1015,8 @@ function Page({ params }) {
                       <div className="flex-1 ">
                         <div
                           onClick={() => filterReviewsByRating(5)}
-                          className={`cursor-pointer rounded px-2 $ `}>
+                          className={`cursor-pointer rounded px-2 $ `}
+                        >
                           <ReviewPercentageBar
                             percentage={calculateRatingPercentage(5)}
                             stars={5}
@@ -995,7 +1025,8 @@ function Page({ params }) {
                         </div>
                         <div
                           onClick={() => filterReviewsByRating(4)}
-                          className={`cursor-pointer rounded px-2 $`}>
+                          className={`cursor-pointer rounded px-2 $`}
+                        >
                           <ReviewPercentageBar
                             percentage={calculateRatingPercentage(4)}
                             stars={4}
@@ -1004,7 +1035,8 @@ function Page({ params }) {
                         </div>
                         <div
                           onClick={() => filterReviewsByRating(3)}
-                          className={`cursor-pointer rounded px-2 $ `}>
+                          className={`cursor-pointer rounded px-2 $ `}
+                        >
                           <ReviewPercentageBar
                             percentage={calculateRatingPercentage(3)}
                             stars={3}
@@ -1013,7 +1045,8 @@ function Page({ params }) {
                         </div>
                         <div
                           onClick={() => filterReviewsByRating(2)}
-                          className={`cursor-pointer rounded px-2 $`}>
+                          className={`cursor-pointer rounded px-2 $`}
+                        >
                           <ReviewPercentageBar
                             percentage={calculateRatingPercentage(2)}
                             stars={2}
@@ -1022,7 +1055,8 @@ function Page({ params }) {
                         </div>
                         <div
                           onClick={() => filterReviewsByRating(1)}
-                          className={`cursor-pointer rounded px-2 $`}>
+                          className={`cursor-pointer rounded px-2 $`}
+                        >
                           <ReviewPercentageBar
                             percentage={calculateRatingPercentage(1)}
                             stars={1}
@@ -1042,7 +1076,8 @@ function Page({ params }) {
                       <form
                         action=""
                         onSubmit={(e) => filterReviewsByText(e)}
-                        className="flex items-center border-2 border-slate-400 pl-2 rounded w-2/3">
+                        className="flex items-center border-2 border-slate-400 pl-2 rounded w-2/3"
+                      >
                         <div className="flex-1">
                           <input
                             type="text"
@@ -1064,7 +1099,8 @@ function Page({ params }) {
                             className="border-2 border-slate-400 p-2 w-full"
                             onChange={(e) =>
                               filterReviewsFromSelect(Number(e.target.value))
-                            }>
+                            }
+                          >
                             <option value="">All Ratings</option>
                             <option value="5">Five stars</option>
                             <option value="4">Four stars</option>
@@ -1128,7 +1164,8 @@ function Page({ params }) {
                     <div className="text-center p-8">
                       <div
                         className="border border-slate-400 w-[400px] mx-auto py-2 cursor-pointer"
-                        onClick={() => setNReviewsShown(nReviewsShown + 10)}>
+                        onClick={() => setNReviewsShown(nReviewsShown + 10)}
+                      >
                         See more reviews
                       </div>
                     </div>
@@ -1142,7 +1179,8 @@ function Page({ params }) {
           <section
             className={`hidden  w-[300px] h-screen top-0 right-0 bg-white overflow-y-scroll overflow-x-hidden ${
               isScrolled ? "fixed" : "relative"
-            } ${isSidebarHidden ? "lg:hidden" : "lg:block"} `}>
+            } ${isSidebarHidden ? "lg:hidden" : "lg:block"} `}
+          >
             {/* Top */}
             <div className="flex justify-between items-center p-4 bg-gray-50">
               <div className="font-bold">Course content</div>
@@ -1169,7 +1207,8 @@ function Page({ params }) {
                     {/* Section Title */}
                     <div
                       className="flex justify-between items-center bg-gray-100 p-4 border-b"
-                      onClick={() => toggleOpenedSection(sectionIndex)}>
+                      onClick={() => toggleOpenedSection(sectionIndex)}
+                    >
                       <div className="font-bold cursor-pointer">
                         Section {sectionIndex}: {course.section.title}
                       </div>
@@ -1179,7 +1218,8 @@ function Page({ params }) {
                           openedSection.includes(sectionIndex)
                             ? "hidden"
                             : "block"
-                        }`}>
+                        }`}
+                      >
                         <KeyboardArrowDownIcon sx={{ fontSize: 16 }} />
                       </span>
                       <span
@@ -1187,7 +1227,8 @@ function Page({ params }) {
                           !openedSection.includes(sectionIndex)
                             ? "hidden"
                             : "block"
-                        }`}>
+                        }`}
+                      >
                         <KeyboardArrowUpIcon sx={{ fontSize: 16 }} />
                       </span>
                     </div>
@@ -1196,7 +1237,8 @@ function Page({ params }) {
                     <div
                       className={`${
                         openedSection.includes(sectionIndex) ? "h-auto" : "h-0"
-                      } overflow-hidden`}>
+                      } overflow-hidden`}
+                    >
                       {course.section.lessons.map(
                         (lesson, lessonIndexInSection) => {
                           // Calculate the overall lesson index
@@ -1208,7 +1250,8 @@ function Page({ params }) {
                               key={lessonIndexInSection}
                               className={`p-4 cursor-pointer hover:bg-slate-200 ${
                                 lesson === currentLesson && "bg-slate-200"
-                              } `}>
+                              } `}
+                            >
                               <div className={``}>
                                 {/* Top */}
                                 <div className="flex items-center gap-2">
@@ -1222,7 +1265,8 @@ function Page({ params }) {
                                     />
                                   </div>
                                   <div
-                                    onClick={() => handleCurrentLesson(lesson)}>
+                                    onClick={() => handleCurrentLesson(lesson)}
+                                  >
                                     {" "}
                                     {lessonIndex} {"."} {lesson.title}
                                   </div>
@@ -1237,7 +1281,8 @@ function Page({ params }) {
                                         className="border border-slate-400 py-1 w-[150px] text-center"
                                         onClick={() =>
                                           toggleOpenedResources(lessonIndex)
-                                        }>
+                                        }
+                                      >
                                         <div className="relative">
                                           {" "}
                                           <span className="text-blue-600">
@@ -1250,16 +1295,19 @@ function Page({ params }) {
                                               openedResources.includes(
                                                 lessonIndex
                                               ) && "h-auto"
-                                            }`}>
+                                            }`}
+                                          >
                                             {lesson.resources.map(
                                               (resource, index) => (
                                                 <div
                                                   key={index}
-                                                  className="p-2 bg-blue-100 w-[150px] hover:bg-blue-200">
+                                                  className="p-2 bg-blue-100 w-[150px] hover:bg-blue-200"
+                                                >
                                                   <Link
                                                     href={resource.url}
                                                     target="_blank"
-                                                    className="flex gap-2 items-center">
+                                                    className="flex gap-2 items-center"
+                                                  >
                                                     {resource.type ===
                                                       "pdf" && (
                                                       <BrowserUpdatedIcon
@@ -1305,7 +1353,8 @@ function Page({ params }) {
         <div
           className={`fixed inset-0 bg-black bg-opacity-50 z-50 ${
             isModalClose && "hidden"
-          }`}>
+          }`}
+        >
           <div className="w-screen h-screen flex justify-center items-center  p-4  ">
             <div className="bg-white w-[500px] h-[400px] rounded ">
               {/* Top */}
@@ -1314,7 +1363,8 @@ function Page({ params }) {
                   <div className="text-lg font-bold">Leave a rating</div>
                   <div
                     className="cursor-pointer text-red-600 hover:text-blue-600 transition-all duration-300"
-                    onClick={() => setIsModalClose(true)}>
+                    onClick={() => setIsModalClose(true)}
+                  >
                     Close
                   </div>
                 </div>
@@ -1345,14 +1395,16 @@ function Page({ params }) {
                     id=""
                     rows="5"
                     className="flex-1 bg-gray-100 border-b-2 px-2 py-2 focus:outline-none focus:border-blue-600 focus:bg-blue-200 rounded"
-                    onChange={(e) => setUserComment(e.target.value)}></textarea>
+                    onChange={(e) => setUserComment(e.target.value)}
+                  ></textarea>
                 </div>
 
                 {/* Submit Buttons */}
                 <div className="flex justify-center py-4">
                   <button
                     type="submit"
-                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all duration-300 w-[200px]">
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all duration-300 w-[200px]"
+                  >
                     Post Comment
                   </button>
                 </div>

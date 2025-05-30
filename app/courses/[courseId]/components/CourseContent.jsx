@@ -255,8 +255,8 @@ const CourseContent = ({ sections, onSelectVideo, selectedVideoId }) => {
 
                 {section.has_mcq_assessment && (
                   <div onClick={() => handleOpenQuizModal(section)}>
-                    <h4 className="mt-3 text-sm font-semibold text-gray-700 mb-2">
-                      Quiz:
+                    <h4 className="cursor-pointer mt-3 text-sm font-semibold text-gray-700 mb-2">
+                      Take Quiz
                     </h4>
                   </div>
                 )}
