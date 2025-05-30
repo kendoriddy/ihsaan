@@ -20,9 +20,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
 } from "@mui/material";
 import QuizQuestion from "@/app/quiz/components/QuizQuestions";
 import QuizQuestion2 from "@/app/quiz/components/QuizQuestions2";
+import { Close } from "@mui/icons-material";
 
 // Dummy course content data
 const courseContent = [
@@ -279,7 +281,16 @@ const CourseContent = ({ sections, onSelectVideo, selectedVideoId }) => {
         aria-labelledby="quiz-modal-title"
         aria-describedby="quiz-modal-description"
       >
-        <DialogTitle id="quiz-modal-title">Quiz</DialogTitle>
+        <DialogTitle id="quiz-modal-title">
+          Take Your Quiz
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseQuizModal}
+            style={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="quiz-modal-description">
             <QuizQuestion2 sectionData={selectedQuiz} />

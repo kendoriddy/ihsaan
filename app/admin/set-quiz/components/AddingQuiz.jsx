@@ -11,6 +11,8 @@ import Editor from "@/components/Editor";
 const AddingQuiz = () => {
   const [fetchAll, setFetchAll] = useState(false);
   const [totalCourses, setTotalCourses] = useState(0);
+  const [totalCourseSections, setTotalCourseSections] = useState(0);
+  const [selectedCourseId, setSelectedCourseId] = useState("");
 
   // Fetch courses dynamically
   const {
@@ -32,7 +34,27 @@ const AddingQuiz = () => {
     }
   );
 
+  const {
+    isLoading: sectionLoading,
+    data: CourseSectionList,
+    isFetching: csFetching,
+    refetch: csRefetch,
+  } = useFetch(
+    "courseSections",
+    selectedCourseId
+      ? `https://ihsaanlms.onrender.com/course/course-sections/?course=${selectedCourseId}`
+      : null,
+    (data) => {
+      if (data?.total && !fetchAll) {
+        setTotalCourseSections(data.total);
+        setFetchAll(true);
+        refetch();
+      }
+    }
+  );
+
   const Courses = CoursesList?.data?.results || [];
+  const CourseSections = CourseSectionList?.data?.results || [];
 
   // Mutation to create quiz questions
   const { mutate: createQuestions, isLoading: isCreatingQuestions } = usePost(
@@ -58,9 +80,10 @@ const AddingQuiz = () => {
         question_text: "",
         options: { A: "", B: "", C: "", D: "" },
         correct_answer: "",
-        section: "",
+        course_section_id: "",
       },
     ],
+    course_section_id: "",
   };
 
   const handleSubmit = (values, { resetForm }) => {
@@ -69,7 +92,14 @@ const AddingQuiz = () => {
   };
 
   const handleCourseChange = (e, setFieldValue) => {
-    setFieldValue("course_id", e.target.value);
+    const courseId = e.target.value;
+    setSelectedCourseId(courseId);
+    setFieldValue("course_id", courseId);
+    setFieldValue("course_section_id", ""); // Reset course section when course changes
+  };
+
+  const handleCourseSectionChange = (e, setFieldValue) => {
+    setFieldValue("course_section_id", e.target.value);
   };
 
   const handleQuestionChange = (setFieldValue, values) => {
@@ -77,7 +107,7 @@ const AddingQuiz = () => {
       question_text: "",
       options: { A: "", B: "", C: "", D: "" },
       correct_answer: "",
-      section: "",
+      course_section_id: "",
     };
     setFieldValue("questions", [...values.questions, newQuestion]);
   };
@@ -126,6 +156,38 @@ const AddingQuiz = () => {
                   </option>
                 ))}
               </Field>
+              <ErrorMessage
+                name="course_id"
+                component="p"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="course_section_id"
+                className="block md:text-lg font-medium mb-2"
+              >
+                Select Course section
+              </label>
+              {sectionLoading ? (
+                "Loading sections..."
+              ) : (
+                <Field
+                  as="select"
+                  id="course_section_id"
+                  name="course_section_id"
+                  onChange={(e) => handleCourseSectionChange(e, setFieldValue)}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                  disabled={sectionLoading || csFetching || !selectedCourseId}
+                >
+                  <option value="">Select a course section</option>
+                  {CourseSections.map((section) => (
+                    <option key={section.id} value={section.id}>
+                      {section.title}
+                    </option>
+                  ))}
+                </Field>
+              )}
               <ErrorMessage
                 name="course_id"
                 component="p"
@@ -195,24 +257,24 @@ const AddingQuiz = () => {
                       Add Option
                     </Button>
                   </div>
-                  <div>
+                  {/* <div>
                     <label
-                      htmlFor={`questions[${index}].section`}
+                      htmlFor={`questions[${index}].course_section_id`}
                       className="block md:text-lg font-medium"
                     >
                       Question Chapter or Section
                     </label>
                     <Field
-                      id={`questions[${index}].section`}
-                      name={`questions[${index}].section`}
+                      id={`questions[${index}].course_section_id`}
+                      name={`questions[${index}].course_section_id`}
                       className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
                     />
                     <ErrorMessage
-                      name={`questions[${index}].section`}
+                      name={`questions[${index}].course_section_id`}
                       component="p"
                       className="text-red-500 text-sm mt-1"
                     />
-                  </div>{" "}
+                  </div>{" "} */}
                   <div>
                     <label
                       htmlFor={`questions[${index}].correct_answer`}

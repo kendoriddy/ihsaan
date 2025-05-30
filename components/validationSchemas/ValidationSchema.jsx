@@ -94,7 +94,6 @@ export const addQuizSchema = Yup.object().shape({
   questions: Yup.array().of(
     Yup.object().shape({
       question_text: Yup.string().required("Question text is required"),
-      section: Yup.string().required("Question chapter or section is required"),
       options: Yup.object().test(
         "at-least-two-options",
         "At least two options are required",
