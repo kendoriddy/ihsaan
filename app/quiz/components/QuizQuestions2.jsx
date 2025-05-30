@@ -44,7 +44,7 @@ const QuizQuestion2 = ({ sectionData, setOpenQuizModal }) => {
     correct_answers: 1,
     total_score: 2,
     student_score: 1,
-    pass_percentage: 2,
+    pass_percentage: 50,
     detailed_results: [
       {
         question: "vhdfdbkjsd",
@@ -99,10 +99,10 @@ const QuizQuestion2 = ({ sectionData, setOpenQuizModal }) => {
         answers,
         timeLeft,
       };
-      localStorage.setItem(
-        `quizState_${quizData.id}`,
-        JSON.stringify(quizState)
-      );
+      // localStorage.setItem(
+      //   `quizState_${quizData.id}`,
+      //   JSON.stringify(quizState)
+      // );
     }
   }, [currentQuestionIndex, answers, timeLeft, Questions]);
 
@@ -241,12 +241,12 @@ const QuizQuestion2 = ({ sectionData, setOpenQuizModal }) => {
     // Check if user has exceeded max attempts
     if (quizData.max_attempts && quizData.max_attempts > 0) {
       const attempts = localStorage.getItem(`quizAttempts_${quizData.id}`) || 0;
-      if (parseInt(attempts) >= quizData.max_attempts) {
-        toast.error(
-          `You have exceeded the maximum number of attempts (${quizData.max_attempts})`
-        );
-        return;
-      }
+      // if (parseInt(attempts) >= quizData.max_attempts) {
+      //   toast.error(
+      //     `You have exceeded the maximum number of attempts (${quizData.max_attempts})`
+      //   );
+      //   return;
+      // }
     }
 
     if (unansweredQuestions.length > 0) {
@@ -310,6 +310,8 @@ const QuizQuestion2 = ({ sectionData, setOpenQuizModal }) => {
     width: 370,
     p: 4,
   };
+
+  console.log(showResponse, "showResponse:");
 
   return (
     <div className="w-full flex">
