@@ -75,7 +75,7 @@ const StudentInfoPage = () => {
     isFetching: isFetchingGrades,
   } = useFetch(
     ["grades", selectedSession],
-    selectedSession
+    selectedSession && selectedTerm
       ? `https://ihsaanlms.onrender.com/assessment/grades/?student=${studentId}`
       : null,
     (data) => {
@@ -92,7 +92,7 @@ const StudentInfoPage = () => {
     isFetching: isFetchingCourses,
   } = useFetch(
     ["terms", selectedSession],
-    selectedSession
+    selectedSession && selectedTerm
       ? `https://ihsaanlms.onrender.com/course/course-enrollments/?user_id=${studentId}`
       : null,
     (data) => {
@@ -190,7 +190,7 @@ const StudentInfoPage = () => {
         {coursesOrGrade === "courses" && (
           <CoursesList courses={StudentCourses?.data} />
         )}
-        {coursesOrGrade === "grades" && <GradesArea />}
+        {coursesOrGrade === "grades" && <GradesArea grades={Grades?.data} />}
       </>
     </Layout>
   );
