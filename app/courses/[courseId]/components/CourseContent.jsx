@@ -293,7 +293,10 @@ const CourseContent = ({ sections, onSelectVideo, selectedVideoId }) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="quiz-modal-description">
-            <QuizQuestion2 sectionData={selectedQuiz} />
+            <QuizQuestion2
+              sectionData={selectedQuiz}
+              setOpenQuizModal={setOpenQuizModal}
+            />
           </DialogContentText>
         </DialogContent>
       </Dialog>

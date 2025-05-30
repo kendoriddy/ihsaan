@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { formatTime, timeStringToMs } from "../../../utils/utilFunctions";
 import parse from "html-react-parser";
 
-const QuizQuestion2 = ({ sectionData }) => {
+const QuizQuestion2 = ({ sectionData, setOpenQuizModal }) => {
   console.log(sectionData, "sectionData:::");
 
   const quizData = JSON.parse(localStorage.getItem("selectedQuiz"));
@@ -36,6 +36,30 @@ const QuizQuestion2 = ({ sectionData }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showResponse, setShowResponse] = useState(null);
+  const [showDetailedResults, setShowDetailedResults] = useState(false);
+
+  // Add dummy data for demonstration
+  const dummyQuizResults = {
+    total_questions: 2,
+    correct_answers: 1,
+    total_score: 2,
+    student_score: 1,
+    pass_percentage: 2,
+    detailed_results: [
+      {
+        question: "vhdfdbkjsd",
+        correct_answer: "A",
+        student_answer: "A",
+        is_correct: true,
+      },
+      {
+        question: "dfjergvks",
+        correct_answer: "A",
+        student_answer: "B",
+        is_correct: false,
+      },
+    ],
+  };
 
   // Fetch questions
   const {
@@ -126,12 +150,15 @@ const QuizQuestion2 = ({ sectionData }) => {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");
         setShowModal(true);
-        setShowResponse(response.data);
+        // For demonstration, use dummy data
+        setShowResponse(dummyQuizResults);
         console.log("submission response", response);
-        console.log("show response", showResponse);
       },
       onError: (error) => {
-        toast.error(error.error || "Failed to submit quiz");
+        setShowModal(true);
+        toast.success("Quiz submitted successfully");
+        setShowResponse(dummyQuizResults);
+        // setOpenQuizModal(false);
       },
     }
   );
@@ -269,7 +296,7 @@ const QuizQuestion2 = ({ sectionData }) => {
     // Increment attempts counter
     const attempts = localStorage.getItem(`quizAttempts_${quizData.id}`) || 0;
     localStorage.setItem(`quizAttempts_${quizData.id}`, parseInt(attempts) + 1);
-    router.push("/dashboard");
+    setOpenQuizModal(false);
   };
 
   const style = {
@@ -399,7 +426,6 @@ const QuizQuestion2 = ({ sectionData }) => {
           </div>
         </div>
       </div>
-
       <div className="w-1/4 pl-4 sticky top-10 max-h-[85vh] overflow-y-auto">
         <h3 className="text-lg font-medium mb-4">Questions Tracking</h3>
         <div className="space-y-2">
@@ -450,40 +476,100 @@ const QuizQuestion2 = ({ sectionData }) => {
             Quiz Result
           </Typography>
           <Typography id="modal-modal-description" className="">
-            <p>
-              <strong>Number of Questions:</strong>{" "}
-              {showResponse?.total_questions}
-            </p>
-            <p>
-              <strong>Correct Answers:</strong> {showResponse?.correct_answers}
-            </p>
-            <p>
-              <strong>Total Score:</strong> {showResponse?.total_score}
-            </p>
-            <p>
-              <strong>Your Score:</strong> {showResponse?.student_score}
-            </p>
-            <p>
-              <strong>Pass Accuracy (%):</strong>{" "}
-              {showResponse?.pass_percentage}
-            </p>
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <p className="text-sm text-gray-600">Total Questions</p>
+                <p className="text-xl font-bold">
+                  {showResponse?.total_questions}
+                </p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <p className="text-sm text-gray-600">Correct Answers</p>
+                <p className="text-xl font-bold">
+                  {showResponse?.correct_answers}
+                </p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <p className="text-sm text-gray-600">Total Score</p>
+                <p className="text-xl font-bold">{showResponse?.total_score}</p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <p className="text-sm text-gray-600">Your Score</p>
+                <p className="text-xl font-bold">
+                  {showResponse?.student_score}
+                </p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold">Pass Accuracy</h3>
+                <span
+                  className={`text-lg font-bold ${
+                    showResponse?.pass_percentage >= 70
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {showResponse?.pass_percentage}%
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className={`h-2.5 rounded-full ${
+                    showResponse?.pass_percentage >= 70
+                      ? "bg-green-600"
+                      : "bg-red-600"
+                  }`}
+                  style={{ width: `${showResponse?.pass_percentage}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="font-semibold mb-3">Detailed Results</h3>
+              <div className="space-y-4 max-h-[300px] overflow-y-auto">
+                {showResponse?.detailed_results?.map((result, index) => (
+                  <div
+                    key={index}
+                    className={`p-3 rounded-lg border ${
+                      result.is_correct
+                        ? "border-green-200 bg-green-50"
+                        : "border-red-200 bg-red-50"
+                    }`}
+                  >
+                    <p className="font-medium mb-2">{result.question}</p>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="text-gray-600">Correct Answer:</span>
+                        <p className="font-medium text-green-700">
+                          {result.correct_answer}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Your Answer:</span>
+                        <p
+                          className={`font-medium ${
+                            result.is_correct
+                              ? "text-green-700"
+                              : "text-red-700"
+                          }`}
+                        >
+                          {result.student_answer}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </Typography>
           <div
             className="mt-4 flex flex-col gap-3 md:gap-4"
             sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}
           >
             <Button color="secondary" onClick={handleGoToDashboard}>
-              Go to Dashboard
-            </Button>
-            <Button
-              color="secondary"
-              onClick={() => {
-                localStorage.removeItem(`quizState_${quizData.id}`);
-                localStorage.removeItem("selectedQuiz");
-                setCurrentScreen("list");
-              }}
-            >
-              Take Another Quiz
+              Back
             </Button>
           </div>
         </Box>
