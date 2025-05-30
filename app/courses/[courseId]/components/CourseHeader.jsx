@@ -38,10 +38,10 @@ const CourseHeader = ({ title, programmeName }) => {
             height={32}
             className="rounded-full"
           />
-          <span className="hidden md:inline-block ml-2 text-sm">
+          {/* <span className="hidden md:inline-block ml-2 text-sm">
             Your progress
           </span>
-          <ChevronDown className="h-4 w-4 ml-1" />
+          <ChevronDown className="h-4 w-4 ml-1" /> */}
         </div>
         <button className="hidden md:flex items-center border border-white rounded px-3 py-1 text-sm">
           <Share2 className="h-4 w-4 mr-1" />
