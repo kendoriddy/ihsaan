@@ -121,8 +121,6 @@ const QuizQuestion2 = ({ sectionData }) => {
 
   // Mutation for submitting the quiz
   const { mutate: submitQuiz, isLoading: submittingQuiz } = usePost(
-    // https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/1/submit/
-
     `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionData?.id}/submit`,
     {
       onSuccess: (response) => {

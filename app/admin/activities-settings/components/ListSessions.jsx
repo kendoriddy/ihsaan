@@ -100,7 +100,7 @@ const AllSessions = () => {
                           setOpenUpdateModal(true);
                         }}
                       >
-                        <Edit/>
+                        <Edit />
                       </Button>
                       <Button
                         onClick={() => {
@@ -108,7 +108,7 @@ const AllSessions = () => {
                           setOpenDeleteDialog(true);
                         }}
                       >
-                        <Delete/>
+                        <Delete />
                       </Button>
                     </TableCell>
                   </TableRow>

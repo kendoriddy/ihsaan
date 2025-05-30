@@ -62,7 +62,6 @@ function EditCoursePage() {
   const [newMaterialData, setNewMaterialData] = useState({
     title: "",
     section: "",
-    order: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
@@ -444,11 +443,7 @@ function EditCoursePage() {
   const handleAddMaterial = async (e) => {
     e.preventDefault();
 
-    if (
-      !newMaterialData.title ||
-      !newMaterialData.section ||
-      !newMaterialData.order
-    ) {
+    if (!newMaterialData.title || !newMaterialData.section) {
       toast.error(
         "Please provide title, select a section, and set an order for the material"
       );
@@ -474,7 +469,6 @@ function EditCoursePage() {
           section: parseInt(newMaterialData.section),
           title: newMaterialData.title,
           material_resource_id: materialResourceId,
-          order: parseInt(newMaterialData.order),
         },
         {
           headers: {
@@ -1136,7 +1130,7 @@ function EditCoursePage() {
                         </select>
                       </div>
                       {/* Material Order Input */}
-                      <div>
+                      {/* <div>
                         <label
                           htmlFor="material_order"
                           className="block text-sm font-medium text-gray-700"
@@ -1157,7 +1151,7 @@ function EditCoursePage() {
                           className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                           placeholder="e.g., 1, 2, 3..."
                         />
-                      </div>
+                      </div> */}
                       <div>
                         <label
                           htmlFor="materialFileInput"
@@ -1308,7 +1302,7 @@ function EditCoursePage() {
                           className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
                       </div>
-                      <div>
+                      {/* <div>
                         <label
                           htmlFor="order"
                           className="block text-sm font-medium text-gray-700"
@@ -1329,7 +1323,7 @@ function EditCoursePage() {
                           className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                           placeholder="e.g., 1, 2, 3..."
                         />
-                      </div>
+                      </div> */}
                       <div>
                         <label
                           htmlFor="video_file"

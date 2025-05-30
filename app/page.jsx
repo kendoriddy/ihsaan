@@ -502,7 +502,6 @@ function Page() {
               {courses && (
                 <>
                   {courses?.slice(0, 6)?.map((course) => {
-                    console.log(course, "coursess");
                     return (
                       <Link
                         key={course?.id}
