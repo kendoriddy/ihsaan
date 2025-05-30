@@ -503,12 +503,12 @@ const DashboardTab = () => {
                   key={programme.id}
                   className="border rounded-lg shadow-md p-4 bg-white relative"
                 >
-                  <IconButton
+                  <div
                     className="absolute top-2 right-2"
                     onClick={(event) => handleMenuClick(event, programme)}
                   >
                     <MoreVert />
-                  </IconButton>
+                  </div>
                   <Menu
                     anchorEl={anchorEl}
                     open={openMenu}
@@ -600,12 +600,12 @@ const DashboardTab = () => {
                   key={classItem.id}
                   className="border rounded-lg shadow-md p-4 bg-white relative"
                 >
-                  <IconButton
+                  <div
                     className="absolute top-2 right-2"
                     onClick={(event) => handleClassMenuClick(event, classItem)}
                   >
                     <MoreVert />
-                  </IconButton>
+                  </div>
                   <Menu
                     anchorEl={anchorElClass}
                     open={openClassMenu}

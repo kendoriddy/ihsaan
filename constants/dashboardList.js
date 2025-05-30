@@ -119,23 +119,9 @@ const DASHBOARD_LIST = {
       id: 17,
       name: "Reports",
       icon: AssessmentIcon,
-      path: "/reports",
+      path: "/admin/reports",
     },
-    // { id: 13, name: "Transactions", path: "/admin/transactions" },
-    // {
-    //   id: 14,
-    //   name: "Reports",
-    //   path: "#",
-    //   subMenu: [
-    //     { id: 1, name: "Invoice Reports", path: "/admin/invoice-reports" },
-    //   ],
-    // },
     { id: 15, name: "My Profile", path: "/admin/profile" },
-    // {
-    //   id: 16,
-    //   name: "Blog",
-    //   path: "/admin/blog",
-    // },
   ],
 };
 

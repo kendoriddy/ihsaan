@@ -74,7 +74,7 @@ function EditCoursePage() {
   const [newSectionData, setNewSectionData] = useState({
     title: "",
     description: "",
-    order: "",
+    has_mcq_assessment: "",
   });
 
   const [enrolledStudents, setEnrolledStudents] = useState([]);
@@ -592,7 +592,7 @@ function EditCoursePage() {
 
   const handleAddSection = async (e) => {
     e.preventDefault();
-    if (!newSectionData.title || !newSectionData.order) {
+    if (!newSectionData.title || !newSectionData.has_mcq_assessment) {
       toast.error("Please provide title and order for the section.");
       return;
     }
@@ -603,7 +603,7 @@ function EditCoursePage() {
         {
           ...newSectionData,
           course: parseInt(courseId), // Ensure courseId is an integer
-          order: parseInt(newSectionData.order), // Ensure order is an integer
+          has_mcq_assessment: newSectionData.has_mcq_assessment === "Yes",
         },
         {
           headers: {
@@ -614,7 +614,7 @@ function EditCoursePage() {
       );
       toast.success("Section added successfully!");
       setCourseSections((prev) => [...prev, response.data]);
-      setNewSectionData({ title: "", description: "", order: "" }); // Reset form
+      setNewSectionData({ title: "", description: "", has_mcq_assessment: "" }); // Reset form
       fetchCourseSections(); // Re-fetch to get the latest list with IDs
     } catch (error) {
       toast.error(
@@ -844,24 +844,29 @@ function EditCoursePage() {
                   </div>
                   <div>
                     <label
-                      htmlFor="section_order"
+                      htmlFor="has_mcq_assessment"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Order
+                      Will this section have assessment?
                     </label>
-                    <input
-                      type="number"
-                      id="section_order"
-                      value={newSectionData.order}
+                    <select
+                      id="has_mcq_assessment"
+                      value={newSectionData.has_mcq_assessment}
                       onChange={(e) =>
                         setNewSectionData({
                           ...newSectionData,
-                          order: e.target.value,
+                          has_mcq_assessment: e.target.value,
                         })
                       }
                       required
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    />
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    >
+                      <option value="" disabled>
+                        Select an option
+                      </option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
                   </div>
                   <button
                     type="submit"

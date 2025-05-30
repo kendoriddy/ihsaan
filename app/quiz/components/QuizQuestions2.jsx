@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { formatTime, timeStringToMs } from "../../../utils/utilFunctions";
 import parse from "html-react-parser";
 
-const QuizQuestion = ({ setCurrentScreen }) => {
+const QuizQuestion2 = ({ sectionData }) => {
   const quizData = JSON.parse(localStorage.getItem("selectedQuiz"));
   const router = useRouter();
 
@@ -28,11 +28,8 @@ const QuizQuestion = ({ setCurrentScreen }) => {
   });
   const [timeLeft, setTimeLeft] = useState(() => {
     const savedState = localStorage.getItem(`quizState_${quizData.id}`);
-    return savedState
-      ? JSON.parse(savedState).timeLeft
-      : quizData.mcq_duration
-      ? timeStringToMs(quizData.mcq_duration)
-      : 0;
+    // Default to 30 minutes if no duration is specified
+    return savedState ? JSON.parse(savedState).timeLeft : 30 * 60 * 1000;
   });
   const [selectedOption, setSelectedOption] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -46,7 +43,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     refetch,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?page_size=${quizData?.mcq_question_count}&assessment_id=${quizData?.id}`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${quizData.id}/`,
     (data) => {},
     (error) => {
       toast.error(
@@ -59,7 +56,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     }
   );
 
-  const Questions = QuestionsList && QuestionsList?.data?.questions;
+  const Questions = QuestionsList && QuestionsList.data;
 
   useEffect(() => {
     if (Questions?.length > 0) {
@@ -122,7 +119,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
 
   // Mutation for submitting the quiz
   const { mutate: submitQuiz, isLoading: submittingQuiz } = usePost(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/submit-answers/?assessment_id=${quizData?.id}`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${quizData?.id}/submit`,
     {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");
@@ -132,7 +129,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
         console.log("show response", showResponse);
       },
       onError: (error) => {
-        // toast.error(error.error || "Failed to submit quiz");
+        toast.error(error.error || "Failed to submit quiz");
       },
     }
   );
@@ -159,6 +156,12 @@ const QuizQuestion = ({ setCurrentScreen }) => {
   }
 
   const currentQuestion = Questions[currentQuestionIndex];
+  console.log(
+    Questions,
+    currentQuestionIndex,
+    currentQuestion,
+    "currentQuestion:::"
+  );
   const totalQuestions = Questions.length;
   const answeredQuestions = answers.filter((answer) => answer !== null).length;
   const pendingQuestions = totalQuestions - answeredQuestions;
@@ -203,10 +206,20 @@ const QuizQuestion = ({ setCurrentScreen }) => {
   };
 
   const handleSubmit = () => {
+    console.log(answers, "answers:::");
     const unansweredQuestions = answers.filter((answer) => answer === null);
-    // if (unansweredQuestions.length > 0) {
-    //   alert("All questions were not answered, are you sure want to submit?");
-    // }
+
+    // Check if user has exceeded max attempts
+    if (quizData.max_attempts && quizData.max_attempts > 0) {
+      const attempts = localStorage.getItem(`quizAttempts_${quizData.id}`) || 0;
+      if (parseInt(attempts) >= quizData.max_attempts) {
+        toast.error(
+          `You have exceeded the maximum number of attempts (${quizData.max_attempts})`
+        );
+        return;
+      }
+    }
+
     if (unansweredQuestions.length > 0) {
       const confirmSubmit = window.confirm(
         "Some questions are unanswered. Are you sure you want to submit?"
@@ -251,6 +264,9 @@ const QuizQuestion = ({ setCurrentScreen }) => {
   const handleGoToDashboard = () => {
     localStorage.removeItem(`quizState_${quizData.id}`);
     localStorage.removeItem("selectedQuiz");
+    // Increment attempts counter
+    const attempts = localStorage.getItem(`quizAttempts_${quizData.id}`) || 0;
+    localStorage.setItem(`quizAttempts_${quizData.id}`, parseInt(attempts) + 1);
     router.push("/dashboard");
   };
 
@@ -474,4 +490,4 @@ const QuizQuestion = ({ setCurrentScreen }) => {
   );
 };
 
-export default QuizQuestion;
+export default QuizQuestion2;
