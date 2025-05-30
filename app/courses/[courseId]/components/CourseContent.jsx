@@ -139,7 +139,6 @@ const CourseContent = ({ sections, onSelectVideo, selectedVideoId }) => {
     setSelectedQuiz(null);
     setOpenQuizModal(false);
   };
-
   const handleSetionQuiz = () => {};
 
   return (

@@ -15,6 +15,8 @@ import { formatTime, timeStringToMs } from "../../../utils/utilFunctions";
 import parse from "html-react-parser";
 
 const QuizQuestion2 = ({ sectionData }) => {
+  console.log(sectionData, "sectionData:::");
+
   const quizData = JSON.parse(localStorage.getItem("selectedQuiz"));
   const router = useRouter();
 
@@ -43,7 +45,7 @@ const QuizQuestion2 = ({ sectionData }) => {
     refetch,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${quizData.id}/`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionData?.id}/`,
     (data) => {},
     (error) => {
       toast.error(
@@ -119,7 +121,9 @@ const QuizQuestion2 = ({ sectionData }) => {
 
   // Mutation for submitting the quiz
   const { mutate: submitQuiz, isLoading: submittingQuiz } = usePost(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${quizData?.id}/submit`,
+    // https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/1/submit/
+
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionData?.id}/submit`,
     {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");
