@@ -20,6 +20,7 @@ import EditQuizQuestion from "../components/EditQuiz";
 import AdminLayout from "@/components/AdminLayout";
 import parse from "html-react-parser";
 import { Delete, Edit } from "@mui/icons-material";
+import Link from "next/link";
 
 const AllQuiz = () => {
   const queryClient = useQueryClient();
@@ -71,6 +72,9 @@ const AllQuiz = () => {
   return (
     <AdminLayout>
       <div>
+        <Link href="/admin/set-quiz" className="mb-6">
+          <Button variant="outlined">Back</Button>
+        </Link>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
