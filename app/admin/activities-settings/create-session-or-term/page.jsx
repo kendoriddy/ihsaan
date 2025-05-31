@@ -9,6 +9,7 @@ import { FormControl, TextField } from "@mui/material";
 import DatePickers from "@/components/validation/DatePicker";
 import CreateTerm from "../components/CreateTerm";
 import AdminLayout from "@/components/AdminLayout";
+import Link from "next/link";
 
 const CreateSession = () => {
   const [sessionOrTerm, setSessionOrTerm] = useState("session");
@@ -46,7 +47,9 @@ const CreateSession = () => {
         <h2 className="text-2xl font-semibold mb-6 text-center">
           Create Academic Year or Term
         </h2>
-
+        <Link href="/admin/activities-settings" className="my-4">
+          <Button variant="outlined">Back</Button>
+        </Link>
         <div className="flex justify-center mb-6">
           <div className="flex gap-4 border-b border-gray-300">
             <button
