@@ -7,12 +7,13 @@ import dayjs from "dayjs";
 import { Grid, TextField } from "@mui/material";
 
 function BasicDatePicker(props) {
-  const { value, placeholder, onChange } = props;
+  const { value, placeholder, onChange, className } = props;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
         label={placeholder}
+        className={`w-full ${className}`}
         value={value ? dayjs(value) : null}
         onChange={(newValue) =>
           onChange(newValue ? newValue.format("YYYY-MM-DD") : "")

@@ -39,7 +39,9 @@ const Grades = () => {
 
   const { data: termData, isFetching: isFetchingTerms } = useFetch(
     "terms",
-    `https://ihsaanlms.onrender.com/terms/`
+    selectedSession
+      ? `https://ihsaanlms.onrender.com/terms/?session=${selectedSession}`
+      : null
   );
   const Terms = termData?.data?.results || [];
 
@@ -101,6 +103,7 @@ const Grades = () => {
           <Select
             value={selectedTerm}
             label="Term"
+            disabled={!selectedSession}
             onChange={(e) => setSelectedTerm(e.target.value)}
           >
             {Terms.map((t) => (
@@ -124,7 +127,17 @@ const Grades = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {isFetchingGrades ? (
+            {!selectedSession || !selectedTerm ? (
+              <TableRow>
+                <TableCell colSpan={4}>
+                  <div className="flex justify-center items-center gap-2 py-4">
+                    <span className="animate-pulse">
+                      Select session and term to get list of grades...
+                    </span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : isFetchingGrades ? (
               <TableRow>
                 <TableCell colSpan={4}>
                   <div className="flex justify-center items-center gap-2 py-4">
