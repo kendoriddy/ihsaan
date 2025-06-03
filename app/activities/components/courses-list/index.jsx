@@ -16,12 +16,15 @@ const CoursesList = ({ courses }) => {
         const { code, title, programme_name, image_url } = course_details;
 
         return (
-          <div key={id} className="border rounded-lg shadow-md bg-white">
-            <h2 className="text-xl font-semibold mb-1 p-4 border-b border-b-gray-300">
+          <div
+            key={id}
+            className="border-2 border-blue-600 rounded-lg shadow-md bg-white"
+          >
+            <h2 className="text-xl font-semibold mb-1 p-4 border-b border-b-blue-600">
               {title} - {code}
             </h2>
             <div>
-              <div className="p-4 flex justify-between md:justify-normal items-start gap-4">
+              <div className="p-4 flex justify-between md:justify-normal items-start gap-4 border-b border-b-blue-600">
                 <div>
                   <p className="font-semibold">Tutor(s):</p>
                   <ul className="list-none list-inside">
@@ -47,7 +50,7 @@ const CoursesList = ({ courses }) => {
                   <People /> {groups[0]?.students.length}
                 </span>
               </div>
-              <div className="flex gap-4 rounded-md bg-gray-100 p-4">
+              <div className="flex gap-4 rounded- text-white p-4 bg-blue-600">
                 <div className="flex gap-2 items-center">
                   <p className="font-semibold">Assignments:</p>
                   <span>
