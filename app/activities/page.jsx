@@ -1,22 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-  Container,
   Typography,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Box,
-  Card,
-  CardContent,
-  CircularProgress,
 } from "@mui/material";
 import Layout from "@/components/Layout";
 import { useFetch } from "@/hooks/useHttp/useHttp";
-import { Field } from "formik";
 import CoursesList from "./components/courses-list";
 import GradesArea from "./components/GradesArea";
+import Loader from "@/components/Loader";
+import animation from "../../assets/no_data.json";
+import Lottie from "lottie-react";
 
 const StudentInfoPage = () => {
   const [coursesOrGrade, setCoursesOrGrade] = useState("courses");
@@ -59,7 +57,7 @@ const StudentInfoPage = () => {
   } = useFetch(
     ["terms", selectedSession],
     selectedSession
-      ? `https://ihsaanlms.onrender.com/terms/?session_year=${selectedSession}`
+      ? `https://ihsaanlms.onrender.com/terms/?session__year=${selectedSession}`
       : null,
     (data) => {
       if (data?.total) {
@@ -101,9 +99,6 @@ const StudentInfoPage = () => {
       }
     }
   );
-
-  console.log("student grades", Grades);
-  console.log("student courses", StudentCourses);
 
   const Terms = TermData?.data?.results || [];
 
@@ -187,10 +182,67 @@ const StudentInfoPage = () => {
             </button>
           </div>
         </div>
-        {coursesOrGrade === "courses" && (
-          <CoursesList courses={StudentCourses?.data} />
-        )}
-        {coursesOrGrade === "grades" && <GradesArea grades={Grades?.data} />}
+        <div>
+          {!selectedSession || !selectedTerm ? (
+            <div>
+              <Lottie
+                animationData={animation}
+                loop
+                autoPlay
+                className="size-28"
+              />
+              <p className="text-red-700 font-medium">No Data!</p>
+              <p className="animate-pulse">
+                Please select session and term to see your academic activities
+                for a specific year
+              </p>
+            </div>
+          ) : isFetchingCourses || isFetchingGrades ? (
+            <div className="flex gap-2">
+              <Loader size={20} />
+              <p className="animate-pulse">
+                Fetching your academic details for the selected year
+              </p>
+            </div>
+          ) : (
+            <>
+              {coursesOrGrade === "courses" &&
+                (StudentCourses?.data?.results?.length > 0 ? (
+                  <CoursesList courses={StudentCourses.data} />
+                ) : (
+                  <div className="text-center py-8">
+                    <Lottie
+                      animationData={animation}
+                      loop={false}
+                      autoPlay
+                      className="w-48 h-48 mx-auto"
+                    />
+                    <p className="mt-4 text-gray-600">
+                      You are not enrolled in any courses for this session &
+                      term.
+                    </p>
+                  </div>
+                ))}
+
+              {coursesOrGrade === "grades" &&
+                (Grades?.data?.results?.length > 0 ? (
+                  <GradesArea grades={Grades.data} />
+                ) : (
+                  <div className="text-center py-8">
+                    <Lottie
+                      animationData={animation}
+                      loop={false}
+                      autoPlay
+                      className="w-48 h-48 mx-auto"
+                    />
+                    <p className="mt-4 text-gray-600">
+                      No grades available for this session & term.
+                    </p>
+                  </div>
+                ))}
+            </>
+          )}
+        </div>
       </>
     </Layout>
   );
