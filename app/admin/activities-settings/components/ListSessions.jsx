@@ -92,7 +92,7 @@ const AllSessions = () => {
                     <TableCell>{year.year}</TableCell>
                     <TableCell>{year.start_date}</TableCell>
                     <TableCell>{year.end_date}</TableCell>
-                    <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
+                    <TableCell className="flex flex-col md:flex-row items-center justify-center gap-6">
                       <Button
                         color="secondary"
                         onClick={() => {

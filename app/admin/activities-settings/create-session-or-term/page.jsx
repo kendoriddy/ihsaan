@@ -43,7 +43,7 @@ const CreateSession = () => {
 
   return (
     <AdminLayout>
-      <div className="">
+      <div className="w-full">
         <h2 className="text-2xl font-semibold mb-6 text-center">
           Create Academic Year or Term
         </h2>
@@ -97,7 +97,7 @@ const CreateSession = () => {
                 <FormControl
                   fullWidth
                   margin="normal"
-                  className="grid grid-cols-1 gap-3 md:grid-cols-3"
+                  className="grid grid-cols-1 gap-3 md:grid-cols-2"
                 >
                   <DatePickers
                     name="start_date"
