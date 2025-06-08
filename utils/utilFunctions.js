@@ -392,6 +392,54 @@ const formatDuration = (duration) => {
   return `${m} minutes`;
 };
 
+// Convert decimal to fraction
+export const decimalToFraction = (decimal) => {
+  if (decimal === 0) return "0";
+  if (decimal === 1) return "1";
+
+  // Handle common fractions
+  const commonFractions = {
+    0.25: "1/4",
+    0.5: "1/2",
+    0.75: "3/4",
+    0.33: "1/3",
+    0.67: "2/3",
+    0.2: "1/5",
+    0.4: "2/5",
+    0.6: "3/5",
+    0.8: "4/5",
+  };
+
+  // Check if it's a common fraction
+  const rounded = Math.round(decimal * 100) / 100;
+  if (commonFractions[rounded]) {
+    return commonFractions[rounded];
+  }
+
+  // For other decimals, convert to fraction
+  const tolerance = 0.0001;
+  let numerator = 1;
+  let denominator = 1;
+  let fraction = numerator / denominator;
+
+  while (Math.abs(fraction - decimal) > tolerance) {
+    if (fraction < decimal) {
+      numerator++;
+    } else {
+      denominator++;
+    }
+    fraction = numerator / denominator;
+  }
+
+  // Simplify the fraction
+  const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+  const divisor = gcd(numerator, denominator);
+  numerator = Math.round(numerator / divisor);
+  denominator = Math.round(denominator / divisor);
+
+  return `${numerator}/${denominator}`;
+};
+
 export {
   formatDate,
   serverDateFormat,

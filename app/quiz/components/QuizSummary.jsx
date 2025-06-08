@@ -78,7 +78,7 @@ const QuizSummary = ({ summaryId, startDate, endDate, duration }) => {
               </h3>
               <p className="text-sm md:text-base">
                 Correct answers are displayed in green while incorrect answers
-                are displayed in red and the correct answer highlighted in green
+                are displayed in red.
               </p>
             </div>
             {Object.entries(responses).map(([key, resp], index) => {

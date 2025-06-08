@@ -22,103 +22,11 @@ import {
   DialogTitle,
   IconButton,
 } from "@mui/material";
-import QuizQuestion from "@/app/quiz/components/QuizQuestions";
 import QuizQuestion2 from "@/app/quiz/components/QuizQuestions2";
 import { Close } from "@mui/icons-material";
 
-// Dummy course content data
-const courseContent = [
-  {
-    id: 1,
-    title: "Course content",
-    isOpen: true,
-    items: [
-      {
-        id: 1,
-        title: "About this course",
-        duration: "2min",
-        completed: true,
-        type: "video",
-      },
-      {
-        id: 2,
-        title: "Introduction",
-        duration: "2min",
-        completed: true,
-        type: "video",
-      },
-      {
-        id: 3,
-        title: "What is DevOps?",
-        duration: "15min",
-        completed: true,
-        type: "video",
-      },
-      {
-        id: 4,
-        title: "Q & A",
-        duration: "2min",
-        completed: true,
-        type: "video",
-      },
-      {
-        id: 5,
-        title: "What is Continuous Integration?",
-        duration: "8min",
-        completed: true,
-        type: "video",
-      },
-      {
-        id: 6,
-        title: "What is Continuous Delivery?",
-        duration: "5min",
-        completed: true,
-        type: "video",
-      },
-      {
-        id: 7,
-        title: "DevOps Quiz",
-        duration: "",
-        completed: true,
-        type: "quiz",
-      },
-      {
-        id: 8,
-        title: "Course Material",
-        duration: "1min",
-        completed: true,
-        type: "document",
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Section 2: Prerequisites Info & Setup",
-    isOpen: false,
-    totalLectures: 9,
-    totalDuration: "58min",
-    items: [],
-  },
-  {
-    id: 3,
-    title: "Section 3: VM Setup",
-    isOpen: false,
-    totalLectures: 9,
-    totalDuration: "1hr 26min",
-    items: [],
-  },
-  {
-    id: 4,
-    title: "Section 4: Linux",
-    isOpen: false,
-    totalLectures: 12,
-    totalDuration: "2hr 15min",
-    items: [],
-  },
-];
-
 const CourseContent = ({ sections, onSelectVideo, selectedVideoId }) => {
-  const [openSectionIndex, setOpenSectionIndex] = useState(0); // Default open first section
+  const [openSectionIndex, setOpenSectionIndex] = useState(0);
   const [openQuizModal, setOpenQuizModal] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
 
