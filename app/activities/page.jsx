@@ -21,6 +21,7 @@ const StudentInfoPage = () => {
   const [selectedSession, setSelectedSession] = useState("");
   const [selectedTerm, setSelectedTerm] = useState("");
   const [studentId, setStudentId] = useState("");
+  const [gradePageSize, setGradePageSize] = useState(null);
 
   const fetchStudentId = () => {
     const storedStudentId = localStorage.getItem("userId");
@@ -44,7 +45,6 @@ const StudentInfoPage = () => {
     `https://ihsaanlms.onrender.com/academic-sessions/`,
     (data) => {
       if (data?.total) {
-        // setTotalSession(data.total);
       }
     }
   );
@@ -72,13 +72,15 @@ const StudentInfoPage = () => {
     refetch: refetchGrade,
     isFetching: isFetchingGrades,
   } = useFetch(
-    ["grades", selectedSession],
+    ["grades", selectedSession, gradePageSize], // include pageSize in key
     selectedSession && selectedTerm
-      ? `https://ihsaanlms.onrender.com/assessment/grades/?student=${studentId}`
+      ? `https://ihsaanlms.onrender.com/assessment/grades/?student=${studentId}${
+          gradePageSize ? `&page_size=${gradePageSize}` : ""
+        }`
       : null,
     (data) => {
-      if (data?.total) {
-        // You can handle data.total here if needed
+      if (data?.total && !gradePageSize) {
+        setGradePageSize(data.total);
       }
     }
   );
