@@ -80,14 +80,9 @@ const QuizQuestion2 = ({ sectionData, setOpenQuizModal }) => {
           });
       },
       onError: (error) => {
-<<<<<<< HEAD
-        // toast.error(error.error || "Failed to submit quiz");
-        toast.success("Quiz submitted successfully");
-=======
         toast.error("Error submitting quiz");
         setShowResponse(null);
         setShowModal(true);
->>>>>>> dc2d657309186e1e3549f2e483d5a1451416796c
       },
     }
   );
