@@ -111,7 +111,7 @@ const IndividualAssignmentPage = () => {
       </Layout>
     );
   }
-
+  console.log(SubmissionData, "pppp");
   return (
     <Layout>
       <Link href="/assignment" className="my-4 p-6">
@@ -156,11 +156,6 @@ const IndividualAssignmentPage = () => {
                 Submission & Comments
               </h3>
             )}{" "}
-            {/* <p className="text-red-600">
-              <strong className="text-blue-600 ml-2">Ends:</strong>
-              {formatDate(AssignmentData.data?.end_date) ||
-                "No end date available"}
-            </p> */}
           </div>
           {showSubmissionForm && (
             <AssignmentSubmission
