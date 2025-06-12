@@ -94,7 +94,7 @@ const ListTerms = () => {
                     <TableCell>{term.name}</TableCell>
                     <TableCell>{term.start_date}</TableCell>
                     <TableCell>{term.end_date}</TableCell>
-                    <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
+                    <TableCell className="flex flex-col md:flex-row items-center justify-center gap-6">
                       <Button
                         color="secondary"
                         onClick={() => {

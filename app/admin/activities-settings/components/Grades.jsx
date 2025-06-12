@@ -1,35 +1,3 @@
-// import { useFetch } from "@/hooks/useHttp/useHttp";
-// import React from "react";
-
-// const Grades = () => {
-//   const { isLoading, data, refetch, isFetching } = useFetch(
-//     "academicSession",
-//     `https://ihsaanlms.onrender.com/academic-sessions/`,
-//     (data) => {
-//       if (data?.total) {
-//       }
-//     }
-//   );
-
-//   const Sessions = data?.data?.results || [];
-
-//   const {
-//     isLoading: isLoadingTerm,
-//     data: TermData,
-//     refetch: refetchTerm,
-//     isFetching: isFetchingTerm,
-//   } = useFetch("terms", `https://ihsaanlms.onrender.com/terms/`, (data) => {
-//     if (data?.total) {
-//     }
-//   });
-
-//   const Terms = TermData?.data?.results || [];
-
-//   return <div>Grades</div>;
-// };
-
-// export default Grades;
-
 "use client";
 import React, { useState } from "react";
 import {
@@ -71,7 +39,9 @@ const Grades = () => {
 
   const { data: termData, isFetching: isFetchingTerms } = useFetch(
     "terms",
-    `https://ihsaanlms.onrender.com/terms/`
+    selectedSession
+      ? `https://ihsaanlms.onrender.com/terms/?session=${selectedSession}`
+      : null
   );
   const Terms = termData?.data?.results || [];
 
@@ -133,6 +103,7 @@ const Grades = () => {
           <Select
             value={selectedTerm}
             label="Term"
+            disabled={!selectedSession}
             onChange={(e) => setSelectedTerm(e.target.value)}
           >
             {Terms.map((t) => (
@@ -143,20 +114,30 @@ const Grades = () => {
           </Select>
         </FormControl>
       </div>
-
       {/* Table */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Student</TableCell>
+              <TableCell>Course Code</TableCell> <TableCell>Student</TableCell>
+              <TableCell>Assessment Score</TableCell>
               <TableCell>Score</TableCell>
               <TableCell>Publish Status</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {isFetchingGrades ? (
+            {!selectedSession || !selectedTerm ? (
+              <TableRow>
+                <TableCell colSpan={4}>
+                  <div className="flex justify-center items-center gap-2 py-4">
+                    <span className="animate-pulse">
+                      Select session and term to get list of grades...
+                    </span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : isFetchingGrades ? (
               <TableRow>
                 <TableCell colSpan={4}>
                   <div className="flex justify-center items-center gap-2 py-4">
@@ -174,7 +155,9 @@ const Grades = () => {
             ) : (
               Grades.map((grade) => (
                 <TableRow key={grade.id}>
+                  <TableCell>{grade.course_code}</TableCell>
                   <TableCell>{grade.student_name}</TableCell>
+                  <TableCell>{grade.assessment_max_score}</TableCell>
                   <TableCell>{grade.score}</TableCell>
                   <TableCell>{grade.is_published}</TableCell>
                   <TableCell className="flex flex-col md:flex-row items-center gap-2">
@@ -187,15 +170,14 @@ const Grades = () => {
                     >
                       <Edit />
                     </Button>
-                    <Button
-                      color="danger"
+                    {/* <Button
                       onClick={() => {
                         setSelectedGrade(grade);
                         setOpenDeleteDialog(true);
                       }}
                     >
                       <Delete />
-                    </Button>
+                    </Button> */}
                   </TableCell>
                 </TableRow>
               ))
@@ -203,7 +185,6 @@ const Grades = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
       {/* Pagination */}
       {Grades.length > 0 && (
         <Pagination
@@ -214,7 +195,6 @@ const Grades = () => {
           sx={{ mt: 2, display: "flex", justifyContent: "center" }}
         />
       )}
-
       {/* Delete Confirmation Modal */}
       <CustomModal
         open={openDeleteDialog}
@@ -226,11 +206,10 @@ const Grades = () => {
       >
         <p>Are you sure you want to delete this grade?</p>
       </CustomModal>
-
       {/* Edit Grade Modal */}
       <EditGrade
-        open={openEditModal}
-        setOpen={setOpenEditModal}
+        openUpdateModal={openEditModal}
+        setOpenUpdateModal={setOpenEditModal}
         selectedGrade={selectedGrade}
         refetchGrades={refetchGrades}
       />

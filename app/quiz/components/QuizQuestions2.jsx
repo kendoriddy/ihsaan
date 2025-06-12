@@ -2,144 +2,163 @@
 import React, { useState, useEffect } from "react";
 import { useFetch, usePost } from "@/hooks/useHttp/useHttp";
 import Button from "@/components/Button";
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import CardActionArea from "@mui/material/CardActionArea";
-import { toast } from "react-toastify";
 import Loader from "@/components/Loader";
-import { Modal } from "@mui/material";
-import { useRouter } from "next/navigation";
-import { formatTime, timeStringToMs } from "../../../utils/utilFunctions";
+import {
+  Box,
+  Modal,
+  Typography,
+  Card,
+  CardContent,
+  CardActionArea,
+} from "@mui/material";
+import { toast } from "react-toastify";
 import parse from "html-react-parser";
+import {
+  formatTime,
+  formatDate,
+  decimalToFraction,
+} from "../../../utils/utilFunctions";
+import { getAuthToken } from "@/hooks/axios/axios";
+import axios from "axios";
 
-const QuizQuestion2 = ({ sectionData }) => {
-  console.log(sectionData, "sectionData:::");
-
-  const quizData = JSON.parse(localStorage.getItem("selectedQuiz"));
-  const router = useRouter();
-
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() => {
-    const savedState = localStorage.getItem(`quizState_${quizData.id}`);
-    return savedState ? JSON.parse(savedState).currentQuestionIndex : 0;
-  });
-  const [answers, setAnswers] = useState(() => {
-    const savedState = localStorage.getItem(`quizState_${quizData.id}`);
-    return savedState ? JSON.parse(savedState).answers : [];
-  });
-  const [timeLeft, setTimeLeft] = useState(() => {
-    const savedState = localStorage.getItem(`quizState_${quizData.id}`);
-    // Default to 30 minutes if no duration is specified
-    return savedState ? JSON.parse(savedState).timeLeft : 30 * 60 * 1000;
-  });
+const QuizQuestion2 = ({ sectionData, setOpenQuizModal }) => {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(30 * 60 * 1000); // default 30 min
   const [selectedOption, setSelectedOption] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showResponse, setShowResponse] = useState(null);
 
-  // Fetch questions
   const {
     isLoading,
     data: QuestionsList,
     isFetching,
-    refetch,
   } = useFetch(
     "questions",
     `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionData?.id}/`,
-    (data) => {},
+    () => {},
     (error) => {
-      toast.error(
-        error.error ||
-          "Failed to load questions, make sure you're eligible for the quiz"
-      );
-      localStorage.removeItem("selectedCourse");
-      localStorage.removeItem(`quizState_${quizData.id}`);
-      setCurrentScreen("list");
+      toast.error(error.error || "Failed to load questions.");
+      setOpenQuizModal(false);
     }
   );
 
-  const Questions = QuestionsList && QuestionsList.data;
+  const Questions = QuestionsList?.data || [];
 
   useEffect(() => {
-    if (Questions?.length > 0) {
-      const savedState = localStorage.getItem(`quizState_${quizData.id}`);
-      const savedAnswers = savedState ? JSON.parse(savedState).answers : null;
-      setAnswers(savedAnswers || Array(Questions.length).fill(null));
+    if (Questions.length > 0) {
+      setAnswers(Array(Questions.length).fill(null));
     }
   }, [Questions]);
 
-  useEffect(() => {
-    if (Questions?.length > 0) {
-      const quizState = {
-        currentQuestionIndex,
-        answers,
-        timeLeft,
-      };
-      localStorage.setItem(
-        `quizState_${quizData.id}`,
-        JSON.stringify(quizState)
-      );
-    }
-  }, [currentQuestionIndex, answers, timeLeft, Questions]);
-
-  const handleAutoSubmit = () => {
-    const formattedAnswers = Questions?.reduce((acc, question, index) => {
-      if (answers[index] !== null) {
-        acc[question.id] = answers[index];
-      }
-      return acc;
-    }, {});
-    submitQuiz({ answers: formattedAnswers });
-  };
-
-  // Timer logic with auto-submit
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      handleAutoSubmit();
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1000) {
-          clearInterval(timer);
-          handleAutoSubmit();
-          return 0;
-        }
-        return prev - 1000;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timeLeft]);
-
-  // Update selected option when navigating between questions
-  useEffect(() => {
-    const selected = answers[currentQuestionIndex];
-    setSelectedOption(selected);
-  }, [currentQuestionIndex, answers]);
-
-  // Mutation for submitting the quiz
   const { mutate: submitQuiz, isLoading: submittingQuiz } = usePost(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionData?.id}/submit`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionData?.id}/submit/`,
     {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");
-        setShowModal(true);
-        setShowResponse(response.data);
-        console.log("submission response", response);
-        console.log("show response", showResponse);
+        console.log(response, "response::::");
+        // Fetch detailed results using mcq_response_id with axios
+        const token = getAuthToken();
+        axios
+          .get(
+            `https://ihsaanlms.onrender.com/assessment/mcq-responses/${response.data.mcq_response_id}/`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
+          .then((res) => {
+            setShowResponse(res.data);
+            setShowModal(true);
+          })
+          .catch((error) => {
+            toast.error("Error fetching detailed results");
+            setShowResponse(null);
+            setShowModal(true);
+          });
       },
       onError: (error) => {
+<<<<<<< HEAD
         // toast.error(error.error || "Failed to submit quiz");
         toast.success("Quiz submitted successfully");
+=======
+        toast.error("Error submitting quiz");
+        setShowResponse(null);
+        setShowModal(true);
+>>>>>>> dc2d657309186e1e3549f2e483d5a1451416796c
       },
     }
   );
 
-  if (isLoading || isFetching || !Questions) {
+  // Timer with auto-submit
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      handleSubmit();
+      return;
+    }
+    const timer = setInterval(() => setTimeLeft((prev) => prev - 1000), 1000);
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const handleOptionSelect = (key) => {
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentQuestionIndex] = key;
+    setAnswers(updatedAnswers);
+    setSelectedOption(key);
+  };
+
+  const handleSubmit = () => {
+    if (!Questions.length) return;
+    const unanswered = answers.filter((a) => a === null);
+    if (unanswered.length > 0) {
+      const confirm = window.confirm(
+        "Some questions are unanswered. Submit anyway?"
+      );
+      if (!confirm) return;
+    }
+    const formatted = Questions.reduce((acc, q, i) => {
+      if (answers[i] !== null) acc[q.id] = answers[i];
+      return acc;
+    }, {});
+    submitQuiz({ answers: formatted });
+  };
+
+  const handleNext = () => {
+    if (currentQuestionIndex < Questions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prev) => prev - 1);
+    }
+  };
+
+  const handleGoBack = () => {
+    setOpenQuizModal(false);
+  };
+
+  const cards = [
+    { id: 1, title: "Total", description: Questions.length },
+    {
+      id: 2,
+      title: "Answered",
+      description: answers.filter((a) => a !== null).length,
+    },
+    {
+      id: 3,
+      title: "Pending",
+      description: answers.filter((a) => a === null).length,
+    },
+    { id: 4, title: "Time Left", description: formatTime(timeLeft) },
+  ];
+
+  if (isLoading || isFetching) {
     return (
-      <div className="">
+      <div className="text-center">
         <p className="text-lg font-semibold text-gray-600">
           Loading questions...
         </p>
@@ -148,252 +167,75 @@ const QuizQuestion2 = ({ sectionData }) => {
     );
   }
 
-  if (!Questions || Questions.length === 0) {
+  if (!Questions.length) {
     return (
-      <div className="">
-        <p className="text-lg font-semibold text-gray-600">
-          No questions available for this course.
-        </p>
-      </div>
+      <p className="text-lg font-semibold text-gray-600">
+        No questions available.
+      </p>
     );
   }
 
-  const currentQuestion = Questions[currentQuestionIndex];
-  console.log(
-    Questions,
-    currentQuestionIndex,
-    currentQuestion,
-    "currentQuestion:::"
-  );
-  const totalQuestions = Questions.length;
-  const answeredQuestions = answers.filter((answer) => answer !== null).length;
-  const pendingQuestions = totalQuestions - answeredQuestions;
-
-  const handleOptionSelect = (key) => {
-    setSelectedOption(key);
-    const newAnswers = [...answers];
-    newAnswers[currentQuestionIndex] = key;
-    setAnswers(newAnswers);
-  };
-
-  const handleNext = () => {
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex((prev) => {
-        const nextIndex = prev + 1;
-        scrollToTracker(nextIndex);
-        return nextIndex;
-      });
-      setSelectedOption(answers[currentQuestionIndex + 1]);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex((prev) => {
-        const prevIndex = prev - 1;
-        scrollToTracker(prevIndex);
-        return prevIndex;
-      });
-      setSelectedOption(answers[currentQuestionIndex - 1]);
-    }
-  };
-
-  const scrollToTracker = (index) => {
-    const element = document.getElementById(`tracker-${index}`);
-    if (element) {
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-  };
-
-  const handleSubmit = () => {
-    console.log(answers, "answers:::");
-    const unansweredQuestions = answers.filter((answer) => answer === null);
-
-    // Check if user has exceeded max attempts
-    if (quizData.max_attempts && quizData.max_attempts > 0) {
-      const attempts = localStorage.getItem(`quizAttempts_${quizData.id}`) || 0;
-      if (parseInt(attempts) >= quizData.max_attempts) {
-        toast.error(
-          `You have exceeded the maximum number of attempts (${quizData.max_attempts})`
-        );
-        return;
-      }
-    }
-
-    if (unansweredQuestions.length > 0) {
-      const confirmSubmit = window.confirm(
-        "Some questions are unanswered. Are you sure you want to submit?"
-      );
-
-      if (!confirmSubmit) {
-        return;
-      }
-    }
-    const formattedAnswers = Questions.reduce((acc, question, index) => {
-      if (answers[index] !== null) {
-        acc[question.id] = answers[index];
-      }
-      return acc;
-    }, {});
-    submitQuiz({ answers: formattedAnswers });
-  };
-
-  const cards = [
-    {
-      id: 1,
-      title: "Total",
-      description: totalQuestions,
-    },
-    {
-      id: 2,
-      title: "Answered",
-      description: answeredQuestions,
-    },
-    {
-      id: 3,
-      title: "Pending",
-      description: pendingQuestions,
-    },
-    {
-      id: 4,
-      title: "Time Left",
-      description: formatTime(timeLeft),
-    },
-  ];
-
-  const handleGoToDashboard = () => {
-    localStorage.removeItem(`quizState_${quizData.id}`);
-    localStorage.removeItem("selectedQuiz");
-    // Increment attempts counter
-    const attempts = localStorage.getItem(`quizAttempts_${quizData.id}`) || 0;
-    localStorage.setItem(`quizAttempts_${quizData.id}`, parseInt(attempts) + 1);
-    router.push("/dashboard");
-  };
-
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    bgcolor: "background.paper",
-    border: "2px solid white",
-    boxShadow: 24,
-    width: 370,
-    p: 4,
-  };
+  const currentQ = Questions[currentQuestionIndex];
 
   return (
     <div className="w-full flex">
       <div className="flex-1">
-        <div className="flex justify-between mb-4">
-          <Box
-            sx={{
-              width: "100%",
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(min(150px, 100%), 1fr))",
-              gap: 2,
-            }}
-          >
-            {cards.map((card, index) => (
-              <Card key={index}>
-                <CardActionArea
-                  sx={{
-                    height: "100%",
-                    "&[data-active]": {
-                      backgroundColor: "action.selected",
-                      "&:hover": {
-                        backgroundColor: "action.selectedHover",
-                      },
-                    },
-                  }}
-                >
-                  <CardContent sx={{ height: "100%" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      className="text-center"
-                    >
-                      {card.title}
-                    </Typography>
-                    <Typography
-                      variant="h6"
-                      color="text.secondary"
-                      className="text-center"
-                    >
-                      {card.description}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            ))}
-          </Box>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+          {cards.map((card) => (
+            <Card key={card.id}>
+              <CardActionArea>
+                <CardContent>
+                  <Typography variant="h6" align="center">
+                    {card.title}
+                  </Typography>
+                  <Typography variant="subtitle1" align="center">
+                    {card.description}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          ))}
         </div>
-        <div className="border border-gray-300 rounded-md p-6 shadow-sm">
-          <p className="text-lg text-center font-semibold mb-4">
+
+        <div className="border p-4 rounded-md">
+          <p className="text-center text-lg font-semibold mb-4">
             Question {currentQuestionIndex + 1}
           </p>
-          <p className="text-lg text-center font-medium mb-4">
-            {parse(currentQuestion?.question_text)}
-          </p>
-          <div className="space-y-3">
-            {currentQuestion?.options &&
-              Object.entries(currentQuestion.options).map(([key, option]) => (
+          <div className="text-center mb-4">
+            {parse(currentQ?.question_text || "")}
+          </div>
+          <div className="space-y-2">
+            {currentQ?.options &&
+              Object.entries(currentQ.options).map(([key, text]) => (
                 <label
                   key={key}
-                  id={`question-${currentQuestionIndex}`}
-                  className="flex items-center p-2 border border-gray-200 rounded-md cursor-pointer hover:border-purple-600"
+                  className="block p-2 border rounded-md cursor-pointer hover:bg-gray-100"
                 >
                   <input
                     type="radio"
-                    name={`question-${currentQuestion.id}`}
-                    value={key}
-                    checked={selectedOption === key}
+                    name={`q-${currentQ.id}`}
+                    checked={answers[currentQuestionIndex] === key}
                     onChange={() => handleOptionSelect(key)}
-                    className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-600 mr-2"
+                    className="mr-2"
                   />
-                  {parse(option)}
+                  {parse(text)}
                 </label>
               ))}
           </div>
-          <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-between items-center mt-6">
-            {/* Previous Button - Left */}
+
+          <div className="flex justify-between mt-6">
             <Button
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
-              className={`px-4 py-2 rounded-md ${
-                currentQuestionIndex === 0
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-gray-600 text-white hover:bg-gray-700"
-              } transition-colors duration-300`}
             >
               Previous
             </Button>
-
-            {/* Submit Button - Center */}
-            <div className="flex-1 flex justify-center">
-              <Button
-                onClick={handleSubmit}
-                color="secondary"
-                className="px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300"
-              >
-                Submit
-              </Button>
-            </div>
-
-            {/* Next Button - Right */}
+            <Button onClick={handleSubmit} color="secondary">
+              Submit
+            </Button>
             <Button
               onClick={handleNext}
-              color="secondary"
-              disabled={currentQuestionIndex === totalQuestions - 1}
-              className={`px-6 py-2 rounded-md ${
-                currentQuestionIndex === totalQuestions - 1
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              } transition-colors duration-300`}
+              disabled={currentQuestionIndex === Questions.length - 1}
             >
               Next
             </Button>
@@ -401,92 +243,150 @@ const QuizQuestion2 = ({ sectionData }) => {
         </div>
       </div>
 
-      <div className="w-1/4 pl-4 sticky top-10 max-h-[85vh] overflow-y-auto">
-        <h3 className="text-lg font-medium mb-4">Questions Tracking</h3>
-        <div className="space-y-2">
-          {Questions.map((_, index) => (
-            <div
-              key={index}
-              id={`tracker-${index}`}
-              className="flex items-center transition-all duration-300 cursor-pointer"
-              onClick={() => setCurrentQuestionIndex(index)}
-              tabIndex={0}
+      <div className="w-1/4 pl-4">
+        <h3 className="text-lg font-semibold mb-2">Question Tracker</h3>
+        <div className="space-y-1">
+          {Questions.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentQuestionIndex(i)}
+              className={`block w-full text-left p-2 rounded-md ${
+                answers[i] ? "bg-green-100" : "bg-red-100"
+              }`}
             >
-              <input
-                type="checkbox"
-                checked={answers[index] !== null}
-                readOnly
-                className="hidden"
-              />
-              <span
-                className={`w-6 h-6 flex items-center justify-center border rounded-md ${
-                  answers[index]
-                    ? "bg-green-500 text-white border-green-500"
-                    : "bg-red-500 text-white border-red-500"
-                }`}
-              >
-                {index + 1}
-              </span>
-              <span className="ml-2 text-sm text-nowrap">
-                {answers[index] ? "Answered" : "Unanswered"}
-              </span>
-            </div>
+              Question {i + 1}: {answers[i] ? "Answered" : "Unanswered"}
+            </button>
           ))}
         </div>
       </div>
 
-      <Modal
-        open={showModal}
-        onClose={() => setShowModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography
-            className="text-center mb-4 font-extrabold"
-            id="modal-modal-title"
-            variant="h6"
-            component="h2"
-          >
-            Quiz Result
-          </Typography>
-          <Typography id="modal-modal-description" className="">
-            <p>
-              <strong>Number of Questions:</strong>{" "}
-              {showResponse?.total_questions}
-            </p>
-            <p>
-              <strong>Correct Answers:</strong> {showResponse?.correct_answers}
-            </p>
-            <p>
-              <strong>Total Score:</strong> {showResponse?.total_score}
-            </p>
-            <p>
-              <strong>Your Score:</strong> {showResponse?.student_score}
-            </p>
-            <p>
-              <strong>Pass Accuracy (%):</strong>{" "}
-              {showResponse?.pass_percentage}
-            </p>
-          </Typography>
-          <div
-            className="mt-4 flex flex-col gap-3 md:gap-4"
-            sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}
-          >
-            <Button color="secondary" onClick={handleGoToDashboard}>
-              Go to Dashboard
-            </Button>
-            <Button
-              color="secondary"
-              onClick={() => {
-                localStorage.removeItem(`quizState_${quizData.id}`);
-                localStorage.removeItem("selectedQuiz");
-                setCurrentScreen("list");
-              }}
-            >
-              Take Another Quiz
-            </Button>
-          </div>
+      <Modal open={showModal} onClose={() => setShowModal(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            width: "90%",
+            maxWidth: "800px",
+            maxHeight: "90vh",
+            overflowY: "auto",
+          }}
+        >
+          {showResponse ? (
+            <div className="space-y-6">
+              <h1 className="text-center font-bold text-xl md:text-3xl">
+                {showResponse.assessment_title}
+              </h1>
+
+              <div className="mt-4 space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <strong>Number of Questions:</strong>
+                  <span>{showResponse.summary?.total_questions}</span>
+                </div>
+                <div className="flex justify-between">
+                  <strong>Correct Answers:</strong>
+                  <span>{showResponse.summary?.correct_answers}</span>
+                </div>
+                <div className="flex justify-between">
+                  <strong>Wrong Answers:</strong>
+                  <span>
+                    {showResponse.summary?.total_questions -
+                      showResponse.summary?.correct_answers}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <strong>Obtainable Score:</strong>
+                  <span>{showResponse.summary?.assessment_max_score}</span>
+                </div>
+                <div className="flex justify-between">
+                  <strong>Your Score:</strong>
+                  <span>{decimalToFraction(showResponse.summary?.score)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <strong>You submitted on:</strong>
+                  <span>{formatDate(showResponse.submission_date)}</span>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-4">
+                <div className="font-semibold text-justify">
+                  <h3 className="text-base md:text-xl">
+                    See your question breakdown below
+                  </h3>
+                  <p className="text-sm md:text-base">
+                    Correct answers are displayed in green while incorrect
+                    answers are displayed in red.
+                  </p>
+                </div>
+                {Object.entries(showResponse.responses || {}).map(
+                  ([key, resp], index) => {
+                    const isCorrect = resp.is_correct;
+                    const correctAnswer = resp.correct_answer;
+                    const studentAnswer = resp.student_answer;
+
+                    return (
+                      <div
+                        key={key}
+                        className={`p-4 rounded-md border ${
+                          isCorrect
+                            ? "border-green-400 bg-green-50"
+                            : "border-red-400 bg-red-50"
+                        }`}
+                      >
+                        <h2
+                          className={`font-semibold mb-2 ${
+                            isCorrect ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {index + 1}. {resp.question_text}
+                        </h2>
+                        <ul className="space-y-1">
+                          {Object.entries(resp.options).map(
+                            ([optionKey, optionValue]) => {
+                              const isStudentAnswer =
+                                studentAnswer === optionKey;
+                              const isCorrectOption =
+                                correctAnswer === optionKey;
+
+                              const optionClass = `p-2 rounded-md ${
+                                isCorrectOption &&
+                                !isStudentAnswer &&
+                                !isCorrect
+                                  ? "bg-green-100 text-green-700"
+                                  : isStudentAnswer && !isCorrect
+                                  ? "bg-red-100 text-red-700"
+                                  : isStudentAnswer && isCorrect
+                                  ? "bg-green-100 text-green-700"
+                                  : ""
+                              }`;
+
+                              return (
+                                <li key={optionKey} className={optionClass}>
+                                  <span className="font-bold">
+                                    {optionKey}.
+                                  </span>{" "}
+                                  {optionValue}
+                                </li>
+                              );
+                            }
+                          )}
+                        </ul>
+                      </div>
+                    );
+                  }
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="text-red-600">No results available</p>
+          )}
+          <Button onClick={handleGoBack} className="mt-4 w-full">
+            Back
+          </Button>
         </Box>
       </Modal>
     </div>

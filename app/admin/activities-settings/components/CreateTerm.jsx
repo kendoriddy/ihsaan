@@ -79,7 +79,7 @@ const CreateTerm = () => {
             <FormControl
               fullWidth
               margin="normal"
-              className="grid grid-cols-1 gap-3 md:grid-cols-3"
+              className="grid grid-cols-1 gap-3 md:grid-cols-2"
             >
               <DatePickers
                 name="start_date"
