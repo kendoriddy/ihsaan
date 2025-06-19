@@ -19,7 +19,13 @@ import {
   CircularProgress,
   Chip,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Divider,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { getAuthToken } from "@/hooks/axios/axios";
 
@@ -43,6 +49,8 @@ const AssessmentResultsReport = () => {
     createdAfter: "",
     createdBefore: "",
   });
+  const [selectedResult, setSelectedResult] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const fetchResults = async () => {
     try {
@@ -135,6 +143,16 @@ const AssessmentResultsReport = () => {
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const handleRowClick = (result) => {
+    setSelectedResult(result);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedResult(null);
   };
 
   if (loading) {
@@ -322,7 +340,17 @@ const AssessmentResultsReport = () => {
           </TableHead>
           <TableBody>
             {results.map((result) => (
-              <TableRow key={result.id}>
+              <TableRow
+                key={result.id}
+                hover
+                style={{ cursor: "pointer", transition: "background 0.2s" }}
+                onClick={() => handleRowClick(result)}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "#f0f4ff",
+                  },
+                }}
+              >
                 <TableCell>{result.student_name}</TableCell>
                 <TableCell>{result.assessment_title}</TableCell>
                 <TableCell>{result.course_title}</TableCell>
@@ -352,6 +380,85 @@ const AssessmentResultsReport = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
+
+      {/* Result Details Modal */}
+      <Dialog
+        open={modalOpen}
+        onClose={handleCloseModal}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 2,
+            background: "linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)",
+            boxShadow: 6,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            pb: 0,
+          }}
+        >
+          <span>Result Details</span>
+          <IconButton onClick={handleCloseModal}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <Divider sx={{ mb: 2 }} />
+        <DialogContent>
+          {selectedResult && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Typography variant="h6" sx={{ color: "#3730a3" }}>
+                {selectedResult.assessment_title}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Student:</strong> {selectedResult.student_name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Course:</strong> {selectedResult.course_title}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Score:</strong> {selectedResult.score} /{" "}
+                {selectedResult.assessment_max_score}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Percentage:</strong> {selectedResult.percentage_score}%
+              </Typography>
+              <Typography variant="body1">
+                <strong>Status:</strong>{" "}
+                {selectedResult.is_passing ? "Passing" : "Failing"}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Graded By:</strong> {selectedResult.graded_by_name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Feedback:</strong> {selectedResult.feedback || "-"}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Assessment Type:</strong>{" "}
+                {selectedResult.assessment_type}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Question Type:</strong>{" "}
+                {selectedResult.assessment_question_type}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Created At:</strong>{" "}
+                {formatDate(selectedResult.created_at)}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Updated At:</strong>{" "}
+                {formatDate(selectedResult.updated_at)}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

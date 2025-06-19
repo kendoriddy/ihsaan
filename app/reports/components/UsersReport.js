@@ -131,6 +131,7 @@ const UsersReport = () => {
       </Box>
     );
   }
+  console.log(filteredUsers, "users:");
 
   return (
     <Box>

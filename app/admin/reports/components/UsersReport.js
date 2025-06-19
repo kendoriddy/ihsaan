@@ -17,7 +17,13 @@ import {
   MenuItem,
   Typography,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Divider,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { getAuthToken } from "@/hooks/axios/axios";
 
@@ -34,6 +40,8 @@ const UsersReport = () => {
     gender: "",
     status: "",
   });
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -105,6 +113,17 @@ const UsersReport = () => {
 
     return matchesSearch && matchesFilters;
   });
+
+  const handleRowClick = (user) => {
+    console.log("User clicked:", user);
+    setSelectedUser(user);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedUser(null);
+  };
 
   if (loading) {
     return (
@@ -224,7 +243,17 @@ const UsersReport = () => {
             {filteredUsers
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((user) => (
-                <TableRow key={user.id}>
+                <TableRow
+                  key={user.id}
+                  hover
+                  style={{ cursor: "pointer", transition: "background 0.2s" }}
+                  onClick={() => handleRowClick(user)}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f0f4ff",
+                    },
+                  }}
+                >
                   <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.country}</TableCell>
@@ -250,6 +279,89 @@ const UsersReport = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
+
+      {/* User Details Modal */}
+      <Dialog
+        open={modalOpen}
+        onClose={handleCloseModal}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 2,
+            background: "linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)",
+            boxShadow: 6,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            pb: 0,
+          }}
+        >
+          <span>User Details</span>
+          <IconButton onClick={handleCloseModal}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <Divider sx={{ mb: 2 }} />
+        <DialogContent>
+          {selectedUser && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Typography variant="h6" sx={{ color: "#3730a3" }}>
+                {selectedUser.first_name} {selectedUser.last_name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Email:</strong> {selectedUser.email}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Country:</strong> {selectedUser.country}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Gender:</strong> {selectedUser.gender}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Status:</strong>{" "}
+                {userType === "student"
+                  ? selectedUser.student_application_status
+                  : selectedUser.tutor_application_status}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Qualification:</strong>{" "}
+                {selectedUser.highest_qualification}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Experience:</strong> {selectedUser.years_of_experience}
+              </Typography>
+              {userType === "student" && (
+                <>
+                  <Typography variant="body1">
+                    <strong>Matric No:</strong> {selectedUser.matric_no || "-"}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Level:</strong> {selectedUser.level || "-"}
+                  </Typography>
+                </>
+              )}
+              {userType === "tutor" && (
+                <>
+                  <Typography variant="body1">
+                    <strong>Specialization:</strong>{" "}
+                    {selectedUser.specialization || "-"}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Bio:</strong> {selectedUser.bio || "-"}
+                  </Typography>
+                </>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
