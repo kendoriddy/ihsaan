@@ -18,7 +18,10 @@ const StudentQuiz = () => {
           <QuizInstructions setCurrentScreen={setCurrentScreen} />
         )}
         {currentScreen === "quiz" && (
-          <QuizQuestion setCurrentScreen={setCurrentScreen} />
+          <>
+            hiiiii
+            <QuizQuestion setCurrentScreen={setCurrentScreen} />
+          </>
           // questions={Questions?.results}
         )}
       </div>

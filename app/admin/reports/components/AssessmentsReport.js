@@ -19,7 +19,13 @@ import {
   CircularProgress,
   Chip,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Divider,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { getAuthToken } from "@/hooks/axios/axios";
 
@@ -45,6 +51,8 @@ const AssessmentsReport = () => {
     endsAfter: "",
     endsBefore: "",
   });
+  const [selectedAssessment, setSelectedAssessment] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const fetchAssessments = async () => {
     try {
@@ -150,6 +158,16 @@ const AssessmentsReport = () => {
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const handleRowClick = (assessment) => {
+    setSelectedAssessment(assessment);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedAssessment(null);
   };
 
   if (loading) {
@@ -360,7 +378,17 @@ const AssessmentsReport = () => {
           </TableHead>
           <TableBody>
             {assessments.map((assessment) => (
-              <TableRow key={assessment.id}>
+              <TableRow
+                key={assessment.id}
+                hover
+                style={{ cursor: "pointer", transition: "background 0.2s" }}
+                onClick={() => handleRowClick(assessment)}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "#f0f4ff",
+                  },
+                }}
+              >
                 <TableCell>{assessment.title}</TableCell>
                 <TableCell>{assessment.course_title}</TableCell>
                 <TableCell>{assessment.type}</TableCell>
@@ -390,6 +418,92 @@ const AssessmentsReport = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
+
+      {/* Assessment Details Modal */}
+      <Dialog
+        open={modalOpen}
+        onClose={handleCloseModal}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 2,
+            background: "linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)",
+            boxShadow: 6,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            pb: 0,
+          }}
+        >
+          <span>Assessment Details</span>
+          <IconButton onClick={handleCloseModal}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <Divider sx={{ mb: 2 }} />
+        <DialogContent>
+          {selectedAssessment && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Typography variant="h6" sx={{ color: "#3730a3" }}>
+                {selectedAssessment.title}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Course:</strong> {selectedAssessment.course_title}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Type:</strong> {selectedAssessment.type}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Question Type:</strong>{" "}
+                {selectedAssessment.question_type}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Tutor:</strong> {selectedAssessment.tutor_name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Start Date:</strong>{" "}
+                {formatDate(selectedAssessment.start_date)}
+              </Typography>
+              <Typography variant="body1">
+                <strong>End Date:</strong>{" "}
+                {formatDate(selectedAssessment.end_date)}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Max Score:</strong> {selectedAssessment.max_score}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Status:</strong>{" "}
+                {selectedAssessment.is_active ? "Active" : "Inactive"}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Description:</strong>{" "}
+                {selectedAssessment.description || "-"}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Term:</strong>{" "}
+                {selectedAssessment.term_title ||
+                  selectedAssessment.term ||
+                  "-"}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Created At:</strong>{" "}
+                {formatDate(selectedAssessment.created_at)}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Updated At:</strong>{" "}
+                {formatDate(selectedAssessment.updated_at)}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

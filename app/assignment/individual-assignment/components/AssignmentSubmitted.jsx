@@ -1,19 +1,35 @@
 "use client";
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
-import { usePatch, usePost } from "@/hooks/useHttp/useHttp";
+import { usePatch, usePost, useFetch } from "@/hooks/useHttp/useHttp";
 import { formatDate, getFileType } from "@/utils/utilFunctions";
 import { Field, Form, Formik } from "formik";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import Comments from "./Comments";
 
 const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
   const [dragActive, setDragActive] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [gradeId, setGradeId] = useState(null);
 
   // Extract assignmentId from submissionData
   const assignmentId = submissionData?.[0]?.assessment;
+
+  // Fetch grade for the submission
+  const { data: gradeData } = useFetch(
+    "grade",
+    assignmentId
+      ? `https://ihsaanlms.onrender.com/assessment/grades/?assessment=${assignmentId}`
+      : null
+  );
+
+  useEffect(() => {
+    if (gradeData?.data?.results?.length > 0) {
+      setGradeId(gradeData.data.results[0].id);
+    }
+  }, [gradeData]);
 
   const { mutate: uploadFile, isLoading: isUploading } = usePost(
     `https://ihsaanlms.onrender.com/resource/assessment-resource/`,
@@ -28,11 +44,11 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
   );
 
   const { mutate: updateAssignment, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/assessment/uploads/${submissionData?.[0]?.id}/`, // Include the submission ID in the URL
+    `https://ihsaanlms.onrender.com/assessment/uploads/${submissionData?.[0]?.id}/`,
     {
       onSuccess: () => {
         toast.success("Assignment updated successfully");
-        setOpenUpdateModal(false); // Close the modal on success
+        setOpenUpdateModal(false);
         refetchSubmission();
       },
       onError: (error) => {
@@ -108,9 +124,7 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
         formData.append("file_resource_ids", [fileResourceId]);
       }
 
-      // Call updateAssignment with the FormData
       updateAssignment(formData);
-
       resetForm();
     } catch (error) {
       toast.error(error.message || "Error during submission process.");
@@ -120,7 +134,7 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
   if (!submissionData || !submissionData[0]) return null;
 
   const {
-    marks,
+    score,
     total_marks,
     user,
     student_name,
@@ -158,6 +172,9 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
                 </a>
               </div>
             )}
+            <p className="mt-2">
+              Marks: {score || "Not graded"} / {total_marks || "N/A"}
+            </p>
             <Button
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               onClick={() => setOpenUpdateModal(true)}
@@ -167,6 +184,9 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
           </div>
         </div>
       </div>
+
+      {/* Comments Section */}
+      {gradeId && <Comments gradeId={gradeId} />}
 
       <CustomModal
         open={openUpdateModal}
@@ -248,15 +268,13 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
               </div>
 
               <div className="flex justify-center">
-                <Button
+                <button
                   type="submit"
-                  disabled={isSubmitting || isUploading || isUpdating}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {isSubmitting || isUploading || isUpdating
-                    ? "Updating..."
-                    : "Update"}
-                </Button>
+                  {isSubmitting ? "Updating..." : "Update Assignment"}
+                </button>
               </div>
             </Form>
           )}

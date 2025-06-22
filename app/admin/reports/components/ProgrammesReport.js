@@ -22,8 +22,14 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Divider,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { getAuthToken } from "@/hooks/axios/axios";
 
@@ -41,6 +47,8 @@ const ProgrammesReport = () => {
     specialType: "",
     level: "",
   });
+  const [selectedProgramme, setSelectedProgramme] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const fetchProgrammes = async () => {
     try {
@@ -117,6 +125,16 @@ const ProgrammesReport = () => {
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const handleRowClick = (programme) => {
+    setSelectedProgramme(programme);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedProgramme(null);
   };
 
   if (loading) {
@@ -216,7 +234,17 @@ const ProgrammesReport = () => {
           </TableHead>
           <TableBody>
             {programmes.map((programme) => (
-              <TableRow key={programme.id}>
+              <TableRow
+                key={programme.id}
+                hover
+                style={{ cursor: "pointer", transition: "background 0.2s" }}
+                onClick={() => handleRowClick(programme)}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "#f0f4ff",
+                  },
+                }}
+              >
                 <TableCell>{programme.code}</TableCell>
                 <TableCell>{programme.name}</TableCell>
                 <TableCell>{programme.type_name}</TableCell>
@@ -266,6 +294,105 @@ const ProgrammesReport = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
+
+      {/* Programme Details Modal */}
+      <Dialog
+        open={modalOpen}
+        onClose={handleCloseModal}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 2,
+            background: "linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)",
+            boxShadow: 6,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            pb: 0,
+          }}
+        >
+          <span>Programme Details</span>
+          <IconButton onClick={handleCloseModal}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <Divider sx={{ mb: 2 }} />
+        <DialogContent>
+          {selectedProgramme && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Typography variant="h6" sx={{ color: "#3730a3" }}>
+                {selectedProgramme.name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Code:</strong> {selectedProgramme.code}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Type:</strong> {selectedProgramme.type_name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Class Group:</strong>{" "}
+                {selectedProgramme.class_group_name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Special Type:</strong>{" "}
+                {selectedProgramme.special_type_name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Level:</strong> {selectedProgramme.level_name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Duration (Months):</strong>{" "}
+                {selectedProgramme.duration_months}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Created At:</strong>{" "}
+                {formatDate(selectedProgramme.created_at)}
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="h6" sx={{ color: "#3730a3" }}>
+                Courses
+              </Typography>
+              {selectedProgramme.courses &&
+              selectedProgramme.courses.length > 0 ? (
+                selectedProgramme.courses.map((course) => (
+                  <Box
+                    key={course.id}
+                    sx={{
+                      mb: 2,
+                      pl: 2,
+                      borderLeft: "3px solid #6366f1",
+                      background: "#f1f5f9",
+                      borderRadius: 1,
+                    }}
+                  >
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                      {course.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {course.description}
+                    </Typography>
+                    <Typography variant="body2">
+                      Assessment Count: {course.assessment_count}
+                    </Typography>
+                    <Typography variant="body2">
+                      Enrolled Users: {course.enrolled_users.length}
+                    </Typography>
+                  </Box>
+                ))
+              ) : (
+                <Typography variant="body2">No courses available.</Typography>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
