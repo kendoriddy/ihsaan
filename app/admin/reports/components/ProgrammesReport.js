@@ -32,6 +32,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { getAuthToken } from "@/hooks/axios/axios";
+import { Detail } from "@/components/Detail";
 
 const ProgrammesReport = () => {
   const [programmes, setProgrammes] = useState([]);
@@ -137,163 +138,151 @@ const ProgrammesReport = () => {
     setSelectedProgramme(null);
   };
 
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box>
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={4}>
-          <TextField
-            fullWidth
-            label="Search"
-            variant="outlined"
-            value={filters.search}
-            onChange={handleFilterChange("search")}
-            placeholder="Search by name or code"
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>Type</InputLabel>
-            <Select
-              value={filters.type}
-              label="Type"
-              onChange={handleFilterChange("type")}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="0">Regular</MenuItem>
-              <MenuItem value="1">Special</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>Class Group</InputLabel>
-            <Select
-              value={filters.classGroup}
-              label="Class Group"
-              onChange={handleFilterChange("classGroup")}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="0">Group A</MenuItem>
-              <MenuItem value="1">Group B</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={2}>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="secondary"
-            onClick={clearFilters}
-            sx={{ height: "56px" }}
-          >
-            Clear Filters
-          </Button>
-        </Grid>
-      </Grid>
+      <div className="bg-white p-6 rounded-xl shadow space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Search Input */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Search
+            </label>
+            <input
+              type="text"
+              value={filters.search}
+              onChange={handleFilterChange("search")}
+              placeholder="Search by name or code"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Code</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Class Group</TableCell>
-              <TableCell>Special Type</TableCell>
-              <TableCell>Level</TableCell>
-              <TableCell>Duration (Months)</TableCell>
-              <TableCell>Courses</TableCell>
-              <TableCell>Created At</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {programmes.map((programme) => (
-              <TableRow
-                key={programme.id}
-                hover
-                style={{ cursor: "pointer", transition: "background 0.2s" }}
-                onClick={() => handleRowClick(programme)}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "#f0f4ff",
-                  },
-                }}
-              >
-                <TableCell>{programme.code}</TableCell>
-                <TableCell>{programme.name}</TableCell>
-                <TableCell>{programme.type_name}</TableCell>
-                <TableCell>{programme.class_group_name}</TableCell>
-                <TableCell>{programme.special_type_name}</TableCell>
-                <TableCell>{programme.level_name}</TableCell>
-                <TableCell>{programme.duration_months}</TableCell>
-                <TableCell>
-                  <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography>
-                        {programme.courses.length} Courses
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {programme.courses.map((course) => (
-                        <Box key={course.id} sx={{ mb: 2 }}>
-                          <Typography variant="subtitle2">
-                            {course.title}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {course.description}
-                          </Typography>
-                          <Typography variant="body2">
-                            Assessment Count: {course.assessment_count}
-                          </Typography>
-                          <Typography variant="body2">
-                            Enrolled Users: {course.enrolled_users.length}
-                          </Typography>
-                        </Box>
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-                </TableCell>
-                <TableCell>{formatDate(programme.created_at)}</TableCell>
+          {/* Type Select */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Type
+            </label>
+            <select
+              value={filters.type}
+              onChange={handleFilterChange("type")}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">All</option>
+              <option value="0">Regular</option>
+              <option value="1">Special</option>
+            </select>
+          </div>
+
+          {/* Clear Button */}
+          <div className="flex items-end">
+            <button
+              onClick={clearFilters}
+              className="w-full border border-red-400 text-red-600 font-medium py-2 px-4 rounded-md hover:bg-red-50 transition"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {loading && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="40px"
+        >
+          <CircularProgress />
+        </Box>
+      )}
+
+      {error ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="400px"
+        >
+          <Typography color="error">{error}</Typography>
+        </Box>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Code</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Class Group</TableCell>
+                <TableCell>Special Type</TableCell>
+                <TableCell>Level</TableCell>
+                <TableCell>Duration (Months)</TableCell>
+                <TableCell>Courses</TableCell>
+                <TableCell>Created At</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={totalProgrammes}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {programmes.map((programme) => (
+                <TableRow
+                  key={programme.id}
+                  hover
+                  style={{ cursor: "pointer", transition: "background 0.2s" }}
+                  onClick={() => handleRowClick(programme)}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f0f4ff",
+                    },
+                  }}
+                >
+                  <TableCell>{programme.code}</TableCell>
+                  <TableCell>{programme.name}</TableCell>
+                  <TableCell>{programme.type_name}</TableCell>
+                  <TableCell>{programme.class_group_name}</TableCell>
+                  <TableCell>{programme.special_type_name}</TableCell>
+                  <TableCell>{programme.level_name}</TableCell>
+                  <TableCell>{programme.duration_months}</TableCell>
+                  <TableCell>
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography>
+                          {programme.courses.length} Courses
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        {programme.courses.map((course) => (
+                          <Box key={course.id} sx={{ mb: 2 }}>
+                            <Typography variant="subtitle2">
+                              {course.title}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {course.description}
+                            </Typography>
+                            <Typography variant="body2">
+                              Assessment Count: {course.assessment_count}
+                            </Typography>
+                            <Typography variant="body2">
+                              Enrolled Users: {course.enrolled_users.length}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </AccordionDetails>
+                    </Accordion>
+                  </TableCell>
+                  <TableCell>{formatDate(programme.created_at)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={totalProgrammes}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
 
       {/* Programme Details Modal */}
       <Dialog
@@ -326,70 +315,67 @@ const ProgrammesReport = () => {
         <Divider sx={{ mb: 2 }} />
         <DialogContent>
           {selectedProgramme && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
+            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
+              {/* Programme Title */}
+              <h2 className="text-2xl font-bold text-indigo-700">
                 {selectedProgramme.name}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Code:</strong> {selectedProgramme.code}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Type:</strong> {selectedProgramme.type_name}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Class Group:</strong>{" "}
-                {selectedProgramme.class_group_name}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Special Type:</strong>{" "}
-                {selectedProgramme.special_type_name}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Level:</strong> {selectedProgramme.level_name}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Duration (Months):</strong>{" "}
-                {selectedProgramme.duration_months}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Created At:</strong>{" "}
-                {formatDate(selectedProgramme.created_at)}
-              </Typography>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
-                Courses
-              </Typography>
-              {selectedProgramme.courses &&
-              selectedProgramme.courses.length > 0 ? (
-                selectedProgramme.courses.map((course) => (
-                  <Box
-                    key={course.id}
-                    sx={{
-                      mb: 2,
-                      pl: 2,
-                      borderLeft: "3px solid #6366f1",
-                      background: "#f1f5f9",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      {course.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {course.description}
-                    </Typography>
-                    <Typography variant="body2">
-                      Assessment Count: {course.assessment_count}
-                    </Typography>
-                    <Typography variant="body2">
-                      Enrolled Users: {course.enrolled_users.length}
-                    </Typography>
-                  </Box>
-                ))
-              ) : (
-                <Typography variant="body2">No courses available.</Typography>
-              )}
-            </Box>
+              </h2>
+
+              {/* Programme Info */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
+                <Detail label="Code" value={selectedProgramme.code} />
+                <Detail label="Type" value={selectedProgramme.type_name} />
+                <Detail
+                  label="Class Group"
+                  value={selectedProgramme.class_group_name}
+                />
+                <Detail
+                  label="Special Type"
+                  value={selectedProgramme.special_type_name}
+                />
+                <Detail label="Level" value={selectedProgramme.level_name} />
+                <Detail
+                  label="Duration (Months)"
+                  value={selectedProgramme.duration_months}
+                />
+                <Detail
+                  label="Created At"
+                  value={formatDate(selectedProgramme.created_at)}
+                />
+              </div>
+
+              {/* Courses Section */}
+              <div className="border-t pt-4 space-y-3">
+                <h3 className="text-xl font-semibold text-indigo-700">
+                  Courses
+                </h3>
+                {selectedProgramme.courses?.length > 0 ? (
+                  selectedProgramme.courses.map((course) => (
+                    <div
+                      key={course.id}
+                      className="border-l-4 border-indigo-500 bg-slate-100 rounded-md p-4"
+                    >
+                      <h4 className="text-lg font-semibold text-gray-800">
+                        {course.title}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        {course.description || "No description provided."}
+                      </p>
+                      <p className="text-sm mt-2">
+                        <span className="font-medium">Assessment Count:</span>{" "}
+                        {course.assessment_count}
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-medium">Enrolled Users:</span>{" "}
+                        {course.enrolled_users.length}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-sm">No courses available.</p>
+                )}
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>

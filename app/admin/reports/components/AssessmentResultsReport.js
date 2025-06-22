@@ -28,6 +28,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { getAuthToken } from "@/hooks/axios/axios";
+import { Detail } from "@/components/Detail";
 
 const AssessmentResultsReport = () => {
   const [results, setResults] = useState([]);
@@ -155,231 +156,260 @@ const AssessmentResultsReport = () => {
     setSelectedResult(null);
   };
 
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box>
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Assessment ID"
-            variant="outlined"
-            value={filters.assessment}
-            onChange={handleFilterChange("assessment")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>Assessment Type</InputLabel>
-            <Select
+      <div className="bg-white p-6 rounded-xl shadow space-y-6">
+        {/* Primary Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Assessment ID
+            </label>
+            <input
+              type="text"
+              value={filters.assessment}
+              onChange={handleFilterChange("assessment")}
+              placeholder="Enter assessment ID"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Assessment Type
+            </label>
+            <select
               value={filters.assessmentType}
-              label="Assessment Type"
               onChange={handleFilterChange("assessmentType")}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
             >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="INDIVIDUAL">Individual</MenuItem>
-              <MenuItem value="GROUP">Group</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>Question Type</InputLabel>
-            <Select
+              <option value="">All</option>
+              <option value="INDIVIDUAL">Individual</option>
+              <option value="GROUP">Group</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Question Type
+            </label>
+            <select
               value={filters.questionType}
-              label="Question Type"
               onChange={handleFilterChange("questionType")}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
             >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="MCQ">MCQ</MenuItem>
-              <MenuItem value="MANUAL">Manual</MenuItem>
-              <MenuItem value="FILE_UPLOAD">File Upload</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>Published Status</InputLabel>
-            <Select
+              <option value="">All</option>
+              <option value="MCQ">MCQ</option>
+              <option value="MANUAL">Manual</option>
+              <option value="FILE_UPLOAD">File Upload</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Published Status
+            </label>
+            <select
               value={filters.isPublished}
-              label="Published Status"
               onChange={handleFilterChange("isPublished")}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
             >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="true">Published</MenuItem>
-              <MenuItem value="false">Not Published</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
+              <option value="">All</option>
+              <option value="true">Published</option>
+              <option value="false">Not Published</option>
+            </select>
+          </div>
+        </div>
 
         {/* Date Range Filters */}
-        <Grid item xs={12}>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+        <div>
+          <h4 className="text-sm font-semibold text-gray-600 mb-2">
             Date Filters
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Created After"
-            type="date"
-            value={filters.createdAfter}
-            onChange={handleFilterChange("createdAfter")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Created Before"
-            type="date"
-            value={filters.createdBefore}
-            onChange={handleFilterChange("createdBefore")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Created After
+              </label>
+              <input
+                type="date"
+                value={filters.createdAfter}
+                onChange={handleFilterChange("createdAfter")}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Created Before
+              </label>
+              <input
+                type="date"
+                value={filters.createdBefore}
+                onChange={handleFilterChange("createdBefore")}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+        </div>
 
         {/* Additional Filters */}
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Course ID"
-            variant="outlined"
-            value={filters.course}
-            onChange={handleFilterChange("course")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Term ID"
-            variant="outlined"
-            value={filters.term}
-            onChange={handleFilterChange("term")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Student ID"
-            variant="outlined"
-            value={filters.student}
-            onChange={handleFilterChange("student")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Tutor ID"
-            variant="outlined"
-            value={filters.tutor}
-            onChange={handleFilterChange("tutor")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Group ID"
-            variant="outlined"
-            value={filters.group}
-            onChange={handleFilterChange("group")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="secondary"
-            onClick={clearFilters}
-            sx={{ height: "56px" }}
-          >
-            Clear Filters
-          </Button>
-        </Grid>
-      </Grid>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Course ID
+            </label>
+            <input
+              type="text"
+              value={filters.course}
+              onChange={handleFilterChange("course")}
+              placeholder="Enter course ID"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Student Name</TableCell>
-              <TableCell>Assessment Title</TableCell>
-              <TableCell>Course</TableCell>
-              <TableCell>Score</TableCell>
-              <TableCell>Percentage</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Graded By</TableCell>
-              <TableCell>Feedback</TableCell>
-              <TableCell>Created At</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {results.map((result) => (
-              <TableRow
-                key={result.id}
-                hover
-                style={{ cursor: "pointer", transition: "background 0.2s" }}
-                onClick={() => handleRowClick(result)}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "#f0f4ff",
-                  },
-                }}
-              >
-                <TableCell>{result.student_name}</TableCell>
-                <TableCell>{result.assessment_title}</TableCell>
-                <TableCell>{result.course_title}</TableCell>
-                <TableCell>{`${result.score}/${result.assessment_max_score}`}</TableCell>
-                <TableCell>{`${result.percentage_score}%`}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={result.is_passing ? "Passing" : "Failing"}
-                    color={result.is_passing ? "success" : "error"}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>{result.graded_by_name}</TableCell>
-                <TableCell>{result.feedback}</TableCell>
-                <TableCell>{formatDate(result.created_at)}</TableCell>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Term ID
+            </label>
+            <input
+              type="text"
+              value={filters.term}
+              onChange={handleFilterChange("term")}
+              placeholder="Enter term ID"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Student ID
+            </label>
+            <input
+              type="text"
+              value={filters.student}
+              onChange={handleFilterChange("student")}
+              placeholder="Enter student ID"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tutor ID
+            </label>
+            <input
+              type="text"
+              value={filters.tutor}
+              onChange={handleFilterChange("tutor")}
+              placeholder="Enter tutor ID"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Group ID
+            </label>
+            <input
+              type="text"
+              value={filters.group}
+              onChange={handleFilterChange("group")}
+              placeholder="Enter group ID"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div className="flex items-end">
+            <button
+              onClick={clearFilters}
+              className="w-full bg-white border border-red-400 text-red-600 font-medium py-2 px-4 rounded-md hover:bg-red-50 transition"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {loading && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="400px"
+        >
+          <CircularProgress />
+        </Box>
+      )}
+
+      {error ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="400px"
+        >
+          <Typography color="error">{error}</Typography>
+        </Box>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Student Name</TableCell>
+                <TableCell>Assessment Title</TableCell>
+                <TableCell>Course</TableCell>
+                <TableCell>Score</TableCell>
+                <TableCell>Percentage</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Graded By</TableCell>
+                <TableCell>Feedback</TableCell>
+                <TableCell>Created At</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={totalResults}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {results.map((result) => (
+                <TableRow
+                  key={result.id}
+                  hover
+                  style={{ cursor: "pointer", transition: "background 0.2s" }}
+                  onClick={() => handleRowClick(result)}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f0f4ff",
+                    },
+                  }}
+                >
+                  <TableCell>{result.student_name}</TableCell>
+                  <TableCell>{result.assessment_title}</TableCell>
+                  <TableCell>{result.course_title}</TableCell>
+                  <TableCell>{`${result.score}/${result.assessment_max_score}`}</TableCell>
+                  <TableCell>{`${result.percentage_score}%`}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={result.is_passing ? "Passing" : "Failing"}
+                      color={result.is_passing ? "success" : "error"}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>{result.graded_by_name}</TableCell>
+                  <TableCell>{result.feedback}</TableCell>
+                  <TableCell>{formatDate(result.created_at)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={totalResults}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
 
       {/* Result Details Modal */}
       <Dialog
@@ -412,50 +442,65 @@ const AssessmentResultsReport = () => {
         <Divider sx={{ mb: 2 }} />
         <DialogContent>
           {selectedResult && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
+            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
+              {/* Title */}
+              <h2 className="text-2xl font-bold text-indigo-700">
                 {selectedResult.assessment_title}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Student:</strong> {selectedResult.student_name}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Course:</strong> {selectedResult.course_title}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Score:</strong> {selectedResult.score} /{" "}
-                {selectedResult.assessment_max_score}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Percentage:</strong> {selectedResult.percentage_score}%
-              </Typography>
-              <Typography variant="body1">
-                <strong>Status:</strong>{" "}
-                {selectedResult.is_passing ? "Passing" : "Failing"}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Graded By:</strong> {selectedResult.graded_by_name}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Feedback:</strong> {selectedResult.feedback || "-"}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Assessment Type:</strong>{" "}
-                {selectedResult.assessment_type}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Question Type:</strong>{" "}
-                {selectedResult.assessment_question_type}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Created At:</strong>{" "}
-                {formatDate(selectedResult.created_at)}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Updated At:</strong>{" "}
-                {formatDate(selectedResult.updated_at)}
-              </Typography>
-            </Box>
+              </h2>
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
+                <Detail label="Student" value={selectedResult.student_name} />
+                <Detail label="Course" value={selectedResult.course_title} />
+                <Detail
+                  label="Score"
+                  value={`${selectedResult.score} / ${selectedResult.assessment_max_score}`}
+                />
+                <Detail
+                  label="Percentage"
+                  value={`${selectedResult.percentage_score}%`}
+                />
+                <Detail
+                  label="Status"
+                  value={
+                    selectedResult.is_passing ? (
+                      <span className="text-green-600 font-semibold">
+                        Passing
+                      </span>
+                    ) : (
+                      <span className="text-red-600 font-semibold">
+                        Failing
+                      </span>
+                    )
+                  }
+                />
+                <Detail
+                  label="Graded By"
+                  value={selectedResult.graded_by_name}
+                />
+                <Detail
+                  label="Assessment Type"
+                  value={selectedResult.assessment_type}
+                />
+                <Detail
+                  label="Question Type"
+                  value={selectedResult.assessment_question_type}
+                />
+                <Detail
+                  label="Created At"
+                  value={formatDate(selectedResult.created_at)}
+                />
+                <Detail
+                  label="Updated At"
+                  value={formatDate(selectedResult.updated_at)}
+                />
+                <Detail
+                  label="Feedback"
+                  value={selectedResult.feedback || "-"}
+                  full
+                />
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>

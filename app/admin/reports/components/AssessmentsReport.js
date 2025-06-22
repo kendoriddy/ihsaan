@@ -28,6 +28,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { getAuthToken } from "@/hooks/axios/axios";
+import { Detail } from "@/components/Detail";
 
 const AssessmentsReport = () => {
   const [assessments, setAssessments] = useState([]);
@@ -170,254 +171,277 @@ const AssessmentsReport = () => {
     setSelectedAssessment(null);
   };
 
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box>
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Search"
-            variant="outlined"
-            value={filters.search}
-            onChange={handleSearch}
-            placeholder="Search by title, description, course, or tutor"
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>Assessment Type</InputLabel>
-            <Select
-              value={filters.type}
-              label="Assessment Type"
-              onChange={handleFilterChange("type")}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="INDIVIDUAL">Individual</MenuItem>
-              <MenuItem value="GROUP">Group</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>Question Type</InputLabel>
-            <Select
-              value={filters.questionType}
-              label="Question Type"
-              onChange={handleFilterChange("questionType")}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="MCQ">MCQ</MenuItem>
-              <MenuItem value="MANUAL">Manual</MenuItem>
-              <MenuItem value="FILE_UPLOAD">File Upload</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>Status</InputLabel>
-            <Select
-              value={filters.isActive}
-              label="Status"
-              onChange={handleFilterChange("isActive")}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="true">Active</MenuItem>
-              <MenuItem value="false">Inactive</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
+      <div className="bg-white p-6 rounded-xl shadow-md space-y-6">
+        {/* Basic Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Search
+            </label>
+            <input
+              type="text"
+              value={filters.search}
+              onChange={handleSearch}
+              placeholder="Search by title, description, course, or tutor"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
 
-        {/* Date Range Filters */}
-        <Grid item xs={12}>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Assessment Type
+            </label>
+            <select
+              value={filters.type}
+              onChange={handleFilterChange("type")}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">All</option>
+              <option value="INDIVIDUAL">Individual</option>
+              <option value="GROUP">Group</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Question Type
+            </label>
+            <select
+              value={filters.questionType}
+              onChange={handleFilterChange("questionType")}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">All</option>
+              <option value="MCQ">MCQ</option>
+              <option value="MANUAL">Manual</option>
+              <option value="FILE_UPLOAD">File Upload</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              value={filters.isActive}
+              onChange={handleFilterChange("isActive")}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">All</option>
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Date Filters */}
+        <div>
+          <h4 className="text-sm font-semibold text-gray-600 mb-2">
             Date Filters
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Created After"
-            type="date"
-            value={filters.createdAfter}
-            onChange={handleFilterChange("createdAfter")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Created Before"
-            type="date"
-            value={filters.createdBefore}
-            onChange={handleFilterChange("createdBefore")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Starts After"
-            type="date"
-            value={filters.startsAfter}
-            onChange={handleFilterChange("startsAfter")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Starts Before"
-            type="date"
-            value={filters.startsBefore}
-            onChange={handleFilterChange("startsBefore")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Ends After"
-            type="date"
-            value={filters.endsAfter}
-            onChange={handleFilterChange("endsAfter")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Ends Before"
-            type="date"
-            value={filters.endsBefore}
-            onChange={handleFilterChange("endsBefore")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Created After
+              </label>
+              <input
+                type="date"
+                value={filters.createdAfter}
+                onChange={handleFilterChange("createdAfter")}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Created Before
+              </label>
+              <input
+                type="date"
+                value={filters.createdBefore}
+                onChange={handleFilterChange("createdBefore")}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Starts After
+              </label>
+              <input
+                type="date"
+                value={filters.startsAfter}
+                onChange={handleFilterChange("startsAfter")}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Starts Before
+              </label>
+              <input
+                type="date"
+                value={filters.startsBefore}
+                onChange={handleFilterChange("startsBefore")}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Ends After
+              </label>
+              <input
+                type="date"
+                value={filters.endsAfter}
+                onChange={handleFilterChange("endsAfter")}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Ends Before
+              </label>
+              <input
+                type="date"
+                value={filters.endsBefore}
+                onChange={handleFilterChange("endsBefore")}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+        </div>
 
         {/* Additional Filters */}
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Course ID"
-            variant="outlined"
-            value={filters.course}
-            onChange={handleFilterChange("course")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Term ID"
-            variant="outlined"
-            value={filters.term}
-            onChange={handleFilterChange("term")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Tutor ID"
-            variant="outlined"
-            value={filters.tutor}
-            onChange={handleFilterChange("tutor")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="secondary"
-            onClick={clearFilters}
-            sx={{ height: "56px" }}
-          >
-            Clear Filters
-          </Button>
-        </Grid>
-      </Grid>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Course ID
+            </label>
+            <input
+              type="text"
+              value={filters.course}
+              onChange={handleFilterChange("course")}
+              placeholder="Course ID"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Course</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Question Type</TableCell>
-              <TableCell>Tutor</TableCell>
-              <TableCell>Start Date</TableCell>
-              <TableCell>End Date</TableCell>
-              <TableCell>Max Score</TableCell>
-              <TableCell>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {assessments.map((assessment) => (
-              <TableRow
-                key={assessment.id}
-                hover
-                style={{ cursor: "pointer", transition: "background 0.2s" }}
-                onClick={() => handleRowClick(assessment)}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "#f0f4ff",
-                  },
-                }}
-              >
-                <TableCell>{assessment.title}</TableCell>
-                <TableCell>{assessment.course_title}</TableCell>
-                <TableCell>{assessment.type}</TableCell>
-                <TableCell>{assessment.question_type}</TableCell>
-                <TableCell>{assessment.tutor_name}</TableCell>
-                <TableCell>{formatDate(assessment.start_date)}</TableCell>
-                <TableCell>{formatDate(assessment.end_date)}</TableCell>
-                <TableCell>{assessment.max_score}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={assessment.is_active ? "Active" : "Inactive"}
-                    color={assessment.is_active ? "success" : "default"}
-                    size="small"
-                  />
-                </TableCell>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Term ID
+            </label>
+            <input
+              type="text"
+              value={filters.term}
+              onChange={handleFilterChange("term")}
+              placeholder="Term ID"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tutor ID
+            </label>
+            <input
+              type="text"
+              value={filters.tutor}
+              onChange={handleFilterChange("tutor")}
+              placeholder="Tutor ID"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div className="flex items-end">
+            <button
+              onClick={clearFilters}
+              className="w-full bg-white border border-red-400 text-red-600 font-medium py-2 px-4 rounded-md hover:bg-red-50 transition"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {loading && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="40px"
+        >
+          <CircularProgress />
+        </Box>
+      )}
+
+      {error ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="400px"
+        >
+          <Typography color="error">{error}</Typography>
+        </Box>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Title</TableCell>
+                <TableCell>Course</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Question Type</TableCell>
+                <TableCell>Tutor</TableCell>
+                <TableCell>Start Date</TableCell>
+                <TableCell>End Date</TableCell>
+                <TableCell>Max Score</TableCell>
+                <TableCell>Status</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={totalAssessments}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {assessments.map((assessment) => (
+                <TableRow
+                  key={assessment.id}
+                  hover
+                  style={{ cursor: "pointer", transition: "background 0.2s" }}
+                  onClick={() => handleRowClick(assessment)}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f0f4ff",
+                    },
+                  }}
+                >
+                  <TableCell>{assessment.title}</TableCell>
+                  <TableCell>{assessment.course_title}</TableCell>
+                  <TableCell>{assessment.type}</TableCell>
+                  <TableCell>{assessment.question_type}</TableCell>
+                  <TableCell>{assessment.tutor_name}</TableCell>
+                  <TableCell>{formatDate(assessment.start_date)}</TableCell>
+                  <TableCell>{formatDate(assessment.end_date)}</TableCell>
+                  <TableCell>{assessment.max_score}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={assessment.is_active ? "Active" : "Inactive"}
+                      color={assessment.is_active ? "success" : "default"}
+                      size="small"
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={totalAssessments}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
 
       {/* Assessment Details Modal */}
       <Dialog
@@ -450,57 +474,81 @@ const AssessmentsReport = () => {
         <Divider sx={{ mb: 2 }} />
         <DialogContent>
           {selectedAssessment && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
+            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+              <h2 className="text-2xl font-bold text-indigo-700">
                 {selectedAssessment.title}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Course:</strong> {selectedAssessment.course_title}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Type:</strong> {selectedAssessment.type}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Question Type:</strong>{" "}
-                {selectedAssessment.question_type}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Tutor:</strong> {selectedAssessment.tutor_name}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Start Date:</strong>{" "}
-                {formatDate(selectedAssessment.start_date)}
-              </Typography>
-              <Typography variant="body1">
-                <strong>End Date:</strong>{" "}
-                {formatDate(selectedAssessment.end_date)}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Max Score:</strong> {selectedAssessment.max_score}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Status:</strong>{" "}
-                {selectedAssessment.is_active ? "Active" : "Inactive"}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Description:</strong>{" "}
-                {selectedAssessment.description || "-"}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Term:</strong>{" "}
-                {selectedAssessment.term_title ||
-                  selectedAssessment.term ||
-                  "-"}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Created At:</strong>{" "}
-                {formatDate(selectedAssessment.created_at)}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Updated At:</strong>{" "}
-                {formatDate(selectedAssessment.updated_at)}
-              </Typography>
-            </Box>
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
+                <Detail
+                  label="Course"
+                  value={selectedAssessment.course_title}
+                />
+                <Detail
+                  label="Course Code"
+                  value={selectedAssessment.course_code}
+                />
+                <Detail label="Type" value={selectedAssessment.type} />
+                <Detail
+                  label="Question Type"
+                  value={selectedAssessment.question_type}
+                />
+                {selectedAssessment.mcq_duration && (
+                  <Detail
+                    label="Duration"
+                    value={selectedAssessment.mcq_duration}
+                  />
+                )}
+                <Detail label="Tutor" value={selectedAssessment.tutor_name} />
+                <Detail
+                  label="Start Date"
+                  value={formatDate(selectedAssessment.start_date)}
+                />
+                <Detail
+                  label="End Date"
+                  value={formatDate(selectedAssessment.end_date)}
+                />
+                <Detail
+                  label="Max Score"
+                  value={selectedAssessment.max_score}
+                />
+                <Detail
+                  label="Status"
+                  value={
+                    selectedAssessment.is_active ? (
+                      <span className="text-green-600 font-semibold">
+                        Active
+                      </span>
+                    ) : (
+                      <span className="text-red-600 font-semibold">
+                        Inactive
+                      </span>
+                    )
+                  }
+                />
+                <Detail
+                  label="Term"
+                  value={
+                    selectedAssessment.term_title ||
+                    selectedAssessment.term ||
+                    "-"
+                  }
+                />
+                <Detail
+                  label="Description"
+                  value={selectedAssessment.description || "-"}
+                  full
+                />
+                <Detail
+                  label="Created At"
+                  value={formatDate(selectedAssessment.created_at)}
+                />
+                <Detail
+                  label="Updated At"
+                  value={formatDate(selectedAssessment.updated_at)}
+                />
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>

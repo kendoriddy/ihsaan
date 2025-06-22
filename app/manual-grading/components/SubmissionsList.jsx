@@ -164,7 +164,7 @@ const SubmissionsList = ({ assessmentId }) => {
             return (
               <div
                 key={submission.id}
-                className="bg-white rounded-lg shadow-md p-6 flex flex-col md:flex-row md:justify-between md:items-center border border-gray-100"
+                className="bg-white rounded-lg shadow-md p-6 flex flex-col md:flex-row md:justify-between md:items-center border border-gray-100 gap-3"
               >
                 <div>
                   <div className="text-lg font-semibold text-indigo-700">

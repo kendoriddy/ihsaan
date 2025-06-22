@@ -1,106 +1,106 @@
-import HomeIcon from '@mui/icons-material/Home'
-import BookmarkIcon from '@mui/icons-material/Bookmark'
-import CastForEducationIcon from '@mui/icons-material/CastForEducation'
-import Person2Icon from '@mui/icons-material/Person2'
-import LogoutIcon from '@mui/icons-material/Logout'
-import ScheduleIcon from '@mui/icons-material/Schedule'
-import QuizIcon from '@mui/icons-material/Quiz'
-import AssessmentIcon from '@mui/icons-material/Assessment'
+import HomeIcon from "@mui/icons-material/Home";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
+import CastForEducationIcon from "@mui/icons-material/CastForEducation";
+import Person2Icon from "@mui/icons-material/Person2";
+import LogoutIcon from "@mui/icons-material/Logout";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import QuizIcon from "@mui/icons-material/Quiz";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 
-import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions'
-import StorefrontIcon from '@mui/icons-material/Storefront'
-import { Assignment, AssignmentInd, BookSharp } from '@mui/icons-material'
-import GradingOutlined from '@mui/icons-material/GradingOutlined'
-import { TbActivity } from 'react-icons/tb'
+import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import { Assignment, AssignmentInd, BookSharp } from "@mui/icons-material";
+import GradingOutlined from "@mui/icons-material/GradingOutlined";
+import { TbActivity } from "react-icons/tb";
 
 const DASHBOARD_LIST = {
   student: [
-    { id: 1, name: 'Dashboard', icon: HomeIcon, path: '/dashboard' },
+    { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
     {
       id: 2,
-      name: 'Assignment',
+      name: "Assignment",
       icon: Assignment,
-      path: '/assignment'
+      path: "/assignment",
     },
     {
       id: 3,
-      name: 'Take Quiz',
+      name: "Take Quiz",
       icon: QuizIcon,
-      path: '/quiz'
+      path: "/quiz",
     },
     {
       id: 4,
-      name: 'Activities',
+      name: "Activities",
       icon: TbActivity,
-      path: '/activities'
+      path: "/activities",
     },
     {
       id: 13,
-      name: 'Courses',
+      name: "Courses",
       icon: BookSharp,
-      path: '/courses/my-courses'
+      path: "/courses/my-courses",
     },
     {
       id: 12,
-      name: 'Applications',
+      name: "Applications",
       icon: BookmarkIcon,
-      path: '/dashboard/my-applications'
+      path: "/dashboard/my-applications",
     },
     {
       id: 20,
-      name: 'Reports',
+      name: "Reports",
       icon: AssessmentIcon,
-      path: '/reports'
+      path: "/reports",
     },
-    { id: 10, name: 'Logout', icon: LogoutIcon, path: '/login' }
+    { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },
   ],
   tutor: [
-    { id: 1, name: 'Dashboard', icon: HomeIcon, path: '/dashboard' },
+    { id: 1, name: "Dashboard", icon: HomeIcon, path: "/dashboard" },
     {
       id: 2,
-      name: 'Applications',
+      name: "Applications",
       icon: BookmarkIcon,
-      path: '/dashboard/my-applications'
+      path: "/dashboard/my-applications",
     },
     {
       id: 3,
-      name: 'Assignment and Quiz',
+      name: "Assignment and Quiz",
       icon: AssignmentInd,
-      path: '/set-assignment'
+      path: "/set-assignment",
     },
     {
       id: 4,
-      name: 'Grading',
+      name: "Grading",
       icon: GradingOutlined,
-      path: '/manual-grading'
+      path: "/manual-grading",
     },
     {
       id: 5,
-      name: 'Forums',
+      name: "Forums",
       icon: GradingOutlined,
-      path: '/forums'
+      path: "/forums",
     },
-    {
-      id: 20,
-      name: 'Reports',
-      icon: AssessmentIcon,
-      path: '/reports'
-    },
-    { id: 10, name: 'Logout', icon: LogoutIcon, path: '/login' }
+    // {
+    //   id: 20,
+    //   name: 'Reports',
+    //   icon: AssessmentIcon,
+    //   path: '/reports'
+    // },
+    { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },
   ],
 
   admin: [
-    { id: 1, name: 'Dashboard', path: '/admin/dashboard' },
-    { id: 2, name: 'Account Manager', path: '/admin/account-manager' },
+    { id: 1, name: "Dashboard", path: "/admin/dashboard" },
+    { id: 2, name: "Account Manager", path: "/admin/account-manager" },
     {
       id: 15,
-      name: 'Tutor Application',
-      path: '/admin/tutor'
+      name: "Tutor Application",
+      path: "/admin/tutor",
     },
     {
       id: 16,
-      name: 'Student Application',
-      path: '/admin/student'
+      name: "Student Application",
+      path: "/admin/student",
     },
     // {
     //   id: 6,
@@ -108,27 +108,27 @@ const DASHBOARD_LIST = {
     //   path: "/admin/categories",
     // },
     // { id: 7, name: "Books", path: "/admin/books" },
-    { id: 8, name: 'Courses', path: '/admin/courses' },
-    { id: 9, name: 'FAQs', path: '/admin/faqs' },
-    { id: 10, name: 'Quotes', path: '/admin/quotes' },
+    { id: 8, name: "Courses", path: "/admin/courses" },
+    { id: 9, name: "FAQs", path: "/admin/faqs" },
+    { id: 10, name: "Quotes", path: "/admin/quotes" },
     {
       id: 11,
-      name: 'Set Quiz',
-      path: '/admin/set-quiz'
+      name: "Set Quiz",
+      path: "/admin/set-quiz",
     },
     {
       id: 12,
-      name: 'Activities Settings',
-      path: '/admin/activities-settings'
+      name: "Activities Settings",
+      path: "/admin/activities-settings",
     },
     {
       id: 17,
-      name: 'Reports',
+      name: "Reports",
       icon: AssessmentIcon,
-      path: '/admin/reports'
+      path: "/admin/reports",
     },
-    { id: 15, name: 'My Profile', path: '/admin/profile' }
-  ]
-}
+    { id: 15, name: "My Profile", path: "/admin/profile" },
+  ],
+};
 
-export { DASHBOARD_LIST }
+export { DASHBOARD_LIST };

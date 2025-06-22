@@ -26,6 +26,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { getAuthToken } from "@/hooks/axios/axios";
+import { Detail } from "@/components/Detail";
 
 const UsersReport = () => {
   const [users, setUsers] = useState([]);
@@ -43,16 +44,21 @@ const UsersReport = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (search = "") => {
     try {
       setLoading(true);
       const headers = {
         Authorization: `Bearer ${getAuthToken()}`,
       };
-      const endpoint =
+      let endpoint =
         userType === "student"
           ? "https://ihsaanlms.onrender.com/api/all-student"
           : "https://ihsaanlms.onrender.com/api/all-tutor";
+
+      // Add search param if present
+      if (search) {
+        endpoint += `?search=${encodeURIComponent(search)}`;
+      }
 
       const response = await axios.get(endpoint, { headers });
 
@@ -67,8 +73,8 @@ const UsersReport = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, [userType]);
+    fetchUsers(searchTerm);
+  }, [searchTerm, userType]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -125,160 +131,169 @@ const UsersReport = () => {
     setSelectedUser(null);
   };
 
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box>
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Search"
-            variant="outlined"
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>User Type</InputLabel>
-            <Select
+      <div className="bg-white p-4 rounded-xl shadow mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+          {/* Search */}
+          <div className="col-span-1 md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Search
+            </label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearch}
+              placeholder="Search by name or email..."
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          {/* User Type */}
+          <div className="col-span-1 md:col-span-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              User Type
+            </label>
+            <select
               value={userType}
-              label="User Type"
               onChange={handleUserTypeChange}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <MenuItem value="student">Students</MenuItem>
-              <MenuItem value="tutor">Tutors</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={2}>
-          <FormControl fullWidth>
-            <InputLabel>Country</InputLabel>
-            <Select
+              <option value="student">Students</option>
+              <option value="tutor">Tutors</option>
+            </select>
+          </div>
+
+          {/* Country */}
+          <div className="col-span-1 md:col-span-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Country
+            </label>
+            <select
               value={filters.country}
-              label="Country"
               onChange={handleFilterChange("country")}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <MenuItem value="">All</MenuItem>
+              <option value="">All</option>
               {Array.from(new Set(users.map((user) => user.country))).map(
                 (country) => (
-                  <MenuItem key={country} value={country}>
+                  <option key={country} value={country}>
                     {country}
-                  </MenuItem>
+                  </option>
                 )
               )}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={2}>
-          <FormControl fullWidth>
-            <InputLabel>Gender</InputLabel>
-            <Select
-              value={filters.gender}
-              label="Gender"
-              onChange={handleFilterChange("gender")}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="MALE">Male</MenuItem>
-              <MenuItem value="FEMALE">Female</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={2}>
-          <FormControl fullWidth>
-            <InputLabel>Status</InputLabel>
-            <Select
-              value={filters.status}
-              label="Status"
-              onChange={handleFilterChange("status")}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="PENDING">Pending</MenuItem>
-              <MenuItem value="APPROVED">Approved</MenuItem>
-              <MenuItem value="REJECTED">Rejected</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-      </Grid>
+            </select>
+          </div>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Country</TableCell>
-              <TableCell>Gender</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Qualification</TableCell>
-              <TableCell>Experience</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredUsers
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((user) => (
-                <TableRow
-                  key={user.id}
-                  hover
-                  style={{ cursor: "pointer", transition: "background 0.2s" }}
-                  onClick={() => handleRowClick(user)}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "#f0f4ff",
-                    },
-                  }}
-                >
-                  <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.country}</TableCell>
-                  <TableCell>{user.gender}</TableCell>
-                  <TableCell>
-                    {userType === "student"
-                      ? user.student_application_status
-                      : user.tutor_application_status}
-                  </TableCell>
-                  <TableCell>{user.highest_qualification}</TableCell>
-                  <TableCell>{user.years_of_experience}</TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredUsers.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+          {/* Gender */}
+          <div className="col-span-1 md:col-span-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Gender
+            </label>
+            <select
+              value={filters.gender}
+              onChange={handleFilterChange("gender")}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">All</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </select>
+          </div>
+
+          {/* Status */}
+          <div className="col-span-1 md:col-span-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              value={filters.status}
+              onChange={handleFilterChange("status")}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">All</option>
+              <option value="PENDING">Pending</option>
+              <option value="APPROVED">Approved</option>
+              <option value="REJECTED">Rejected</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {loading && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="40px"
+        >
+          <CircularProgress />
+        </Box>
+      )}
+      {error ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="400px"
+        >
+          <Typography color="error">{error}</Typography>
+        </Box>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Country</TableCell>
+                <TableCell>Gender</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Qualification</TableCell>
+                <TableCell>Experience</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredUsers
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((user) => (
+                  <TableRow
+                    key={user.id}
+                    hover
+                    style={{ cursor: "pointer", transition: "background 0.2s" }}
+                    onClick={() => handleRowClick(user)}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "#f0f4ff",
+                      },
+                    }}
+                  >
+                    <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.country}</TableCell>
+                    <TableCell>{user.gender}</TableCell>
+                    <TableCell>
+                      {userType === "student"
+                        ? user.student_application_status
+                        : user.tutor_application_status}
+                    </TableCell>
+                    <TableCell>{user.highest_qualification}</TableCell>
+                    <TableCell>{user.years_of_experience}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredUsers.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
 
       {/* User Details Modal */}
       <Dialog
@@ -311,54 +326,66 @@ const UsersReport = () => {
         <Divider sx={{ mb: 2 }} />
         <DialogContent>
           {selectedUser && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
+            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+              <h2 className="text-2xl font-bold text-indigo-700">
                 {selectedUser.first_name} {selectedUser.last_name}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Email:</strong> {selectedUser.email}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Country:</strong> {selectedUser.country}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Gender:</strong> {selectedUser.gender}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Status:</strong>{" "}
-                {userType === "student"
-                  ? selectedUser.student_application_status
-                  : selectedUser.tutor_application_status}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Qualification:</strong>{" "}
-                {selectedUser.highest_qualification}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Experience:</strong> {selectedUser.years_of_experience}
-              </Typography>
-              {userType === "student" && (
-                <>
-                  <Typography variant="body1">
-                    <strong>Matric No:</strong> {selectedUser.matric_no || "-"}
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Level:</strong> {selectedUser.level || "-"}
-                  </Typography>
-                </>
-              )}
-              {userType === "tutor" && (
-                <>
-                  <Typography variant="body1">
-                    <strong>Specialization:</strong>{" "}
-                    {selectedUser.specialization || "-"}
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Bio:</strong> {selectedUser.bio || "-"}
-                  </Typography>
-                </>
-              )}
-            </Box>
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
+                <Detail label="Email" value={selectedUser.email} />
+                <Detail label="Country" value={selectedUser.country} />
+                <Detail label="Gender" value={selectedUser.gender} />
+                <Detail
+                  label="Date of Birth"
+                  value={selectedUser.date_of_birth}
+                />
+                <Detail
+                  label="Marital Status"
+                  value={selectedUser.marital_status}
+                />
+                <Detail
+                  label="Status"
+                  value={
+                    userType === "student"
+                      ? selectedUser.student_application_status
+                      : selectedUser.tutor_application_status
+                  }
+                />
+                <Detail
+                  label="Qualification"
+                  value={selectedUser.highest_qualification}
+                />
+                <Detail
+                  label="Experience"
+                  value={`${selectedUser.years_of_experience} years`}
+                />
+
+                {userType === "student" && (
+                  <>
+                    <Detail
+                      label="Matric No"
+                      value={selectedUser.matric_no || "-"}
+                    />
+                    <Detail label="Level" value={selectedUser.level || "-"} />
+                    <Detail
+                      label="Additional Info"
+                      full
+                      value={selectedUser.additional_info}
+                    />
+                  </>
+                )}
+
+                {userType === "tutor" && (
+                  <>
+                    <Detail
+                      label="Specialization"
+                      value={selectedUser.specialization || "-"}
+                    />
+                    <Detail label="Bio" value={selectedUser.bio || "-"} full />
+                  </>
+                )}
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>

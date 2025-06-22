@@ -28,6 +28,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { getAuthToken } from "@/hooks/axios/axios";
+import { Detail } from "@/components/Detail";
 
 const CoursesReport = () => {
   const [courses, setCourses] = useState([]);
@@ -54,7 +55,7 @@ const CoursesReport = () => {
       const params = new URLSearchParams();
 
       // Add pagination parameters
-      params.append("page", page + 1);
+      params.append("page", page + 1); // backend expects 1-based page
       params.append("page_size", rowsPerPage);
 
       // Add filter parameters
@@ -65,8 +66,12 @@ const CoursesReport = () => {
         `https://ihsaanlms.onrender.com/course/courses/?${params.toString()}`,
         { headers }
       );
+      console.log("here:", response.data);
       setCourses(response.data.results);
-      setTotalCourses(response.data.count);
+      setTotalCourses(response.data.total);
+      if (rowsPerPage !== response.data.page_size) {
+        setRowsPerPage(response.data.page_size);
+      }
       setError(null);
     } catch (err) {
       setError("Failed to fetch courses");
@@ -82,13 +87,11 @@ const CoursesReport = () => {
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    fetchCourses();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    fetchCourses();
   };
 
   const handleFilterChange = (filterName) => (event) => {
@@ -97,7 +100,6 @@ const CoursesReport = () => {
       [filterName]: event.target.value,
     });
     setPage(0);
-    fetchCourses();
   };
 
   const clearFilters = () => {
@@ -106,7 +108,6 @@ const CoursesReport = () => {
       programme: "",
     });
     setPage(0);
-    fetchCourses();
   };
 
   const formatDate = (dateString) => {
@@ -151,39 +152,44 @@ const CoursesReport = () => {
 
   return (
     <Box>
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={5}>
-          <TextField
-            fullWidth
-            label="Search"
-            variant="outlined"
-            value={filters.search}
-            onChange={handleFilterChange("search")}
-            placeholder="Search by title, name, or code"
-          />
-        </Grid>
-        <Grid item xs={12} md={5}>
-          <TextField
-            fullWidth
-            label="Programme ID"
-            variant="outlined"
-            value={filters.programme}
-            onChange={handleFilterChange("programme")}
-            placeholder="Enter programme ID"
-          />
-        </Grid>
-        <Grid item xs={12} md={2}>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="secondary"
-            onClick={clearFilters}
-            sx={{ height: "56px" }}
-          >
-            Clear Filters
-          </Button>
-        </Grid>
-      </Grid>
+      <div className="bg-white p-6 rounded-xl shadow space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-10 gap-4">
+          {/* Search by title, name, or code */}
+          <div className="md:col-span-5">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Search
+            </label>
+            <input
+              type="text"
+              value={filters.search}
+              onChange={handleFilterChange("search")}
+              placeholder="Search by title, name, or code"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div className="md:col-span-5">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Programme ID
+            </label>
+            <input
+              type="text"
+              value={filters.programme}
+              onChange={handleFilterChange("programme")}
+              placeholder="Enter programme ID"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          {/* Clear Filters Button */}
+          <div className="md:col-span-2 flex items-end">
+            <button
+              onClick={clearFilters}
+              className="w-full border border-red-400 text-red-600 font-medium py-2 px-4 rounded-md hover:bg-red-50 transition"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
 
       <TableContainer component={Paper}>
         <Table>
@@ -313,271 +319,271 @@ const CoursesReport = () => {
         <Divider sx={{ mb: 2 }} />
         <DialogContent>
           {selectedCourse && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
+            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-8">
+              {/* Course Header */}
+              <h2 className="text-2xl font-bold text-indigo-700">
                 {selectedCourse.title}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Code:</strong> {selectedCourse.code}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Programme:</strong> {selectedCourse.programme_name}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Description:</strong> {selectedCourse.description}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Created At:</strong>{" "}
-                {formatDate(selectedCourse.created_at)}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Updated At:</strong>{" "}
-                {formatDate(selectedCourse.updated_at)}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Enrolled Users:</strong>{" "}
-                {selectedCourse.enrolled_users.length}
-              </Typography>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
-                Sections
-              </Typography>
-              {selectedCourse.sections && selectedCourse.sections.length > 0 ? (
-                selectedCourse.sections.map((section) => (
-                  <Box
-                    key={section.id}
-                    sx={{
-                      mb: 2,
-                      pl: 2,
-                      borderLeft: "3px solid #6366f1",
-                      background: "#f1f5f9",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      {section.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {section.description}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Order:</strong> {section.order}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Active:</strong>{" "}
-                      {section.is_active ? "Yes" : "No"}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Max Attempts:</strong> {section.max_attempts}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Has MCQ Assessment:</strong>{" "}
-                      {section.has_mcq_assessment ? "Yes" : "No"}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Created At:</strong>{" "}
-                      {formatDate(section.created_at)}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Updated At:</strong>{" "}
-                      {formatDate(section.updated_at)}
-                    </Typography>
-                    <Divider sx={{ my: 1 }} />
-                    <Typography variant="subtitle2">Videos</Typography>
-                    {section.videos && section.videos.length > 0 ? (
-                      section.videos.map((video) => (
-                        <Box key={video.id} sx={{ mb: 1, pl: 1 }}>
-                          <Typography variant="body2">
-                            <strong>Title:</strong> {video.title}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Duration:</strong> {video.duration}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Order:</strong> {video.order}
-                          </Typography>
-                          <Typography variant="body2">
-                            <a
-                              href={video.video_resource.media_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{ color: "#2563eb" }}
-                            >
-                              View Video
-                            </a>
-                          </Typography>
-                        </Box>
-                      ))
-                    ) : (
-                      <Typography variant="body2">
-                        No videos available.
-                      </Typography>
-                    )}
-                    <Typography variant="subtitle2">Materials</Typography>
-                    {section.materials && section.materials.length > 0 ? (
-                      section.materials.map((material) => (
-                        <Box key={material.id} sx={{ mb: 1, pl: 1 }}>
-                          <Typography variant="body2">
-                            <strong>Title:</strong> {material.title}
-                          </Typography>
-                          <Typography variant="body2">
-                            <a
-                              href={material.material_resource.media_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{ color: "#2563eb" }}
-                            >
-                              View Material
-                            </a>
-                          </Typography>
-                        </Box>
-                      ))
-                    ) : (
-                      <Typography variant="body2">
-                        No materials available.
-                      </Typography>
-                    )}
-                  </Box>
-                ))
-              ) : (
-                <Typography variant="body2">No sections available.</Typography>
-              )}
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
-                Assessments
-              </Typography>
-              {selectedCourse.assessments &&
-              selectedCourse.assessments.length > 0 ? (
-                selectedCourse.assessments.map((assessment) => (
-                  <Box
-                    key={assessment.id}
-                    sx={{
-                      mb: 2,
-                      pl: 2,
-                      borderLeft: "3px solid #f59e42",
-                      background: "#fef9c3",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      {assessment.title}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Description:</strong> {assessment.description}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Type:</strong> {assessment.type}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Question Type:</strong> {assessment.question_type}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Max Score:</strong> {assessment.max_score}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Passing Score:</strong> {assessment.passing_score}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Start Date:</strong>{" "}
-                      {formatDate(assessment.start_date)}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>End Date:</strong>{" "}
-                      {formatDate(assessment.end_date)}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Tutor:</strong> {assessment.tutor_name}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Created At:</strong>{" "}
-                      {formatDate(assessment.created_at)}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Updated At:</strong>{" "}
-                      {formatDate(assessment.updated_at)}
-                    </Typography>
-                  </Box>
-                ))
-              ) : (
-                <Typography variant="body2">
-                  No assessments available.
-                </Typography>
-              )}
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
-                Tutors
-              </Typography>
-              {selectedCourse.tutors && selectedCourse.tutors.length > 0 ? (
-                selectedCourse.tutors.map((tutor) => (
-                  <Box
-                    key={tutor.id}
-                    sx={{
-                      mb: 2,
-                      pl: 2,
-                      borderLeft: "3px solid #10b981",
-                      background: "#ecfdf5",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography variant="body2">
-                      <strong>Name:</strong> {tutor.tutor_full_name}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Assigned At:</strong>{" "}
-                      {formatDate(tutor.assigned_at)}
-                    </Typography>
-                  </Box>
-                ))
-              ) : (
-                <Typography variant="body2">No tutors available.</Typography>
-              )}
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
-                Groups
-              </Typography>
-              {selectedCourse.groups && selectedCourse.groups.length > 0 ? (
-                selectedCourse.groups.map((group) => (
-                  <Box
-                    key={group.id}
-                    sx={{
-                      mb: 2,
-                      pl: 2,
-                      borderLeft: "3px solid #f43f5e",
-                      background: "#fef2f2",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography variant="body2">
-                      <strong>Name:</strong> {group.name}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Created At:</strong>{" "}
-                      {formatDate(group.created_at)}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Students:</strong> {group.students.length}
-                    </Typography>
-                  </Box>
-                ))
-              ) : (
-                <Typography variant="body2">No groups available.</Typography>
-              )}
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" sx={{ color: "#3730a3" }}>
-                Enrolled Users
-              </Typography>
-              <Typography variant="body2">
-                {selectedCourse.enrolled_users &&
-                selectedCourse.enrolled_users.length > 0
-                  ? selectedCourse.enrolled_users.join(", ")
-                  : "No enrolled users."}
-              </Typography>
-            </Box>
+              </h2>
+
+              {/* Course Info */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
+                <Detail label="Code" value={selectedCourse.code} />
+                <Detail
+                  label="Programme"
+                  value={selectedCourse.programme_name}
+                />
+                <Detail
+                  label="Description"
+                  value={selectedCourse.description}
+                />
+                <Detail
+                  label="Created At"
+                  value={formatDate(selectedCourse.created_at)}
+                />
+                <Detail
+                  label="Updated At"
+                  value={formatDate(selectedCourse.updated_at)}
+                />
+                <Detail
+                  label="Enrolled Users"
+                  value={selectedCourse.enrolled_users.length}
+                />
+              </div>
+
+              {/* Sections */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-indigo-700 border-t pt-4">
+                  Sections
+                </h3>
+                {selectedCourse.sections?.length > 0 ? (
+                  selectedCourse.sections.map((section) => (
+                    <SectionCard
+                      key={section.id}
+                      title={section.title}
+                      description={section.description}
+                      border="border-indigo-500"
+                    >
+                      <div className="text-sm space-y-1">
+                        <p>
+                          <strong>Order:</strong> {section.order}
+                        </p>
+                        <p>
+                          <strong>Active:</strong>{" "}
+                          {section.is_active ? "Yes" : "No"}
+                        </p>
+                        <p>
+                          <strong>Max Attempts:</strong> {section.max_attempts}
+                        </p>
+                        <p>
+                          <strong>Has MCQ Assessment:</strong>{" "}
+                          {section.has_mcq_assessment ? "Yes" : "No"}
+                        </p>
+                        <p>
+                          <strong>Created At:</strong>{" "}
+                          {formatDate(section.created_at)}
+                        </p>
+                        <p>
+                          <strong>Updated At:</strong>{" "}
+                          {formatDate(section.updated_at)}
+                        </p>
+
+                        <div className="mt-2">
+                          <p className="font-semibold text-sm">Videos</p>
+                          {section.videos?.length > 0 ? (
+                            section.videos.map((video) => (
+                              <div key={video.id} className="pl-2 text-sm">
+                                <p>
+                                  <strong>Title:</strong> {video.title}
+                                </p>
+                                <p>
+                                  <strong>Duration:</strong> {video.duration}
+                                </p>
+                                <p>
+                                  <strong>Order:</strong> {video.order}
+                                </p>
+                                <p>
+                                  <a
+                                    href={video.video_resource.media_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 underline"
+                                  >
+                                    View Video
+                                  </a>
+                                </p>
+                              </div>
+                            ))
+                          ) : (
+                            <p>No videos available.</p>
+                          )}
+
+                          <p className="font-semibold text-sm mt-2">
+                            Materials
+                          </p>
+                          {section.materials?.length > 0 ? (
+                            section.materials.map((material) => (
+                              <div key={material.id} className="pl-2 text-sm">
+                                <p>
+                                  <strong>Title:</strong> {material.title}
+                                </p>
+                                <p>
+                                  <a
+                                    href={material.material_resource.media_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 underline"
+                                  >
+                                    View Material
+                                  </a>
+                                </p>
+                              </div>
+                            ))
+                          ) : (
+                            <p>No materials available.</p>
+                          )}
+                        </div>
+                      </div>
+                    </SectionCard>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-600">
+                    No sections available.
+                  </p>
+                )}
+              </div>
+
+              {/* Tutors */}
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-indigo-700 border-t pt-4">
+                  Tutors
+                </h3>
+                {selectedCourse.tutors?.length > 0 ? (
+                  selectedCourse.tutors.map((tutor) => (
+                    <SectionCard
+                      key={tutor.id}
+                      title={tutor.tutor_full_name}
+                      description={`Assigned At: ${formatDate(
+                        tutor.assigned_at
+                      )}`}
+                      border="border-green-500 bg-green-50"
+                    />
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-600">No tutors available.</p>
+                )}
+              </div>
+
+              {/* Groups */}
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-indigo-700 border-t pt-4">
+                  Groups
+                </h3>
+                {selectedCourse.groups?.length > 0 ? (
+                  selectedCourse.groups.map((group) => (
+                    <SectionCard
+                      key={group.id}
+                      title={group.name}
+                      description={`Created At: ${formatDate(
+                        group.created_at
+                      )}`}
+                      border="border-rose-500 bg-rose-50"
+                    >
+                      <p className="text-sm">
+                        <strong>Students:</strong> {group.students.length}
+                      </p>
+                    </SectionCard>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-600">No groups available.</p>
+                )}
+              </div>
+
+              {/* Enrolled Users */}
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-indigo-700 border-t pt-4">
+                  Enrolled Users
+                </h3>
+                <p className="text-sm text-gray-700">
+                  {selectedCourse.enrolled_users?.length > 0
+                    ? selectedCourse.enrolled_users.join(", ")
+                    : "No enrolled users."}
+                </p>
+              </div>
+
+              {/* Assessments */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-indigo-700 border-t pt-4">
+                  Assessments
+                </h3>
+                {selectedCourse.assessments?.length > 0 ? (
+                  selectedCourse.assessments.map((assessment) => (
+                    <SectionCard
+                      key={assessment.id}
+                      title={assessment.title}
+                      description={assessment.description}
+                      border="border-yellow-500 bg-yellow-50"
+                    >
+                      <div className="text-sm space-y-1">
+                        <p>
+                          <strong>Type:</strong> {assessment.type}
+                        </p>
+                        <p>
+                          <strong>Question Type:</strong>{" "}
+                          {assessment.question_type}
+                        </p>
+                        <p>
+                          <strong>Max Score:</strong> {assessment.max_score}
+                        </p>
+                        <p>
+                          <strong>Passing Score:</strong>{" "}
+                          {assessment.passing_score}
+                        </p>
+                        <p>
+                          <strong>Start Date:</strong>{" "}
+                          {formatDate(assessment.start_date)}
+                        </p>
+                        <p>
+                          <strong>End Date:</strong>{" "}
+                          {formatDate(assessment.end_date)}
+                        </p>
+                        <p>
+                          <strong>Tutor:</strong> {assessment.tutor_name}
+                        </p>
+                        <p>
+                          <strong>Created At:</strong>{" "}
+                          {formatDate(assessment.created_at)}
+                        </p>
+                        <p>
+                          <strong>Updated At:</strong>{" "}
+                          {formatDate(assessment.updated_at)}
+                        </p>
+                      </div>
+                    </SectionCard>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-600">
+                    No assessments available.
+                  </p>
+                )}
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
     </Box>
   );
 };
+
+const SectionCard = ({ title, description, children, border }) => (
+  <div className={`border-l-4 rounded-md p-4 ${border} bg-gray-50 space-y-1`}>
+    <h4 className="text-lg font-semibold text-gray-800">
+      {typeof title === "string" && title.length > 0
+        ? title.charAt(0).toUpperCase() + title.slice(1)
+        : title}
+    </h4>
+    <p className="text-sm text-gray-600">{description}</p>
+    {children}
+  </div>
+);
 
 export default CoursesReport;
