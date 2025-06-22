@@ -12,6 +12,14 @@ import {
   Card,
   Box,
 } from "@mui/material";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+} from "@mui/material";
 import Button from "@/components/Button";
 import Layout from "@/components/Layout";
 import { useState, useEffect } from "react";
@@ -24,12 +32,29 @@ const ManualGrading = () => {
   const [fetchAll, setFetchAll] = useState(false);
   const [totalCourses, setTotalCourses] = useState(10);
   const [selectedAssessment, setSelectedAssessment] = useState(null);
+  const [grades, setGrades] = useState([]);
+
+  const isGroupAssessment = selectedAssessment?.type === "GROUP";
+
+  // Fetch grades for selected assessment (individual only)
+  const {
+    isLoading: loadingGrades,
+    data: GradesList,
+    refetch: refetchGrades,
+  } = useFetch(
+    "grades",
+    selectedAssessment && selectedAssessment.type !== "GROUP"
+      ? `https://ihsaanlms.onrender.com/assessment/grades/?assessment=${selectedAssessment.id}`
+      : null,
+    (data) => setGrades(data.results || []),
+    (error) => setGrades([])
+  );
 
   useEffect(() => {
-    if (selectedAssessmentId) {
-      refetchStudents();
+    if (!selectedAssessment || selectedAssessment.type === "GROUP") {
+      setGrades([]);
     }
-  }, [selectedAssessmentId]);
+  }, [selectedAssessment]);
 
   const {
     isLoading: courseLoading,
@@ -91,6 +116,17 @@ const ManualGrading = () => {
   const handleSubmit = (values, { resetForm }) => {
     let payload;
 
+    // Check if student already graded (for individual assessments)
+    if (selectedAssessment?.type !== "GROUP") {
+      const alreadyGraded = grades.find((g) => g.student === values.student);
+      if (alreadyGraded) {
+        const proceed = window.confirm(
+          `Warning: ${alreadyGraded.student_name} has already been graded (Score: ${alreadyGraded.score}). Do you want to override?`
+        );
+        if (!proceed) return;
+      }
+    }
+
     if (selectedAssessment?.type === "GROUP") {
       // Find the selected group and its leader
       const selectedGroup = GroupList?.data?.results?.find(
@@ -120,6 +156,10 @@ const ManualGrading = () => {
       onSuccess: () => {
         toast.success("Assignment graded successfully");
         resetForm();
+        // Refetch grades after grading
+        if (selectedAssessment && selectedAssessment.type !== "GROUP") {
+          refetchGrades();
+        }
       },
       onError: (error) => {
         toast.error(
@@ -128,10 +168,51 @@ const ManualGrading = () => {
       },
     });
   };
-  const isGroupAssessment = selectedAssessment?.type === "GROUP";
 
   return (
     <Layout>
+      {/* Show grades table if not group assessment */}
+      {!isGroupAssessment && selectedAssessment && (
+        <Paper sx={{ mb: 4, p: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Existing Grades
+          </Typography>
+          {loadingGrades ? (
+            <Typography>Loading grades...</Typography>
+          ) : grades.length === 0 ? (
+            <Typography>No grades yet.</Typography>
+          ) : (
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Student</TableCell>
+                  <TableCell>Score</TableCell>
+                  <TableCell>Max Score</TableCell>
+                  <TableCell>Percentage</TableCell>
+                  <TableCell>Feedback</TableCell>
+                  <TableCell>Graded By</TableCell>
+                  <TableCell>Published</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {grades.map((g) => (
+                  <TableRow key={g.id}>
+                    <TableCell>{g.student_name}</TableCell>
+                    <TableCell>{g.score}</TableCell>
+                    <TableCell>{g.assessment_max_score}</TableCell>
+                    <TableCell>{g.percentage_score}%</TableCell>
+                    <TableCell>{g.feedback}</TableCell>
+                    <TableCell>{g.graded_by_name}</TableCell>
+                    <TableCell>{g.is_published ? "Yes" : "No"}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Paper>
+      )}
+
+      {/* Form */}
       <Formik
         enableReinitialize
         initialValues={initialValues}
