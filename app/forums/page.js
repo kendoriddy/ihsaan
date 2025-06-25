@@ -143,7 +143,7 @@ const Forums = () => {
         </div>
         {isLoading ? (
           <div className='text-center py-20 text-gray-500'>
-            Loading comments...
+            Loading forums...
           </div>
         ) : (
           forums.length > 0 && (

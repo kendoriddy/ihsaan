@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 import {
   ArrowLeft,
@@ -95,7 +97,44 @@ const ForumPosts = ({ forumId, forumTitle, onBack }) => {
           </div>
         ) : (
           <div className='space-y-4'>
-            {comments.length > 0 &&
+            {/* Add New Comment Section */}
+            <div className='text-center'>
+              <Button
+                onClick={() => setReplyingTo('new')}
+                className='bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg mb-4'
+              >
+                Add New Comment
+              </Button>
+
+              {replyingTo === 'new' && (
+                <div className='mt-4 max-w-xl mx-auto'>
+                  <textarea
+                    value={replyContent}
+                    onChange={e => setReplyContent(e.target.value)}
+                    placeholder='Write your comment...'
+                    className='w-full border border-gray-300 rounded-lg p-3'
+                    rows={4}
+                  />
+                  <div className='flex items-center justify-center space-x-2 mt-3'>
+                    <Button
+                      onClick={handleCommentSubmit}
+                      disabled={!replyContent.trim()}
+                    >
+                      <Send className='w-4 h-4 mr-1' /> Post Comment
+                    </Button>
+                    <Button
+                      variant='outlined'
+                      onClick={() => setReplyingTo(null)}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Comments List */}
+            {comments.length > 0 ? (
               comments.map(post => (
                 <div
                   key={post.id}
@@ -186,9 +225,8 @@ const ForumPosts = ({ forumId, forumTitle, onBack }) => {
                     </div>
                   </div>
                 </div>
-              ))}
-
-            {comments.length === 0 && (
+              ))
+            ) : (
               <div className='text-center py-12'>
                 <MessageSquare className='w-16 h-16 text-gray-300 mx-auto mb-4' />
                 <h3 className='text-lg font-medium text-gray-900 mb-2'>
@@ -197,38 +235,6 @@ const ForumPosts = ({ forumId, forumTitle, onBack }) => {
                 <p className='text-gray-600 mb-4'>
                   Be the first to start the discussion!
                 </p>
-                <Button
-                  onClick={() => setReplyingTo('new')}
-                  className='bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg'
-                >
-                  Add First Comment
-                </Button>
-
-                {replyingTo === 'new' && (
-                  <div className='mt-6 max-w-xl mx-auto'>
-                    <textarea
-                      value={replyContent}
-                      onChange={e => setReplyContent(e.target.value)}
-                      placeholder='Write your first comment...'
-                      className='w-full border border-gray-300 rounded-lg p-3'
-                      rows={4}
-                    />
-                    <div className='flex items-center justify-center space-x-2 mt-3'>
-                      <Button
-                        onClick={handleCommentSubmit}
-                        disabled={!replyContent.trim()}
-                      >
-                        <Send className='w-4 h-4 mr-1' /> Post Comment
-                      </Button>
-                      <Button
-                        variant='outlined'
-                        onClick={() => setReplyingTo(null)}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
