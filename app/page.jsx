@@ -20,6 +20,7 @@ import { useFetch } from "@/hooks/useHttp/useHttp";
 import Loader from "@/components/Loader";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import FAQSection from "@/components/FAQSection";
 
 function Page() {
   const router = useRouter();
@@ -448,33 +449,7 @@ function Page() {
           </section>
 
           {/* FAQ Section */}
-          {/* <section className="py-12">
-            <div className="text-center mb-6" style={{ color: "#7e1a0b", fontWeight: "600" }}>
-              Frequently Asked Questions
-            </div>
-            <div className="w-full max-w-3xl mx-auto">
-              {FAQs &&
-                FAQs.map((faq) => (
-                  <Accordion
-                    key={faq.id}
-                    className="mb-4 rounded-md shadow-sm"
-                    sx={{
-                      border: "1px solid #ff6600",
-                      "&::before": { display: "none" },
-                    }}
-                  >
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon style={{ color: "#ff6600" }} />}
-                      aria-controls="panel1-content"
-                      id="panel1-header"
-                    >
-                      <span style={{ fontWeight: 600, color: "#7e1a0b" }}>{faq.title}</span>
-                    </AccordionSummary>
-                    <AccordionDetails style={{ color: "#555" }}>{faq.content}</AccordionDetails>
-                  </Accordion>
-                ))}
-            </div>
-          </section> */}
+          <FAQSection />
 
           {/* COURSES */}
           <section className="py-6 w-full">
@@ -497,6 +472,7 @@ function Page() {
                 help you.
               </p>
             </div>
+
             {/* Bottom */}
             <div className="flex flex-wrap justify-center gap-6 flex-col md:flex-row items-center ">
               {courses && (

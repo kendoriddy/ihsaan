@@ -10,6 +10,7 @@ import programmeTypeReducer from "./slices/programmeTypeSlice";
 import classesReducer from "./slices/classesSlice";
 import levelsReducer from "./slices/levelsSlice";
 import courseReducer from "./slices/courseSlice";
+import blogReducer from "./slices/blogSlice";
 
 export const store = configureStore({
   reducer: {
@@ -23,5 +24,6 @@ export const store = configureStore({
     classes: classesReducer,
     levels: levelsReducer,
     course: courseReducer,
+    blog: blogReducer,
   },
 });

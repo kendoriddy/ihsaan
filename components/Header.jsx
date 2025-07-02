@@ -28,6 +28,8 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { IconButton, InputAdornment } from "@mui/material";
 import NahuProgramme from "./NahuProgramme";
 import { getAuthToken } from "@/hooks/axios/axios";
+import PrimaryProgramme from "./PrimaryProgramme";
+import SecondaryProgramme from "./SecondaryProgramme";
 
 function Header() {
   const currentRoute = usePathname();
@@ -117,7 +119,9 @@ function Header() {
     setOpen(true);
   };
 
+  const [mode, setMode] = useState("");
   const handleOpenProgrammeModal = (mode) => {
+    setMode(mode);
     setProgrammeOpen(true);
   };
 
@@ -364,8 +368,7 @@ function Header() {
                   <div
                     className="block w-full h-full"
                     onClick={() => {
-                      handleOpenModal("student");
-                      setType("student");
+                      handleOpenProgrammeModal("Primary Programmes");
                     }}
                   >
                     Primary Programmes
@@ -375,8 +378,7 @@ function Header() {
                   <div
                     className="block w-full h-full"
                     onClick={() => {
-                      handleOpenModal("student");
-                      setType("student");
+                      handleOpenProgrammeModal("Secondary Programmes");
                     }}
                   >
                     Secondary Programmes
@@ -708,11 +710,17 @@ function Header() {
             </Modal>
 
             <Modal
-              title="Welcome to Nahu Programme"
+              title={`Welcome to ${mode}`}
               isOpen={programmeOpen}
               handleClose={() => setProgrammeOpen(false)}
             >
-              <NahuProgramme setOpen={setOpen} />
+              {mode === "nahu programme" && <NahuProgramme setOpen={setOpen} />}
+              {mode === "Primary Programmes" && (
+                <PrimaryProgramme setOpen={setOpen} />
+              )}
+              {mode === "Secondary Programmes" && (
+                <SecondaryProgramme setOpen={setOpen} />
+              )}
             </Modal>
           </ul>
         </div>
@@ -867,11 +875,20 @@ function Header() {
                       <div
                         className="block w-full h-full"
                         onClick={() => {
-                          handleOpenModal("tutor");
-                          setType("tutor");
+                          handleOpenProgrammeModal("Primary Programmes");
                         }}
                       >
                         Primary Programmes
+                      </div>
+                    </div>
+                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
+                      <div
+                        className="block w-full h-full"
+                        onClick={() => {
+                          handleOpenProgrammeModal("Secondary Programmes");
+                        }}
+                      >
+                        Secondary Programmes
                       </div>
                     </div>
                   </div>

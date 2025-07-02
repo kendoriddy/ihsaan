@@ -19,8 +19,8 @@ export const newsLetterSchema = object({
 });
 
 export const faqSchema = object({
-  title: string().required("Required"),
-  content: string().required("Required"),
+  question: string().required("Required"),
+  answer: string().required("Required"),
 });
 
 export const quoteSchema = object({

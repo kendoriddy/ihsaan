@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Modal from "@/components/validation/Modal";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
@@ -14,6 +14,7 @@ import { faqSchema } from "@/components/validationSchemas/ValidationSchema";
 import { Button } from "@mui/material";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
 function Page() {
   const queryClient = useQueryClient();
@@ -23,83 +24,129 @@ function Page() {
   const [deleteFaq, setDeleteFaq] = useState(false);
   const [toEditFaq, setToEditFaq] = useState(null);
   const [deletingFaq, setDeletingFaq] = useState(null);
+
   const toggleOption = (index) => {
     setOpenSubMenuIndex((prevIndex) => (prevIndex === index ? null : index));
   };
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  // Extract base domain from API_BASE_URL (remove /api part for FAQ endpoints)
+  const getFaqBaseUrl = () => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+    return apiUrl.replace("/api", "");
+  };
+
   const {
     isLoading,
     data: FaqsList,
-    isFetching,
     refetch,
-  } = useFetch("faqs", `/faqs`);
-  const Faqs = FaqsList && FaqsList?.data;
+  } = useFetch("faqs", `${getFaqBaseUrl()}/faqs/faq/`);
+
+  const Faqs = FaqsList && FaqsList?.data?.results;
+
   const [FaqMode, setFaqMode] = useState("create");
   const [open, setOpen] = useState(false);
+
   const handleClose = () => {
     setFaqMode("");
     setOpen(false);
     setToEditFaq(null);
   };
+
   const FaqInitialValues = {
-    title: toEditFaq?.title || "",
-    content: toEditFaq?.content || "",
+    question: toEditFaq?.question || "",
+    answer: toEditFaq?.answer || "",
   };
+
   const { mutate: createNewFaq, isLoading: isCreatingFaq } = usePost(
-    "/faqs/create",
+    `${getFaqBaseUrl()}/faqs/faq/`,
     {
       onSuccess: (response) => {
-        toast.success("Faq created successfully");
+        toast.success("FAQ created successfully");
         queryClient.invalidateQueries("faqs");
         handleClose();
       },
       onError: (error) => {
-        toast.error(error.response.data.message);
+        toast.error(error.response?.data?.message || "Failed to create FAQ");
       },
     }
   );
-  const { mutate: updateFaq, isLoading: isUpdatingFaq } = usePut("/faqs", {
-    onSuccess: (response) => {
-      const { data } = response;
-      toast.success("Faq updated successfully");
+
+  const [isUpdatingFaq, setIsUpdatingFaq] = useState(false);
+
+  // Custom update function to handle trailing slash requirement
+  const handleUpdateFaq = async (id, data) => {
+    try {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      setIsUpdatingFaq(true);
+      await axios.patch(`${getFaqBaseUrl()}/faqs/faq/${id}/`, data, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      toast.success("FAQ updated successfully");
       queryClient.invalidateQueries("faqs");
       handleClose();
-    },
-    onError: (error) => {
-      toast.error(error.response.data.message);
-    },
-  });
-  const { mutate: FaqDelete, isLoading: isDeletingFaq } = useDelete("/faqs", {
-    onSuccess: (data) => {
-      toast.success("deleted successfully");
+      setIsUpdatingFaq(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update FAQ");
+    } finally {
+      setIsUpdatingFaq(false);
+    }
+  };
+
+  const { mutate: FaqDelete, isLoading: isDeletingFaq } = useDelete(
+    `${getFaqBaseUrl()}/faqs/faq`,
+    {
+      onSuccess: (data) => {
+        toast.success("FAQ deleted successfully");
+        queryClient.invalidateQueries("faqs");
+        setDeleteFaq(false);
+        setDeletingFaq(null);
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || "Failed to delete FAQ");
+      },
+    }
+  );
+
+  // Custom delete function to handle trailing slash requirement
+  const handleDeleteFaq = async (id) => {
+    try {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      await axios.delete(`${getFaqBaseUrl()}/faqs/faq/${id}/`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      toast.success("FAQ deleted successfully");
       queryClient.invalidateQueries("faqs");
       setDeleteFaq(false);
       setDeletingFaq(null);
-    },
-    onError: (error) => {
-      toast.error(error.response.data.message);
-    },
-  });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete FAQ");
+    }
+  };
+
   const handleSubmit = (values) => {
-    const { content, title } = values;
+    const { question, answer } = values;
     const payload = {
-      title: title,
-      content: content,
+      question: question,
+      answer: answer,
     };
+
     if (FaqMode === "create") {
       createNewFaq(payload);
     } else {
-      updateFaq({ id: toEditFaq?.id, data: payload });
+      handleUpdateFaq(toEditFaq?.id, payload);
     }
   };
-  const handleDeleteFaq = (id) => {
-    FaqDelete(id);
-  };
+
   useEffect(() => {
     refetch();
   }, [open, deleteFaq]);
+
   return (
     <div className="relative">
       {/* Header */}
@@ -116,7 +163,7 @@ function Page() {
         />
         {/* Main Body */}
         <section
-          className=" lg:ml-[250px] w-screen px-2"
+          className="lg:ml-[250px] w-screen px-2"
           style={{
             "@media (min-width: 1024px)": {
               width: "calc(100vw - 250px)",
@@ -127,7 +174,7 @@ function Page() {
           <div className="p-4">
             {/* Top */}
             <div className="flex justify-between items-center">
-              <div className="text-lg font-bold"></div>
+              <div className="text-lg font-bold">FAQ Management</div>
               <div
                 className="bg-red-600 text-white px-3 py-2 rounded hover:bg-blue-600 transition-all duration-300 cursor-pointer"
                 onClick={() => {
@@ -139,71 +186,77 @@ function Page() {
               </div>
             </div>
 
-            <div className="py-4 font-bold text-lg">FAQS</div>
-
             {/* Space */}
             <div className="py-4"></div>
 
-            {/* Faq  */}
+            {/* FAQ Table */}
             <section className="rounded border px-4 py-4 overflow-x-scroll">
               {isLoading ? (
                 <Loader />
               ) : (
-                <table className="table-auto w-full rounded bg-gray-50 ">
-                  <thead className="sticky top-[-20px] bg-gray-100 z-20 text-left">
-                    <tr className="border text-red-600">
-                      <th className=" border px-4 py-2">Question</th>
-                      <th className=" border px-4 py-2">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Faqs?.length > 0 ? (
-                      Faqs?.map((Faq) => (
-                        <tr className="even:bg-gray-100" key={Faq?.id}>
-                          <td className="border px-4 py-2">{Faq?.title}</td>
-                          <td className="border px-4 py-2">{Faq?.content}</td>
-                          <td className="border pl-4 py-2 w-[170px]">
-                            <span
-                              className="px-2 py-1 bg-blue-600 cursor-pointer text-white rounded hover:bg-blue-700"
-                              onClick={() => {
-                                setToEditFaq(Faq);
-                                setFaqMode("edit");
-                                setOpen(true);
-                              }}
-                            >
-                              Edit
-                            </span>
-                            <span
-                              className="px-2 py-1 bg-red-600 cursor-pointer text-white rounded hover:bg-red-700 ml-1"
-                              onClick={() => {
-                                setDeletingFaq(Faq);
-                                setDeleteFaq(true);
-                              }}
-                            >
-                              Delete
-                            </span>
+                <>
+                  <table className="table-auto w-full rounded bg-gray-50">
+                    <thead className="sticky top-[-20px] bg-gray-100 z-20 text-left">
+                      <tr className="border text-red-600">
+                        <th className="border px-4 py-2">Question</th>
+                        <th className="border px-4 py-2">Answer</th>
+                        <th className="border px-4 py-2">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Faqs?.length > 0 ? (
+                        Faqs?.map((Faq) => (
+                          <tr className="even:bg-gray-100" key={Faq?.id}>
+                            <td className="border px-4 py-2">
+                              {Faq?.question}
+                            </td>
+                            <td className="border px-4 py-2 max-w-xs truncate">
+                              {Faq?.answer}
+                            </td>
+                            <td className="border pl-4 py-2 w-[170px]">
+                              <span
+                                className="px-2 py-1 bg-blue-600 cursor-pointer text-white rounded hover:bg-blue-700"
+                                onClick={() => {
+                                  setToEditFaq(Faq);
+                                  setFaqMode("edit");
+                                  setOpen(true);
+                                }}
+                              >
+                                Edit
+                              </span>
+                              <span
+                                className="px-2 py-1 bg-red-600 cursor-pointer text-white rounded hover:bg-red-700 ml-1"
+                                onClick={() => {
+                                  setDeletingFaq(Faq);
+                                  setDeleteFaq(true);
+                                }}
+                              >
+                                Delete
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan="3"
+                            className="border px-4 py-2 text-center"
+                          >
+                            No FAQs to show at the moment
                           </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan="3"
-                          className="border px-4 py-2 text-center"
-                        >
-                          No data to show at the moment
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                      )}
+                    </tbody>
+                  </table>
+                </>
               )}
             </section>
-            {/* ADD,UPDATE Faq */}
+
+            {/* Add/Update FAQ Modal */}
             <Modal
               isOpen={open}
               handleClose={handleClose}
-              title={FaqMode === "create" ? "New Faq" : "Update Faq"}
+              title={FaqMode === "create" ? "New FAQ" : "Update FAQ"}
             >
               <div className="my-2 flex flex-col gap-2">
                 <Formik
@@ -214,21 +267,24 @@ function Page() {
                   <Form>
                     <div className="flex flex-col gap-2">
                       <div>
-                        <FormikControl name="title" placeholder="FAQ Title" />
+                        <FormikControl
+                          name="question"
+                          placeholder="FAQ Question"
+                        />
                       </div>
                       <div>
                         <FormikControl
-                          name="content"
+                          name="answer"
                           multiline
                           minRows={4}
-                          placeholder="Faq content"
+                          placeholder="FAQ Answer"
                         />
                       </div>
 
                       <div className="w-full flex justify-center">
                         <AuthButton
                           isLoading={isCreatingFaq || isUpdatingFaq}
-                          text={FaqMode === "create" ? "submit" : "update"}
+                          text={FaqMode === "create" ? "Submit" : "Update"}
                         />
                       </div>
                     </div>
@@ -236,18 +292,21 @@ function Page() {
                 </Formik>
               </div>
             </Modal>
+
+            {/* Delete Confirmation Modal */}
             <Modal
               isOpen={deleteFaq}
               handleClose={() => {
                 setDeleteFaq(false);
                 setDeletingFaq(null);
               }}
-              title={"Delete Faq"}
+              title="Delete FAQ"
             >
               <div>
-                <p>Are you sure you want to delete Faq </p>
+                <p>Are you sure you want to delete this FAQ?</p>
+                <p className="font-semibold mt-2">{deletingFaq?.question}</p>
               </div>
-              <div className="flex justify-center">
+              <div className="flex justify-center mt-4">
                 <Button
                   onClick={() => handleDeleteFaq(deletingFaq?.id)}
                   variant="contained"
@@ -257,7 +316,7 @@ function Page() {
                     color: "white !important",
                   }}
                 >
-                  {isDeletingFaq ? "deleting" : "confirm"}
+                  {isDeletingFaq ? "Deleting..." : "Confirm Delete"}
                 </Button>
               </div>
             </Modal>

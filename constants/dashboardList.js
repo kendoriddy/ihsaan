@@ -80,12 +80,12 @@ const DASHBOARD_LIST = {
       icon: GradingOutlined,
       path: "/forums",
     },
-    // {
-    //   id: 20,
-    //   name: 'Reports',
-    //   icon: AssessmentIcon,
-    //   path: '/reports'
-    // },
+    {
+      id: 20,
+      name: "Reports",
+      icon: AssessmentIcon,
+      path: "/reports",
+    },
     { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },
   ],
 
