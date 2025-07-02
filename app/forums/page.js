@@ -5,53 +5,37 @@ import { Plus, MessageSquare, Calendar, Users, Settings } from 'lucide-react'
 
 import ForumCreationModal from '@/components/ForumCreationModal'
 import Layout from '@/components/Layout'
-// import ForumParticipants from './components/ForumParticipants'
 import ForumPosts from './components/ForumPosts'
+import { useFetch } from '@/hooks/useHttp/useHttp'
+import { useQueryClient } from '@tanstack/react-query'
 
 const Forums = () => {
+  const queryClient = useQueryClient()
+  const [page, setPage] = useState(1)
+  const [totalForums, setTotalForums] = useState(0)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [currentView, setCurrentView] = useState('forums')
   const [selectedForumId, setSelectedForumId] = useState('')
   const [selectedForumTitle, setSelectedForumTitle] = useState('')
-  const [forums, setForums] = useState([
-    {
-      id: '1',
-      title: 'BUAD 825 [International Business Finance]',
-      description:
-        'Attempt all the following Questions: 1. Discuss the interacting elements in a society. 2. What are the essential elements of a contract?',
-      startDate: '2025-01-15T09:00:00',
-      endDate: '2025-02-15T23:59:00',
-      isGraded: true,
-      maxMark: 5,
-      participants: 25,
-      posts: 12,
-      createdAt: '2024-11-15T10:30:00'
-    },
-    {
-      id: '2',
-      title: 'Welcome message - BUAD 822',
-      description:
-        'Good morning, all. You are all welcome to Dr Bello Taofik tutoring for BUAD 822 (MIS/ICT management).',
-      startDate: '2025-01-10T08:30:00',
-      endDate: '2025-06-10T18:00:00',
-      isGraded: false,
-      maxMark: 0,
-      participants: 30,
-      posts: 18,
-      createdAt: '2024-12-20T14:15:00'
-    }
-  ])
 
-  const handleCreateForum = forumData => {
-    const newForum = {
-      ...forumData,
-      id: Date.now().toString(),
-      participants: 0,
-      posts: 0,
-      createdAt: new Date().toISOString()
+  const { isLoading, data, refetch, isFetching } = useFetch(
+    'forums',
+    `https://ihsaanlms.onrender.com/forum/forums/?page_size=15&page=${page}`,
+    data => {
+      if (data?.total) {
+        setTotalForums(data.total)
+      }
     }
-    setForums(prev => [newForum, ...prev])
-    setShowCreateModal(false)
+  )
+
+  const forums = data?.data?.results || []
+
+  console.log({ forums })
+
+  // Handle Page Change
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage)
+    refetch()
   }
 
   const getRelativeTime = dateString => {
@@ -127,16 +111,6 @@ const Forums = () => {
     setSelectedForumTitle('')
   }
 
-  // if (currentView === 'participants') {
-  //   return (
-  //     <ForumParticipants
-  //       forumId={selectedForumId}
-  //       forumTitle={selectedForumTitle}
-  //       onBack={handleBackToForums}
-  //     />
-  //   )
-  // }
-
   if (currentView === 'posts') {
     return (
       <ForumPosts
@@ -167,82 +141,77 @@ const Forums = () => {
             <span>Create Forum</span>
           </button>
         </div>
-
-        <div className='grid gap-4'>
-          {forums.map(forum => (
-            <div
-              key={forum.id}
-              className='bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow'
-            >
-              <div className='flex items-start space-x-4'>
-                <div className='flex-shrink-0'>
-                  <div className='w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center'>
-                    <MessageSquare className='w-6 h-6 text-blue-600' />
-                  </div>
-                </div>
-
-                <div className='flex-1'>
-                  <div className='flex items-center justify-between mb-2'>
-                    <div className='flex items-center space-x-2'>
-                      <span className='text-green-600 text-sm'>●</span>
-                      <span className='text-gray-500 text-sm'>
-                        {getRelativeTime(forum.createdAt)}
-                      </span>
-                      <span className='bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium'>
-                        ADOODLE BABAJOLA
-                      </span>
+        {isLoading ? (
+          <div className='text-center py-20 text-gray-500'>
+            Loading forums...
+          </div>
+        ) : (
+          forums.length > 0 && (
+            <div className='grid gap-4'>
+              {forums.map(forum => (
+                <div
+                  key={forum.id}
+                  className='bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow'
+                >
+                  <div className='flex items-start space-x-4'>
+                    <div className='flex-shrink-0'>
+                      <div className='w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center'>
+                        <MessageSquare className='w-6 h-6 text-blue-600' />
+                      </div>
                     </div>
-                    {/* <div className='flex items-center space-x-2'>
-                      <button
-                        onClick={() => handleParticipantsClick(forum.id)}
-                        className='flex items-center space-x-1 hover:text-blue-600 transition-colors cursor-pointer text-sm text-gray-500'
-                      >
-                        <Users className='w-4 h-4' />
-                        <span className='underline'>{forum.participants}</span>
-                      </button>
-                      <button className='p-2 text-gray-400 hover:text-gray-600 transition-colors'>
-                        <Settings className='w-5 h-5' />
-                      </button>
-                    </div> */}
-                  </div>
 
-                  <h3 className='text-lg font-semibold text-gray-900 mb-2'>
-                    {forum.title}
-                  </h3>
-                  <p className='text-gray-600 mb-4'>{forum.description}</p>
+                    <div className='flex-1'>
+                      <div className='flex items-center justify-between mb-2'>
+                        <div className='flex items-center space-x-2'>
+                          <span className='text-green-600 text-sm'>●</span>
+                          <span className='text-gray-500 text-sm'>
+                            {getRelativeTime(forum.created_at)}
+                          </span>
+                          <span className='bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium'>
+                            ADOODLE BABAJOLA
+                          </span>
+                        </div>
+                      </div>
 
-                  <div className='flex flex-wrap gap-2'>
-                    {forum.isGraded && (
-                      <span className='bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm border border-red-200'>
-                        MARK OBTAINABLE: {forum.maxMark}.00
-                      </span>
-                    )}
-                    <button
-                      onClick={() => handlePostsClick(forum.id)}
-                      className='bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm border border-green-200 hover:bg-green-200 transition-colors'
-                    >
-                      📝 {forum.posts}
-                    </button>
+                      <h3 className='text-lg font-semibold text-gray-900 mb-2'>
+                        {forum.title}
+                      </h3>
+                      <p className='text-gray-600 mb-4'>{forum.preview}</p>
 
-                    <span className='bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm border border-purple-200'>
+                      <div className='flex flex-wrap gap-2'>
+                        {forum.isGraded && (
+                          <span className='bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm border border-red-200'>
+                            MARK OBTAINABLE: {forum.maxMark}.00
+                          </span>
+                        )}
+                        <button
+                          onClick={() => handlePostsClick(forum.id)}
+                          className='bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm border border-green-200 hover:bg-green-200 transition-colors'
+                        >
+                          📝 {forum.posts}
+                        </button>
+
+                        {/* <span className='bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm border border-purple-200'>
                       👤 {forum.participants}
-                    </span>
-                    <span className='bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm border border-gray-200'>
-                      ⏰ START: {formatDateOnly(forum.startDate)}{' '}
-                      {formatTimeOnly(forum.startDate)}
-                    </span>
-                    <span className='bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm border border-gray-200'>
-                      🔚 END: {formatDateOnly(forum.endDate)}{' '}
-                      {formatTimeOnly(forum.endDate)}
-                    </span>
+                    </span> */}
+                        <span className='bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm border border-gray-200'>
+                          ⏰ START: {formatDateOnly(forum.start_date)}{' '}
+                          {formatTimeOnly(forum.start_date)}
+                        </span>
+                        <span className='bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm border border-gray-200'>
+                          🔚 END: {formatDateOnly(forum.end_date)}{' '}
+                          {formatTimeOnly(forum.end_date)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )
+        )}
 
-        {forums.length === 0 && (
+        {!isLoading && forums.length === 0 && (
           <div className='text-center py-12'>
             <MessageSquare className='w-16 h-16 text-gray-300 mx-auto mb-4' />
             <h3 className='text-lg font-medium text-gray-900 mb-2'>
@@ -263,7 +232,6 @@ const Forums = () => {
         <ForumCreationModal
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
-          onSubmit={handleCreateForum}
         />
       </div>
     </Layout>
