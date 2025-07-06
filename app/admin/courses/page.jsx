@@ -23,6 +23,12 @@ import { fetchCourses } from "@/utils/redux/slices/courseSlice";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useFetch, usePost, useDelete } from "@/hooks/useHttp/useHttp";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 
 function Page() {
   const pathname = usePathname();
@@ -122,6 +128,77 @@ function Page() {
     }
   };
 
+  // Tutor Assignment Modal State
+  const [openAssignModal, setOpenAssignModal] = useState(false);
+  const [selectedTutor, setSelectedTutor] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedTerm, setSelectedTerm] = useState("");
+
+  // Fetch tutors
+  const { data: tutorsData, isLoading: tutorsLoading } = useFetch(
+    "tutors",
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/all-tutor?page_size=1000`
+  );
+  const tutors = tutorsData?.data?.results || [];
+
+  // Fetch terms
+  const { data: termsData, isLoading: termsLoading } = useFetch(
+    "terms",
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms/`
+  );
+  const terms = termsData?.data?.results || [];
+
+  // Fetch assignments
+  const {
+    data: assignmentsData,
+    isLoading: assignmentsLoading,
+    refetch: refetchAssignments,
+  } = useFetch(
+    "tutorAssignments",
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-tutor-assignments/`
+  );
+  const assignments = assignmentsData?.data?.results || [];
+
+  // Assign tutor mutation
+  const { mutate: assignTutor, isLoading: assigning } = usePost(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-tutor-assignments/`,
+    {
+      onSuccess: () => {
+        toast.success("Tutor assigned successfully");
+        setOpenAssignModal(false);
+        setSelectedTutor("");
+        setSelectedCourse("");
+        setSelectedTerm("");
+        refetchAssignments();
+      },
+      onError: (error) => {
+        const errorData = error.response?.data;
+        if (typeof errorData === "string") {
+          toast.error(errorData);
+        } else if (typeof errorData === "object" && errorData !== null) {
+          const messages = Object.values(errorData)
+            .map((msg) => (Array.isArray(msg) ? msg.join(" ") : msg))
+            .join(" ");
+          toast.error(messages);
+        } else {
+          toast.error("Failed to assign tutor");
+        }
+      },
+    }
+  );
+
+  // Delete assignment mutation
+  const { mutate: deleteAssignment } = useDelete(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-tutor-assignments`,
+    {
+      onSuccess: () => {
+        toast.success("Assignment deleted");
+        refetchAssignments();
+      },
+      onError: () => toast.error("Failed to delete assignment"),
+    }
+  );
+
   return (
     <div className="relative">
       {/* Header */}
@@ -150,13 +227,205 @@ function Page() {
           <div className="p-4">
             {/*   Top */}
             {/* Top */}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-4">
               <div className="text-lg font-bold">Courses</div>
-              <Link href="/admin/courses/add-course">
-                <Button className="bg-red-600 text-white px-3 py-2 rounded hover:bg-blue-600 transition-all duration-300 cursor-pointer">
-                  Add Course
+              <div className="flex gap-2">
+                <Button
+                  className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all duration-300 cursor-pointer"
+                  onClick={() => setOpenAssignModal(true)}
+                >
+                  Assign Tutor to Course
                 </Button>
-              </Link>
+                <Link href="/admin/courses/add-course">
+                  <Button className="bg-red-600 text-white px-3 py-2 rounded hover:bg-blue-600 transition-all duration-300 cursor-pointer">
+                    Add Course
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Tutor Assignment Modal */}
+            <Dialog
+              open={openAssignModal}
+              onClose={() => setOpenAssignModal(false)}
+              maxWidth="sm"
+              fullWidth
+            >
+              <DialogTitle>Assign Tutor to Course</DialogTitle>
+              <DialogContent>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    assignTutor({
+                      user: selectedTutor,
+                      course: selectedCourse,
+                      term: selectedTerm,
+                    });
+                  }}
+                  className="space-y-4 mt-2"
+                >
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel id="tutor-label">Tutor</InputLabel>
+                    <Select
+                      labelId="tutor-label"
+                      value={selectedTutor}
+                      onChange={(e) => setSelectedTutor(e.target.value)}
+                      label="Tutor"
+                      required
+                    >
+                      {tutorsLoading ? (
+                        <MenuItem disabled>Loading...</MenuItem>
+                      ) : tutors.length > 0 ? (
+                        tutors.map((tutor) => (
+                          <MenuItem key={tutor.id} value={tutor.id}>
+                            {tutor.first_name} {tutor.last_name} ({tutor.email})
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled>No tutors found</MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel id="course-label">Course</InputLabel>
+                    <Select
+                      labelId="course-label"
+                      value={selectedCourse}
+                      onChange={(e) => setSelectedCourse(e.target.value)}
+                      label="Course"
+                      required
+                    >
+                      {allCourses && allCourses.length > 0 ? (
+                        allCourses.map((course) => (
+                          <MenuItem key={course.id} value={course.id}>
+                            {course.title || course.name}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled>No courses found</MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel id="term-label">Term</InputLabel>
+                    <Select
+                      labelId="term-label"
+                      value={selectedTerm}
+                      onChange={(e) => setSelectedTerm(e.target.value)}
+                      label="Term"
+                      required
+                    >
+                      {termsLoading ? (
+                        <MenuItem disabled>Loading...</MenuItem>
+                      ) : terms.length > 0 ? (
+                        terms.map((term) => (
+                          <MenuItem key={term.id} value={term.id}>
+                            <div className="flex flex-col">
+                              <div className="font-medium">
+                                {term.name} ({term.session?.year || "N/A"})
+                                {term.is_active && (
+                                  <span className="ml-2 text-green-600 text-xs font-bold">
+                                    [ACTIVE]
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {term.start_date} to {term.end_date}
+                              </div>
+                            </div>
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled>No terms found</MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                  <DialogActions>
+                    <Button
+                      onClick={() => setOpenAssignModal(false)}
+                      color="primary"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      color="secondary"
+                      disabled={assigning}
+                    >
+                      {assigning ? "Assigning..." : "Assign"}
+                    </Button>
+                  </DialogActions>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            {/* Tutor Assignments Table */}
+            <div className="mt-8">
+              <h2 className="text-lg font-semibold mb-2">Tutor Assignments</h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 border">Tutor</th>
+                      <th className="px-4 py-2 border">Course</th>
+                      <th className="px-4 py-2 border">Term</th>
+                      <th className="px-4 py-2 border">Assigned At</th>
+                      <th className="px-4 py-2 border">Active</th>
+                      <th className="px-4 py-2 border">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {assignmentsLoading ? (
+                      <tr>
+                        <td colSpan={6} className="text-center py-4">
+                          Loading...
+                        </td>
+                      </tr>
+                    ) : assignments.length > 0 ? (
+                      assignments.map((assignment) => (
+                        <tr key={assignment.id}>
+                          <td className="border px-4 py-2">
+                            {assignment.tutor_full_name ||
+                              assignment.first_name +
+                                " " +
+                                assignment.last_name}
+                          </td>
+                          <td className="border px-4 py-2">
+                            {assignment.course}
+                          </td>
+                          <td className="border px-4 py-2">
+                            {assignment.term}
+                          </td>
+                          <td className="border px-4 py-2">
+                            {assignment.assigned_at
+                              ? new Date(
+                                  assignment.assigned_at
+                                ).toLocaleString()
+                              : "-"}
+                          </td>
+                          <td className="border px-4 py-2">
+                            {assignment.is_active ? "Yes" : "No"}
+                          </td>
+                          <td className="border px-4 py-2">
+                            <Button
+                              color="error"
+                              onClick={() => deleteAssignment(assignment.id)}
+                            >
+                              Delete
+                            </Button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="text-center py-4">
+                          No assignments found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* LIST COURSES */}

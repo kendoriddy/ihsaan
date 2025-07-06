@@ -7,7 +7,7 @@ export default function BlogPostDisplay({
   onEdit,
   onDelete,
   onTogglePublish,
-  isAuthor = false,
+  isAdmin = false,
 }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -30,6 +30,20 @@ export default function BlogPostDisplay({
               <span>By {post.author}</span>
               <span>•</span>
               <span>{formatDate(post.created_at)}</span>
+              {post.category_name && (
+                <>
+                  <span>•</span>
+                  <span className="bg-white/20 px-2 py-1 rounded text-xs font-medium">
+                    {post.category_name}
+                  </span>
+                </>
+              )}
+              {post.word_count && (
+                <>
+                  <span>•</span>
+                  <span>{post.word_count} words</span>
+                </>
+              )}
               {!post.is_published && (
                 <>
                   <span>•</span>
@@ -41,7 +55,7 @@ export default function BlogPostDisplay({
             </div>
           </div>
 
-          {isAuthor && (
+          {isAdmin && (
             <div className="flex gap-2">
               <button
                 onClick={onEdit}

@@ -94,7 +94,17 @@ const CreateAssignment = () => {
         fetchTutorId();
       },
       onError: (error) => {
-        toast.error(error.response?.data?.message || "Failed to submit quiz");
+        const errorData = error.response?.data;
+        if (typeof errorData === "string") {
+          toast.error(errorData);
+        } else if (typeof errorData === "object" && errorData !== null) {
+          const messages = Object.values(errorData)
+            .map((msg) => (Array.isArray(msg) ? msg.join(" ") : msg))
+            .join(" ");
+          toast.error(messages);
+        } else {
+          toast.error("Failed to submit quiz");
+        }
       },
     });
   };

@@ -102,12 +102,6 @@ const DASHBOARD_LIST = {
       name: "Student Application",
       path: "/admin/student",
     },
-    // {
-    //   id: 6,
-    //   name: "Categories",
-    //   path: "/admin/categories",
-    // },
-    // { id: 7, name: "Books", path: "/admin/books" },
     { id: 8, name: "Courses", path: "/admin/courses" },
     { id: 9, name: "FAQs", path: "/admin/faqs" },
     { id: 10, name: "Quotes", path: "/admin/quotes" },
@@ -120,6 +114,16 @@ const DASHBOARD_LIST = {
       id: 12,
       name: "Activities Settings",
       path: "/admin/activities-settings",
+    },
+    {
+      id: 13,
+      name: "Blog Categories",
+      path: "/admin/blog-categories",
+    },
+    {
+      id: 14,
+      name: "Blog",
+      path: "/admin/blog",
     },
     {
       id: 17,

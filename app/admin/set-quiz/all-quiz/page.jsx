@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFetch, useDelete } from "@/hooks/useHttp/useHttp";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -11,6 +11,14 @@ import {
   TableRow,
   Paper,
   Pagination,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  Grid,
+  Button as MuiButton,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import Button from "@/components/Button";
@@ -19,7 +27,7 @@ import Loader from "@/components/Loader";
 import EditQuizQuestion from "../components/EditQuiz";
 import AdminLayout from "@/components/AdminLayout";
 import parse from "html-react-parser";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, Search, Clear } from "@mui/icons-material";
 import Link from "next/link";
 
 const AllQuiz = () => {
@@ -30,9 +38,60 @@ const AllQuiz = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [totalQuestions, setTotalQuestions] = useState(0);
 
+  // Filter states
+  const [filters, setFilters] = useState({
+    search: "",
+    course: "",
+    course_section: "",
+  });
+  const [selectedCourseId, setSelectedCourseId] = useState("");
+  const [fetchAllCourses, setFetchAllCourses] = useState(false);
+  const [totalCourses, setTotalCourses] = useState(0);
+
+  // Fetch courses for filter
+  const { data: coursesData, isLoading: coursesLoading } = useFetch(
+    "courses",
+    `https://ihsaanlms.onrender.com/course/courses/?page_size=${
+      fetchAllCourses ? totalCourses : 10
+    }`,
+    (data) => {
+      if (data?.total && !fetchAllCourses) {
+        setTotalCourses(data.total);
+        setFetchAllCourses(true);
+      }
+    }
+  );
+
+  // Fetch course sections for selected course
+  const { data: courseSectionsData, isLoading: sectionsLoading } = useFetch(
+    "courseSections",
+    selectedCourseId
+      ? `https://ihsaanlms.onrender.com/course/course-sections/?course=${selectedCourseId}`
+      : null
+  );
+
+  const courses = coursesData?.data?.results || [];
+  const courseSections = courseSectionsData?.data?.results || [];
+
+  // Build API URL with filters
+  const buildApiUrl = () => {
+    const baseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/`;
+    const params = new URLSearchParams();
+
+    params.append("page_size", "15");
+    params.append("page", page.toString());
+
+    if (filters.search) params.append("search", filters.search);
+    if (filters.course) params.append("course", filters.course);
+    if (filters.course_section)
+      params.append("course_section", filters.course_section);
+
+    return `${baseUrl}?${params.toString()}`;
+  };
+
   const { isLoading, data, refetch, isFetching } = useFetch(
-    "questions",
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/?page_size=15&page=${page}`,
+    ["questions", page, filters],
+    buildApiUrl(),
     (data) => {
       if (data?.total) {
         setTotalQuestions(data.total);
@@ -44,7 +103,7 @@ const AllQuiz = () => {
 
   // DELETE QUESTION
   const { mutate: questionDelete, isLoading: isDeleting } = useDelete(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions`,
     {
       onSuccess: () => {
         toast.success("Deleted successfully");
@@ -60,7 +119,6 @@ const AllQuiz = () => {
   // Handle Page Change
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
-    refetch();
   };
 
   const handleDelete = () => {
@@ -69,12 +127,108 @@ const AllQuiz = () => {
     }
   };
 
+  // Handle filter changes
+  const handleFilterChange = (filterName) => (event) => {
+    const value = event.target.value;
+    setFilters((prev) => ({
+      ...prev,
+      [filterName]: value,
+    }));
+    setPage(1); // Reset to first page when filters change
+  };
+
+  const handleCourseChange = (event) => {
+    const courseId = event.target.value;
+    setSelectedCourseId(courseId);
+    setFilters((prev) => ({
+      ...prev,
+      course: courseId,
+      course_section: "", // Reset course section when course changes
+    }));
+    setPage(1);
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      search: "",
+      course: "",
+      course_section: "",
+    });
+    setSelectedCourseId("");
+    setPage(1);
+  };
+
   return (
     <AdminLayout>
       <div>
         <Link href="/admin/set-quiz" className="mb-6">
           <Button variant="outlined">Back</Button>
         </Link>
+
+        {/* Filters Section */}
+        <Box className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={3}>
+              <TextField
+                fullWidth
+                label="Search Questions"
+                value={filters.search}
+                onChange={handleFilterChange("search")}
+                placeholder="Search by question text..."
+                InputProps={{
+                  endAdornment: <Search />,
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <FormControl fullWidth>
+                <InputLabel>Course</InputLabel>
+                <Select
+                  value={filters.course}
+                  onChange={handleCourseChange}
+                  disabled={coursesLoading}
+                  label="Course"
+                >
+                  <MenuItem value="">All Courses</MenuItem>
+                  {courses.map((course) => (
+                    <MenuItem key={course.id} value={course.id}>
+                      {course.name} ({course.code})
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <FormControl fullWidth>
+                <InputLabel>Course Section</InputLabel>
+                <Select
+                  value={filters.course_section}
+                  onChange={handleFilterChange("course_section")}
+                  disabled={sectionsLoading || !selectedCourseId}
+                  label="Course Section"
+                >
+                  <MenuItem value="">All Sections</MenuItem>
+                  {courseSections.map((section) => (
+                    <MenuItem key={section.id} value={section.id}>
+                      {section.title}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <MuiButton
+                variant="outlined"
+                onClick={clearFilters}
+                startIcon={<Clear />}
+                fullWidth
+              >
+                Clear Filters
+              </MuiButton>
+            </Grid>
+          </Grid>
+        </Box>
+
         <TableContainer component={Paper}>
           <Table>
             <TableHead>

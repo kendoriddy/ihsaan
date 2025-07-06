@@ -12,6 +12,12 @@ import {
   editBlogPost,
 } from "@/utils/redux/slices/blogSlice";
 import NewsletterModal from "./NewsletterModal";
+import Pagination from "@mui/material/Pagination";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
 
 export default function BlogApp() {
   const [currentView, setCurrentView] = useState("list");
@@ -26,6 +32,10 @@ export default function BlogApp() {
   const [repliesLoading, setRepliesLoading] = useState({});
   const [repliesError, setRepliesError] = useState({});
   const [showNewsletter, setShowNewsletter] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [postToDelete, setPostToDelete] = useState(null);
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -36,10 +46,13 @@ export default function BlogApp() {
   if (typeof window !== "undefined") {
     try {
       const userStr = localStorage.getItem("user");
+      const rolesStr = localStorage.getItem("roles");
       if (userStr) {
         const userObj = JSON.parse(userStr);
         currentUser = userObj.first_name + " " + userObj.last_name;
-        currentUserRoles = userObj.roles || [];
+      }
+      if (rolesStr) {
+        currentUserRoles = JSON.parse(rolesStr);
       }
     } catch (e) {
       // fallback to default
@@ -48,18 +61,19 @@ export default function BlogApp() {
   const isAdmin = currentUserRoles.includes("ADMIN");
 
   // Store fetchPosts in a ref so it can be called after post
-  const fetchPosts = async () => {
+  const fetchPosts = async (page = 1) => {
     setLoading(true);
     setError(null);
     try {
       const token =
         typeof window !== "undefined" ? localStorage.getItem("token") : null;
       const res = await axios.get(
-        process.env.NEXT_PUBLIC_API_BASE_URL + "/blog/blogs/",
+        process.env.NEXT_PUBLIC_API_BASE_URL + `/blog/blogs/?page=${page}`,
         {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
+
       const apiPosts = res.data.results.map((item) => ({
         id: item.id,
         title: item.title,
@@ -67,12 +81,19 @@ export default function BlogApp() {
         content: item.content,
         display_pic_id: item.display_pic?.id || 0,
         display_pic_url: item.display_pic?.media_url || null,
+        category: item.category,
+        category_name: item.blog_category?.name || null,
+        category_slug: item.blog_category?.slug || null,
         is_published: item.is_published,
         created_at: item.created_at,
         author: item.author_name || item.author,
         preview: item.preview,
+        word_count: item.word_count,
+        time_since_posted: item.time_since_posted,
       }));
       setPosts(apiPosts);
+      setTotalPages(res.data.total_pages || 1);
+      setCurrentPage(res.data.current_page || 1);
     } catch (err) {
       setError("Failed to load blog posts.");
     } finally {
@@ -81,8 +102,9 @@ export default function BlogApp() {
   };
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    fetchPosts(currentPage);
+    // eslint-disable-next-line
+  }, [currentPage]);
 
   // Show newsletter modal only once per session
   useEffect(() => {
@@ -155,9 +177,10 @@ export default function BlogApp() {
         process.env.NEXT_PUBLIC_API_BASE_URL + "/blog/blogs/",
         {
           title: postData.title,
-          slug: "", // always empty
+          slug: postData.slug,
           content: postData.content,
           display_pic_id: postData.display_pic_id,
+          category: postData.category,
           is_published: postData.is_published,
         },
         {
@@ -196,14 +219,36 @@ export default function BlogApp() {
     }
   };
 
-  const handleDeletePost = async () => {
-    if (!selectedPost) return;
+  const requestDeletePost = (post) => {
+    setPostToDelete(post);
+    setShowDeleteModal(true);
+  };
 
-    setPosts((prev) => prev.filter((post) => post.id !== selectedPost.id));
+  const confirmDeletePost = async () => {
+    if (!postToDelete) return;
+    // Optimistically remove from UI
+    setPosts((prev) => prev.filter((post) => post.id !== postToDelete.id));
+    setShowDeleteModal(false);
     setCurrentView("list");
-
-    // Here you would make your API call
-    console.log("Deleting post:", selectedPost.id);
+    try {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      await axios.delete(
+        process.env.NEXT_PUBLIC_API_BASE_URL +
+          `/blog/blogs/${postToDelete.id}/`,
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
+      // Refetch posts in the background
+      fetchPosts(currentPage);
+    } catch (err) {
+      alert("Failed to delete blog post.");
+      // Optionally, refetch to restore the post if delete failed
+      fetchPosts(currentPage);
+    } finally {
+      setPostToDelete(null);
+    }
   };
 
   const handleTogglePublish = async () => {
@@ -304,6 +349,33 @@ export default function BlogApp() {
         open={showNewsletter}
         onClose={() => setShowNewsletter(false)}
       />
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">
+              Delete Blog Post
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this blog post? This action cannot
+              be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeletePost}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Navigation */}
       <nav className="bg-[#7e1a0b] text-white p-4">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
@@ -339,14 +411,18 @@ export default function BlogApp() {
             >
               All Posts
             </button>
-            <button
-              onClick={() => setCurrentView("create")}
-              className={`px-4 py-2 rounded-lg font-medium ${
-                currentView === "create" ? "bg-[#ff6600]" : "hover:bg-white/10"
-              }`}
-            >
-              Create Post
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setCurrentView("create")}
+                className={`px-4 py-2 rounded-lg font-medium ${
+                  currentView === "create"
+                    ? "bg-[#ff6600]"
+                    : "hover:bg-white/10"
+                }`}
+              >
+                Create Post
+              </button>
+            )}
           </div>
         </div>
       </nav>
@@ -422,8 +498,8 @@ export default function BlogApp() {
                       )}
                     </div>
 
-                    {/* Author Actions (if current user is author or admin) */}
-                    {(post.author === currentUser || isAdmin) && (
+                    {/* Admin Actions */}
+                    {isAdmin && (
                       <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <div className="flex gap-1">
                           <button
@@ -449,12 +525,11 @@ export default function BlogApp() {
                               />
                             </svg>
                           </button>
-                          {/* Delete button for admin/author */}
+                          {/* Delete button for admin */}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelectedPost(post);
-                              handleDeletePost();
+                              requestDeletePost(post);
                             }}
                             className="bg-white/90 hover:bg-white text-red-600 p-1.5 rounded-full shadow-lg transition-colors"
                             title="Delete post"
@@ -473,7 +548,7 @@ export default function BlogApp() {
                               />
                             </svg>
                           </button>
-                          {/* Publish/Unpublish button for admin/author */}
+                          {/* Publish/Unpublish button for admin */}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -541,6 +616,14 @@ export default function BlogApp() {
                           year: "numeric",
                         })}
                       </span>
+                      {post.category_name && (
+                        <>
+                          <span>•</span>
+                          <span className="bg-[#7e1a0b]/10 text-[#7e1a0b] px-2 py-1 rounded-full text-xs font-medium">
+                            {post.category_name}
+                          </span>
+                        </>
+                      )}
                     </div>
 
                     <h3 className="text-xl font-bold text-[#7e1a0b] mb-3 line-clamp-2 group-hover:text-[#ff6600] transition-colors">
@@ -596,13 +679,56 @@ export default function BlogApp() {
                           </svg>
                           {comments.filter((c) => c.id === post.id).length}
                         </span>
-                        <span>#{post.display_pic_id || "no-img"}</span>
+                        {post.word_count && (
+                          <span className="flex items-center gap-1">
+                            <svg
+                              className="w-3 h-3"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            {post.word_count}
+                          </span>
+                        )}
+                        {post.time_since_posted && (
+                          <span className="flex items-center gap-1">
+                            <svg
+                              className="w-3 h-3"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            {post.time_since_posted}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-8">
+                <Pagination
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={(_, page) => setCurrentPage(page)}
+                  color="primary"
+                />
+              </div>
+            )}
 
             {/* Empty State */}
             {posts.length === 0 && (
@@ -626,14 +752,18 @@ export default function BlogApp() {
                   No blog posts yet
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Get started by creating your first blog post
+                  {isAdmin
+                    ? "Get started by creating your first blog post"
+                    : "No blog posts are available at the moment. Check back later!"}
                 </p>
-                <button
-                  onClick={() => setCurrentView("create")}
-                  className="px-6 py-3 bg-[#7e1a0b] text-white rounded-lg hover:bg-[#6d1609] font-medium"
-                >
-                  Create Your First Post
-                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => setCurrentView("create")}
+                    className="px-6 py-3 bg-[#7e1a0b] text-white rounded-lg hover:bg-[#6d1609] font-medium"
+                  >
+                    Create Your First Post
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -722,9 +852,9 @@ export default function BlogApp() {
             <BlogPostDisplay
               post={selectedPost}
               onEdit={() => setCurrentView("edit")}
-              onDelete={handleDeletePost}
+              onDelete={() => requestDeletePost(selectedPost)}
               onTogglePublish={handleTogglePublish}
-              isAuthor={selectedPost.author === currentUser || isAdmin}
+              isAdmin={isAdmin}
             />
             <CommentSystem
               postId={selectedPost.id}

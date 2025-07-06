@@ -25,6 +25,10 @@ import Link from "next/link";
 import { MoreVert } from "@mui/icons-material";
 import GroupStudents from "./components/GroupStudents";
 import { getAuthToken } from "@/hooks/axios/axios";
+import AddingQuiz from "../admin/set-quiz/components/AddingQuiz";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
 
 const AllAssignment = () => {
   const queryClient = useQueryClient();
@@ -35,6 +39,7 @@ const AllAssignment = () => {
   const [openGroupModal, setOpenGroupModal] = useState(false);
   const [totalAssignments, setTotalAssignments] = useState(0);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null); // Anchor for the dropdown menu
+  const [openQuizModal, setOpenQuizModal] = useState(false);
 
   const { isLoading, data, refetch, isFetching } = useFetch(
     "assignments",
@@ -91,12 +96,14 @@ const AllAssignment = () => {
     <Layout>
       <div className="max-w-full">
         <div className="w-full">
-          <Link
-            href="/set-assignment/create-assignment"
-            className="flex justify-end mb-6"
-          >
-            <Button color="secondary">Create new Assignment/Quiz</Button>
-          </Link>
+          <div className="flex justify-end mb-6 gap-2">
+            <Link href="/set-assignment/create-assignment">
+              <Button color="secondary">Create new Assignment/Quiz</Button>
+            </Link>
+            <Button color="primary" onClick={() => setOpenQuizModal(true)}>
+              Add Quiz Questions
+            </Button>
+          </div>
           <TableContainer
             component={Paper}
             className="overflow-x-auto max-w-full"
@@ -221,6 +228,19 @@ const AllAssignment = () => {
         getAuthToken={getAuthToken}
         assessment={selectedAssignment}
       />
+
+      {/* Quiz Questions Modal */}
+      <Dialog
+        open={openQuizModal}
+        onClose={() => setOpenQuizModal(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Add Quiz Questions</DialogTitle>
+        <DialogContent>
+          <AddingQuiz />
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

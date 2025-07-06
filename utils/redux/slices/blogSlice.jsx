@@ -15,6 +15,7 @@ export const patchBlogPublishStatus = createAsyncThunk(
           slug: post.slug,
           content: post.content,
           display_pic_id: post.display_pic_id,
+          category: post.category,
           is_published,
         },
         {
@@ -44,6 +45,7 @@ export const editBlogPost = createAsyncThunk(
           slug: post.slug,
           content: post.content,
           display_pic_id: post.display_pic_id,
+          category: post.category,
           is_published: post.is_published,
         },
         {
