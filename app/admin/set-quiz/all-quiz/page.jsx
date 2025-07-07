@@ -29,6 +29,8 @@ import AdminLayout from "@/components/AdminLayout";
 import parse from "html-react-parser";
 import { Delete, Edit, Search, Clear } from "@mui/icons-material";
 import Link from "next/link";
+import Switch from "@mui/material/Switch";
+import axios from "axios";
 
 const AllQuiz = () => {
   const queryClient = useQueryClient();
@@ -37,6 +39,7 @@ const AllQuiz = () => {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const [activeLoadingId, setActiveLoadingId] = useState(null);
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -158,6 +161,35 @@ const AllQuiz = () => {
     setPage(1);
   };
 
+  // PATCH is_active
+  const handleToggleActive = async (question) => {
+    setActiveLoadingId(question.id);
+    try {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/${question.id}/`,
+        { is_active: !question.is_active },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      toast.success(
+        `Question ${!question.is_active ? "activated" : "deactivated"}`
+      );
+      refetch();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to update active status"
+      );
+    } finally {
+      setActiveLoadingId(null);
+    }
+  };
+
   return (
     <AdminLayout>
       <div>
@@ -235,7 +267,7 @@ const AllQuiz = () => {
               <TableRow>
                 <TableCell>Question</TableCell>
                 <TableCell>Options</TableCell>
-                <TableCell>Correct Answer</TableCell>
+                <TableCell>Active</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -261,7 +293,19 @@ const AllQuiz = () => {
                           )
                         )}
                       </TableCell>
-                      <TableCell>{question.correct_answer}</TableCell>
+                      <TableCell>
+                        <Switch
+                          checked={!!question.is_active}
+                          onChange={() => handleToggleActive(question)}
+                          color="primary"
+                          disabled={activeLoadingId === question.id}
+                        />
+                        {activeLoadingId === question.id && (
+                          <span className="text-xs text-gray-500 ml-2">
+                            Updating...
+                          </span>
+                        )}
+                      </TableCell>
                       <TableCell className="flex flex-col md:flex-row items-center justify-center gap-3">
                         <Button
                           color="secondary"
