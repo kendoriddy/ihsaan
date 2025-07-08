@@ -47,6 +47,12 @@ const DASHBOARD_LIST = {
       path: '/dashboard/my-applications'
     },
     {
+      id: 14,
+      name: 'Forums',
+      icon: GradingOutlined,
+      path: '/forums'
+    },
+    {
       id: 20,
       name: 'Reports',
       icon: AssessmentIcon,
