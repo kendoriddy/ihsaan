@@ -30,6 +30,7 @@ import NahuProgramme from "./NahuProgramme";
 import { getAuthToken } from "@/hooks/axios/axios";
 import PrimaryProgramme from "./PrimaryProgramme";
 import SecondaryProgramme from "./SecondaryProgramme";
+import QuranTutorApplicationModal from "./QuranTutorApplicationModal";
 
 function Header() {
   const currentRoute = usePathname();
@@ -69,6 +70,7 @@ function Header() {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+  const [quranTutorModalOpen, setQuranTutorModalOpen] = useState(false);
 
   const intialValues = {
     first_name: authenticatedUsersPayload?.first_name || "",
@@ -307,10 +309,7 @@ function Header() {
                   <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                     <div
                       className="block w-full h-full"
-                      onClick={() => {
-                        handleOpenModal("pick tutor");
-                        setType("pick tutor");
-                      }}
+                      onClick={() => router.push("/quran-tutors")}
                     >
                       Pick a Qur'an Tutor
                     </div>
@@ -320,10 +319,7 @@ function Header() {
                   <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                     <div
                       className="block w-full h-full"
-                      onClick={() => {
-                        handleOpenModal("become tutor");
-                        setType("become tutor");
-                      }}
+                      onClick={() => setQuranTutorModalOpen(true)}
                     >
                       Become a Qur'an Tutor
                     </div>
@@ -722,6 +718,10 @@ function Header() {
                 <SecondaryProgramme setOpen={setOpen} />
               )}
             </Modal>
+            <QuranTutorApplicationModal
+              isOpen={quranTutorModalOpen}
+              handleClose={() => setQuranTutorModalOpen(false)}
+            />
           </ul>
         </div>
 
@@ -831,10 +831,7 @@ function Header() {
                       <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                         <div
                           className="block w-full h-full"
-                          onClick={() => {
-                            handleOpenModal("student");
-                            setType("student");
-                          }}
+                          onClick={() => router.push("/quran-tutors")}
                         >
                           Pick a Qur'an Tutor
                         </div>
@@ -844,10 +841,7 @@ function Header() {
                       <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
                         <div
                           className="block w-full h-full"
-                          onClick={() => {
-                            handleOpenModal("tutor");
-                            setType("tutor");
-                          }}
+                          onClick={() => setQuranTutorModalOpen(true)}
                         >
                           Become a Qur'an Tutor
                         </div>
