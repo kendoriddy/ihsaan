@@ -399,6 +399,16 @@ function Header() {
                 Blog
               </Link>
             </li>
+            <li>
+              <Link
+                href="/feedback"
+                className={` navlink ${
+                  currentRoute.includes("/feedback") && "text-primary"
+                }`}
+              >
+                Feedback
+              </Link>
+            </li>
 
             <li>
               <Link href={"/cart"}>
@@ -914,6 +924,16 @@ function Header() {
                     }`}
                   >
                     Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/feedback"
+                    className={` navlink ${
+                      currentRoute.includes("/feedback") && "text-primary"
+                    }`}
+                  >
+                    Feedback
                   </Link>
                 </li>
                 {!isAuth && (
