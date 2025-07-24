@@ -20,10 +20,10 @@ function Page() {
   const queryClient = useQueryClient();
   const currentRoute = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [openSubMenuIndex, setOpenSubMenuIndex] = useState(null);
   const [deleteaccounts, setDeleteaccounts] = useState(false);
   const [toEditaccounts, setToEditaccounts] = useState(null);
   const [deletingaccounts, setDeletingaccounts] = useState(null);
+  const [openSubMenuIndex, setOpenSubMenuIndex] = useState(null);
   const toggleOption = (index) => {
     setOpenSubMenuIndex((prevIndex) => (prevIndex === index ? null : index));
   };

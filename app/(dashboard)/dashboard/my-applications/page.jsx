@@ -29,6 +29,7 @@ import { baseurl } from "@/hooks/useHttp/api";
 import EditApplication from "@/components/my-applications/EditApplication";
 import TutorForm from "@/components/my-applications/TutorForm";
 import StudentForm from "@/components/my-applications/StudentForm";
+import clsx from "clsx";
 
 const Page = () => {
   const currentRoute = usePathname();
@@ -45,6 +46,8 @@ const Page = () => {
   const [applicationType, setApplicationType] = useState("");
   const [userApplications, setUserApplications] = useState([]);
   const [selectedApplication, setSelectedApplication] = useState();
+  const [quranTutorApp, setQuranTutorApp] = useState(null);
+  const [quranTutorAppLoading, setQuranTutorAppLoading] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -85,6 +88,31 @@ const Page = () => {
     }
   };
 
+  // Fetch Qur'an Tutor application
+  useEffect(() => {
+    async function fetchQuranTutorApp() {
+      setQuranTutorAppLoading(true);
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(
+          "https://ihsaanlms.onrender.com/api/my-quran-tutor-application/",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setQuranTutorApp(data);
+        }
+      } catch (err) {
+        // ignore
+      } finally {
+        setQuranTutorAppLoading(false);
+      }
+    }
+    fetchQuranTutorApp();
+  }, []);
+
   useEffect(() => {
     fetchApplicationData();
   }, [userRoles]);
@@ -116,12 +144,22 @@ const Page = () => {
     label: `${i + 1} year${i + 1 > 1 ? "s" : ""}`,
   }));
 
+  // Helper for status badge
+  const getStatusColor = (status) =>
+    clsx("text-white px-4 py-2 rounded-full", {
+      "bg-green-500": status?.toUpperCase() === "ACCEPTED",
+      "bg-yellow-500": status?.toUpperCase() === "PENDING",
+      "bg-red-500": status?.toUpperCase() === "REJECTED",
+      "bg-gray-400": !["ACCEPTED", "PENDING", "REJECTED"].includes(
+        status?.toUpperCase()
+      ),
+    });
+
   return (
     <RequireAuth>
       <Header />
       <main className=" py-2 flex">
         <DashboardSidebar currentRoute={currentRoute} />
-
         <section className="flex flex-col md:flex-row p-4 justify-self-center flex-1 min-h-screen">
           <div className="px-4  w-full py-8 lg:py-0">
             {/* Waving Hand */}
@@ -188,6 +226,44 @@ const Page = () => {
                   ? "Loading..."
                   : userApplications && (
                       <tbody>
+                        {/* Qur'an Tutor Application Row */}
+                        {quranTutorApp && (
+                          <tr className="even:bg-gray-100 hover:bg-gray-200">
+                            <td className="border px-4 py-2">QURAN-TUTOR</td>
+                            <td className="border px-4 py-2">
+                              Qur'an Tutor Application
+                            </td>
+                            <td className="border px-4 py-2">
+                              {quranTutorApp.first_name}{" "}
+                              {quranTutorApp.last_name}
+                            </td>
+                            <td className="border px-4 py-2">
+                              {quranTutorApp.gender}
+                            </td>
+                            <td className="border px-4 py-2">-</td>
+                            <td className="border px-4 py-2">
+                              {quranTutorApp.years_of_experience || "N/A"}
+                            </td>
+                            <td className="border px-4 py-2">
+                              <span
+                                className={getStatusColor(
+                                  quranTutorApp.status || "PENDING"
+                                )}
+                              >
+                                {quranTutorApp.status || "PENDING"}
+                              </span>
+                            </td>
+
+                            <td className="border px-4 py-2">
+                              <button className="px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]">
+                                <a href="/dashboard/quran-tutor">
+                                  View Details
+                                </a>
+                              </button>
+                            </td>
+                          </tr>
+                        )}
+                        {/* Existing application rows */}
                         {userApplications.map((application, index) => (
                           <tr
                             key={application.id}

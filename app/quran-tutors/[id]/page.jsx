@@ -15,7 +15,7 @@ const mockTutor = {
   date_of_birth: "1985-01-01",
   country_of_origin: "Nigeria",
   country_of_residence: "Nigeria",
-  ajaza_memorized: 8,
+  ajzaa_memorized: 8,
   languages: ["Arabic", "English"],
   sect: "Sunni",
   available: true,
@@ -73,8 +73,8 @@ export default function TutorProfilePage({ params }) {
               {tutor.country_of_residence}
             </div>
             <div className="mb-2 text-gray-700">
-              <span className="font-semibold">Ajaza Memorized:</span>{" "}
-              {tutor.ajaza_memorized}
+              <span className="font-semibold">Ajzaa Memorized:</span>{" "}
+              {tutor.ajzaa_memorized}
             </div>
             <div className="mb-2 text-gray-700">
               <span className="font-semibold">Languages:</span>{" "}

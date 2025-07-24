@@ -18,12 +18,12 @@ const mockTutors = [
     last_name: "Riyadh",
     country_of_origin: "Nigeria",
     country_of_residence: "Nigeria",
-    ajaza_memorized: 8,
+    ajzaa_memorized: 8,
     languages: ["Arabic", "English"],
     sect: "Sunni",
     available: true,
     bio: "As Salaam Alaykum. This is Abu AbdirRahman, a good speaker of English and Arabic language. I teach adults and kids. I can teach you the recitation of the Qur'an from scratch, assist you with your memorization of the Qur'an, perfect your recitation...",
-    hourly_rate: 20000,
+    hourly_rate: 2000,
     currency: "naira",
   },
   {
@@ -36,12 +36,12 @@ const mockTutors = [
     last_name: "Sufyan",
     country_of_origin: "Pakistan",
     country_of_residence: "Pakistan",
-    ajaza_memorized: 5,
+    ajzaa_memorized: 5,
     languages: ["English", "Urdu", "Hindi"],
     sect: "Sunni",
     available: false,
     bio: "Assalamu alaikum. If the heart is hardened, the soul is weakened, and the stimuli of desires and worldly affairs fall into it, then we need to reform the soul, soften the heart and strengthen the relationship with Allah. Reading the Quran and understanding it...",
-    hourly_rate: 50000,
+    hourly_rate: 5000,
     currency: "naira",
   },
 ];
@@ -91,8 +91,8 @@ export default function QuranTutorsPage() {
       return false;
     if (filters.sect && tutor.sect !== filters.sect) return false;
     if (
-      filters.ajaza_memorized &&
-      String(tutor.ajaza_memorized) !== String(filters.ajaza_memorized)
+      filters.ajzaa_memorized &&
+      String(tutor.ajzaa_memorized) !== String(filters.ajzaa_memorized)
     )
       return false;
 

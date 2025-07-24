@@ -70,8 +70,8 @@ export default function QuranTutorFilters({ filters, setFilters }) {
       ],
     },
     {
-      key: "ajaza_memorized",
-      label: "Ajaza Memorized",
+      key: "ajzaa_memorized",
+      label: "Ajzaa Memorized",
       icon: <MenuBook className="w-5 h-5 text-teal-600" />,
       type: "number",
       placeholder: "1-30",

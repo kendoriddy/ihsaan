@@ -48,9 +48,9 @@ const DASHBOARD_LIST = {
     },
     {
       id: 14,
-      name: 'Forums',
+      name: "Forums",
       icon: GradingOutlined,
-      path: '/forums'
+      path: "/forums",
     },
     {
       id: 20,
@@ -92,6 +92,12 @@ const DASHBOARD_LIST = {
       icon: AssessmentIcon,
       path: "/reports",
     },
+    {
+      id: 30,
+      name: "Qur'an Tutor",
+      icon: CastForEducationIcon,
+      path: "/dashboard/quran-tutor",
+    },
     { id: 10, name: "Logout", icon: LogoutIcon, path: "/login" },
   ],
 
@@ -102,6 +108,11 @@ const DASHBOARD_LIST = {
       id: 15,
       name: "Tutor Application",
       path: "/admin/tutor",
+    },
+    {
+      id: 99,
+      name: "Qur'an Tutor Apps",
+      path: "/admin/quran-tutor-apps",
     },
     {
       id: 16,

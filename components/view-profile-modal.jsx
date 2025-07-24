@@ -262,10 +262,10 @@ export default function ViewProfileModal({
                   <div className="bg-purple-50 rounded-xl p-4 text-center">
                     <MenuBook className="w-6 h-6 text-purple-600 mx-auto mb-2" />
                     <div className="text-sm font-medium text-purple-800">
-                      Ajaza
+                      Ajzaa
                     </div>
                     <div className="text-xs text-purple-700 mt-1">
-                      {tutor.ajaza_memorized} Memorized
+                      {tutor.ajzaa_memorized} Memorized
                     </div>
                   </div>
                   <div className="bg-green-50 rounded-xl p-4 text-center">

@@ -73,7 +73,7 @@ export default function QuranTutorCard({ tutor }) {
               {tutor.hourly_rate}
             </div>
             <div className="text-sm text-gray-500 capitalize">
-              {tutor.currency}/month
+              {tutor.currency}/hour
             </div>
           </div>
         </div>
@@ -98,10 +98,10 @@ export default function QuranTutorCard({ tutor }) {
           <div className="bg-purple-50 rounded-xl p-3">
             <div className="flex items-center gap-2 mb-1">
               <MenuBook className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-800">Ajaza</span>
+              <span className="text-sm font-medium text-purple-800">Ajzaa</span>
             </div>
             <div className="text-sm text-purple-700">
-              {tutor.ajaza_memorized} Memorized
+              {tutor.ajzaa_memorized} Memorized
             </div>
           </div>
         </div>

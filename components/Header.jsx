@@ -31,6 +31,7 @@ import { getAuthToken } from "@/hooks/axios/axios";
 import PrimaryProgramme from "./PrimaryProgramme";
 import SecondaryProgramme from "./SecondaryProgramme";
 import QuranTutorApplicationModal from "./QuranTutorApplicationModal";
+import BecomeTutorForm from "./BecomeTutorForm";
 
 function Header() {
   const currentRoute = usePathname();
@@ -258,6 +259,8 @@ function Header() {
     { key: "Others", value: "others" },
   ];
 
+  console.log(type, "ppppp");
+
   useEffect(() => {
     refetch();
   }, [createNewaccounts]);
@@ -312,16 +315,6 @@ function Header() {
                       onClick={() => router.push("/quran-tutors")}
                     >
                       Pick a Qur'an Tutor
-                    </div>
-                  </div>
-                )}
-                {!isUserCouncellor && (
-                  <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                    <div
-                      className="block w-full h-full"
-                      onClick={() => setQuranTutorModalOpen(true)}
-                    >
-                      Become a Qur'an Tutor
                     </div>
                   </div>
                 )}
@@ -473,111 +466,117 @@ function Header() {
               handleClose={() => setOpen(false)}
             >
               <div>
-                <Formik
-                  initialValues={intialValues}
-                  // validationSchema={LoginSchema}
-                  onSubmit={handleSubmit}
-                >
-                  {({ values }) => {
-                    return (
-                      <Form>
-                        <div className="flex flex-col gap-6">
-                          <div>
-                            <FormikControl
-                              disabled={token ? true : false}
-                              name="first_name"
-                              placeholder="First name"
-                            />
-                          </div>
-                          <div>
-                            <FormikControl
-                              disabled={token ? true : false}
-                              readOnly={token}
-                              name="last_name"
-                              placeholder="Last name"
-                            />
-                          </div>
-                          <div>
-                            <FormikControl
-                              disabled={token ? true : false}
-                              name="email"
-                              placeholder="Email address"
-                            />
-                          </div>
-                          {!token && (
+                {type === "teacher" ? (
+                  <BecomeTutorForm
+                    onSubmit={handleSubmit}
+                    isLoading={isCreating}
+                  />
+                ) : (
+                  <Formik
+                    initialValues={intialValues}
+                    // validationSchema={LoginSchema}
+                    onSubmit={handleSubmit}
+                  >
+                    {({ values }) => {
+                      return (
+                        <Form>
+                          <div className="flex flex-col gap-6">
                             <div>
                               <FormikControl
-                                name="password"
-                                type={!showPassword ? "text" : "password"}
-                                placeholder="Password"
-                                InputProps={{
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
-                                      >
-                                        {showPassword ? (
-                                          <VisibilityOff />
-                                        ) : (
-                                          <Visibility />
-                                        )}
-                                      </IconButton>
-                                    </InputAdornment>
-                                  ),
-                                }}
+                                disabled={token ? true : false}
+                                name="first_name"
+                                placeholder="First name"
                               />
                             </div>
-                          )}
-
-                          {!token && (
                             <div>
                               <FormikControl
-                                name="confirm_password"
-                                type={!showPassword ? "text" : "password"}
-                                placeholder="Confirm Password"
-                                InputProps={{
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
-                                      >
-                                        {showPassword ? (
-                                          <VisibilityOff />
-                                        ) : (
-                                          <Visibility />
-                                        )}
-                                      </IconButton>
-                                    </InputAdornment>
-                                  ),
-                                }}
+                                disabled={token ? true : false}
+                                readOnly={token}
+                                name="last_name"
+                                placeholder="Last name"
                               />
                             </div>
-                          )}
-                          {type === "tutor" && (
                             <div>
+                              <FormikControl
+                                disabled={token ? true : false}
+                                name="email"
+                                placeholder="Email address"
+                              />
+                            </div>
+                            {!token && (
                               <div>
                                 <FormikControl
-                                  name="additional_info"
-                                  placeholder="List skills related to your field, with comma seperating each"
-                                  multiline
-                                  minRows={3}
+                                  name="password"
+                                  type={!showPassword ? "text" : "password"}
+                                  placeholder="Password"
+                                  InputProps={{
+                                    endAdornment: (
+                                      <InputAdornment position="end">
+                                        <IconButton
+                                          aria-label="toggle password visibility"
+                                          onClick={handleClickShowPassword}
+                                          onMouseDown={handleMouseDownPassword}
+                                        >
+                                          {showPassword ? (
+                                            <VisibilityOff />
+                                          ) : (
+                                            <Visibility />
+                                          )}
+                                        </IconButton>
+                                      </InputAdornment>
+                                    ),
+                                  }}
                                 />
                               </div>
-                            </div>
-                          )}
-                          <div>
+                            )}
+
+                            {!token && (
+                              <div>
+                                <FormikControl
+                                  name="confirm_password"
+                                  type={!showPassword ? "text" : "password"}
+                                  placeholder="Confirm Password"
+                                  InputProps={{
+                                    endAdornment: (
+                                      <InputAdornment position="end">
+                                        <IconButton
+                                          aria-label="toggle password visibility"
+                                          onClick={handleClickShowPassword}
+                                          onMouseDown={handleMouseDownPassword}
+                                        >
+                                          {showPassword ? (
+                                            <VisibilityOff />
+                                          ) : (
+                                            <Visibility />
+                                          )}
+                                        </IconButton>
+                                      </InputAdornment>
+                                    ),
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {type === "tutor" && (
+                              <div>
+                                <div>
+                                  <FormikControl
+                                    name="additional_info"
+                                    placeholder="List skills related to your field, with comma seperating each"
+                                    multiline
+                                    minRows={3}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                            {/* <div>
                             <FormikControl
                               name="years_of_experience"
                               options={programme}
                               control={"select"}
                               placeholder="Select programme you are registering for"
                             />
-                          </div>
-                          {/* <div>
+                          </div> */}
+                            {/* <div>
                             <FormikControl
                               name="highest_qualification"
                               options={qualificationsList}
@@ -585,49 +584,49 @@ function Header() {
                               placeholder="Select your highest qualification"
                             />
                           </div> */}
-                          {/* <div>
-                            <FormikControl
-                              name="years_of_experience"
-                              options={yearsOfExperienceOptions}
-                              control={"select"}
-                              placeholder="Select your years of experience"
-                            />
-                          </div> */}
-                          <div>
-                            <FormikControl
-                              name="country"
-                              options={countriesList}
-                              control={"select"}
-                              placeholder="Select your country"
-                            />
-                          </div>
-                          <div>
-                            <FormikControl
-                              name="additional_info"
-                              placeholder="Other info you would like us to know about you (max 250words)"
-                              multiline
-                              minRows={3}
-                              maxLength={250}
-                            />
-                          </div>
+                            <div>
+                              <FormikControl
+                                name="years_of_experience"
+                                options={yearsOfExperienceOptions}
+                                control={"select"}
+                                placeholder="Select your years of experience"
+                              />
+                            </div>
+                            <div>
+                              <FormikControl
+                                name="country"
+                                options={countriesList}
+                                control={"select"}
+                                placeholder="Select your country"
+                              />
+                            </div>
+                            <div>
+                              <FormikControl
+                                name="additional_info"
+                                placeholder="Other info you would like us to know about you (max 250words)"
+                                multiline
+                                minRows={3}
+                                maxLength={250}
+                              />
+                            </div>
 
-                          <div>
-                            <FormikControl
-                              name="religion"
-                              options={religion}
-                              control={"select"}
-                              placeholder="Religion"
-                            />
-                          </div>
-                          <div>
-                            <FormikControl
-                              name="gender"
-                              options={gender}
-                              control={"select"}
-                              placeholder="Gender"
-                            />
-                          </div>
-                          {/* <div>
+                            <div>
+                              <FormikControl
+                                name="religion"
+                                options={religion}
+                                control={"select"}
+                                placeholder="Religion"
+                              />
+                            </div>
+                            <div>
+                              <FormikControl
+                                name="gender"
+                                options={gender}
+                                control={"select"}
+                                placeholder="Gender"
+                              />
+                            </div>
+                            {/* <div>
                             <FormikControl
                               name="marital_status"
                               options={maritalStatus}
@@ -635,21 +634,21 @@ function Header() {
                               placeholder="Marital status"
                             />
                           </div> */}
-                          <div>
-                            <FormikControl
-                              name="date_of_birth"
-                              control={"date"}
-                              placeholder="Input your date of birth"
-                            />
-                          </div>
-                          {/* <div>
+                            <div>
+                              <FormikControl
+                                name="date_of_birth"
+                                control={"date"}
+                                placeholder="Input your date of birth"
+                              />
+                            </div>
+                            {/* <div>
                             <FormikControl
                               control="imageUpload"
                               name="picture"
                               placeholder="Upload your picture"
                             />
                           </div> */}
-                          {/* <div>
+                            {/* <div>
                             <FormikControl
                               name="preferred_mentee_gender"
                               options={menteeGender}
@@ -657,51 +656,52 @@ function Header() {
                               placeholder="Which gender of mentee do you prefer?"
                             />
                           </div> */}
-                          {type !== "student" && (
-                            <div>
-                              <FormikControl
-                                name="professional_bio"
-                                placeholder="Enter professional bio"
-                                multiline
-                                minRows={3}
-                              />
-                            </div>
-                          )}
-                          {type !== "student" && (
-                            <div>
-                              <FormikControl
-                                name="mentorship_areas"
-                                placeholder="Areas of expertise"
-                              />
-                            </div>
-                          )}
-                          {/* <div>
+                            {type !== "student" && (
+                              <div>
+                                <FormikControl
+                                  name="professional_bio"
+                                  placeholder="Enter professional bio"
+                                  multiline
+                                  minRows={3}
+                                />
+                              </div>
+                            )}
+                            {type !== "student" && (
+                              <div>
+                                <FormikControl
+                                  name="mentorship_areas"
+                                  placeholder="Areas of expertise"
+                                />
+                              </div>
+                            )}
+                            {/* <div>
                             <FormikControl
                               name="councelling_areas"
                               placeholder="Concelling areas"
                             />
                           </div> */}
 
-                          <div className="flex justify-between items-center gap-4">
-                            <button
-                              className="border border-[#f44336] text-[#f44336] px-4 py-2 rounded-md hover:bg-[#f44336] hover:text-white transition-all duration-300"
-                              type="button"
-                              onClick={() => setOpen(false)}
-                            >
-                              Back
-                            </button>
-                            <AuthButton
-                              text="submit"
-                              isLoading={isCreating}
-                              disabled={isCreating}
-                              onClick={handleSubmit}
-                            />
+                            <div className="flex justify-between items-center gap-4">
+                              <button
+                                className="border border-[#f44336] text-[#f44336] px-4 py-2 rounded-md hover:bg-[#f44336] hover:text-white transition-all duration-300"
+                                type="button"
+                                onClick={() => setOpen(false)}
+                              >
+                                Back
+                              </button>
+                              <AuthButton
+                                text="submit"
+                                isLoading={isCreating}
+                                disabled={isCreating}
+                                onClick={handleSubmit}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      </Form>
-                    );
-                  }}
-                </Formik>
+                        </Form>
+                      );
+                    }}
+                  </Formik>
+                )}
               </div>
             </Modal>
 
@@ -822,6 +822,7 @@ function Header() {
                     Courses
                   </Link>
                 </li>
+                {/* Mobile menu Qur'an Tutors dropdown */}
                 <div className="relative text-slate-50 rounded group cursor-pointer">
                   <h3 className="text-[15px] font-normal text-black">
                     Qur&apos;an Tutors
@@ -834,16 +835,6 @@ function Header() {
                           onClick={() => router.push("/quran-tutors")}
                         >
                           Pick a Qur'an Tutor
-                        </div>
-                      </div>
-                    )}
-                    {!isUserCouncellor && (
-                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                        <div
-                          className="block w-full h-full"
-                          onClick={() => setQuranTutorModalOpen(true)}
-                        >
-                          Become a Qur'an Tutor
                         </div>
                       </div>
                     )}
