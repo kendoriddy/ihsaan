@@ -35,6 +35,12 @@ const DASHBOARD_LIST = {
       path: "/activities",
     },
     {
+      id: 21,
+      name: "Notifications",
+      icon: TbActivity,
+      path: "/dashboard/notifications",
+    },
+    {
       id: 13,
       name: "Courses",
       icon: BookSharp,
@@ -141,6 +147,11 @@ const DASHBOARD_LIST = {
       id: 14,
       name: "Blog",
       path: "/admin/blog",
+    },
+    {
+      id: 18,
+      name: "Notifications",
+      path: "/admin/notifications",
     },
     {
       id: 17,
