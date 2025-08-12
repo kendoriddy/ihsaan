@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Link from "next/link";
@@ -16,7 +16,7 @@ function Page() {
   const intialValues = {
     email: "",
   };
-  const { mutate, isLoading } = usePost("api/auth/password-reset", {
+  const { mutate, isLoading } = usePost("api/auth/password-reset/", {
     onSuccess: (response) => {
       console.log(response);
       const { data } = response;

@@ -13,7 +13,7 @@ function Page() {
   const intialValues = {
     email: "",
   };
-  const { mutate, isLoading } = usePost("/auth/password-reset", {
+  const { mutate, isLoading } = usePost("/auth/password-reset/", {
     onSuccess: (response) => {
       console.log(response);
       const { data } = response;

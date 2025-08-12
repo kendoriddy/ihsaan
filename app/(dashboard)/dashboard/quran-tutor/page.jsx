@@ -42,7 +42,7 @@ export default function QuranTutorDashboardPage() {
 
   const getStatusColor = (status) => {
     switch (status?.toUpperCase()) {
-      case "APPROVED":
+      case "ACCEPTED":
         return "bg-green-100 text-green-800 border-green-200";
       case "PENDING":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
@@ -55,7 +55,7 @@ export default function QuranTutorDashboardPage() {
 
   const getStatusIcon = (status) => {
     switch (status?.toUpperCase()) {
-      case "APPROVED":
+      case "ACCEPTED":
         return <CheckCircle className="w-4 h-4" />;
       case "PENDING":
         return <Pending className="w-4 h-4" />;
@@ -91,7 +91,7 @@ export default function QuranTutorDashboardPage() {
     }
     fetchApp();
   }, [showModal]);
-
+  console.log(application, "application data");
   return (
     <>
       <Header />
@@ -143,11 +143,11 @@ export default function QuranTutorDashboardPage() {
                   </div>
                   <div
                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(
-                      application.status || "PENDING"
+                      application.application_status || "PENDING"
                     )}`}
                   >
-                    {getStatusIcon(application.status || "PENDING")}
-                    {application.status || "PENDING"}
+                    {getStatusIcon(application.application_status || "PENDING")}
+                    {application.application_status || "PENDING"}
                   </div>
                 </div>
               </div>

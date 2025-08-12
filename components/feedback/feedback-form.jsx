@@ -24,6 +24,7 @@ export default function FeedbackForm({ isOpen, onClose, userRole, onSubmit }) {
   });
 
   const [hoveredRating, setHoveredRating] = useState(0);
+  const [validationError, setValidationError] = useState("");
 
   if (!isOpen) return null;
 
@@ -96,6 +97,16 @@ export default function FeedbackForm({ isOpen, onClose, userRole, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Validation: At least one of rating or content must be provided
+    if (formData.rating === 0 && !formData.content.trim()) {
+      setValidationError(
+        "Please provide either a rating or feedback content (or both) before submitting."
+      );
+      return;
+    }
+
+    setValidationError(""); // Clear any previous errors
     onSubmit(formData);
     setFormData({
       entityType: "",
@@ -252,15 +263,18 @@ export default function FeedbackForm({ isOpen, onClose, userRole, onSubmit }) {
                   {formData.rating === 5 && "Excellent"}
                 </p>
               )}
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Tip: You must provide either a rating or feedback content (or
+                both)
+              </p>
             </div>
 
             {/* Feedback Content */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Your Feedback *
+                Your Feedback (Optional)
               </label>
               <textarea
-                required
                 value={formData.content}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, content: e.target.value }))
@@ -269,6 +283,10 @@ export default function FeedbackForm({ isOpen, onClose, userRole, onSubmit }) {
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 transition-all duration-200 resize-none"
                 placeholder="Share your thoughts, suggestions, or experiences..."
               />
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Tip: You must provide either a rating or feedback content (or
+                both)
+              </p>
             </div>
 
             {/* File Attachment */}
@@ -298,6 +316,13 @@ export default function FeedbackForm({ isOpen, onClose, userRole, onSubmit }) {
               </div>
             </div>
 
+            {/* Validation Error Message */}
+            {validationError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-700 text-sm">{validationError}</p>
+              </div>
+            )}
+
             {/* Submit Button */}
             <div className="flex gap-3 pt-4">
               <button
@@ -309,7 +334,10 @@ export default function FeedbackForm({ isOpen, onClose, userRole, onSubmit }) {
               </button>
               <button
                 type="submit"
-                disabled={!formData.entityType || !formData.content.trim()}
+                disabled={
+                  !formData.entityType ||
+                  (formData.rating === 0 && !formData.content.trim())
+                }
                 className="flex-1 bg-red-800 hover:bg-red-900 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
               >
                 <Send className="w-5 h-5" />

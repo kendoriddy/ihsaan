@@ -143,15 +143,9 @@ export default function FeedbackDashboard({ userRole, onCreateFeedback }) {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Feedback Dashboard
-          </h1>
-          <p className="text-gray-600">Manage and view your feedback</p>
-        </div>
+    <div className="w-full p-2.5">
+      {/* Action Button */}
+      <div className="flex justify-end mb-6">
         <button
           onClick={onCreateFeedback}
           className="bg-red-800 hover:bg-red-900 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-lg hover:shadow-xl"

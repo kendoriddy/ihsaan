@@ -12,6 +12,7 @@ import StorefrontIcon from "@mui/icons-material/Storefront";
 import { Assignment, AssignmentInd, BookSharp } from "@mui/icons-material";
 import GradingOutlined from "@mui/icons-material/GradingOutlined";
 import { TbActivity } from "react-icons/tb";
+import FeedbackIcon from "@mui/icons-material/Feedback";
 
 const DASHBOARD_LIST = {
   student: [
@@ -59,6 +60,12 @@ const DASHBOARD_LIST = {
       path: "/forums",
     },
     {
+      id: 15,
+      name: "Feedback",
+      icon: FeedbackIcon,
+      path: "/dashboard/feedback",
+    },
+    {
       id: 20,
       name: "Reports",
       icon: AssessmentIcon,
@@ -91,6 +98,12 @@ const DASHBOARD_LIST = {
       name: "Forums",
       icon: GradingOutlined,
       path: "/forums",
+    },
+    {
+      id: 6,
+      name: "Feedback",
+      icon: FeedbackIcon,
+      path: "/dashboard/feedback",
     },
     {
       id: 20,
@@ -152,6 +165,12 @@ const DASHBOARD_LIST = {
       id: 18,
       name: "Notifications",
       path: "/admin/notifications",
+    },
+    {
+      id: 19,
+      name: "Feedback",
+      icon: FeedbackIcon,
+      path: "/dashboard/feedback",
     },
     {
       id: 17,

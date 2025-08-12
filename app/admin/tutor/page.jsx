@@ -536,58 +536,128 @@ const TutorApplication = () => {
               <Divider />
 
               {/* Tutor Details */}
-              <div className="py-4">
+              <div className="py-4 max-h-96 overflow-y-auto">
                 <table className="w-full border-collapse border border-gray-300">
                   <tbody>
+                    {/* Application Status Section */}
+                    <tr className="bg-blue-50">
+                      <td
+                        className="border px-4 py-2 font-semibold"
+                        colSpan="2"
+                      >
+                        Application Information
+                      </td>
+                    </tr>
                     <tr>
                       <td className="border px-4 py-2 font-semibold">
-                        Application Status
+                        Tutor Application Status
                       </td>
-                      <td className="border px-4 py-2">{selectedStatus}</td>
+                      <td className="border px-4 py-2">
+                        <span
+                          className={`px-2 py-1 rounded text-white text-sm ${
+                            selectedTutor.tutor_application_status ===
+                            "APPROVED"
+                              ? "bg-green-500"
+                              : selectedTutor.tutor_application_status ===
+                                "REJECTED"
+                              ? "bg-red-500"
+                              : "bg-yellow-500"
+                          }`}
+                        >
+                          {selectedTutor.tutor_application_status}
+                        </span>
+                      </td>
                     </tr>
-                    {selectedTutor.tutor_application_status && (
+                    {selectedTutor.tutor_rejection_reason && (
                       <tr>
                         <td className="border px-4 py-2 font-semibold">
-                          Reason for rejection
+                          Tutor Rejection Reason
                         </td>
                         <td className="border px-4 py-2">
                           {selectedTutor.tutor_rejection_reason}
                         </td>
                       </tr>
                     )}
-                    <tr className="bg-gray-100">
-                      <td className="border px-4 py-2 font-semibold">Name</td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.user_details.first_name}{" "}
-                        {selectedTutor.user_details.last_name}
+                    {selectedTutor.user_details
+                      .quran_tutor_application_status && (
+                      <tr>
+                        <td className="border px-4 py-2 font-semibold">
+                          Quran Tutor Application Status
+                        </td>
+                        <td className="border px-4 py-2">
+                          <span
+                            className={`px-2 py-1 rounded text-white text-sm ${
+                              selectedTutor.user_details
+                                .quran_tutor_application_status === "APPROVED"
+                                ? "bg-green-500"
+                                : selectedTutor.user_details
+                                    .quran_tutor_application_status ===
+                                  "REJECTED"
+                                ? "bg-red-500"
+                                : "bg-yellow-500"
+                            }`}
+                          >
+                            {
+                              selectedTutor.user_details
+                                .quran_tutor_application_status
+                            }
+                          </span>
+                        </td>
+                      </tr>
+                    )}
+                    {selectedTutor.user_details
+                      .quran_tutor_rejection_reason && (
+                      <tr>
+                        <td className="border px-4 py-2 font-semibold">
+                          Quran Tutor Rejection Reason
+                        </td>
+                        <td className="border px-4 py-2">
+                          {
+                            selectedTutor.user_details
+                              .quran_tutor_rejection_reason
+                          }
+                        </td>
+                      </tr>
+                    )}
+
+                    {/* Personal Information Section */}
+                    <tr className="bg-blue-50">
+                      <td
+                        className="border px-4 py-2 font-semibold"
+                        colSpan="2"
+                      >
+                        Personal Information
                       </td>
                     </tr>
                     <tr>
+                      <td className="border px-4 py-2 font-semibold">
+                        Full Name
+                      </td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.user_details.first_name}{" "}
+                        {selectedTutor.user_details.middle_name}{" "}
+                        {selectedTutor.user_details.last_name}
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-50">
                       <td className="border px-4 py-2 font-semibold">Email</td>
                       <td className="border px-4 py-2">
                         {selectedTutor.user_details.email}
                       </td>
                     </tr>
-                    <tr className="bg-gray-100">
+                    <tr>
+                      <td className="border px-4 py-2 font-semibold">
+                        Phone Number
+                      </td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.user_details.phone_number ||
+                          "Not provided"}
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-50">
                       <td className="border px-4 py-2 font-semibold">Gender</td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.gender}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-4 py-2 font-semibold">
-                        Qualification
-                      </td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.highest_qualification}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-4 py-2 font-semibold">
-                        Country
-                      </td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.country}
+                      <td className="border px-4 py-2 capitalize">
+                        {selectedTutor.gender || "Not provided"}
                       </td>
                     </tr>
                     <tr>
@@ -595,23 +665,120 @@ const TutorApplication = () => {
                         Date of Birth
                       </td>
                       <td className="border px-4 py-2">
-                        {selectedTutor.date_of_birth}
+                        {selectedTutor.date_of_birth || "Not provided"}
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td className="border px-4 py-2 font-semibold">
+                        Marital Status
+                      </td>
+                      <td className="border px-4 py-2 capitalize">
+                        {selectedTutor.marital_status || "Not provided"}
                       </td>
                     </tr>
                     <tr>
                       <td className="border px-4 py-2 font-semibold">
-                        Marital Status
+                        Religion
                       </td>
-                      <td className="border px-4 py-2">
-                        {selectedTutor.marital_status}
+                      <td className="border px-4 py-2 capitalize">
+                        {selectedTutor.religion || "Not provided"}
                       </td>
                     </tr>
-                    <tr className="bg-gray-100">
+
+                    {/* Location Information Section */}
+                    <tr className="bg-blue-50">
+                      <td
+                        className="border px-4 py-2 font-semibold"
+                        colSpan="2"
+                      >
+                        Location Information
+                      </td>
+                    </tr>
+                    <tr>
                       <td className="border px-4 py-2 font-semibold">
-                        Experience
+                        Country of Origin
                       </td>
                       <td className="border px-4 py-2">
-                        {selectedTutor.years_of_experience || "-"} years
+                        {selectedTutor.user_details.country_of_origin ||
+                          "Not provided"}
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td className="border px-4 py-2 font-semibold">
+                        Country of Residence
+                      </td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.user_details.country_of_residence ||
+                          "Not provided"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-4 py-2 font-semibold">
+                        Country (Legacy)
+                      </td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.country || "Not provided"}
+                      </td>
+                    </tr>
+
+                    {/* Professional Information Section */}
+                    <tr className="bg-blue-50">
+                      <td
+                        className="border px-4 py-2 font-semibold"
+                        colSpan="2"
+                      >
+                        Professional Information
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-4 py-2 font-semibold">
+                        Years of Experience
+                      </td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.years_of_experience || "0"} years
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td className="border px-4 py-2 font-semibold">
+                        Highest Qualification
+                      </td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.highest_qualification || "Not provided"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-4 py-2 font-semibold">Skills</td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.skills || "Not provided"}
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td className="border px-4 py-2 font-semibold">
+                        Area of Specialization
+                      </td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.area_of_specialization?.length > 0
+                          ? selectedTutor.area_of_specialization.join(", ")
+                          : "Not provided"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-4 py-2 font-semibold">
+                        Preferred Mentee Gender
+                      </td>
+                      <td className="border px-4 py-2 capitalize">
+                        {selectedTutor.preferred_mentee_gender ||
+                          "Not specified"}
+                      </td>
+                    </tr>
+
+                    {/* Bio & Additional Info Section */}
+                    <tr className="bg-blue-50">
+                      <td
+                        className="border px-4 py-2 font-semibold"
+                        colSpan="2"
+                      >
+                        Bio & Additional Information
                       </td>
                     </tr>
                     <tr>
@@ -619,15 +786,129 @@ const TutorApplication = () => {
                         Professional Bio
                       </td>
                       <td className="border px-4 py-2">
-                        {selectedTutor.professional_bio}
+                        {selectedTutor.professional_bio || "Not provided"}
                       </td>
                     </tr>
-                    <tr>
+                    <tr className="bg-gray-50">
                       <td className="border px-4 py-2 font-semibold">
                         Additional Info
                       </td>
                       <td className="border px-4 py-2">
-                        {selectedTutor.additional_info}
+                        {selectedTutor.additional_info || "Not provided"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-4 py-2 font-semibold">
+                        User Bio
+                      </td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.user_details.bio || "Not provided"}
+                      </td>
+                    </tr>
+
+                    {/* Quran Tutor Specific Information */}
+                    {selectedTutor.user_details.roles?.includes(
+                      "QURAN_TUTOR"
+                    ) && (
+                      <>
+                        <tr className="bg-blue-50">
+                          <td
+                            className="border px-4 py-2 font-semibold"
+                            colSpan="2"
+                          >
+                            Quran Tutor Specific Information
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border px-4 py-2 font-semibold">
+                            Ajzaa Memorized
+                          </td>
+                          <td className="border px-4 py-2">
+                            {selectedTutor.user_details.ajzaa_memorized || "0"}{" "}
+                            parts
+                          </td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border px-4 py-2 font-semibold">
+                            Tajweed Level
+                          </td>
+                          <td className="border px-4 py-2 capitalize">
+                            {selectedTutor.user_details.tejweed_level ||
+                              "Not specified"}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border px-4 py-2 font-semibold">
+                            Religion Sect
+                          </td>
+                          <td className="border px-4 py-2 capitalize">
+                            {selectedTutor.user_details.religion_sect ||
+                              "Not specified"}
+                          </td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border px-4 py-2 font-semibold">
+                            Languages
+                          </td>
+                          <td className="border px-4 py-2">
+                            {selectedTutor.user_details.languages ||
+                              "Not specified"}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border px-4 py-2 font-semibold">
+                            Tutor Summary
+                          </td>
+                          <td className="border px-4 py-2">
+                            {selectedTutor.user_details.tutor_summary ||
+                              "Not provided"}
+                          </td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border px-4 py-2 font-semibold">
+                            Display Profile Picture
+                          </td>
+                          <td className="border px-4 py-2">
+                            {selectedTutor.user_details.display_profile_pic
+                              ? "Yes"
+                              : "No"}
+                          </td>
+                        </tr>
+                      </>
+                    )}
+
+                    {/* System Information */}
+                    <tr className="bg-blue-50">
+                      <td
+                        className="border px-4 py-2 font-semibold"
+                        colSpan="2"
+                      >
+                        System Information
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-4 py-2 font-semibold">
+                        User ID
+                      </td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.user_details.id}
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td className="border px-4 py-2 font-semibold">Roles</td>
+                      <td className="border px-4 py-2">
+                        {selectedTutor.user_details.roles?.join(", ") ||
+                          "No roles assigned"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-4 py-2 font-semibold">
+                        Created At
+                      </td>
+                      <td className="border px-4 py-2">
+                        {new Date(
+                          selectedTutor.created_at
+                        ).toLocaleDateString()}
                       </td>
                     </tr>
                   </tbody>

@@ -18,6 +18,7 @@ import {
   ThumbUp,
   ThumbDown,
 } from "@mui/icons-material";
+import { Tooltip } from "@mui/material";
 
 export default function TutorApplicationModal({
   isOpen,
@@ -122,14 +123,34 @@ export default function TutorApplicationModal({
                     <p className="text-gray-600">{selectedTutor.email}</p>
                   </div>
                 </div>
-                <div
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border ${getStatusBadgeColor(
-                    selectedTutor.quran_tutor_application_status
-                  )}`}
-                >
-                  {getStatusIcon(selectedTutor.quran_tutor_application_status)}
-                  {selectedTutor.quran_tutor_application_status}
-                </div>
+
+                {selectedTutor.quran_tutor_application_status === "REJECTED" &&
+                selectedTutor.rejection_reason ? (
+                  <Tooltip title={selectedTutor.rejection_reason}>
+                    <div
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border ${getStatusBadgeColor(
+                        selectedTutor.quran_tutor_application_status
+                      )}`}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {getStatusIcon(
+                        selectedTutor.quran_tutor_application_status
+                      )}
+                      {selectedTutor.quran_tutor_application_status}
+                    </div>
+                  </Tooltip>
+                ) : (
+                  <div
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border ${getStatusBadgeColor(
+                      selectedTutor.quran_tutor_application_status
+                    )}`}
+                  >
+                    {getStatusIcon(
+                      selectedTutor.quran_tutor_application_status
+                    )}
+                    {selectedTutor.quran_tutor_application_status}
+                  </div>
+                )}
               </div>
 
               {/* Personal Information */}

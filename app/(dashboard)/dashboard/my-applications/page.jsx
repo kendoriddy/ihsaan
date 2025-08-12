@@ -165,7 +165,7 @@ const Page = () => {
             {/* Waving Hand */}
             <div className="flex items-center justify-between">
               <div className="text-sm my-3">
-                Welcome <span className="text-lg">{user.first_name}</span>{" "}
+                Welcome <span className="text-lg">{user?.first_name}</span>{" "}
                 <WavingHand sx={{ color: "blue", fontSize: "2rem" }} />
               </div>
               <div>

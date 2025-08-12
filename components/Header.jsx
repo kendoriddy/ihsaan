@@ -25,7 +25,13 @@ import { useFetch, usePost, useProfileUpdate } from "@/hooks/useHttp/useHttp";
 import Loader from "./Loader";
 import { useQueryClient } from "@tanstack/react-query";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { IconButton, InputAdornment } from "@mui/material";
+import {
+  IconButton,
+  InputAdornment,
+  Menu,
+  MenuItem,
+  Button,
+} from "@mui/material";
 import NahuProgramme from "./NahuProgramme";
 import { getAuthToken } from "@/hooks/axios/axios";
 import PrimaryProgramme from "./PrimaryProgramme";
@@ -72,6 +78,16 @@ function Header() {
     event.preventDefault();
   };
   const [quranTutorModalOpen, setQuranTutorModalOpen] = useState(false);
+  const [registerMenuAnchorEl, setRegisterMenuAnchorEl] = useState(null);
+  const [programmeMenuAnchorEl, setProgrammeMenuAnchorEl] = useState(null);
+  const [coursesMenuAnchorEl, setCoursesMenuAnchorEl] = useState(null);
+  const [quranTutorsMenuAnchorEl, setQuranTutorsMenuAnchorEl] = useState(null);
+  const [mobileRegisterMenuAnchorEl, setMobileRegisterMenuAnchorEl] =
+    useState(null);
+  const [mobileProgrammeMenuAnchorEl, setMobileProgrammeMenuAnchorEl] =
+    useState(null);
+  const [mobileQuranTutorsMenuAnchorEl, setMobileQuranTutorsMenuAnchorEl] =
+    useState(null);
 
   const intialValues = {
     first_name: authenticatedUsersPayload?.first_name || "",
@@ -138,6 +154,64 @@ function Header() {
     router.push("/dashboard");
   };
 
+  // Menu handlers
+  const handleRegisterMenuOpen = (event) => {
+    setRegisterMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleRegisterMenuClose = () => {
+    setRegisterMenuAnchorEl(null);
+  };
+
+  const handleProgrammeMenuOpen = (event) => {
+    setProgrammeMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleProgrammeMenuClose = () => {
+    setProgrammeMenuAnchorEl(null);
+  };
+
+  const handleCoursesMenuOpen = (event) => {
+    setCoursesMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleCoursesMenuClose = () => {
+    setCoursesMenuAnchorEl(null);
+  };
+
+  const handleQuranTutorsMenuOpen = (event) => {
+    setQuranTutorsMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleQuranTutorsMenuClose = () => {
+    setQuranTutorsMenuAnchorEl(null);
+  };
+
+  // Mobile menu handlers
+  const handleMobileRegisterMenuOpen = (event) => {
+    setMobileRegisterMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileRegisterMenuClose = () => {
+    setMobileRegisterMenuAnchorEl(null);
+  };
+
+  const handleMobileProgrammeMenuOpen = (event) => {
+    setMobileProgrammeMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileProgrammeMenuClose = () => {
+    setMobileProgrammeMenuAnchorEl(null);
+  };
+
+  const handleMobileQuranTutorsMenuOpen = (event) => {
+    setMobileQuranTutorsMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileQuranTutorsMenuClose = () => {
+    setMobileQuranTutorsMenuAnchorEl(null);
+  };
+
   console.log(token, "getAuthUserInformation", getAuthUserInformation);
 
   const { mutate: createNewaccounts, isLoading: isCreating } = usePost(
@@ -168,12 +242,12 @@ function Header() {
     }
   );
   const handleSubmit = (values) => {
+    console.log(values, "====values====");
     const {
       first_name,
       last_name,
       email,
       password,
-      confirm_password,
       country,
       professional_bio,
       additional_info,
@@ -184,16 +258,27 @@ function Header() {
       marital_status,
       date_of_birth,
       preferred_mentee_gender,
-      councelling_areas,
-      mentorship_areas,
       years_of_experience,
+      become_quran_tutor,
+      ajzaa_memorized,
+      country_of_origin,
+      country_of_residence,
+      display_profile_pic,
+      tejweed_level,
+      religion_sect,
+      tutor_summary,
+      languages,
     } = values;
     const payload = {
       first_name: first_name,
       last_name: last_name,
       email: email,
       password: password,
-      roles: type === "student" ? ["USER", "STUDENT"] : ["USER", "TUTOR"],
+      roles: become_quran_tutor
+        ? ["USER", "TUTOR", "QURAN_TUTOR"]
+        : type === "student"
+        ? ["USER", "STUDENT"]
+        : ["USER", "TUTOR"],
       country: country,
       professional_bio: professional_bio,
       skills: skills,
@@ -204,10 +289,18 @@ function Header() {
       marital_status: marital_status,
       date_of_birth: date_of_birth,
       preferred_mentee_gender: preferred_mentee_gender,
-      mentorship_areas: mentorship_areas,
       years_of_experience: years_of_experience,
       tutor_application_status: "PENDING",
       student_application_status: "PENDING",
+
+      country_of_origin: country_of_origin,
+      country_of_residence: country_of_residence,
+      display_profile_pic: display_profile_pic,
+      ajzaa_memorized: ajzaa_memorized,
+      tejweed_level: tejweed_level,
+      religion_sect: religion_sect,
+      tutor_summary: tutor_summary,
+      languages: languages,
       is_active: true,
     };
     createNewaccounts(payload);
@@ -303,77 +396,190 @@ function Header() {
                 Why us
               </Link>
             </li>
-            <div className="relative text-slate-50 rounded group cursor-pointer">
-              <h3 className="text-[16px] font-semibold text-black">
+            <div>
+              <Button
+                className="navlink"
+                onClick={handleQuranTutorsMenuOpen}
+                sx={{
+                  textTransform: "none",
+                  color: "black",
+                  fontSize: "16px",
+                  fontWeight: "semibold",
+                  padding: "0",
+                  minWidth: "auto",
+                  "&:hover": {
+                    backgroundColor: "transparent",
+                    color: "#f97316",
+                  },
+                }}
+              >
                 Qur&apos;an Tutors
-              </h3>
-              <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
+              </Button>
+              <Menu
+                anchorEl={quranTutorsMenuAnchorEl}
+                open={Boolean(quranTutorsMenuAnchorEl)}
+                onClose={handleQuranTutorsMenuClose}
+                PaperProps={{
+                  sx: {
+                    mt: 1,
+                    minWidth: 200,
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                    borderRadius: 2,
+                  },
+                }}
+              >
                 {!isUserMentor && (
-                  <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                    <div
-                      className="block w-full h-full"
-                      onClick={() => router.push("/quran-tutors")}
-                    >
-                      Pick a Qur'an Tutor
-                    </div>
-                  </div>
+                  <MenuItem
+                    onClick={() => {
+                      router.push("/quran-tutors");
+                      handleQuranTutorsMenuClose();
+                    }}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "#f97316",
+                      },
+                    }}
+                  >
+                    Pick a Qur'an Tutor
+                  </MenuItem>
                 )}
-              </div>
+              </Menu>
             </div>
 
-            <div className="relative text-slate-50 rounded group cursor-pointer">
-              <h3 className="text-[16px] font-semibold text-black">Courses</h3>
-              <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
-                <div className="bg-slate-500 px-1 py-2 hover:bg-primary transition-all duration-300">
-                  <Link href="/courses" className="block w-full h-full">
-                    Take a Course
-                  </Link>
-                </div>
-                <div className="bg-slate-500 px-1 py-2 hover:bg-primary transition-all duration-300">
-                  <Link href="/courses" className="block w-full h-full">
-                    Upload and Sell a Course
-                  </Link>
-                </div>
-              </div>
+            <div>
+              <Button
+                className="navlink"
+                onClick={handleCoursesMenuOpen}
+                sx={{
+                  textTransform: "none",
+                  color: "black",
+                  fontSize: "16px",
+                  fontWeight: "semibold",
+                  padding: "0",
+                  minWidth: "auto",
+                  "&:hover": {
+                    backgroundColor: "transparent",
+                    color: "#f97316",
+                  },
+                }}
+              >
+                Courses
+              </Button>
+              <Menu
+                anchorEl={coursesMenuAnchorEl}
+                open={Boolean(coursesMenuAnchorEl)}
+                onClose={handleCoursesMenuClose}
+                PaperProps={{
+                  sx: {
+                    mt: 1,
+                    minWidth: 200,
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                    borderRadius: 2,
+                  },
+                }}
+              >
+                <MenuItem
+                  onClick={() => {
+                    router.push("/courses");
+                    handleCoursesMenuClose();
+                  }}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f97316",
+                    },
+                  }}
+                >
+                  Take a Course
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    router.push("/courses");
+                    handleCoursesMenuClose();
+                  }}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f97316",
+                    },
+                  }}
+                >
+                  Upload and Sell a Course
+                </MenuItem>
+              </Menu>
             </div>
 
-            <div className="relative text-slate-50 rounded group cursor-pointer">
-              <h3 className="text-[16px] font-semibold text-black">
+            <div>
+              <Button
+                className="navlink"
+                onClick={handleProgrammeMenuOpen}
+                sx={{
+                  textTransform: "none",
+                  color: "black",
+                  fontSize: "16px",
+                  fontWeight: "semibold",
+                  padding: "0",
+                  minWidth: "auto",
+                  "&:hover": {
+                    backgroundColor: "transparent",
+                    color: "#f97316",
+                  },
+                }}
+              >
                 Programmes
-              </h3>
-              <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[200px] transition-all duration-300 w-[200px]">
-                <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                  <div
-                    className="block w-full h-full"
-                    onClick={() => {
-                      handleOpenProgrammeModal("nahu programme");
-                      setType("student");
-                    }}
-                  >
-                    Nahu Programme
-                  </div>
-                </div>
-                <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                  <div
-                    className="block w-full h-full"
-                    onClick={() => {
-                      handleOpenProgrammeModal("Primary Programmes");
-                    }}
-                  >
-                    Primary Programmes
-                  </div>
-                </div>
-                <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                  <div
-                    className="block w-full h-full"
-                    onClick={() => {
-                      handleOpenProgrammeModal("Secondary Programmes");
-                    }}
-                  >
-                    Secondary Programmes
-                  </div>
-                </div>
-              </div>
+              </Button>
+              <Menu
+                anchorEl={programmeMenuAnchorEl}
+                open={Boolean(programmeMenuAnchorEl)}
+                onClose={handleProgrammeMenuClose}
+                PaperProps={{
+                  sx: {
+                    mt: 1,
+                    minWidth: 200,
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                    borderRadius: 2,
+                  },
+                }}
+              >
+                <MenuItem
+                  onClick={() => {
+                    handleOpenProgrammeModal("nahu programme");
+                    setType("student");
+                    handleProgrammeMenuClose();
+                  }}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f97316",
+                    },
+                  }}
+                >
+                  Nahu Programme
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleOpenProgrammeModal("Primary Programmes");
+                    handleProgrammeMenuClose();
+                  }}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f97316",
+                    },
+                  }}
+                >
+                  Primary Programmes
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleOpenProgrammeModal("Secondary Programmes");
+                    handleProgrammeMenuClose();
+                  }}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f97316",
+                    },
+                  }}
+                >
+                  Secondary Programmes
+                </MenuItem>
+              </Menu>
             </div>
 
             {isAuth && (
@@ -399,16 +605,6 @@ function Header() {
                 Blog
               </Link>
             </li>
-            <li>
-              <Link
-                href="/feedback"
-                className={` navlink ${
-                  currentRoute.includes("/feedback") && "text-primary"
-                }`}
-              >
-                Feedback
-              </Link>
-            </li>
 
             <li>
               <Link href={"/cart"}>
@@ -432,40 +628,73 @@ function Header() {
                 </Link>
               )}
             </div>
-            {/* Dropdown button */}
+            {/* Register Menu */}
             {isUserBoth ? null : (
-              <div className="relative text-slate-50 rounded group cursor-pointer">
-                <div className="bg-primary px-3 py-2 min-w-[200px] text-center">
+              <div>
+                <Button
+                  style={{
+                    backgroundColor: "#f97316",
+                    color: "white",
+                    fontWeight: "semibold",
+                    textTransform: "none",
+                  }}
+                  className="bg-primary hover:bg-primary/90 text-white px-3 py-2 min-w-[100px] text-center"
+                  onClick={handleRegisterMenuOpen}
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: "semibold",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#f97316",
+                    },
+                  }}
+                >
                   Register
-                </div>
-                <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300">
+                </Button>
+                <Menu
+                  anchorEl={registerMenuAnchorEl}
+                  open={Boolean(registerMenuAnchorEl)}
+                  onClose={handleRegisterMenuClose}
+                  PaperProps={{
+                    sx: {
+                      mt: 1,
+                      minWidth: 200,
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                      borderRadius: 2,
+                    },
+                  }}
+                >
                   {!isUserMentor && (
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                      <div
-                        className="block w-full h-full"
-                        onClick={() => {
-                          handleOpenModal("student");
-                          setType("student");
-                        }}
-                      >
-                        Become a student
-                      </div>
-                    </div>
+                    <MenuItem
+                      onClick={() => {
+                        handleOpenModal("student");
+                        setType("student");
+                        handleRegisterMenuClose();
+                      }}
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "#f97316",
+                        },
+                      }}
+                    >
+                      Become a student
+                    </MenuItem>
                   )}
-                  {!isUserCouncellor && (
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                      <div
-                        className="block w-full h-full"
-                        onClick={() => {
-                          handleOpenModal("teacher");
-                          setType("teacher");
-                        }}
-                      >
-                        Become a tutor
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  <MenuItem
+                    onClick={() => {
+                      handleOpenModal("teacher");
+                      setType("teacher");
+                      handleRegisterMenuClose();
+                    }}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "#f97316",
+                      },
+                    }}
+                  >
+                    Become a tutor
+                  </MenuItem>
+                </Menu>
               </div>
             )}
 
@@ -833,60 +1062,130 @@ function Header() {
                   </Link>
                 </li>
                 {/* Mobile menu Qur'an Tutors dropdown */}
-                <div className="relative text-slate-50 rounded group cursor-pointer">
-                  <h3 className="text-[15px] font-normal text-black">
+                <div>
+                  <Button
+                    className="navlink"
+                    onClick={handleMobileQuranTutorsMenuOpen}
+                    sx={{
+                      textTransform: "none",
+                      color: "black",
+                      fontSize: "15px",
+                      fontWeight: "normal",
+                      justifyContent: "flex-start",
+                      padding: "8px 16px",
+                      minWidth: "auto",
+                      "&:hover": {
+                        backgroundColor: "transparent",
+                        color: "#f97316",
+                      },
+                    }}
+                  >
                     Qur&apos;an Tutors
-                  </h3>
-                  <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] transition-all duration-300 w-[200px]">
+                  </Button>
+                  <Menu
+                    anchorEl={mobileQuranTutorsMenuAnchorEl}
+                    open={Boolean(mobileQuranTutorsMenuAnchorEl)}
+                    onClose={handleMobileQuranTutorsMenuClose}
+                    PaperProps={{
+                      sx: {
+                        mt: 1,
+                        minWidth: 200,
+                        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                        borderRadius: 2,
+                      },
+                    }}
+                  >
                     {!isUserMentor && (
-                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                        <div
-                          className="block w-full h-full"
-                          onClick={() => router.push("/quran-tutors")}
-                        >
-                          Pick a Qur'an Tutor
-                        </div>
-                      </div>
+                      <MenuItem
+                        onClick={() => {
+                          router.push("/quran-tutors");
+                          handleMobileQuranTutorsMenuClose();
+                        }}
+                        sx={{
+                          "&:hover": {
+                            backgroundColor: "#f97316",
+                          },
+                        }}
+                      >
+                        Pick a Qur'an Tutor
+                      </MenuItem>
                     )}
-                  </div>
+                  </Menu>
                 </div>
-                <div className="relative text-slate-50 rounded group cursor-pointer">
-                  <h3 className="text-[15px] font-normal text-black">
+                <div>
+                  <Button
+                    className="navlink"
+                    onClick={handleMobileProgrammeMenuOpen}
+                    sx={{
+                      textTransform: "none",
+                      color: "black",
+                      fontSize: "15px",
+                      fontWeight: "normal",
+                      justifyContent: "flex-start",
+                      padding: "8px 16px",
+                      minWidth: "auto",
+                      "&:hover": {
+                        backgroundColor: "transparent",
+                        color: "#f97316",
+                      },
+                    }}
+                  >
                     Programmes
-                  </h3>
-                  <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[200px] transition-all duration-300 w-[200px]">
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                      <div
-                        className="block w-full h-full"
-                        onClick={() => {
-                          handleOpenProgrammeModal("nahu programme");
-                          setType("student");
-                        }}
-                      >
-                        Nahu Programme
-                      </div>
-                    </div>
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                      <div
-                        className="block w-full h-full"
-                        onClick={() => {
-                          handleOpenProgrammeModal("Primary Programmes");
-                        }}
-                      >
-                        Primary Programmes
-                      </div>
-                    </div>
-                    <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                      <div
-                        className="block w-full h-full"
-                        onClick={() => {
-                          handleOpenProgrammeModal("Secondary Programmes");
-                        }}
-                      >
-                        Secondary Programmes
-                      </div>
-                    </div>
-                  </div>
+                  </Button>
+                  <Menu
+                    anchorEl={mobileProgrammeMenuAnchorEl}
+                    open={Boolean(mobileProgrammeMenuAnchorEl)}
+                    onClose={handleMobileProgrammeMenuClose}
+                    PaperProps={{
+                      sx: {
+                        mt: 1,
+                        minWidth: 200,
+                        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                        borderRadius: 2,
+                      },
+                    }}
+                  >
+                    <MenuItem
+                      onClick={() => {
+                        handleOpenProgrammeModal("nahu programme");
+                        setType("student");
+                        handleMobileProgrammeMenuClose();
+                      }}
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "#f97316",
+                        },
+                      }}
+                    >
+                      Nahu Programme
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        handleOpenProgrammeModal("Primary Programmes");
+                        handleMobileProgrammeMenuClose();
+                      }}
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "#f97316",
+                        },
+                      }}
+                    >
+                      Primary Programmes
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        handleOpenProgrammeModal("Secondary Programmes");
+                        handleMobileProgrammeMenuClose();
+                      }}
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "#f97316",
+                        },
+                      }}
+                    >
+                      Secondary Programmes
+                    </MenuItem>
+                  </Menu>
                 </div>
                 <li>
                   {isAuth && (
@@ -926,16 +1225,7 @@ function Header() {
                     Blog
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/feedback"
-                    className={` navlink ${
-                      currentRoute.includes("/feedback") && "text-primary"
-                    }`}
-                  >
-                    Feedback
-                  </Link>
-                </li>
+
                 {!isAuth && (
                   <li>
                     <Link
@@ -948,38 +1238,72 @@ function Header() {
                     </Link>
                   </li>
                 )}
-                <div className="relative text-slate-50 rounded group cursor-pointer">
-                  <div className="text-[15px] font-normal text-black">
+                <div>
+                  <Button
+                    className="navlink"
+                    onClick={handleMobileRegisterMenuOpen}
+                    sx={{
+                      textTransform: "none",
+                      color: "black",
+                      fontSize: "15px",
+                      fontWeight: "normal",
+                      justifyContent: "flex-start",
+                      padding: "8px 16px",
+                      minWidth: "auto",
+                      "&:hover": {
+                        backgroundColor: "transparent",
+                        color: "#f97316",
+                      },
+                    }}
+                  >
                     Register
-                  </div>
-                  <div className="absolute top-[38px] left-0 z-30 h-0 overflow-hidden group-hover:h-[77px] w-full transition-all duration-300">
+                  </Button>
+                  <Menu
+                    anchorEl={mobileRegisterMenuAnchorEl}
+                    open={Boolean(mobileRegisterMenuAnchorEl)}
+                    onClose={handleMobileRegisterMenuClose}
+                    PaperProps={{
+                      sx: {
+                        mt: 1,
+                        minWidth: 200,
+                        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                        borderRadius: 2,
+                      },
+                    }}
+                  >
                     {!isUserMentor && (
-                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                        <div
-                          className="block w-full h-full"
-                          onClick={() => {
-                            handleOpenModal("student");
-                            setType("student");
-                          }}
-                        >
-                          Become a student
-                        </div>
-                      </div>
+                      <MenuItem
+                        onClick={() => {
+                          handleOpenModal("student");
+                          setType("student");
+                          handleMobileRegisterMenuClose();
+                        }}
+                        sx={{
+                          "&:hover": {
+                            backgroundColor: "#f97316",
+                          },
+                        }}
+                      >
+                        Become a student
+                      </MenuItem>
                     )}
                     {!isUserCouncellor && (
-                      <div className="bg-slate-500 px-3 py-2 hover:bg-primary transition-all duration-300">
-                        <div
-                          className="block w-full h-full"
-                          onClick={() => {
-                            handleOpenModal("tutor");
-                            setType("tutor");
-                          }}
-                        >
-                          Become a tutor
-                        </div>
-                      </div>
+                      <MenuItem
+                        onClick={() => {
+                          handleOpenModal("tutor");
+                          setType("tutor");
+                          handleMobileRegisterMenuClose();
+                        }}
+                        sx={{
+                          "&:hover": {
+                            backgroundColor: "#f97316",
+                          },
+                        }}
+                      >
+                        Become a tutor
+                      </MenuItem>
                     )}
-                  </div>
+                  </Menu>
                 </div>
 
                 <li>

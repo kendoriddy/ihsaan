@@ -39,7 +39,7 @@ export default function AdminQuranTutorAppsPage() {
         if (statusFilter) params.push(`application_status=${statusFilter}`);
         if (search) params.push(`search=${encodeURIComponent(search)}`);
         if (page) params.push(`page=${page}`);
-        const url = `https://ihsaanlms.onrender.com/api/quran-tutors/?${params.join(
+        const url = `https://ihsaanlms.onrender.com/api/list-quran-tutor-applications/?${params.join(
           "&"
         )}`;
         const res = await fetch(url, {
@@ -90,7 +90,7 @@ export default function AdminQuranTutorAppsPage() {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `https://ihsaanlms.onrender.com/api/quran-tutors/${id}/`,
+        `https://ihsaanlms.onrender.com/api/admin/quran-tutors/${id}/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -228,12 +228,16 @@ export default function AdminQuranTutorAppsPage() {
                 <tbody>
                   {tutors.map((tutor) => (
                     <tr key={tutor.id} className="even:bg-gray-50">
-                      <td className="border px-4 py-2">{tutor.full_name}</td>
+                      <td className="border px-4 py-2">
+                        {tutor.first_name + " " + tutor.last_name}
+                      </td>
                       <td className="border px-4 py-2">{tutor.email}</td>
                       <td className="border px-4 py-2">
                         {tutor.country_of_origin} / {tutor.country_of_residence}
                       </td>
-                      <td className="border px-4 py-2">{tutor.gender}</td>
+                      <td className="border px-4 py-2 capitalize">
+                        {tutor.gender}
+                      </td>
                       <td className="border px-4 py-2">
                         {tutor.ajzaa_memorized}
                       </td>
