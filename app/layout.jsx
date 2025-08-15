@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme } from "@mui/material";
 import { muiTheme } from "@/utils/muiTheme";
 import Provider from "./provider";
 import Toastify from "@/components/Toastify";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "IHSAAN ACADEMIA",
@@ -12,17 +13,19 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ReduxProvider>
-      <ThemeProvider theme={muiTheme}>
-        <html lang="en">
-          <Provider>
-            <body className={`font-nunito text-sm`}>
-              {children}
-              <Toastify />
-            </body>
-          </Provider>
-        </html>
-      </ThemeProvider>
-    </ReduxProvider>
+    <Suspense>
+      <ReduxProvider>
+        <ThemeProvider theme={muiTheme}>
+          <html lang="en">
+            <Provider>
+              <body className={`font-nunito text-sm`}>
+                {children}
+                <Toastify />
+              </body>
+            </Provider>
+          </html>
+        </ThemeProvider>
+      </ReduxProvider>
+    </Suspense>
   );
 }
