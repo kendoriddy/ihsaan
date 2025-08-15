@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { usePathname } from "next/navigation";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
@@ -9,8 +9,11 @@ import AnnouncementDashboard from "@/components/notifications/announcement-dashb
 
 function Page() {
   const currentRoute = usePathname();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [userRole, setUserRole] = useState("tutor");
+
+  const rolesStr = localStorage.getItem("roles");
+  const roles = JSON.parse(rolesStr);
+
+  const [userRole, setUserRole] = useState(roles[0]);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -24,6 +27,15 @@ function Page() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  useEffect(() => {
+    if (roles.includes("ADMIN")) {
+      setUserRole("admin");
+    } else if (roles.includes("TUTOR")) {
+      setUserRole("tutor");
+    }
+  }, [roles]);
+
+  console.log(userRole, "userRole:::");
   return (
     <div className="relative">
       {/* Header */}
@@ -59,7 +71,7 @@ function Page() {
                     <h1 className="text-xl font-bold text-gray-800">
                       IHSAAN Announcement System
                     </h1>
-                    <div className="flex items-center gap-3">
+                    {/* <div className="flex items-center gap-3">
                       <span className="text-sm text-gray-600">Demo as:</span>
                       <select
                         value={userRole}
@@ -69,7 +81,7 @@ function Page() {
                         <option value="tutor">Tutor</option>
                         <option value="admin">Admin</option>
                       </select>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 

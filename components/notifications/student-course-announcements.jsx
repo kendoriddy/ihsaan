@@ -18,8 +18,7 @@ export default function StudentCourseAnnouncements({
   onDownloadAttachment,
 }) {
   const [filter, setFilter] = useState("all");
-  const [selectedAnnouncement, setSelectedAnnouncement] =
-    (useState < CourseAnnouncement) | (null > null);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
 
   const getTypeColor = (type) => {
     switch (type) {

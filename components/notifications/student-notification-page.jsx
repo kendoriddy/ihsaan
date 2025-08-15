@@ -24,8 +24,7 @@ export default function StudentNotificationPage({
 }) {
   const [filter, setFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
-  const [selectedNotification, setSelectedNotification] =
-    (useState < StudentNotification) | (null > null);
+  const [selectedNotification, setSelectedNotification] = useState(null);
 
   const getTypeColor = (type) => {
     switch (type) {

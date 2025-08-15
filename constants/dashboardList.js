@@ -9,7 +9,12 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
 import StorefrontIcon from "@mui/icons-material/Storefront";
-import { Assignment, AssignmentInd, BookSharp } from "@mui/icons-material";
+import {
+  Assignment,
+  AssignmentInd,
+  BookSharp,
+  LocalActivity,
+} from "@mui/icons-material";
 import GradingOutlined from "@mui/icons-material/GradingOutlined";
 import { TbActivity } from "react-icons/tb";
 import FeedbackIcon from "@mui/icons-material/Feedback";
@@ -37,7 +42,7 @@ const DASHBOARD_LIST = {
     },
     {
       id: 21,
-      name: "Notifications",
+      name: "Notifications and Announcements",
       icon: TbActivity,
       path: "/dashboard/notifications",
     },
@@ -112,6 +117,12 @@ const DASHBOARD_LIST = {
       path: "/reports",
     },
     {
+      id: 18,
+      name: "Notifications and Announcements",
+      icon: LocalActivity,
+      path: "/dashboard/notifications",
+    },
+    {
       id: 30,
       name: "Qur'an Tutor",
       icon: CastForEducationIcon,
@@ -163,14 +174,14 @@ const DASHBOARD_LIST = {
     },
     {
       id: 18,
-      name: "Notifications",
+      name: "Notifications and Announcements",
       path: "/admin/notifications",
     },
     {
       id: 19,
       name: "Feedback",
       icon: FeedbackIcon,
-      path: "/dashboard/feedback",
+      path: "/admin/feedback",
     },
     {
       id: 17,

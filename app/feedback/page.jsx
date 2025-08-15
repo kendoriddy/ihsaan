@@ -6,10 +6,33 @@ import { useRouter } from "next/navigation";
 export default function Page() {
   const router = useRouter();
 
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    // Determine user role from localStorage or Redux state
+    if (typeof window !== "undefined") {
+      const roles = JSON.parse(localStorage.getItem("roles") || "[]");
+
+      if (roles.includes("ADMIN")) {
+        setUserRole("admin");
+      } else if (roles.includes("TUTOR")) {
+        setUserRole("tutor");
+      } else if (roles.includes("STUDENT")) {
+        setUserRole("student");
+      } else {
+        setUserRole("ordinary");
+      }
+    }
+  }, []);
+
   useEffect(() => {
     // Redirect to the new dashboard feedback page
+    if (userRole === "admin") {
+      router.push("/admin/feedback");
+      return;
+    }
     router.push("/dashboard/feedback");
-  }, [router]);
+  }, [router, userRole]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">

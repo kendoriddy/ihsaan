@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import RequireAuth from "@/app/lib/ReuquireAuth";
 import AdminDashboardHeader from "./AdminDashboardHeader";
 import AdminDashboardSidebar from "./AdminDashboardSidebar";
+import ToastContainer from "./ToastContainer";
 
 function AdminLayout({ children }) {
   const currentRoute = usePathname();
@@ -41,6 +42,9 @@ function AdminLayout({ children }) {
             {children}
           </section>
         </main>
+
+        {/* Toast Container for notifications */}
+        <ToastContainer />
       </div>
     </RequireAuth>
   );

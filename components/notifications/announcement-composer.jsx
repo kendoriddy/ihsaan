@@ -22,20 +22,17 @@ export default function AnnouncementComposer({
   userRole,
   userCourses,
   onSubmit,
+  isLoading = false,
 }) {
   const [formData, setFormData] = useState({
     title: "",
-    message: "",
-    targetType: "",
-    courseId: "",
-    expiresAt: "",
-    notifyVia: {
-      inApp: true,
-      email: false,
-      push: false,
-    },
-    attachments: [],
-    announcementType: "informational",
+    content: "",
+    announcement_type: "",
+    announcement_class: "INFORMATIONAL",
+    delivery_method: "IN_APP",
+    course: "",
+    term: "",
+    is_active: true,
   });
 
   if (!isOpen) return null;
@@ -43,83 +40,126 @@ export default function AnnouncementComposer({
   const targetOptions = {
     tutor: [
       {
-        value: "students_per_course",
+        value: "STUDENTS_OFFERING_COURSE",
         label: "Students in Course",
         icon: <School className="w-4 h-4" />,
       },
       {
-        value: "ordinary_users_per_course",
+        value: "ORDINARY_USERS_OFFERING_COURSE",
         label: "Course Buyers",
         icon: <Person className="w-4 h-4" />,
       },
     ],
     admin: [
       {
-        value: "all_users",
+        value: "ALL_USERS",
         label: "All Users",
         icon: <Public className="w-4 h-4" />,
       },
       {
-        value: "all_students",
+        value: "ALL_STUDENTS",
         label: "All Students",
         icon: <School className="w-4 h-4" />,
       },
       {
-        value: "all_tutors",
+        value: "ALL_TUTORS",
         label: "All Tutors",
         icon: <People className="w-4 h-4" />,
       },
       {
-        value: "all_ordinary_users",
+        value: "ORDINARY_USERS",
         label: "All Ordinary Users",
         icon: <Person className="w-4 h-4" />,
       },
       {
-        value: "students_per_course",
+        value: "STUDENTS_OFFERING_COURSE",
         label: "Students in Course",
         icon: <School className="w-4 h-4" />,
       },
       {
-        value: "ordinary_users_per_course",
+        value: "ORDINARY_USERS_OFFERING_COURSE",
         label: "Course Buyers",
         icon: <Person className="w-4 h-4" />,
+      },
+      {
+        value: "TUTORS_TEACHING_COURSE",
+        label: "Tutors Teaching Course",
+        icon: <People className="w-4 h-4" />,
       },
     ],
   };
 
   const announcementTypes = [
     {
-      value: "informational",
+      value: "INFORMATIONAL",
       label: "Informational",
       color: "bg-blue-100 text-blue-800",
     },
-    { value: "alert", label: "Alert", color: "bg-red-100 text-red-800" },
+    { value: "ALERT", label: "Alert", color: "bg-red-100 text-red-800" },
     {
-      value: "reminder",
+      value: "REMINDER",
       label: "Reminder",
       color: "bg-yellow-100 text-yellow-800",
     },
     {
-      value: "promotional",
+      value: "PROMOTIONAL",
       label: "Promotional",
       color: "bg-green-100 text-green-800",
     },
   ];
 
+  const deliveryMethods = [
+    {
+      value: "IN_APP",
+      label: "In-app Notification",
+      icon: <Notifications className="w-5 h-5" />,
+    },
+    {
+      value: "EMAIL",
+      label: "Email Notification",
+      icon: <Email className="w-5 h-5" />,
+    },
+    {
+      value: "BOTH",
+      label: "Both (In-app & Email)",
+      icon: <Notifications className="w-5 h-5" />,
+    },
+  ];
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+
+    // Prepare the payload for API
+    const payload = {
+      title: formData.title,
+      content: formData.content,
+      announcement_type: formData.announcement_type,
+      announcement_class: formData.announcement_class,
+      delivery_method: formData.delivery_method,
+      is_active: formData.is_active,
+    };
+
+    // Add course and term only if they are provided
+    if (formData.course) {
+      payload.course = parseInt(formData.course);
+    }
+    if (formData.term) {
+      payload.term = parseInt(formData.term);
+    }
+
+    onSubmit(payload);
+
+    // Reset form
     setFormData({
       title: "",
-      message: "",
-      targetType: "",
-      courseId: "",
-      expiresAt: "",
-      notifyVia: { inApp: true, email: false, push: false },
-      attachments: [],
-      announcementType: "informational",
+      content: "",
+      announcement_type: "",
+      announcement_class: "INFORMATIONAL",
+      delivery_method: "IN_APP",
+      course: "",
+      term: "",
+      is_active: true,
     });
-    onClose();
   };
 
   const handleFileChange = (e) => {
@@ -138,35 +178,39 @@ export default function AnnouncementComposer({
   };
 
   const getTargetDescription = () => {
-    if (!formData.targetType) return "";
+    if (!formData.announcement_type) return "";
 
     const selectedCourse = userCourses.find(
-      (course) => course.id === formData.courseId
+      (course) => course.id === formData.course
     );
 
-    switch (formData.targetType) {
-      case "all_users":
+    switch (formData.announcement_type) {
+      case "ALL_USERS":
         return "All platform users will receive this announcement";
-      case "all_students":
+      case "ALL_STUDENTS":
         return "All enrolled students will receive this announcement";
-      case "all_tutors":
+      case "ALL_TUTORS":
         return "All tutors will receive this announcement";
-      case "all_ordinary_users":
+      case "ORDINARY_USERS":
         return "All ordinary users will receive this announcement";
-      case "students_per_course":
+      case "STUDENTS_OFFERING_COURSE":
         return selectedCourse
           ? `${selectedCourse.studentCount} students in "${selectedCourse.title}" will receive this`
           : "Select a course to see recipient count";
-      case "ordinary_users_per_course":
+      case "ORDINARY_USERS_OFFERING_COURSE":
         return selectedCourse
           ? `${selectedCourse.ordinaryUserCount} buyers of "${selectedCourse.title}" will receive this`
+          : "Select a course to see recipient count";
+      case "TUTORS_TEACHING_COURSE":
+        return selectedCourse
+          ? `Tutors teaching "${selectedCourse.title}" will receive this`
           : "Select a course to see recipient count";
       default:
         return "";
     }
   };
 
-  const needsCourseSelection = formData.targetType.includes("per_course");
+  const needsCourseSelection = formData.announcement_type.includes("_COURSE");
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -190,6 +234,7 @@ export default function AnnouncementComposer({
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              disabled={isLoading}
             >
               <Close className="w-6 h-6 text-gray-500" />
             </button>
@@ -213,6 +258,7 @@ export default function AnnouncementComposer({
                 }
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 transition-all duration-200"
                 placeholder="Enter announcement title..."
+                disabled={isLoading}
               />
             </div>
 
@@ -229,14 +275,15 @@ export default function AnnouncementComposer({
                     onClick={() =>
                       setFormData((prev) => ({
                         ...prev,
-                        announcementType: type.value,
+                        announcement_class: type.value,
                       }))
                     }
                     className={`p-3 border rounded-xl transition-all duration-200 ${
-                      formData.announcementType === type.value
+                      formData.announcement_class === type.value
                         ? "border-red-800 bg-red-50 text-red-800 ring-2 ring-red-200"
                         : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                     }`}
+                    disabled={isLoading}
                   >
                     <div
                       className={`text-xs px-2 py-1 rounded-full ${type.color} mb-1`}
@@ -261,15 +308,16 @@ export default function AnnouncementComposer({
                     onClick={() =>
                       setFormData((prev) => ({
                         ...prev,
-                        targetType: option.value,
-                        courseId: "",
+                        announcement_type: option.value,
+                        course: "",
                       }))
                     }
                     className={`p-4 border rounded-xl transition-all duration-200 flex items-center gap-3 ${
-                      formData.targetType === option.value
+                      formData.announcement_type === option.value
                         ? "border-red-800 bg-red-50 text-red-800 ring-2 ring-red-200"
                         : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                     }`}
+                    disabled={isLoading}
                   >
                     {option.icon}
                     <span className="font-medium">{option.label}</span>
@@ -286,14 +334,15 @@ export default function AnnouncementComposer({
                 </label>
                 <select
                   required
-                  value={formData.courseId}
+                  value={formData.course}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      courseId: e.target.value,
+                      course: e.target.value,
                     }))
                   }
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 transition-all duration-200"
+                  disabled={isLoading}
                 >
                   <option value="">Choose a course...</option>
                   {userCourses.map((course) => (
@@ -307,7 +356,7 @@ export default function AnnouncementComposer({
             )}
 
             {/* Target Description */}
-            {formData.targetType && (
+            {formData.announcement_type && (
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <p className="text-sm text-blue-800 flex items-center gap-2">
                   <People className="w-4 h-4" />
@@ -323,139 +372,48 @@ export default function AnnouncementComposer({
               </label>
               <textarea
                 required
-                value={formData.message}
+                value={formData.content}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, message: e.target.value }))
+                  setFormData((prev) => ({ ...prev, content: e.target.value }))
                 }
                 rows={6}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 transition-all duration-200 resize-none"
                 placeholder="Write your announcement message..."
+                disabled={isLoading}
               />
             </div>
 
-            {/* Expiration Date */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Expiration Date (Optional)
-                <span className="text-xs text-gray-500 ml-2">
-                  Leave empty for permanent announcement
-                </span>
-              </label>
-              <div className="relative">
-                <CalendarToday className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="datetime-local"
-                  value={formData.expiresAt}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      expiresAt: e.target.value,
-                    }))
-                  }
-                  className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 transition-all duration-200"
-                />
-              </div>
-            </div>
-
-            {/* Attachments */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Attachments (Optional)
-              </label>
-              <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-gray-300 transition-colors">
-                <input
-                  type="file"
-                  id="attachments"
-                  multiple
-                  onChange={handleFileChange}
-                  className="hidden"
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.mp4,.mp3"
-                />
-                <label htmlFor="attachments" className="cursor-pointer">
-                  <AttachFile className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">Click to upload files</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    PDF, Word, Images, Videos, Audio
-                  </p>
-                </label>
-              </div>
-
-              {/* Attachment List */}
-              {formData.attachments.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  {formData.attachments.map((file, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between bg-gray-50 rounded-lg p-3"
-                    >
-                      <div className="flex items-center gap-2">
-                        <AttachFile className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">
-                          {file.name}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeAttachment(index)}
-                        className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
-                      >
-                        <Delete className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Notification Methods */}
+            {/* Delivery Method */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Notify Recipients Via
+                Delivery Method
               </label>
               <div className="space-y-3">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.notifyVia.inApp}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        notifyVia: {
-                          ...prev.notifyVia,
-                          inApp: e.target.checked,
-                        },
-                      }))
-                    }
-                    className="w-4 h-4 text-red-800 border-gray-300 rounded focus:ring-red-700"
-                  />
-                  <Notifications className="w-5 h-5 text-gray-500" />
-                  <span className="text-sm text-gray-700">
-                    In-app Notification
-                  </span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.notifyVia.email}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        notifyVia: {
-                          ...prev.notifyVia,
-                          email: e.target.checked,
-                        },
-                      }))
-                    }
-                    className="w-4 h-4 text-red-800 border-gray-300 rounded focus:ring-red-700"
-                  />
-                  <Email className="w-5 h-5 text-gray-500" />
-                  <span className="text-sm text-gray-700">
-                    Email Notification
-                  </span>
-                </label>
+                {deliveryMethods.map((method) => (
+                  <label
+                    key={method.value}
+                    className="flex items-center gap-3 cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="delivery_method"
+                      value={method.value}
+                      checked={formData.delivery_method === method.value}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          delivery_method: e.target.value,
+                        }))
+                      }
+                      className="w-4 h-4 text-red-800 border-gray-300 focus:ring-red-700"
+                      disabled={isLoading}
+                    />
+                    {method.icon}
+                    <span className="text-sm text-gray-700">
+                      {method.label}
+                    </span>
+                  </label>
+                ))}
               </div>
             </div>
 
@@ -465,18 +423,32 @@ export default function AnnouncementComposer({
                 type="button"
                 onClick={onClose}
                 className="flex-1 border border-gray-300 text-gray-700 font-medium py-3 px-4 rounded-xl hover:bg-gray-50 transition-colors"
+                disabled={isLoading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={
-                  !formData.title || !formData.message || !formData.targetType
+                  !formData.title ||
+                  !formData.content ||
+                  !formData.announcement_type ||
+                  (needsCourseSelection && !formData.course) ||
+                  isLoading
                 }
                 className="flex-1 bg-red-800 hover:bg-red-900 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
               >
-                <Send className="w-5 h-5" />
-                Send Announcement
+                {isLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" />
+                    Send Announcement
+                  </>
+                )}
               </button>
             </div>
           </form>

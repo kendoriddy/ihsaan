@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import AnnouncementComposer from "./announcement-composer";
 import AnnouncementHistory from "./announcement-history";
 import NotificationCenter from "./notification-center";
@@ -11,68 +12,107 @@ import {
   Notifications,
   NotificationsActive,
 } from "@mui/icons-material";
+import { toast } from "react-toastify";
+import {
+  fetchAnnouncements,
+  createAnnouncement,
+  deleteAnnouncement,
+  fetchCoursesForAnnouncements,
+  clearErrors,
+  resetCreateStatus,
+  resetDeleteStatus,
+} from "@/utils/redux/slices/announcementSlice";
 
 export default function AnnouncementDashboard({ userRole }) {
+  const dispatch = useDispatch();
+  const {
+    announcements,
+    courses,
+    status,
+    createStatus,
+    deleteStatus,
+    coursesStatus,
+    error,
+    createError,
+    deleteError,
+    total_count,
+  } = useSelector((state) => state.announcements);
+
   const [activeTab, setActiveTab] = useState("create");
   const [showComposer, setShowComposer] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // Mock data - replace with actual API calls
-  const mockCourses = [
-    {
-      id: "1",
-      title: "Arabic Grammar Fundamentals",
-      studentCount: 45,
-      ordinaryUserCount: 12,
-    },
-    {
-      id: "2",
-      title: "Tajweed Mastery Course",
-      studentCount: 78,
-      ordinaryUserCount: 23,
-    },
-    {
-      id: "3",
-      title: "Islamic History Overview",
-      studentCount: 32,
-      ordinaryUserCount: 8,
-    },
-  ];
+  // Fetch announcements and courses on component mount
+  useEffect(() => {
+    dispatch(fetchAnnouncements());
+    dispatch(fetchCoursesForAnnouncements());
+  }, [dispatch]);
 
-  const mockAnnouncements = [
-    {
-      id: "1",
-      title: "Assignment Reminder - Arabic Grammar",
-      message:
-        "Don't forget to submit your homework by Friday. The assignment covers chapters 1-3.",
-      type: "reminder",
-      targetType: "students_per_course",
-      courseTitle: "Arabic Grammar Fundamentals",
-      recipientCount: 45,
-      deliveredCount: 45,
-      readCount: 38,
-      createdAt: "2024-01-15T10:30:00Z",
-      hasAttachments: false,
-      canEdit: true,
-      canDelete: true,
-    },
-    {
-      id: "2",
-      title: "New Course Material Available",
-      message:
-        "I've uploaded additional practice exercises for Tajweed. Check the resources section.",
-      type: "informational",
-      targetType: "students_per_course",
-      courseTitle: "Tajweed Mastery Course",
-      recipientCount: 78,
-      deliveredCount: 78,
-      readCount: 65,
-      createdAt: "2024-01-12T14:20:00Z",
-      hasAttachments: true,
-      canEdit: true,
-      canDelete: true,
-    },
-  ];
+  // Handle success/error messages
+  useEffect(() => {
+    if (createStatus === "succeeded") {
+      toast.success("Announcement created successfully!");
+      setShowComposer(false);
+      dispatch(resetCreateStatus());
+    } else if (createStatus === "failed" && createError) {
+      toast.error(createError);
+      dispatch(resetCreateStatus());
+    }
+
+    if (deleteStatus === "succeeded") {
+      toast.success("Announcement deleted successfully!");
+      dispatch(resetDeleteStatus());
+    } else if (deleteStatus === "failed" && deleteError) {
+      toast.error(deleteError);
+      dispatch(resetDeleteStatus());
+    }
+
+    if (status === "failed" && error) {
+      toast.error(error);
+      dispatch(clearErrors());
+    }
+  }, [
+    createStatus,
+    deleteStatus,
+    status,
+    createError,
+    deleteError,
+    error,
+    dispatch,
+  ]);
+
+  const handleSubmitAnnouncement = async (announcementData) => {
+    dispatch(createAnnouncement(announcementData));
+  };
+
+  const handleMarkAsRead = (notificationId) => {
+    console.log("Marking notification as read:", notificationId);
+    // Implement API call
+  };
+
+  const handleMarkAllAsRead = () => {
+    console.log("Marking all notifications as read");
+    // Implement API call
+  };
+
+  const handleDeleteNotification = (notificationId) => {
+    console.log("Deleting notification:", notificationId);
+    // Implement API call
+  };
+
+  const handleEditAnnouncement = (announcementId) => {
+    console.log("Editing announcement:", announcementId);
+    // Implement edit functionality
+  };
+
+  const handleDeleteAnnouncement = async (announcementId) => {
+    dispatch(deleteAnnouncement(announcementId));
+  };
+
+  const handleViewAnnouncement = (announcementId) => {
+    console.log("Viewing announcement:", announcementId);
+    // Implement view functionality
+  };
 
   const mockNotifications = [
     {
@@ -103,41 +143,6 @@ export default function AnnouncementDashboard({ userRole }) {
       announcementId: "2",
     },
   ];
-
-  const handleSubmitAnnouncement = (announcementData) => {
-    console.log("Submitting announcement:", announcementData);
-    // Implement API call to create announcement
-  };
-
-  const handleMarkAsRead = (notificationId) => {
-    console.log("Marking notification as read:", notificationId);
-    // Implement API call
-  };
-
-  const handleMarkAllAsRead = () => {
-    console.log("Marking all notifications as read");
-    // Implement API call
-  };
-
-  const handleDeleteNotification = (notificationId) => {
-    console.log("Deleting notification:", notificationId);
-    // Implement API call
-  };
-
-  const handleEditAnnouncement = (announcementId) => {
-    console.log("Editing announcement:", announcementId);
-    // Implement edit functionality
-  };
-
-  const handleDeleteAnnouncement = (announcementId) => {
-    console.log("Deleting announcement:", announcementId);
-    // Implement delete functionality
-  };
-
-  const handleViewAnnouncement = (announcementId) => {
-    console.log("Viewing announcement:", announcementId);
-    // Implement view functionality
-  };
 
   const unreadNotifications = mockNotifications.filter((n) => !n.isRead).length;
 
@@ -239,7 +244,8 @@ export default function AnnouncementDashboard({ userRole }) {
             {activeTab === "history" && (
               <AnnouncementHistory
                 userRole={userRole}
-                announcements={mockAnnouncements}
+                announcements={announcements}
+                total_count={total_count}
                 onEdit={handleEditAnnouncement}
                 onDelete={handleDeleteAnnouncement}
                 onView={handleViewAnnouncement}
@@ -254,8 +260,9 @@ export default function AnnouncementDashboard({ userRole }) {
         isOpen={showComposer}
         onClose={() => setShowComposer(false)}
         userRole={userRole}
-        userCourses={mockCourses}
+        userCourses={courses}
         onSubmit={handleSubmitAnnouncement}
+        isLoading={createStatus === "loading"}
       />
 
       <NotificationCenter
