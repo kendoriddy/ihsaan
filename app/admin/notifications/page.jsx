@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { usePathname } from "next/navigation";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
 import AdminDashboardHeader from "@/components/AdminDashboardHeader";
@@ -9,14 +8,8 @@ import AnnouncementDashboard from "@/components/notifications/announcement-dashb
 
 function Page() {
   const currentRoute = usePathname();
-
-  const rolesStr = localStorage.getItem("roles");
-  const roles = JSON.parse(rolesStr);
-
-  const [userRole, setUserRole] = useState(roles[0]);
-
+  const [userRole, setUserRole] = useState("admin");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const [openSubMenuIndex, setOpenSubMenuIndex] = useState(null);
 
   const toggleOption = (index) => {
@@ -28,14 +21,25 @@ function Page() {
   };
 
   useEffect(() => {
-    if (roles.includes("ADMIN")) {
-      setUserRole("admin");
-    } else if (roles.includes("TUTOR")) {
-      setUserRole("tutor");
+    // Only access localStorage on the client side
+    if (typeof window !== "undefined") {
+      try {
+        const rolesStr = localStorage.getItem("roles");
+        if (rolesStr) {
+          const roles = JSON.parse(rolesStr);
+          if (roles.includes("ADMIN")) {
+            setUserRole("admin");
+          } else if (roles.includes("TUTOR")) {
+            setUserRole("tutor");
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing roles from localStorage:", error);
+        setUserRole("admin"); // Default to admin
+      }
     }
-  }, [roles]);
+  }, []);
 
-  console.log(userRole, "userRole:::");
   return (
     <div className="relative">
       {/* Header */}
@@ -53,7 +57,7 @@ function Page() {
 
         {/* Right Main Body */}
         <section
-          className=" lg:ml-[250px] w-screen px-2"
+          className="lg:ml-[250px] w-screen px-2"
           style={{
             "@media (min-width: 1024px)": {
               width: "calc(100vw - 250px)",
@@ -61,27 +65,14 @@ function Page() {
           }}
         >
           <div>
-            {/* <div className="p-2 font-bold  bg-white">Notification </div> */}
-
             <div className="w-full h-20 border rounded">
               <div className="min-h-screen bg-gray-50">
-                {/* Role Switcher for Demo */}
+                {/* Header */}
                 <div className="bg-white shadow-sm border-b border-gray-200 p-4">
                   <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <h1 className="text-xl font-bold text-gray-800">
                       IHSAAN Announcement System
                     </h1>
-                    {/* <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-600">Demo as:</span>
-                      <select
-                        value={userRole}
-                        onChange={(e) => setUserRole(e.target.value)}
-                        className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
-                      >
-                        <option value="tutor">Tutor</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                    </div> */}
                   </div>
                 </div>
 

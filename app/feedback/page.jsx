@@ -1,26 +1,30 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
   const router = useRouter();
-
   const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     // Determine user role from localStorage or Redux state
     if (typeof window !== "undefined") {
-      const roles = JSON.parse(localStorage.getItem("roles") || "[]");
+      try {
+        const roles = JSON.parse(localStorage.getItem("roles") || "[]");
 
-      if (roles.includes("ADMIN")) {
-        setUserRole("admin");
-      } else if (roles.includes("TUTOR")) {
-        setUserRole("tutor");
-      } else if (roles.includes("STUDENT")) {
-        setUserRole("student");
-      } else {
-        setUserRole("ordinary");
+        if (roles.includes("ADMIN")) {
+          setUserRole("admin");
+        } else if (roles.includes("TUTOR")) {
+          setUserRole("tutor");
+        } else if (roles.includes("STUDENT")) {
+          setUserRole("student");
+        } else {
+          setUserRole("ordinary");
+        }
+      } catch (error) {
+        console.error("Error parsing roles from localStorage:", error);
+        setUserRole("ordinary"); // Default to ordinary user
       }
     }
   }, []);
