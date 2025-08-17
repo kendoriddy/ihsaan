@@ -196,7 +196,7 @@ export default function StudentCourseAnnouncements({
                               e.stopPropagation();
                               onMarkAsRead(announcement.id);
                             }}
-                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                            className="text-sm text-primary hover:text-blue-800 font-medium"
                           >
                             Mark as read
                           </button>

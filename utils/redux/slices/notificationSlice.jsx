@@ -16,17 +16,64 @@ export const fetchUserNotifications = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch recent notifications
+export const fetchRecentNotifications = createAsyncThunk(
+  "notifications/fetchRecentNotifications",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await http2.get(
+        "/in-app-notification/notifications/recent/"
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch recent notifications"
+      );
+    }
+  }
+);
+
+// Async thunk to fetch unread count
+export const fetchUnreadCount = createAsyncThunk(
+  "notifications/fetchUnreadCount",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await http2.get(
+        "/in-app-notification/notifications/unread_count/"
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch unread count"
+      );
+    }
+  }
+);
+
+// Async thunk to fetch single notification by ID
+export const fetchNotificationById = createAsyncThunk(
+  "notifications/fetchNotificationById",
+  async (notificationId, { rejectWithValue }) => {
+    try {
+      const response = await http2.get(
+        `/in-app-notification/notifications/${notificationId}/`
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch notification details"
+      );
+    }
+  }
+);
+
 // Async thunk to mark notification as read
 export const markNotificationAsRead = createAsyncThunk(
   "notifications/markNotificationAsRead",
   async (notification, { rejectWithValue }) => {
     try {
       const payload = {
-        title: notification.title || notification.message,
-        message: notification.content || notification.message,
-        notification_type: notification.notification_type || "ANNOUNCEMENT",
-        is_read: true,
-        action_url: notification.action_url || "",
+        notification_ids: [notification.id],
       };
 
       const response = await http2.post(
@@ -50,21 +97,13 @@ export const markAllNotificationsAsRead = createAsyncThunk(
       const state = getState();
       const notifications = state.notifications.notifications;
 
-      // Use the first notification as template for the payload
-      const templateNotification = notifications[0] || {
-        title: "All Notifications",
-        message: "All notifications marked as read",
-        notification_type: "ANNOUNCEMENT",
-        action_url: "",
-      };
+      // Get all unread notification IDs
+      const unreadNotificationIds = notifications
+        .filter((notification) => !notification.is_read)
+        .map((notification) => notification.id);
 
       const payload = {
-        title: templateNotification.title || templateNotification.message,
-        message: templateNotification.content || templateNotification.message,
-        notification_type:
-          templateNotification.notification_type || "ANNOUNCEMENT",
-        is_read: true,
-        action_url: templateNotification.action_url || "",
+        notification_ids: unreadNotificationIds,
       };
 
       const response = await http2.post(
@@ -102,12 +141,21 @@ const notificationSlice = createSlice({
   name: "notifications",
   initialState: {
     notifications: [],
+    recentNotifications: [],
+    unreadCount: 0,
+    selectedNotification: null,
     total_count: 0,
     status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+    recentStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+    unreadCountStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+    fetchDetailStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     markReadStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     markAllReadStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     deleteStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
+    recentError: null,
+    unreadCountError: null,
+    fetchDetailError: null,
     markReadError: null,
     markAllReadError: null,
     deleteError: null,
@@ -115,9 +163,24 @@ const notificationSlice = createSlice({
   reducers: {
     clearErrors: (state) => {
       state.error = null;
+      state.recentError = null;
+      state.unreadCountError = null;
+      state.fetchDetailError = null;
       state.markReadError = null;
       state.markAllReadError = null;
       state.deleteError = null;
+    },
+    resetRecentStatus: (state) => {
+      state.recentStatus = "idle";
+      state.recentError = null;
+    },
+    resetUnreadCountStatus: (state) => {
+      state.unreadCountStatus = "idle";
+      state.unreadCountError = null;
+    },
+    resetFetchDetailStatus: (state) => {
+      state.fetchDetailStatus = "idle";
+      state.fetchDetailError = null;
     },
     resetMarkReadStatus: (state) => {
       state.markReadStatus = "idle";
@@ -130,6 +193,9 @@ const notificationSlice = createSlice({
     resetDeleteStatus: (state) => {
       state.deleteStatus = "idle";
       state.deleteError = null;
+    },
+    clearSelectedNotification: (state) => {
+      state.selectedNotification = null;
     },
   },
   extraReducers: (builder) => {
@@ -149,6 +215,52 @@ const notificationSlice = createSlice({
         state.status = "failed";
         state.error = action.payload || "Failed to fetch notifications";
       })
+      // Fetch recent notifications
+      .addCase(fetchRecentNotifications.pending, (state) => {
+        state.recentStatus = "loading";
+        state.recentError = null;
+      })
+      .addCase(fetchRecentNotifications.fulfilled, (state, action) => {
+        state.recentStatus = "succeeded";
+        state.recentNotifications = action.payload.results || action.payload;
+        state.recentError = null;
+      })
+      .addCase(fetchRecentNotifications.rejected, (state, action) => {
+        state.recentStatus = "failed";
+        state.recentError =
+          action.payload || "Failed to fetch recent notifications";
+      })
+      // Fetch unread count
+      .addCase(fetchUnreadCount.pending, (state) => {
+        state.unreadCountStatus = "loading";
+        state.unreadCountError = null;
+      })
+      .addCase(fetchUnreadCount.fulfilled, (state, action) => {
+        state.unreadCountStatus = "succeeded";
+        state.unreadCount =
+          action.payload.count || action.payload.unread_count || 0;
+        state.unreadCountError = null;
+      })
+      .addCase(fetchUnreadCount.rejected, (state, action) => {
+        state.unreadCountStatus = "failed";
+        state.unreadCountError =
+          action.payload || "Failed to fetch unread count";
+      })
+      // Fetch notification by ID
+      .addCase(fetchNotificationById.pending, (state) => {
+        state.fetchDetailStatus = "loading";
+        state.fetchDetailError = null;
+      })
+      .addCase(fetchNotificationById.fulfilled, (state, action) => {
+        state.fetchDetailStatus = "succeeded";
+        state.selectedNotification = action.payload;
+        state.fetchDetailError = null;
+      })
+      .addCase(fetchNotificationById.rejected, (state, action) => {
+        state.fetchDetailStatus = "failed";
+        state.fetchDetailError =
+          action.payload || "Failed to fetch notification details";
+      })
       // Mark notification as read
       .addCase(markNotificationAsRead.pending, (state) => {
         state.markReadStatus = "loading";
@@ -162,6 +274,17 @@ const notificationSlice = createSlice({
         );
         if (notification) {
           notification.is_read = true;
+        }
+        // Also update in recent notifications if it exists there
+        const recentNotification = state.recentNotifications.find(
+          (n) => n.id === action.payload.id
+        );
+        if (recentNotification) {
+          recentNotification.is_read = true;
+        }
+        // Decrease unread count
+        if (state.unreadCount > 0) {
+          state.unreadCount -= 1;
         }
         state.markReadError = null;
       })
@@ -181,6 +304,11 @@ const notificationSlice = createSlice({
         state.notifications.forEach((notification) => {
           notification.is_read = true;
         });
+        state.recentNotifications.forEach((notification) => {
+          notification.is_read = true;
+        });
+        // Reset unread count
+        state.unreadCount = 0;
         state.markAllReadError = null;
       })
       .addCase(markAllNotificationsAsRead.rejected, (state, action) => {
@@ -199,6 +327,9 @@ const notificationSlice = createSlice({
         state.notifications = state.notifications.filter(
           (notification) => notification.id !== action.payload
         );
+        state.recentNotifications = state.recentNotifications.filter(
+          (notification) => notification.id !== action.payload
+        );
         state.deleteError = null;
       })
       .addCase(deleteNotification.rejected, (state, action) => {
@@ -210,9 +341,13 @@ const notificationSlice = createSlice({
 
 export const {
   clearErrors,
+  resetRecentStatus,
+  resetUnreadCountStatus,
+  resetFetchDetailStatus,
   resetMarkReadStatus,
   resetMarkAllReadStatus,
   resetDeleteStatus,
+  clearSelectedNotification,
 } = notificationSlice.actions;
 
 export default notificationSlice.reducer;

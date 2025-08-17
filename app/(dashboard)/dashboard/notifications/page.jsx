@@ -9,6 +9,8 @@ import StudentNotificationPage from "@/components/notifications/student-notifica
 import { toast } from "react-toastify";
 import {
   fetchUserNotifications,
+  fetchRecentNotifications,
+  fetchUnreadCount,
   markNotificationAsRead,
   markAllNotificationsAsRead,
   deleteNotification,
@@ -35,9 +37,11 @@ function Page() {
 
   const currentRoute = usePathname();
 
-  // Fetch notifications on component mount
+  // Fetch notifications, recent notifications, and unread count on component mount
   useEffect(() => {
     dispatch(fetchUserNotifications());
+    dispatch(fetchRecentNotifications());
+    dispatch(fetchUnreadCount());
   }, [dispatch]);
 
   // Handle success/error messages
@@ -136,7 +140,7 @@ function Page() {
           <div className="">
             {/* Header */}
             <div className="bg-white shadow-sm border-b border-gray-200">
-              <div className="max-w-7xl mx-auto px-4 py-4">
+              <div className="max-w-6xl mx-auto px-4 py-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <h1 className="text-xl font-bold text-gray-800">
@@ -153,7 +157,7 @@ function Page() {
             {/* Content */}
             <div className="py-8">
               {status === "loading" ? (
-                <div className="max-w-4xl mx-auto px-4 py-8">
+                <div className="max-w-6xl mx-auto px-4 py-8">
                   <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
                     <div className="w-20 h-20 bg-gradient-to-br from-red-800 to-red-900 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                       <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Notifications,
   Campaign,
@@ -13,7 +14,22 @@ import {
   FilterList,
   Settings,
   OpenInNew,
+  Close,
+  CalendarToday,
+  AccessTime,
+  CheckCircle,
+  Refresh,
 } from "@mui/icons-material";
+import { toast } from "react-toastify";
+import {
+  fetchNotificationById,
+  fetchRecentNotifications,
+  fetchUnreadCount,
+  clearSelectedNotification,
+  resetFetchDetailStatus,
+  resetRecentStatus,
+  resetUnreadCountStatus,
+} from "@/utils/redux/slices/notificationSlice";
 
 export default function StudentNotificationPage({
   notifications,
@@ -22,9 +38,51 @@ export default function StudentNotificationPage({
   onDelete,
   onNavigateToCourse,
 }) {
+  const dispatch = useDispatch();
+  const {
+    selectedNotification,
+    fetchDetailStatus,
+    fetchDetailError,
+    recentNotifications,
+    recentStatus,
+    recentError,
+    unreadCount: apiUnreadCount,
+    unreadCountStatus,
+    unreadCountError,
+  } = useSelector((state) => state.notifications);
+
   const [filter, setFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [viewMode, setViewMode] = useState("all"); // 'all' | 'recent'
+
+  // Fetch recent notifications and unread count on component mount
+  useEffect(() => {
+    dispatch(fetchRecentNotifications());
+    dispatch(fetchUnreadCount());
+  }, [dispatch]);
+
+  // Handle success/error messages for notification detail fetch
+  useEffect(() => {
+    if (fetchDetailStatus === "failed" && fetchDetailError) {
+      toast.error(fetchDetailError);
+      dispatch(resetFetchDetailStatus());
+    }
+  }, [fetchDetailStatus, fetchDetailError, dispatch]);
+
+  // Handle success/error messages for recent notifications
+  useEffect(() => {
+    if (recentStatus === "failed" && recentError) {
+      toast.error(recentError);
+      dispatch(resetRecentStatus());
+    }
+  }, [recentStatus, recentError, dispatch]);
+
+  // Handle success/error messages for unread count
+  useEffect(() => {
+    if (unreadCountStatus === "failed" && unreadCountError) {
+      toast.error(unreadCountError);
+      dispatch(resetUnreadCountStatus());
+    }
+  }, [unreadCountStatus, unreadCountError, dispatch]);
 
   const getTypeColor = (type) => {
     switch (type) {
@@ -78,29 +136,38 @@ export default function StudentNotificationPage({
     }
   };
 
-  const filteredNotifications = notifications.filter((notification) => {
-    const matchesReadFilter =
-      filter === "all" ||
-      (filter === "unread" && !notification.isRead) ||
-      (filter === "read" && notification.isRead);
+  // Determine which notifications to show based on view mode
+  const displayNotifications =
+    viewMode === "recent" ? recentNotifications : notifications;
 
-    const matchesTypeFilter =
-      typeFilter === "all" || notification.type === typeFilter;
-
-    return matchesReadFilter && matchesTypeFilter;
+  // Filter notifications based on read status
+  const filteredNotifications = displayNotifications.filter((notification) => {
+    if (filter === "all") return true;
+    if (filter === "unread") return !notification.isRead;
+    if (filter === "read") return notification.isRead;
+    return true;
   });
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  // Use API unread count if available, otherwise fallback to local calculation
+  const unreadCount =
+    apiUnreadCount || notifications.filter((n) => !n.isRead).length;
 
   const handleNotificationClick = (notification) => {
-    if (!notification.isRead) {
-      onMarkAsRead(notification.id);
-    }
-    setSelectedNotification(notification);
+    // Fetch notification details from API
+    dispatch(fetchNotificationById(notification.id));
+  };
+
+  const handleCloseModal = () => {
+    dispatch(clearSelectedNotification());
+  };
+
+  const handleRefreshRecent = () => {
+    dispatch(fetchRecentNotifications());
+    dispatch(fetchUnreadCount());
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
@@ -124,6 +191,13 @@ export default function StudentNotificationPage({
                 Mark All Read
               </button>
             )}
+            <button
+              onClick={handleRefreshRecent}
+              className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Refresh recent notifications"
+            >
+              <Refresh className="w-5 h-5" />
+            </button>
             <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
               <Settings className="w-5 h-5" />
             </button>
@@ -190,40 +264,69 @@ export default function StudentNotificationPage({
         </div>
       </div>
 
-      {/* Filters */}
+      {/* View Mode Toggle and Filters */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 mb-6">
         <div className="p-6 border-b border-gray-200">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            {/* View Mode Toggle */}
             <div className="flex items-center gap-2">
-              <FilterList className="w-5 h-5 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">
-                Filter by:
-              </span>
+              <span className="text-sm font-medium text-gray-700">View:</span>
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode("all")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                    viewMode === "all"
+                      ? "bg-white text-gray-800 shadow-sm"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
+                >
+                  All Notifications
+                </button>
+                <button
+                  onClick={() => setViewMode("recent")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                    viewMode === "recent"
+                      ? "bg-white text-gray-800 shadow-sm"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
+                >
+                  Recent Only
+                </button>
+              </div>
             </div>
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
-            >
-              <option value="all">All Notifications</option>
-              <option value="unread">Unread Only</option>
-              <option value="read">Read Only</option>
-            </select>
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
-            >
-              <option value="all">All Types</option>
-              <option value="informational">Informational</option>
-              <option value="alert">Alerts</option>
-              <option value="reminder">Reminders</option>
-              <option value="promotional">Promotional</option>
-            </select>
-            <span className="text-sm text-gray-600 ml-auto">
-              Showing {filteredNotifications.length} of {notifications.length}{" "}
-              notifications
-            </span>
+
+            {/* Filters */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <FilterList className="w-5 h-5 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  Filter:
+                </span>
+              </div>
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
+              >
+                <option value="all">All</option>
+                <option value="unread">Unread Only</option>
+                <option value="read">Read Only</option>
+              </select>
+            </div>
+
+            {/* Status Info */}
+            <div className="text-sm text-gray-600">
+              {viewMode === "recent" ? (
+                <span>
+                  Showing {filteredNotifications.length} recent notifications
+                </span>
+              ) : (
+                <span>
+                  Showing {filteredNotifications.length} of{" "}
+                  {notifications.length} notifications
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -239,7 +342,12 @@ export default function StudentNotificationPage({
                 {filter === "unread" &&
                   "You're all caught up! No unread notifications."}
                 {filter === "read" && "No read notifications found."}
-                {filter === "all" && "No notifications available."}
+                {filter === "all" &&
+                  viewMode === "recent" &&
+                  "No recent notifications available."}
+                {filter === "all" &&
+                  viewMode === "all" &&
+                  "No notifications available."}
               </p>
             </div>
           ) : (
@@ -337,7 +445,7 @@ export default function StudentNotificationPage({
                                 e.stopPropagation();
                                 onMarkAsRead(notification.id);
                               }}
-                              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                              className="text-sm text-primary hover:text-blue-800 font-medium"
                             >
                               Mark as read
                             </button>
@@ -348,7 +456,7 @@ export default function StudentNotificationPage({
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 ml-4">
+                  {/* <div className="flex items-center gap-2 ml-4">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -359,7 +467,7 @@ export default function StudentNotificationPage({
                     >
                       <Delete className="w-4 h-4" />
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             ))
@@ -370,83 +478,115 @@ export default function StudentNotificationPage({
       {/* Notification Detail Modal */}
       {selectedNotification && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                    {selectedNotification.senderRole === "admin" ? (
-                      <Public className="w-6 h-6 text-gray-600" />
-                    ) : (
-                      <Person className="w-6 h-6 text-gray-600" />
-                    )}
+                  <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                    <Notifications className="w-6 h-6 text-red-800" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-800">
-                      {selectedNotification.title}
+                    <h2 className="text-2xl font-bold text-gray-800">
+                      Notification Details
                     </h2>
                     <p className="text-gray-600 text-sm">
-                      From {selectedNotification.senderName} (
-                      {selectedNotification.senderRole})
+                      View complete notification information
                     </p>
                   </div>
                 </div>
                 <button
-                  onClick={() => setSelectedNotification(null)}
+                  onClick={handleCloseModal}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <Delete className="w-6 h-6 text-gray-500" />
+                  <Close className="w-6 h-6 text-gray-500" />
                 </button>
               </div>
             </div>
 
             {/* Content */}
-            <div className="p-6">
-              {selectedNotification.courseTitle && (
-                <div className="flex items-center gap-2 mb-4 p-3 bg-blue-50 rounded-lg">
-                  <School className="w-5 h-5 text-blue-600" />
-                  <span className="text-blue-800 font-medium">
-                    {selectedNotification.courseTitle}
-                  </span>
-                  <button
-                    onClick={() => {
-                      if (selectedNotification.courseId) {
-                        onNavigateToCourse(selectedNotification.courseId);
-                        setSelectedNotification(null);
-                      }
-                    }}
-                    className="ml-auto text-blue-600 hover:text-blue-800 text-sm font-medium"
-                  >
-                    Go to Course
-                  </button>
-                </div>
-              )}
-
-              <div className="prose max-w-none">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {selectedNotification.message}
-                </p>
-              </div>
-
-              {selectedNotification.hasAttachment && (
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AttachFile className="w-5 h-5 text-gray-600" />
-                    <span className="font-medium text-gray-800">
-                      Attachments
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    This announcement includes attachments. View the full
-                    announcement to access them.
+            <div className="max-h-[calc(90vh-120px)] overflow-y-auto">
+              {fetchDetailStatus === "loading" ? (
+                <div className="p-12 text-center">
+                  <div className="w-16 h-16 border-4 border-red-200 border-t-red-800 rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-gray-600">
+                    Loading notification details...
                   </p>
                 </div>
-              )}
+              ) : (
+                <div className="p-6 space-y-6">
+                  {/* Notification Type Badge */}
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`px-3 py-1 text-sm font-medium rounded-full ${getTypeColor(
+                        selectedNotification.notification_type?.toLowerCase()
+                      )}`}
+                    >
+                      {selectedNotification.notification_type_display ||
+                        selectedNotification.notification_type}
+                    </span>
+                    {selectedNotification.is_read && (
+                      <div className="flex items-center gap-2 text-green-600">
+                        <CheckCircle className="w-4 h-4" />
+                        <span className="text-sm font-medium">Read</span>
+                      </div>
+                    )}
+                  </div>
 
-              <div className="mt-6 pt-4 border-t border-gray-200 text-sm text-gray-500">
-                Sent {formatDate(selectedNotification.createdAt)}
-              </div>
+                  {/* Title */}
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                      {selectedNotification.title}
+                    </h3>
+                  </div>
+
+                  {/* Message */}
+                  <div>
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {selectedNotification.message}
+                    </p>
+                  </div>
+
+                  {/* Timestamps */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <CalendarToday className="w-5 h-5 text-gray-500" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">
+                          Created
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {formatDate(selectedNotification.created_at)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {selectedNotification.read_at && (
+                      <div className="flex items-center gap-3">
+                        <AccessTime className="w-5 h-5 text-gray-500" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">
+                            Read At
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {formatDate(selectedNotification.read_at)}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Time Since Created */}
+                  {selectedNotification.time_since_created && (
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Time since created:</span>{" "}
+                        {selectedNotification.time_since_created}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

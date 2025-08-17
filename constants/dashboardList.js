@@ -14,6 +14,7 @@ import {
   AssignmentInd,
   BookSharp,
   LocalActivity,
+  LocalActivityTwoTone,
 } from "@mui/icons-material";
 import GradingOutlined from "@mui/icons-material/GradingOutlined";
 import { TbActivity } from "react-icons/tb";
@@ -37,13 +38,13 @@ const DASHBOARD_LIST = {
     {
       id: 4,
       name: "Activities",
-      icon: TbActivity,
+      icon: LocalActivityTwoTone,
       path: "/activities",
     },
     {
       id: 21,
       name: "Notifications and Announcements",
-      icon: TbActivity,
+      icon: LocalActivity,
       path: "/dashboard/notifications",
     },
     {
