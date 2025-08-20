@@ -23,6 +23,40 @@ import { convertDurationToSeconds } from "@/utils/utilFunctions";
 import AdminDashboardHeader from "@/components/AdminDashboardHeader";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
 
+// Utility function to extract error messages from API responses
+const extractErrorMessage = (error, defaultMessage = "An error occurred") => {
+  let errorMessage = defaultMessage;
+
+  if (error.response?.data) {
+    const errorData = error.response.data;
+
+    // Handle different error response structures
+    if (errorData.file && Array.isArray(errorData.file)) {
+      // File validation errors (like size limit)
+      errorMessage = errorData.file[0];
+    } else if (errorData.message) {
+      // General message
+      errorMessage = errorData.message;
+    } else if (errorData.detail) {
+      // Detail field
+      errorMessage = errorData.detail;
+    } else if (typeof errorData === "string") {
+      // Direct string error
+      errorMessage = errorData;
+    } else if (typeof errorData === "object") {
+      // Try to find any error message in the object
+      const firstError = Object.values(errorData).find(
+        (val) => Array.isArray(val) && val.length > 0
+      );
+      if (firstError && Array.isArray(firstError)) {
+        errorMessage = firstError[0];
+      }
+    }
+  }
+
+  return errorMessage;
+};
+
 function EditCoursePage() {
   const dispatch = useDispatch();
   const pathname = usePathname();
@@ -357,7 +391,8 @@ function EditCoursePage() {
       setVideoFile(null);
       fetchCourseSections();
     } catch (error) {
-      toast.error("Failed to add video");
+      console.log("error here", error);
+      toast.error(extractErrorMessage(error, "Failed to add video"));
     } finally {
       setVideoUploadLoading(false);
     }
@@ -388,7 +423,7 @@ function EditCoursePage() {
       setImageUploadSuccessful(true);
       return { media_url: response.data.media_url, id: response.data.id };
     } catch (error) {
-      toast.error("Failed to upload image");
+      toast.error(extractErrorMessage(error, "Failed to upload image"));
       throw error;
     } finally {
       setImageUploadLoading(false);
@@ -407,7 +442,7 @@ function EditCoursePage() {
         setPreviewImage(media_url);
         URL.revokeObjectURL(preview);
       } catch (error) {
-        toast.error("Image upload failed");
+        toast.error(extractErrorMessage(error, "Image upload failed"));
       }
     }
   };
