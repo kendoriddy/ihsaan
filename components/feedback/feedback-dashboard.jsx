@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Feedback as FeedbackIcon,
   Send,
@@ -14,57 +15,54 @@ import {
   Reply,
   FilterList,
   Add,
+  Refresh,
 } from "@mui/icons-material";
+import {
+  fetchFeedbacks,
+  deleteFeedback,
+} from "@/utils/redux/slices/feedbackSlice";
 
-export default function FeedbackDashboard({ userRole, onCreateFeedback }) {
+export default function FeedbackDashboard({
+  userRole,
+  onCreateFeedback,
+  status,
+  error,
+}) {
   const [activeTab, setActiveTab] = useState("sent");
   const [filterType, setFilterType] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
 
-  // Mock data - replace with actual API calls
-  const mockFeedbackSent = [
-    {
-      id: "1",
-      senderName: "You",
-      receiverName: "Ahmad Hassan",
-      entityType: "tutor",
-      entityId: "tutor-123",
-      content:
-        "Excellent teacher! Very patient and knowledgeable. My Tajweed has improved significantly.",
-      rating: 5,
-      createdAt: "2024-01-15T10:30:00Z",
-      canEdit: true,
-      canDelete: true,
-    },
-    {
-      id: "2",
-      senderName: "You",
-      entityType: "course",
-      entityId: "course-456",
-      content: "Great course content but could use more interactive exercises.",
-      rating: 4,
-      createdAt: "2024-01-10T14:20:00Z",
-      canEdit: true,
-      canDelete: true,
-    },
-  ];
+  const dispatch = useDispatch();
+  const { feedbacks, total_count, next, previous } = useSelector(
+    (state) => state.feedback
+  );
 
-  const mockFeedbackReceived = [
-    {
-      id: "3",
-      senderName: "Sarah Ahmed",
-      receiverName: "You",
-      entityType: "tutor",
-      entityId: "you",
-      content:
-        "Thank you for the excellent lessons. Your teaching style is very clear and easy to follow.",
-      rating: 5,
-      createdAt: "2024-01-12T09:15:00Z",
-      canEdit: false,
-      canDelete: false,
-    },
-  ];
+  useEffect(() => {
+    // Fetch feedbacks when filters change
+    const filters = {
+      page: currentPage,
+      page_size: pageSize,
+      ...(filterType !== "all" && { subject: filterType }),
+    };
 
-  const mockAllFeedback = [...mockFeedbackSent, ...mockFeedbackReceived];
+    dispatch(fetchFeedbacks(filters));
+  }, [dispatch, filterType, currentPage, pageSize]);
+
+  const handleDeleteFeedback = (feedbackId) => {
+    if (window.confirm("Are you sure you want to delete this feedback?")) {
+      dispatch(deleteFeedback(feedbackId));
+    }
+  };
+
+  const handleRefresh = () => {
+    const filters = {
+      page: currentPage,
+      page_size: pageSize,
+      ...(filterType !== "all" && { subject: filterType }),
+    };
+    dispatch(fetchFeedbacks(filters));
+  };
 
   const getEntityIcon = (entityType) => {
     switch (entityType) {
@@ -72,11 +70,13 @@ export default function FeedbackDashboard({ userRole, onCreateFeedback }) {
         return <MenuBook className="w-4 h-4" />;
       case "tutor":
         return <Person className="w-4 h-4" />;
-      case "student":
-        return <Person className="w-4 h-4" />;
+      case "book":
+        return <AttachFile className="w-4 h-4" />;
       case "platform":
         return <Public className="w-4 h-4" />;
-      case "resource":
+      case "payment":
+        return <AttachFile className="w-4 h-4" />;
+      case "other":
         return <AttachFile className="w-4 h-4" />;
       default:
         return <FeedbackIcon className="w-4 h-4" />;
@@ -103,23 +103,58 @@ export default function FeedbackDashboard({ userRole, onCreateFeedback }) {
     });
   };
 
-  const getFeedbackData = () => {
-    switch (activeTab) {
-      case "sent":
-        return mockFeedbackSent;
-      case "received":
-        return mockFeedbackReceived;
-      case "all":
-        return mockAllFeedback;
-      default:
-        return [];
+  // Helper function to properly display subject detail
+  const getSubjectDetailDisplay = (subjectDetail, subject) => {
+    // If subjectDetail is a string, return it
+    if (typeof subjectDetail === "string") {
+      return subjectDetail;
     }
+
+    // If subjectDetail is an object, extract the appropriate display value
+    if (typeof subjectDetail === "object" && subjectDetail !== null) {
+      switch (subject) {
+        case "course":
+          return (
+            subjectDetail.title ||
+            subjectDetail.name ||
+            `Course ${subjectDetail.id || ""}`
+          );
+        case "tutor":
+          return subjectDetail.first_name && subjectDetail.last_name
+            ? `${subjectDetail.first_name} ${subjectDetail.last_name}`
+            : subjectDetail.name || `Tutor ${subjectDetail.id || ""}`;
+        case "book":
+          return (
+            subjectDetail.title ||
+            subjectDetail.name ||
+            `Book ${subjectDetail.id || ""}`
+          );
+        default:
+          return subjectDetail.title || subjectDetail.name || subject;
+      }
+    }
+
+    // Fallback to subject if subjectDetail is null or undefined
+    return subject;
   };
 
-  const filteredFeedback = getFeedbackData().filter((feedback) => {
-    if (filterType === "all") return true;
-    return feedback.entityType === filterType;
-  });
+  const getFeedbackData = () => {
+    if (!feedbacks || feedbacks.length === 0) return [];
+
+    // Debug: Log the feedback data structure
+    console.log("Feedback data:", feedbacks);
+    if (feedbacks.length > 0) {
+      console.log("First feedback item:", feedbacks[0]);
+      console.log("Subject detail type:", typeof feedbacks[0].subject_detail);
+      console.log("Subject detail value:", feedbacks[0].subject_detail);
+    }
+
+    // For now, we'll show all feedbacks since the API doesn't distinguish between sent/received
+    // In a real implementation, you might want to filter based on user ID
+    return feedbacks;
+  };
+
+  const filteredFeedback = getFeedbackData();
 
   const tabs = [
     {
@@ -180,30 +215,60 @@ export default function FeedbackDashboard({ userRole, onCreateFeedback }) {
 
         {/* Filters */}
         <div className="p-4 bg-gray-50 border-b border-gray-200">
-          <div className="flex items-center gap-4">
-            <FilterList className="w-5 h-5 text-gray-500" />
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <FilterList className="w-5 h-5 text-gray-500" />
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
+              >
+                <option value="all">All Types</option>
+                <option value="course">Courses</option>
+                <option value="tutor">Tutors</option>
+                <option value="book">Books</option>
+                <option value="platform">Platform</option>
+                <option value="payment">Payment</option>
+                <option value="other">Other</option>
+              </select>
+              <span className="text-sm text-gray-600">
+                Showing {filteredFeedback.length} of {total_count} feedback
+                {total_count !== 1 ? "s" : ""}
+              </span>
+            </div>
+            <button
+              onClick={handleRefresh}
+              disabled={status === "loading"}
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+              title="Refresh"
             >
-              <option value="all">All Types</option>
-              <option value="course">Courses</option>
-              <option value="tutor">Tutors</option>
-              <option value="student">Students</option>
-              <option value="platform">Platform</option>
-              <option value="resource">Resources</option>
-            </select>
-            <span className="text-sm text-gray-600">
-              Showing {filteredFeedback.length} feedback
-              {filteredFeedback.length !== 1 ? "s" : ""}
-            </span>
+              <Refresh className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
         {/* Feedback List */}
         <div className="divide-y divide-gray-200">
-          {filteredFeedback.length === 0 ? (
+          {status === "loading" ? (
+            <div className="p-12 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-800 mx-auto mb-4"></div>
+              <p className="text-gray-500">Loading feedbacks...</p>
+            </div>
+          ) : error ? (
+            <div className="p-12 text-center">
+              <FeedbackIcon className="w-16 h-16 text-red-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-red-800 mb-2">
+                Error loading feedbacks
+              </h3>
+              <p className="text-red-500 mb-4">{error}</p>
+              <button
+                onClick={handleRefresh}
+                className="px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-900 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : filteredFeedback.length === 0 ? (
             <div className="p-12 text-center">
               <FeedbackIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-800 mb-2">
@@ -225,23 +290,30 @@ export default function FeedbackDashboard({ userRole, onCreateFeedback }) {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                      {getEntityIcon(feedback.entityType)}
+                      {getEntityIcon(feedback.subject)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-medium text-gray-800">
-                          {activeTab === "sent"
-                            ? `To: ${
-                                feedback.receiverName || feedback.entityId
-                              }`
-                            : `From: ${feedback.senderName}`}
+                          {getSubjectDetailDisplay(
+                            feedback.subject_detail,
+                            feedback.subject
+                          )}
                         </span>
                         <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full capitalize">
-                          {feedback.entityType}
+                          {feedback.subject}
                         </span>
+                        {feedback.is_resolved && (
+                          <span className="px-2 py-1 bg-green-100 text-green-600 text-xs rounded-full">
+                            Resolved
+                          </span>
+                        )}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {formatDate(feedback.createdAt)}
+                        {formatDate(feedback.created_at)}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        From: {feedback.email}
                       </div>
                     </div>
                   </div>
@@ -252,47 +324,81 @@ export default function FeedbackDashboard({ userRole, onCreateFeedback }) {
                         {renderStars(feedback.rating)}
                       </div>
                     )}
-                    {feedback.canEdit && (
-                      <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                    )}
-                    {feedback.canDelete && (
-                      <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                        <Delete className="w-4 h-4" />
-                      </button>
-                    )}
-                    {activeTab === "received" && (
-                      <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                        <Reply className="w-4 h-4" />
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleDeleteFeedback(feedback.id)}
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete feedback"
+                    >
+                      <Delete className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
 
                 <div className="bg-gray-50 rounded-xl p-4">
                   <p className="text-gray-700 leading-relaxed">
-                    {feedback.content}
+                    {typeof feedback.message === "string"
+                      ? feedback.message
+                      : "No message provided"}
                   </p>
                 </div>
 
-                {feedback.attachment && (
+                {feedback.resource_detail && (
                   <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
                     <AttachFile className="w-4 h-4" />
-                    <span>Attachment: {feedback.attachment}</span>
+                    <span>
+                      Attachment:{" "}
+                      {typeof feedback.resource_detail === "object"
+                        ? feedback.resource_detail.title || "Attachment"
+                        : feedback.resource_detail}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      (
+                      {typeof feedback.resource_detail === "object"
+                        ? feedback.resource_detail.type || "Unknown"
+                        : "File"}
+                      )
+                    </span>
                   </div>
                 )}
 
-                {feedback.updatedAt &&
-                  feedback.updatedAt !== feedback.createdAt && (
-                    <div className="mt-2 text-xs text-gray-500">
-                      Last edited: {formatDate(feedback.updatedAt)}
-                    </div>
-                  )}
+                {feedback.country && (
+                  <div className="mt-2 text-xs text-gray-500">
+                    Country: {feedback.country}
+                  </div>
+                )}
               </div>
             ))
           )}
         </div>
+
+        {/* Pagination */}
+        {total_count > pageSize && (
+          <div className="p-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Page {currentPage} of {Math.ceil(total_count / pageSize)}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(1, prev - 1))
+                  }
+                  disabled={!previous || status === "loading"}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                  disabled={!next || status === "loading"}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

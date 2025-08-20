@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Campaign,
   People,
@@ -26,24 +26,6 @@ export default function AnnouncementHistory({
   const [filter, setFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-
-  // Map API data structure to component expectations
-  const mappedAnnouncements = announcements?.map((announcement) => ({
-    id: announcement.id,
-    title: announcement.title,
-    message: announcement.content,
-    type: announcement.announcement_class?.toLowerCase(),
-    targetType: announcement.announcement_type?.toLowerCase(),
-    courseTitle: announcement.course_title,
-    recipientCount: announcement.recipient_count || 0,
-    deliveredCount: announcement.delivered_count || 0,
-    readCount: announcement.read_count || 0,
-    createdAt: announcement.created_at,
-    hasAttachments: announcement.has_attachments || false,
-    canEdit: announcement.can_edit !== false,
-    canDelete: announcement.can_delete !== false,
-    expiresAt: announcement.expires_at,
-  }));
 
   const getTypeColor = (type) => {
     switch (type) {
@@ -102,6 +84,7 @@ export default function AnnouncementHistory({
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "Not specified";
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -117,21 +100,22 @@ export default function AnnouncementHistory({
   };
 
   const getReadRate = (announcement) => {
-    if (announcement.deliveredCount === 0) return 0;
+    if (!announcement.in_app_sent || announcement.in_app_sent === 0) return 0;
     return Math.round(
-      (announcement.readCount / announcement.deliveredCount) * 100
+      (announcement.total_read / announcement.in_app_sent) * 100
     );
   };
 
-  const filteredAnnouncements = mappedAnnouncements
+  const filteredAnnouncements = announcements
     .filter((announcement) => {
       const matchesFilter =
         filter === "all" ||
-        (filter === "active" && !isExpired(announcement.expiresAt)) ||
-        (filter === "expired" && isExpired(announcement.expiresAt));
+        (filter === "active" && !isExpired(announcement.expires_at)) ||
+        (filter === "expired" && isExpired(announcement.expires_at));
 
       const matchesType =
-        typeFilter === "all" || announcement.type === typeFilter;
+        typeFilter === "all" ||
+        announcement.announcement_class?.toLowerCase() === typeFilter;
 
       return matchesFilter && matchesType;
     })
@@ -139,14 +123,14 @@ export default function AnnouncementHistory({
       switch (sortBy) {
         case "newest":
           return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
         case "oldest":
           return (
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
           );
         case "most_recipients":
-          return b.recipientCount - a.recipientCount;
+          return (b.total_recipients || 0) - (a.total_recipients || 0);
         case "highest_read_rate":
           return getReadRate(b) - getReadRate(a);
         default:
@@ -154,6 +138,7 @@ export default function AnnouncementHistory({
       }
     });
 
+  console.log(filteredAnnouncements, "filteredAnnouncements!!!");
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
@@ -187,8 +172,8 @@ export default function AnnouncementHistory({
             </div>
             <div>
               <div className="text-2xl font-bold text-gray-800">
-                {mappedAnnouncements.reduce(
-                  (sum, a) => sum + a.recipientCount,
+                {announcements.reduce(
+                  (sum, a) => sum + (a.total_recipients || 0),
                   0
                 )}
               </div>
@@ -204,12 +189,12 @@ export default function AnnouncementHistory({
             </div>
             <div>
               <div className="text-2xl font-bold text-gray-800">
-                {mappedAnnouncements.length > 0
+                {announcements.length > 0
                   ? Math.round(
-                      mappedAnnouncements.reduce(
+                      announcements.reduce(
                         (sum, a) => sum + getReadRate(a),
                         0
-                      ) / mappedAnnouncements.length
+                      ) / announcements.length
                     )
                   : 0}
                 %
@@ -226,10 +211,7 @@ export default function AnnouncementHistory({
             </div>
             <div>
               <div className="text-2xl font-bold text-gray-800">
-                {
-                  mappedAnnouncements.filter((a) => isExpired(a.expiresAt))
-                    .length
-                }
+                {announcements.filter((a) => isExpired(a.expires_at)).length}
               </div>
               <div className="text-sm text-gray-600">Expired</div>
             </div>
@@ -318,12 +300,12 @@ export default function AnnouncementHistory({
                     </h3>
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(
-                        announcement.type
+                        announcement.announcement_class?.toLowerCase()
                       )}`}
                     >
-                      {announcement.type}
+                      {announcement.announcement_class}
                     </span>
-                    {isExpired(announcement.expiresAt) && (
+                    {isExpired(announcement.expires_at) && (
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
                         Expired
                       </span>
@@ -331,23 +313,27 @@ export default function AnnouncementHistory({
                   </div>
 
                   <p className="text-gray-600 mb-4 line-clamp-2">
-                    {announcement.message}
+                    {announcement.content}
                   </p>
 
                   <div className="flex items-center gap-6 text-sm text-gray-500">
                     <div className="flex items-center gap-2">
-                      {getTargetIcon(announcement.targetType)}
+                      {getTargetIcon(
+                        announcement.announcement_type?.toLowerCase()
+                      )}
                       <span>
                         {getTargetLabel(
-                          announcement.targetType,
-                          announcement.courseTitle
+                          announcement.announcement_type?.toLowerCase(),
+                          announcement.course_title
                         )}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <People className="w-4 h-4" />
-                      <span>{announcement.recipientCount} recipients</span>
+                      <span>
+                        {announcement.total_recipients || 0} recipients
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -357,10 +343,10 @@ export default function AnnouncementHistory({
 
                     <div className="flex items-center gap-2">
                       <CalendarToday className="w-4 h-4" />
-                      <span>{formatDate(announcement.createdAt)}</span>
+                      <span>{formatDate(announcement.created_at)}</span>
                     </div>
 
-                    {announcement.hasAttachments && (
+                    {announcement.has_attachments && (
                       <div className="flex items-center gap-2">
                         <AttachFile className="w-4 h-4" />
                         <span>Has attachments</span>
@@ -370,15 +356,13 @@ export default function AnnouncementHistory({
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
-                  {announcement.canEdit && (
-                    <button
-                      onClick={() => onEdit(announcement.id)}
-                      className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="Edit announcement"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                  )}
+                  <button
+                    onClick={() => onEdit(announcement.id)}
+                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="Edit announcement"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
 
                   <button
                     onClick={() => onView(announcement.id)}
@@ -388,15 +372,13 @@ export default function AnnouncementHistory({
                     <Visibility className="w-4 h-4" />
                   </button>
 
-                  {announcement.canDelete && (
-                    <button
-                      onClick={() => onDelete(announcement.id)}
-                      className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete announcement"
-                    >
-                      <Delete className="w-4 h-4" />
-                    </button>
-                  )}
+                  <button
+                    onClick={() => onDelete(announcement.id)}
+                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete announcement"
+                  >
+                    <Delete className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>

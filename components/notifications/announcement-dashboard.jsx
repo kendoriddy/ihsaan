@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AnnouncementComposer from "./announcement-composer";
 import AnnouncementHistory from "./announcement-history";
+import AnnouncementViewEditModal from "./AnnouncementViewEditModal";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import NotificationCenter from "./notification-center";
 import {
   Campaign,
@@ -15,32 +17,44 @@ import {
 import { toast } from "react-toastify";
 import {
   fetchAnnouncements,
+  fetchAnnouncementById,
   createAnnouncement,
+  updateAnnouncement,
   deleteAnnouncement,
   fetchCoursesForAnnouncements,
   clearErrors,
   resetCreateStatus,
+  resetUpdateStatus,
   resetDeleteStatus,
+  clearSelectedAnnouncement,
 } from "@/utils/redux/slices/announcementSlice";
 
 export default function AnnouncementDashboard({ userRole }) {
   const dispatch = useDispatch();
   const {
     announcements,
+    selectedAnnouncement,
     courses,
     status,
     createStatus,
+    updateStatus,
     deleteStatus,
     coursesStatus,
     error,
     createError,
+    updateError,
     deleteError,
     total_count,
   } = useSelector((state) => state.announcements);
+  console.log(announcements, "announcements here!!!", total_count);
 
-  const [activeTab, setActiveTab] = useState("create");
+  const [activeTab, setActiveTab] = useState("history");
   const [showComposer, setShowComposer] = useState(false);
+  const [showViewEditModal, setShowViewEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [announcementToDelete, setAnnouncementToDelete] = useState(null);
+  const [modalMode, setModalMode] = useState("view"); // 'view' or 'edit'
 
   // Fetch announcements and courses on component mount
   useEffect(() => {
@@ -59,8 +73,21 @@ export default function AnnouncementDashboard({ userRole }) {
       dispatch(resetCreateStatus());
     }
 
+    if (updateStatus === "succeeded") {
+      toast.success("Announcement updated successfully!");
+      setShowViewEditModal(false);
+      setModalMode("view");
+      dispatch(resetUpdateStatus());
+      dispatch(clearSelectedAnnouncement());
+    } else if (updateStatus === "failed" && updateError) {
+      toast.error(updateError);
+      dispatch(resetUpdateStatus());
+    }
+
     if (deleteStatus === "succeeded") {
       toast.success("Announcement deleted successfully!");
+      setShowDeleteModal(false);
+      setAnnouncementToDelete(null);
       dispatch(resetDeleteStatus());
     } else if (deleteStatus === "failed" && deleteError) {
       toast.error(deleteError);
@@ -73,9 +100,11 @@ export default function AnnouncementDashboard({ userRole }) {
     }
   }, [
     createStatus,
+    updateStatus,
     deleteStatus,
     status,
     createError,
+    updateError,
     deleteError,
     error,
     dispatch,
@@ -102,49 +131,47 @@ export default function AnnouncementDashboard({ userRole }) {
 
   const handleEditAnnouncement = (announcementId) => {
     console.log("Editing announcement:", announcementId);
-    // Implement edit functionality
+    setModalMode("edit");
+    dispatch(fetchAnnouncementById(announcementId));
+    setShowViewEditModal(true);
   };
 
   const handleDeleteAnnouncement = async (announcementId) => {
-    dispatch(deleteAnnouncement(announcementId));
+    // Find the announcement to get its title for the confirmation modal
+    const announcement = announcements.find((a) => a.id === announcementId);
+    if (announcement) {
+      setAnnouncementToDelete(announcement);
+      setShowDeleteModal(true);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (announcementToDelete) {
+      dispatch(deleteAnnouncement(announcementToDelete.id));
+    }
   };
 
   const handleViewAnnouncement = (announcementId) => {
     console.log("Viewing announcement:", announcementId);
-    // Implement view functionality
+    setModalMode("view");
+    dispatch(fetchAnnouncementById(announcementId));
+    setShowViewEditModal(true);
   };
 
-  const mockNotifications = [
-    {
-      id: "1",
-      title: "Assignment Reminder - Arabic Grammar",
-      message:
-        "Don't forget to submit your homework by Friday. The assignment covers chapters 1-3.",
-      type: "reminder",
-      senderName: "Ahmad Hassan",
-      senderRole: "tutor",
-      courseTitle: "Arabic Grammar Fundamentals",
-      isRead: false,
-      createdAt: "2024-01-15T10:30:00Z",
-      hasAttachment: false,
-      announcementId: "1",
-    },
-    {
-      id: "2",
-      title: "Platform Maintenance Notice",
-      message:
-        "The platform will be under maintenance this Saturday from 2-4 AM UTC.",
-      type: "alert",
-      senderName: "IHSAAN Admin",
-      senderRole: "admin",
-      isRead: true,
-      createdAt: "2024-01-14T09:15:00Z",
-      hasAttachment: false,
-      announcementId: "2",
-    },
-  ];
+  const handleSaveAnnouncement = (announcementId, announcementData) => {
+    dispatch(updateAnnouncement({ announcementId, announcementData }));
+  };
 
-  const unreadNotifications = mockNotifications.filter((n) => !n.isRead).length;
+  const handleCloseViewEditModal = () => {
+    setShowViewEditModal(false);
+    setModalMode("view");
+    dispatch(clearSelectedAnnouncement());
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setAnnouncementToDelete(null);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -161,7 +188,7 @@ export default function AnnouncementDashboard({ userRole }) {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <button
+              {/* <button
                 onClick={() => setShowNotifications(true)}
                 className="relative p-3 text-gray-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
               >
@@ -175,7 +202,7 @@ export default function AnnouncementDashboard({ userRole }) {
                     {unreadNotifications > 9 ? "9+" : unreadNotifications}
                   </div>
                 )}
-              </button>
+              </button> */}
               <button
                 onClick={() => setShowComposer(true)}
                 className="bg-red-800 hover:bg-red-900 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-lg hover:shadow-xl"
@@ -193,7 +220,7 @@ export default function AnnouncementDashboard({ userRole }) {
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           <div className="border-b border-gray-200">
             <div className="flex">
-              <button
+              {/* <button
                 onClick={() => setActiveTab("create")}
                 className={`px-6 py-4 font-medium transition-colors flex items-center gap-2 ${
                   activeTab === "create"
@@ -203,7 +230,7 @@ export default function AnnouncementDashboard({ userRole }) {
               >
                 <Campaign className="w-4 h-4" />
                 Quick Create
-              </button>
+              </button> */}
               <button
                 onClick={() => setActiveTab("history")}
                 className={`px-6 py-4 font-medium transition-colors flex items-center gap-2 ${
@@ -265,10 +292,29 @@ export default function AnnouncementDashboard({ userRole }) {
         isLoading={createStatus === "loading"}
       />
 
+      <AnnouncementViewEditModal
+        isOpen={showViewEditModal}
+        onClose={handleCloseViewEditModal}
+        announcement={selectedAnnouncement}
+        userRole={userRole}
+        userCourses={courses}
+        onSave={handleSaveAnnouncement}
+        isLoading={updateStatus === "loading"}
+        mode={modalMode}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        announcementTitle={announcementToDelete?.title || ""}
+        isLoading={deleteStatus === "loading"}
+      />
+
       <NotificationCenter
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
-        notifications={mockNotifications}
+        notifications={[]}
         onMarkAsRead={handleMarkAsRead}
         onMarkAllAsRead={handleMarkAllAsRead}
         onDelete={handleDeleteNotification}

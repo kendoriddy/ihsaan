@@ -301,13 +301,12 @@ function EditCoursePage() {
 
   const handleAddVideo = async (e) => {
     e.preventDefault();
-
+    console.log("newVideoData::", newVideoData);
     if (
       !newVideoData.title ||
       !videoFile ||
       !newVideoData.section ||
       !newVideoData.video_no ||
-      !newVideoData.order ||
       !newVideoData.duration
     ) {
       toast.error(
