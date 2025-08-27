@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { ForgotPasswordSchema } from "@/components/validationSchemas/ValidationSchema";
 import FormikControl from "@/components/validation/FormikControl";
 import { Formik, Form } from "formik";
+import Swal from "sweetalert2";
 
 function Page() {
   const router = useRouter();
@@ -23,7 +24,13 @@ function Page() {
       }, 2000);
     },
     onError: (error) => {
-      toast.error(error.message);
+      Swal.fire({
+        title: error.message,
+        icon: "error",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
     },
   });
   const handleSubmit = (values) => {
