@@ -14,6 +14,8 @@ import blogReducer from "./slices/blogSlice";
 import announcementReducer from "./slices/announcementSlice";
 import notificationReducer from "./slices/notificationSlice";
 import feedbackReducer from "./slices/feedbackSlice";
+import productReducer from "./slices/productSlice";
+import cartReducer from "./slices/cartSlice";
 
 export const store = configureStore({
   reducer: {
@@ -31,5 +33,7 @@ export const store = configureStore({
     announcements: announcementReducer,
     notifications: notificationReducer,
     feedback: feedbackReducer,
+    products: productReducer,
+    cart: cartReducer,
   },
 });

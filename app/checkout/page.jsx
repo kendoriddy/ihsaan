@@ -1,416 +1,451 @@
 "use client";
-import Header from "@/components/Header";
-import Link from "next/link";
-//material-ui-select-country;
-import { COUNTRIES } from "@/constants";
-import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import HttpsIcon from "@mui/icons-material/Https";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
-import { cartItems } from "@/constants";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getOrCreateCart, checkoutCart } from "@/utils/redux/slices/cartSlice";
+import { toast } from "react-toastify";
 import Image from "next/image";
-import paypalImage from "@/assets/images/paypal.webp";
+import { IMAGES } from "@/constants";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import DashboardSidebar from "@/components/DashboardSidebar";
+import { usePathname, useRouter } from "next/navigation";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 
-const Page = () => {
-  const [openedOption, setOpenedOption] = useState(0);
+// Validation schema for checkout form
+const CheckoutSchema = Yup.object().shape({
+  firstName: Yup.string().required("First name is required"),
+  lastName: Yup.string().required("Last name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  phone: Yup.string().required("Phone number is required"),
+  address: Yup.string().required("Address is required"),
+  city: Yup.string().required("City is required"),
+  state: Yup.string().required("State is required"),
+  zipCode: Yup.string().required("ZIP code is required"),
+  cardNumber: Yup.string()
+    .matches(/^\d{16}$/, "Card number must be 16 digits")
+    .required("Card number is required"),
+  expiryDate: Yup.string()
+    .matches(/^(0[1-9]|1[0-2])\/([0-9]{2})$/, "Invalid expiry date (MM/YY)")
+    .required("Expiry date is required"),
+  cvv: Yup.string()
+    .matches(/^\d{3,4}$/, "CVV must be 3-4 digits")
+    .required("CVV is required"),
+});
 
-  const handleOpenedOption = (option) => setOpenedOption(option);
+function Checkout() {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [currentRoute, setCurrentRoute] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  return (
-    <div className="">
-      <div className="relative">
+  const { cart, status, itemCount, totalAmount } = useSelector(
+    (state) => state.cart
+  );
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentRoute(pathname);
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    dispatch(getOrCreateCart());
+  }, [dispatch]);
+
+  const handleCheckout = async (values) => {
+    if (itemCount === 0) {
+      toast.error("Your cart is empty. Add some items first!");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // Here you would typically integrate with a payment processor
+      // For now, we'll just simulate the checkout process
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+
+      await dispatch(checkoutCart()).unwrap();
+      toast.success("Order placed successfully! Redirecting to orders...");
+      router.push("/dashboard/orders");
+    } catch (error) {
+      toast.error(error || "Failed to process checkout. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+    }).format(price);
+  };
+
+  if (itemCount === 0) {
+    return (
+      <div>
         <Header />
-        <div className="flex w-full">
-          <main className="min-h-[500px] flex flex-col items-center justify-center px-8 lg:pl-12 md:w-[60%] md:justify-start ">
-            <section className="flex flex-col mb-8">
-              <h1 className="text-[32px] my-8 font-bold">Checkout</h1>
-              <h2 className="text-[24px] mb-4 mt-[0px] font-bold">
-                Billing address
-              </h2>
-              <label className="text-sm font-bold p-2 flex justify-between md:w-[264px]">
-                Country{" "}
-                <span className="text-sm font-normal text-slate-500 ml-[8px]">
-                  Required
-                </span>
-              </label>
-              <div className="w-full">
-                <Autocomplete
-                  id="country-select-demo"
-                  className=" w-full md:w-[264px] mb-2"
-                  sx={{}}
-                  options={COUNTRIES}
-                  autoHighlight
-                  getOptionLabel={(option) => option.label}
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                      {...props}>
-                      <Image
-                        width={20}
-                        alt=""
-                        // srcSet={paypalImage}
-                        src={paypalImage}
-                      />
-                      {/* <img
-                        loading="lazy"
-                        width="20"
-                        srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                        src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                        alt=""
-                      /> */}
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Please select a country"
-                      inputProps={{
-                        ...params.inputProps,
-                        autoComplete: "new-password", // disable autocomplete and autofill
-                      }}
-                    />
-                  )}
-                />
-              </div>
-              <div className="text-[12px] text-slate-500">
-                RightMentors is required by law to collect applicable
-                transaction taxes for purchase made in certain tax jurisdictions
-              </div>
-            </section>
-            <section className="w-full mb-8">
-              <div className=" flex mb-4 items-start justify-between">
-                <h2 className="text-2xl font-bold">Payment Method</h2>
-                <p className="flex items-center">
-                  <span className="text-xs text-gray-500 mr-2">
-                    Secured connection
-                  </span>
-                  <svg className="h-[20px] w-[20px]">
-                    <HttpsIcon className="" />
-                  </svg>
+        <main className="flex relative">
+          <DashboardSidebar currentRoute={currentRoute} />
+          <section className="flex flex-col md:flex-row p-4 justify-self-center flex-1 min-h-screen">
+            <div className="px-4 w-full py-8 lg:py-0">
+              <div className="text-center py-12">
+                <h1 className="text-2xl font-bold text-gray-800 mb-4">
+                  Your cart is empty
+                </h1>
+                <p className="text-gray-600 mb-6">
+                  Add some items to your cart before checkout.
                 </p>
+                <button
+                  onClick={() => router.push("/store")}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-medium"
+                >
+                  Continue Shopping
+                </button>
               </div>
-
-              <div id="accordion" className="border border-gray-300">
-                <div className="border-gray-200">
-                  <div className="bg-gray-100 flex items-center gap-2 h-[44px] p-2">
-                    <input
-                      type="radio"
-                      name="accordion"
-                      id="first"
-                      onClick={() => handleOpenedOption(1)}
-                    />
-                    <label
-                      for="first"
-                      className="flex justify-between w-full p-2 items-center">
-                      <div className=" flex mr-4 items-center">
-                        <span className=" p-[1px] rounded-md bg-white-700 border text-center mr-2">
-                          <CreditCardIcon className="" />
-                        </span>
-                        <span className="font-bold">Credit/Debit Card</span>
-                      </div>
-                      <span className="flex gap-1">
-                        <Image
-                          src="https://www.udemy.com/staticx/udemy/images/v9/card-amex.svg"
-                          width={42}
-                          height={28}
-                          className="border rounded-md"
-                          alt="amex"
-                        />
-                        <Image
-                          src="https://www.udemy.com/staticx/udemy/images/v9/card-discover.svg"
-                          width={42}
-                          height={28}
-                          className="border rounded-md"
-                          alt="discover"
-                        />
-                        <Image
-                          src="https://www.udemy.com/staticx/udemy/images/v9/card-mastercard.svg"
-                          width={42}
-                          height={28}
-                          className="border rounded-md"
-                          alt="mastercard"
-                        />
-                        <Image
-                          src="https://www.udemy.com/staticx/udemy/images/v9/card-visa.svg"
-                          width={42}
-                          height={28}
-                          className="border rounded-md"
-                          alt="visa"
-                        />
-                        {/* <img
-                          src="https://www.udemy.com/staticx/udemy/images/v9/card-amex.svg"
-                          className="h-[28px] w-[42px] border rounded-md"
-                        />
-                        <img
-                          src="https://www.udemy.com/staticx/udemy/images/v9/card-discover.svg"
-                          className="h-[28px] w-[42px] border rounded-md"
-                        />
-                        <img
-                          src="https://www.udemy.com/staticx/udemy/images/v9/card-mastercard.svg"
-                          className="h-[28px] w-[42px] border rounded-md"
-                        />
-                        <img
-                          src="https://www.udemy.com/staticx/udemy/images/v9/card-visa.svg"
-                          className="h-[28px] w-[42px] border rounded-md"
-                        /> */}
-                      </span>
-                    </label>
-                  </div>
-                  <div
-                    className={`${
-                      openedOption === 1 ? "block" : "hidden"
-                    }  py-8 px-6`}>
-                    <form className="flex flex-col items-center">
-                      <div>
-                        <label
-                          for="card_name"
-                          className="flex justify-between font-bold">
-                          Name on card
-                          <span className="text-gray-500 ml-2 font-normal text-[12px]">
-                            Required
-                          </span>
-                        </label>
-                        <input
-                          type="text"
-                          id="card_name"
-                          name="card_name"
-                          size="40"
-                          required
-                          minLength="8"
-                          maxLength="40"
-                          placeholder="Name on card"
-                          className="border border-solid border-black focus:border focus:border-solid focus:border-black p-4"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          for="card_number"
-                          className="flex justify-between font-bold">
-                          Card Number
-                          <span className="text-gray-500 ml-2 font-normal text-[12px]">
-                            Required
-                          </span>
-                        </label>
-                        <input
-                          type="text"
-                          id="card_number"
-                          name="card_number"
-                          size="40"
-                          required
-                          minLength="8"
-                          maxLength="40"
-                          placeholder="1234 5678 9012 3456"
-                          className="border border-solid border-black focus:border focus:border-solid focus:border-black p-4"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          for="exp_date"
-                          className="flex justify-between font-bold">
-                          Expiry date
-                          <span className="text-gray-500 ml-2 font-normal text-[12px]">
-                            Required
-                          </span>
-                        </label>
-                        <input
-                          type="month"
-                          value="2018-07"
-                          id="exp_date"
-                          name="exp_date"
-                          required
-                          size="40"
-                          className="border border-solid border-black pt-3 px-4 min-w-[360px] h-[48px]"
-                        />
-                      </div>
-
-                      <div>
-                        <label
-                          for="cvv_cvc"
-                          className="flex justify-between font-bold">
-                          CVC/CVV
-                          <span className="text-gray-500 ml-2 font-normal text-[12px]">
-                            Required
-                          </span>
-                        </label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          id="cvv_cvc"
-                          name="cvv_cvc"
-                          size="40"
-                          required
-                          minLength="3"
-                          maxLength="3"
-                          placeholder="CVC"
-                          className="border border-solid border-black focus:border focus:border-solid focus:border-black p-4 min-w-[360px]"
-                        />
-                      </div>
-
-                      <div className=" flex gap-4">
-                        <input type="checkbox" />
-                        <label>
-                          Securely save this card for my later purchase
-                        </label>
-                      </div>
-                      <div className="mt-4">
-                        <b>The amount your card will be charged is $17.06</b>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-                <div className="">
-                  <div className="bg-gray-100 p-2 flex gap-2 items-center">
-                    <input
-                      type="radio"
-                      name="accordion"
-                      id="second"
-                      className="mr-2"
-                      onClick={() => handleOpenedOption(2)}
-                    />
-                    <label for="second" className="flex mr-4">
-                      <Image
-                        src={paypalImage}
-                        width={42}
-                        height={28}
-                        className=" bg-white border rounded-md mr-2"
-                        alt="paypal"
-                      />
-                      {/* <img
-                        src="https://cdn.pixabay.com/photo/2018/05/08/21/29/paypal-3384015_1280.png"
-                        className="h-[28px] w-[42px] bg-white border rounded-md mr-2"
-                      /> */}
-                      <span className="font-bold">Paypal</span>
-                    </label>
-                  </div>
-                  <div
-                    className={`${
-                      openedOption === 2 ? "block" : "hidden"
-                    } flex flex-col py-8 px-6`}>
-                    <div className="">
-                      In order to complete your transaction, we will transfer
-                      you over to PayPal's secure servers.
-                    </div>
-                    <b>The amount your card will be charged is $17.06</b>
-                  </div>
-                </div>
-              </div>
-            </section>
-            {/* Section */}
-            <section className="flex flex-col mb-12 justify-start items-start w-full">
-              <div>
-                <h2 className="font-bold text-[24px] mb-4">Order details</h2>
-              </div>
-
-              <div className="w-full">
-                <ul>
-                  {cartItems.map((cartItem) => {
-                    return (
-                      <li
-                        key={cartItem.id}
-                        className="flex w-full items-center justify-between py-2 ">
-                        <div className="flex items-center ">
-                          <Image
-                            src={cartItem.image}
-                            width={32}
-                            height={32}
-                            className="mr-2"
-                            alt={""}
-                          />
-                          {/* <img
-                          src={cartItem.image}
-                          className="w-[32px] h-[32px] mr-2"
-                        /> */}
-                          <span className="capitalize text-sm font-bold">
-                            {cartItem.title}
-                          </span>
-                        </div>
-
-                        <span className="text-[14px] text-gray-500">
-                          NGN {cartItem.price}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            </section>
-          </main>
-          <aside className="bg-gray-100 hidden md:flex flex-col items-center w-[40%]">
-            <div className="mt-[104px] pr-8 pl-12">
-              <section className="">
-                <h2 className="text-2xl mb-4 font-bold">Summary</h2>
-                <div className="flex justify-between text-[14px]">
-                  <span>Original Price:</span>
-                  <span>&#8358; 24,900</span>
-                </div>
-                <hr className="my-[12px]" />
-                <div className="flex justify-between font-bold">
-                  <span>Total:</span>
-                  <span className="md:hidden">&#8358; 24,900</span>
-                </div>
-              </section>
-              <div className="flex flex-col justify-center gap-2">
-                <span className="text-[12px]">
-                  By completing your purchase you agree to these {""}
-                  <Link href="" className="text-blue-500">
-                    Terms of Service.
-                  </Link>
-                </span>
-                <Link href="">
-                  <button className="w-full bg-blue-500 text-white h-[60px] font-bold">
-                    Complete Checkout
-                  </button>
-                </Link>
-                <div className="text-center text-[12px]">
-                  30-Day Money-Back Guarantee
-                </div>
-              </div>
-            </div>
-          </aside>
-        </div>
-        <div className="mb-10 md:pb-[96px] px-[32px] sticky">
-          <section className="md:hidden">
-            <h2 className="text-2xl mb-4 font-bold">Summary</h2>
-            <div className="flex justify-between text-[14px]">
-              <span>Original Price:</span>
-              <span>&#8358; 24,900</span>
-            </div>
-            <hr className="my-[12px]" />
-            <div className="flex justify-between font-bold">
-              <span>Total:</span>
-              <span className="md:hidden">&#8358; 24,900</span>
             </div>
           </section>
-        </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
-        <section className="flex flex-col py-3 px-4 bg-white-500 shadow-lg border border-white-500 relative md:hidden">
-          <div className="flex justify-between font-bold mb-2 text-[19px]">
-            <span>Total:</span>
-            <span>&#8358;14,500</span>
-          </div>
-          <div className="flex flex-col justify-center gap-2">
-            <span className="text-[12px]">
-              By completing your purchase you agree to these {""}
-              <Link href="" className="text-blue-500">
-                Terms of Service.
-              </Link>
-            </span>
-            <Link href="">
-              <button className="w-full bg-blue-500 text-white h-[60px] font-bold">
-                Complete Checkout
-              </button>
-            </Link>
-            <div className="text-center text-[12px]">
-              30-Day Money-Back Guarantee
+  return (
+    <div>
+      <Header />
+      <main className="flex relative">
+        <DashboardSidebar currentRoute={currentRoute} />
+
+        <section className="flex flex-col md:flex-row p-4 justify-self-center flex-1 min-h-screen">
+          <div className="px-4 w-full py-8 lg:py-0">
+            {/* Header */}
+            <div className="mb-8">
+              <div className="flex items-center gap-4 mb-4">
+                <button
+                  onClick={() => router.push("/store")}
+                  className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                >
+                  <ArrowBackIcon />
+                  Back to Store
+                </button>
+              </div>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                Checkout
+              </h1>
+              <p className="text-gray-600">Complete your purchase</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Checkout Form */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                    Payment Information
+                  </h2>
+
+                  <Formik
+                    initialValues={{
+                      firstName: "",
+                      lastName: "",
+                      email: "",
+                      phone: "",
+                      address: "",
+                      city: "",
+                      state: "",
+                      zipCode: "",
+                      cardNumber: "",
+                      expiryDate: "",
+                      cvv: "",
+                    }}
+                    validationSchema={CheckoutSchema}
+                    onSubmit={handleCheckout}
+                  >
+                    {({ errors, touched }) => (
+                      <Form className="space-y-4">
+                        {/* Personal Information */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              First Name
+                            </label>
+                            <Field
+                              name="firstName"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="John"
+                            />
+                            {errors.firstName && touched.firstName && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors.firstName}
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Last Name
+                            </label>
+                            <Field
+                              name="lastName"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="Doe"
+                            />
+                            {errors.lastName && touched.lastName && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors.lastName}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Email
+                          </label>
+                          <Field
+                            name="email"
+                            type="email"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="john@example.com"
+                          />
+                          {errors.email && touched.email && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors.email}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Phone Number
+                          </label>
+                          <Field
+                            name="phone"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="+234 123 456 7890"
+                          />
+                          {errors.phone && touched.phone && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors.phone}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Billing Address */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Address
+                          </label>
+                          <Field
+                            name="address"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="123 Main Street"
+                          />
+                          {errors.address && touched.address && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors.address}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              City
+                            </label>
+                            <Field
+                              name="city"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="Lagos"
+                            />
+                            {errors.city && touched.city && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors.city}
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              State
+                            </label>
+                            <Field
+                              name="state"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="Lagos"
+                            />
+                            {errors.state && touched.state && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors.state}
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              ZIP Code
+                            </label>
+                            <Field
+                              name="zipCode"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="100001"
+                            />
+                            {errors.zipCode && touched.zipCode && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors.zipCode}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Payment Information */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Card Number
+                          </label>
+                          <Field
+                            name="cardNumber"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="1234 5678 9012 3456"
+                          />
+                          {errors.cardNumber && touched.cardNumber && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors.cardNumber}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Expiry Date
+                            </label>
+                            <Field
+                              name="expiryDate"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="MM/YY"
+                            />
+                            {errors.expiryDate && touched.expiryDate && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors.expiryDate}
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              CVV
+                            </label>
+                            <Field
+                              name="cvv"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="123"
+                            />
+                            {errors.cvv && touched.cvv && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors.cvv}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={isProcessing}
+                          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isProcessing
+                            ? "Processing..."
+                            : `Pay ${formatPrice(totalAmount)}`}
+                        </button>
+                      </Form>
+                    )}
+                  </Formik>
+                </div>
+              </div>
+
+              {/* Order Summary */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                    Order Summary
+                  </h2>
+
+                  {/* Cart Items */}
+                  <div className="space-y-4 mb-6">
+                    {cart?.items?.map((item) => (
+                      <div key={item.id} className="flex gap-3">
+                        <div className="relative w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                          <Image
+                            src={
+                              item.product.image?.startsWith("http")
+                                ? item.product.image
+                                : IMAGES.course_1
+                            }
+                            alt={item.product.title}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-800 text-sm mb-1">
+                            {item.product.title}
+                          </h4>
+                          <p className="text-xs text-gray-600 mb-1">
+                            Qty: {item.quantity}
+                          </p>
+                          <p className="font-semibold text-blue-600 text-sm">
+                            {formatPrice(
+                              parseFloat(item.product.price) * item.quantity
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Price Breakdown */}
+                  <div className="space-y-3 border-t border-gray-200 pt-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Subtotal</span>
+                      <span className="font-medium">
+                        {formatPrice(totalAmount)}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tax</span>
+                      <span className="font-medium">₦0.00</span>
+                    </div>
+
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Shipping</span>
+                      <span className="font-medium">Free</span>
+                    </div>
+
+                    <div className="border-t border-gray-200 pt-3">
+                      <div className="flex justify-between font-semibold text-lg">
+                        <span>Total</span>
+                        <span className="text-blue-600">
+                          {formatPrice(totalAmount)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
-};
-export default Page;
+}
+
+export default Checkout;
