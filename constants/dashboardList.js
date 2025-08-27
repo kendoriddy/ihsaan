@@ -9,6 +9,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
 import StorefrontIcon from "@mui/icons-material/Storefront";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import {
   Assignment,
   AssignmentInd,
@@ -54,25 +55,31 @@ const DASHBOARD_LIST = {
       path: "/courses/my-courses",
     },
     {
+      id: 14,
+      name: "Store",
+      icon: StorefrontIcon,
+      path: "/store",
+    },
+    {
       id: 12,
       name: "Applications",
       icon: BookmarkIcon,
       path: "/dashboard/my-applications",
     },
     {
-      id: 14,
+      id: 15,
       name: "Forums",
       icon: GradingOutlined,
       path: "/forums",
     },
     {
-      id: 15,
+      id: 16,
       name: "Feedback",
       icon: FeedbackIcon,
       path: "/dashboard/feedback",
     },
     {
-      id: 20,
+      id: 17,
       name: "Reports",
       icon: AssessmentIcon,
       path: "/reports",
@@ -151,46 +158,47 @@ const DASHBOARD_LIST = {
       path: "/admin/student",
     },
     { id: 8, name: "Courses", path: "/admin/courses" },
-    { id: 9, name: "FAQs", path: "/admin/faqs" },
-    { id: 10, name: "Quotes", path: "/admin/quotes" },
+    { id: 9, name: "Products", icon: StorefrontIcon, path: "/admin/products" },
+    { id: 10, name: "FAQs", path: "/admin/faqs" },
+    { id: 11, name: "Quotes", path: "/admin/quotes" },
     {
-      id: 11,
+      id: 12,
       name: "Set Quiz",
       path: "/admin/set-quiz",
     },
     {
-      id: 12,
+      id: 13,
       name: "Activities Settings",
       path: "/admin/activities-settings",
     },
     {
-      id: 13,
+      id: 14,
       name: "Blog Categories",
       path: "/admin/blog-categories",
     },
     {
-      id: 14,
+      id: 15,
       name: "Blog",
       path: "/admin/blog",
     },
     {
-      id: 18,
+      id: 16,
       name: "Notifications and Announcements",
       path: "/admin/notifications",
     },
     {
-      id: 19,
+      id: 17,
       name: "Feedback",
       icon: FeedbackIcon,
       path: "/admin/feedback",
     },
     {
-      id: 17,
+      id: 18,
       name: "Reports",
       icon: AssessmentIcon,
       path: "/admin/reports",
     },
-    { id: 15, name: "My Profile", path: "/admin/profile" },
+    { id: 19, name: "My Profile", path: "/admin/profile" },
   ],
 };
 

@@ -15,6 +15,7 @@ import {
 } from "../utils/redux/slices/auth.reducer";
 import { logoutUser } from "@/utils/redux/slices/auth.reducer";
 import { useDispatch } from "react-redux";
+import CartDrawer from "./CartDrawer";
 import Modal from "./validation/Modal";
 import { toast } from "react-toastify";
 import FormikControl from "./validation/FormikControl";
@@ -66,6 +67,8 @@ function Header() {
 
   const isAuth = useSelector(selectIsAuth);
   const signedInUserName = useSelector(currentlyLoggedInUser);
+  const { itemCount } = useSelector((state) => state.cart);
+  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -607,15 +610,14 @@ function Header() {
             </li>
 
             <li>
-              <Link href={"/cart"}>
-                <Badge
-                  // badgeContent={4}
-                  color="primary"
-                  className="navlink cursor-pointer"
-                >
+              <button
+                onClick={() => setIsCartDrawerOpen(true)}
+                className="navlink cursor-pointer"
+              >
+                <Badge badgeContent={itemCount || 0} color="primary">
                   <AddShoppingCartIcon />
                 </Badge>
-              </Link>
+              </button>
             </li>
             <div>
               {isAuth ? (
@@ -971,14 +973,14 @@ function Header() {
               <div className={`  flex items-center gap-2`}>
                 <ul className="hidden gap-2 md:flex items-center">
                   <li>
-                    <Link href={"/cart"}>
-                      <Badge
-                        // badgeContent={4}
-                        color="primary"
-                      >
+                    <button
+                      onClick={() => setIsCartDrawerOpen(true)}
+                      className="navlink cursor-pointer"
+                    >
+                      <Badge badgeContent={itemCount || 0} color="primary">
                         <AddShoppingCartIcon />
                       </Badge>
-                    </Link>
+                    </button>
                   </li>
                   <div>
                     {isAuth ? (
@@ -1322,6 +1324,12 @@ function Header() {
           </div>
         </div>
       </div>
+
+      {/* Cart Drawer */}
+      <CartDrawer
+        isOpen={isCartDrawerOpen}
+        onClose={() => setIsCartDrawerOpen(false)}
+      />
     </header>
   );
 }
