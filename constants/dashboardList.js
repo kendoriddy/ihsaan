@@ -198,6 +198,11 @@ const DASHBOARD_LIST = {
       icon: AssessmentIcon,
       path: "/admin/reports",
     },
+    {
+      id: 18,
+      name: "Audit Trail",
+      path: "/admin/audit-trail",
+    },
     { id: 19, name: "My Profile", path: "/admin/profile" },
   ],
 };
