@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { usePathname } from "next/navigation";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import Header from "@/components/Header";
 import StudentNotificationPage from "@/components/notifications/student-notification-page";
-import { toast } from "react-toastify";
 import {
   fetchUserNotifications,
   fetchRecentNotifications,
@@ -19,6 +18,7 @@ import {
   resetMarkAllReadStatus,
   resetDeleteStatus,
 } from "@/utils/redux/slices/notificationSlice";
+import Swal from "sweetalert2";
 
 function Page() {
   const dispatch = useDispatch();
@@ -47,31 +47,73 @@ function Page() {
   // Handle success/error messages
   useEffect(() => {
     if (markReadStatus === "succeeded") {
-      toast.success("Notification marked as read!");
+      Swal.fire({
+        title: "Notification marked as read!",
+        icon: "success",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
       dispatch(resetMarkReadStatus());
     } else if (markReadStatus === "failed" && markReadError) {
-      toast.error(markReadError);
+      Swal.fire({
+        title: markReadError,
+        icon: "error",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
       dispatch(resetMarkReadStatus());
     }
 
     if (markAllReadStatus === "succeeded") {
-      toast.success("All notifications marked as read!");
+      Swal.fire({
+        title: "All notifications marked as read!",
+        icon: "success",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
       dispatch(resetMarkAllReadStatus());
     } else if (markAllReadStatus === "failed" && markAllReadError) {
-      toast.error(markAllReadError);
+      Swal.fire({
+        title: markAllReadError,
+        icon: "error",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
       dispatch(resetMarkAllReadStatus());
     }
 
     if (deleteStatus === "succeeded") {
-      toast.success("Notification deleted successfully!");
+      Swal.fire({
+        title: "Notification deleted successfully!",
+        icon: "success",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
       dispatch(resetDeleteStatus());
     } else if (deleteStatus === "failed" && deleteError) {
-      toast.error(deleteError);
+      Swal.fire({
+        title: deleteError,
+        icon: "error",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
       dispatch(resetDeleteStatus());
     }
 
     if (status === "failed" && error) {
-      toast.error(error);
+      Swal.fire({
+        title: error,
+        icon: "error",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
       dispatch(clearErrors());
     }
   }, [

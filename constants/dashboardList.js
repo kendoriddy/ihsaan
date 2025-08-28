@@ -187,6 +187,11 @@ const DASHBOARD_LIST = {
       path: "/admin/notifications",
     },
     {
+      id: 16,
+      name: "Newsletter",
+      path: "/admin/newsletter",
+    },
+    {
       id: 17,
       name: "Feedback",
       icon: FeedbackIcon,
