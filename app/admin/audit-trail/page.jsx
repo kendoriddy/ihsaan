@@ -32,46 +32,7 @@ import {
   AccountCircle,
 } from "@mui/icons-material";
 import AdminLayout from "@/components/AdminLayout";
-
-// Enhanced dummy data
-const errorLogs = [
-  {
-    id: 1,
-    message: "Server timeout - Database connection lost",
-    level: "Critical",
-    time: "2025-08-28 14:30",
-  },
-  {
-    id: 2,
-    message: "Unauthorized access attempt from IP 192.168.1.100",
-    level: "Warning",
-    time: "2025-08-28 13:15",
-  },
-  {
-    id: 3,
-    message: "Memory usage exceeded 85% threshold",
-    level: "Warning",
-    time: "2025-08-28 12:45",
-  },
-  {
-    id: 4,
-    message: "SSL certificate expires in 7 days",
-    level: "Info",
-    time: "2025-08-28 11:20",
-  },
-  {
-    id: 5,
-    message: "Disk space critically low (95% used)",
-    level: "Critical",
-    time: "2025-08-28 10:00",
-  },
-  {
-    id: 6,
-    message: "Failed login attempts exceeded limit",
-    level: "Warning",
-    time: "2025-08-28 09:30",
-  },
-];
+import ErrorLogs from "./components/ErrorLogs";
 
 const activityLogs = [
   {
@@ -172,19 +133,6 @@ const dashboardIndicators = [
 const AuditTrail = () => {
   const [tab, setTab] = useState(0);
 
-  const getLevelColor = (level) => {
-    switch (level) {
-      case "Critical":
-        return "bg-red-100 text-red-800";
-      case "Warning":
-        return "bg-yellow-100 text-yellow-800";
-      case "Info":
-        return "bg-blue-100 text-blue-800";
-      default:
-        return "bg-green-100 text-green-800";
-    }
-  };
-
   const getCardColors = (color) => {
     const colors = {
       red: "from-red-50 to-red-100 border-red-200",
@@ -256,65 +204,7 @@ const AuditTrail = () => {
         </div>
 
         {/* Error Log Tab */}
-        {tab === 0 && (
-          <div className="p-4">
-            <h2 className="text-2xl font-semibold text-red-900 mb-6">
-              System Error Logs
-            </h2>
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <Table>
-                <TableHead>
-                  <TableRow className="bg-gradient-to-r from-red-50 to-blue-50">
-                    <TableCell className="font-bold text-red-900">ID</TableCell>
-                    <TableCell className="font-bold text-red-900">
-                      Error Message
-                    </TableCell>
-                    <TableCell className="font-bold text-red-900">
-                      Severity Level
-                    </TableCell>
-                    <TableCell className="font-bold text-red-900">
-                      Timestamp
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {errorLogs.map((log, index) => (
-                    <TableRow
-                      key={log.id}
-                      className={`hover:bg-red-50 ${
-                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                      }`}
-                    >
-                      <TableCell>
-                        <div className="bg-red-100 text-red-900 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">
-                          {log.id}
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {log.message}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-semibold ${getLevelColor(
-                            log.level
-                          )}`}
-                        >
-                          {log.level}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <AccessTime className="w-4 h-4 text-gray-500" />
-                          {log.time}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-        )}
+        {tab === 0 && <ErrorLogs />}
 
         {/* Activity Log Tab */}
         {tab === 1 && (
