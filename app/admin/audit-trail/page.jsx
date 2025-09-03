@@ -1,89 +1,17 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Box,
-  Tabs,
-  Tab,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Card,
-  CardContent,
-  Grid,
-  Chip,
-  Avatar,
-} from "@mui/material";
+import { Tabs, Tab } from "@mui/material";
 import {
   ErrorOutline,
   Timeline,
   Dashboard,
-  Person,
-  AccessTime,
-  Warning,
-  Info,
   CheckCircle,
   Security,
-  Settings,
   AccountCircle,
 } from "@mui/icons-material";
 import AdminLayout from "@/components/AdminLayout";
 import ErrorLogs from "./components/ErrorLogs";
-
-const activityLogs = [
-  {
-    id: 1,
-    user: "Admin",
-    action: "Created new security policy",
-    time: "2025-08-28 14:00",
-  },
-  {
-    id: 2,
-    user: "John Doe",
-    action: "Updated user profile information",
-    time: "2025-08-28 13:30",
-  },
-  {
-    id: 3,
-    user: "Sarah Wilson",
-    action: "Generated monthly compliance report",
-    time: "2025-08-28 12:15",
-  },
-  {
-    id: 4,
-    user: "Mike Johnson",
-    action: "Modified system configurations",
-    time: "2025-08-28 11:45",
-  },
-  {
-    id: 5,
-    user: "Emily Davis",
-    action: "Accessed sensitive data module",
-    time: "2025-08-28 10:20",
-  },
-  {
-    id: 6,
-    user: "Admin",
-    action: "Performed database backup",
-    time: "2025-08-28 09:00",
-  },
-  {
-    id: 7,
-    user: "Robert Brown",
-    action: "Updated user permissions",
-    time: "2025-08-28 08:30",
-  },
-  {
-    id: 8,
-    user: "Lisa Anderson",
-    action: "Downloaded audit trail report",
-    time: "2025-08-28 08:00",
-  },
-];
+import ActivitiesLogs from "./components/ActivitiesLogs";
 
 const dashboardIndicators = [
   {
@@ -207,64 +135,7 @@ const AuditTrail = () => {
         {tab === 0 && <ErrorLogs />}
 
         {/* Activity Log Tab */}
-        {tab === 1 && (
-          <div className="p-4">
-            <h2 className="text-2xl font-semibold text-blue-600 mb-6">
-              User Activity Logs
-            </h2>
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <Table>
-                <TableHead>
-                  <TableRow className="bg-gradient-to-r from-blue-50 to-red-50">
-                    <TableCell className="font-bold text-blue-600">
-                      ID
-                    </TableCell>
-                    <TableCell className="font-bold text-blue-600">
-                      User
-                    </TableCell>
-                    <TableCell className="font-bold text-blue-600">
-                      Action Performed
-                    </TableCell>
-                    <TableCell className="font-bold text-blue-600">
-                      Timestamp
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {activityLogs.map((log, index) => (
-                    <TableRow
-                      key={log.id}
-                      className={`hover:bg-blue-50 ${
-                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                      }`}
-                    >
-                      <TableCell>
-                        <div className="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">
-                          {log.id}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Person className="w-4 h-4 text-gray-500" />
-                          <span className="font-medium">{log.user}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {log.action}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <AccessTime className="w-4 h-4 text-gray-500" />
-                          {log.time}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-        )}
+        {tab === 1 && <ActivitiesLogs />}
 
         {/* Dashboard Indicators Tab */}
         {tab === 2 && (
