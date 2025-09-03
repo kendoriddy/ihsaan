@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Formik, Form } from "formik";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { ChangePasswordSchema } from "@/components/validationSchemas/ValidationSchema";
+import Swal from "sweetalert2";
 
 function Page() {
   const router = useRouter();
@@ -33,7 +34,13 @@ function Page() {
       }, 2000);
     },
     onError: (error) => {
-      toast.error(error.message);
+      Swal.fire({
+        title: error.message,
+        icon: "error",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
     },
   });
   const handleSubmit = (values) => {

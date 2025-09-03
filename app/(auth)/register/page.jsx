@@ -11,6 +11,7 @@ import AuthButton from "@/components/AuthButton";
 import { Formik, Form } from "formik";
 import { usePost } from "@/hooks/useHttp/useHttp";
 import Autocomplete from "@mui/material/Autocomplete";
+import Swal from "sweetalert2";
 
 function Page() {
   const router = useRouter();
@@ -40,9 +41,14 @@ function Page() {
 
   const { mutate, isLoading } = usePost("/auth/register", {
     onSuccess: (response) => {
-      toast.info(
-        "Registration successful. Please verify your email by clicking the link sent to your mail."
-      );
+      Swal.fire({
+        title:
+          "Registration successful. Please verify your email by clicking the link sent to your mail.",
+        icon: "info",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
       router.push("/");
     },
     onError: (error) => {
@@ -50,7 +56,13 @@ function Page() {
         ? error.response.data.email.join(", ")
         : "An error occurred";
       console.log(errorMessage);
-      toast.error(errorMessage);
+      Swal.fire({
+        title: errorMessage,
+        icon: "error",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
     },
   });
 

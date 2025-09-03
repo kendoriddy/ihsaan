@@ -15,6 +15,7 @@ import { useDispatch } from "react-redux";
 import { loginUserSuccess } from "@/utils/redux/slices/auth.reducer";
 import { IMAGES } from "@/constants";
 import Image from "next/image";
+import Swal from "sweetalert2";
 
 const LogIn = () => {
   const dispatch = useDispatch();
@@ -52,16 +53,39 @@ const LogIn = () => {
       if (error.response) {
         const errorMessage =
           error.response.data?.message || "An unexpected error occurred";
-        toast.error(errorMessage);
+        Swal.fire({
+          title: errorMessage,
+          icon: "error",
+          customClass: {
+            confirmButton: "my-confirm-btn",
+          },
+        });
       } else if (error.request) {
         // Network error (request was made but no response received)
-        toast.error("Network error: Please check your internet connection");
+        Swal.fire({
+          title: "Network error: Please check your internet connection",
+          icon: "error",
+          customClass: {
+            confirmButton: "my-confirm-btn",
+          },
+        });
       } else {
         // Some other error occurred
-        toast.error("An unknown error occurred");
+        Swal.fire({
+          title: "An unknown error occurred",
+          icon: "error",
+          customClass: {
+            confirmButton: "my-confirm-btn",
+          },
+        });
       }
-
-      toast.error("Invalid email or password");
+      Swal.fire({
+        title: "Invalid email or password",
+        icon: "error",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
     },
   });
 

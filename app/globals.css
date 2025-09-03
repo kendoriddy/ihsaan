@@ -107,6 +107,14 @@ input[type="number"] {
   }
 }
 
+.my-confirm-btn {
+  background-color: #2563eb !important;
+  color: white !important;
+  font-weight: 500;
+  padding: 8px 20px;
+  border-radius: 8px;
+}
+
 /* Button css ends here */
 
 /* animation for blogcomment section */

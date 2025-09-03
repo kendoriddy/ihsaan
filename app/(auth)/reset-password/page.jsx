@@ -11,6 +11,7 @@ import { usePost } from "@/hooks/useHttp/useHttp";
 import { Formik, Form } from "formik";
 import { ResetPasswordSchema } from "@/components/validationSchemas/ValidationSchema";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,7 +38,13 @@ function Page() {
       }, 2000);
     },
     onError: (error) => {
-      toast.error(error.message);
+      Swal.fire({
+        title: error.message,
+        icon: "error",
+        customClass: {
+          confirmButton: "my-confirm-btn",
+        },
+      });
     },
   });
   const handleSubmit = (values) => {
