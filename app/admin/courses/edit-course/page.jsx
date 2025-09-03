@@ -18,6 +18,7 @@ import {
   FaFileExcel,
   FaFilePdf,
   FaFileWord,
+  FaGripVertical,
 } from "react-icons/fa";
 import { convertDurationToSeconds } from "@/utils/utilFunctions";
 import AdminDashboardHeader from "@/components/AdminDashboardHeader";
@@ -109,6 +110,13 @@ function EditCoursePage() {
     description: "",
     has_mcq_assessment: "",
   });
+
+  // Drag and drop state
+  const [draggedSection, setDraggedSection] = useState(null);
+  const [isReordering, setIsReordering] = useState(false);
+
+  // Section collapse state - all sections collapsed by default
+  const [collapsedSections, setCollapsedSections] = useState(new Set());
 
   const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [allStudents, setAllStudents] = useState([]);
@@ -618,6 +626,104 @@ function EditCoursePage() {
     }
   };
 
+  // Drag and drop handlers for sections
+  const handleDragStart = (e, section) => {
+    setDraggedSection(section);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/html", section.id);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = async (e, targetSection) => {
+    e.preventDefault();
+    if (!draggedSection || draggedSection.id === targetSection.id) {
+      setDraggedSection(null);
+      return;
+    }
+
+    setIsReordering(true);
+    try {
+      // Create new array with reordered sections
+      const sectionsCopy = [...courseSections];
+      const draggedIndex = sectionsCopy.findIndex(
+        (s) => s.id === draggedSection.id
+      );
+      const targetIndex = sectionsCopy.findIndex(
+        (s) => s.id === targetSection.id
+      );
+
+      // Remove dragged section from its current position
+      const [draggedItem] = sectionsCopy.splice(draggedIndex, 1);
+
+      // Insert dragged section at target position
+      sectionsCopy.splice(targetIndex, 0, draggedItem);
+
+      // Update order numbers
+      const updatedSections = sectionsCopy.map((section, index) => ({
+        ...section,
+        order: index + 1,
+      }));
+
+      // Update local state immediately for better UX
+      setCourseSections(updatedSections);
+
+      // Prepare payload for API
+      const payload = {
+        sections: updatedSections.map((section, index) => ({
+          id: section.id,
+          order: index + 1,
+        })),
+      };
+
+      // Send update to API
+      const response = await axios.post(
+        "https://ihsaanlms.onrender.com/course/course-sections/update_order/",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Sections reordered successfully!");
+        // Refresh sections to ensure consistency
+        fetchCourseSections();
+      }
+    } catch (error) {
+      toast.error("Failed to reorder sections. Please try again.");
+      console.error("Error reordering sections:", error);
+      // Revert to original order on error
+      fetchCourseSections();
+    } finally {
+      setIsReordering(false);
+      setDraggedSection(null);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedSection(null);
+  };
+
+  // Toggle section collapse state
+  const toggleSectionCollapse = (sectionId) => {
+    setCollapsedSections((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionId)) {
+        newSet.delete(sectionId);
+      } else {
+        newSet.add(sectionId);
+      }
+      return newSet;
+    });
+  };
+
   const handleAddSection = async (e) => {
     e.preventDefault();
     if (!newSectionData.title || !newSectionData.has_mcq_assessment) {
@@ -908,171 +1014,239 @@ function EditCoursePage() {
                 {/* Display Course Sections */}
                 <div className="mt-6">
                   <h3 className="text-lg font-medium text-gray-800 mb-2">
-                    Available Sections
+                    Available Sections{" "}
+                    {isReordering && (
+                      <span className="text-sm text-blue-600">
+                        (Reordering...)
+                      </span>
+                    )}
                   </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    💡 Sections are collapsed by default for easier reordering.
+                    Click on a section header or use the arrow button to
+                    expand/collapse content.
+                  </p>
                   {courseSections && courseSections.length > 0 ? (
                     <ul className="space-y-3">
-                      {courseSections.map((section) => (
-                        <li
-                          key={section.id}
-                          className="p-4 border rounded-lg bg-white shadow-md mb-6"
-                        >
-                          <div className="mb-3 pb-2 border-b">
-                            <h4 className="text-xl font-semibold text-indigo-700">
-                              {section.title}
-                            </h4>
-                            {section.description && (
-                              <p className="text-sm text-gray-600 mt-1">
-                                {section.description}
-                              </p>
-                            )}
-                            <p className="text-xs text-gray-500 mt-1">
-                              Order: {section.order}
-                            </p>
-                          </div>
-
-                          {/* Display Videos for this section */}
-                          <div className="mb-4">
-                            <h5 className="text-md font-semibold text-gray-700 mb-2">
-                              Videos in this section:
-                            </h5>
-                            {section.videos && section.videos.length > 0 ? (
-                              <ul className="divide-y divide-gray-200 border rounded-md">
-                                {section.videos.map((video) => (
-                                  <li
-                                    key={video.id}
-                                    className="p-3 flex items-center justify-between hover:bg-gray-50"
+                      {courseSections
+                        .sort((a, b) => (a.order || 0) - (b.order || 0))
+                        .map((section) => (
+                          <li
+                            key={section.id}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, section)}
+                            onDragOver={handleDragOver}
+                            onDrop={(e) => handleDrop(e, section)}
+                            onDragEnd={handleDragEnd}
+                            className={`p-4 border rounded-lg bg-white shadow-md mb-6 cursor-move transition-all duration-200 ${
+                              draggedSection?.id === section.id
+                                ? "opacity-50 scale-95 border-blue-400"
+                                : "hover:shadow-lg hover:border-gray-300"
+                            } ${isReordering ? "pointer-events-none" : ""}`}
+                          >
+                            <div
+                              className="mb-3 pb-2 border-b cursor-pointer hover:bg-gray-50 transition-colors duration-200 rounded-t p-2 -m-2"
+                              onClick={() => toggleSectionCollapse(section.id)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center flex-1">
+                                  <FaGripVertical className="text-gray-400 mr-2 cursor-grab active:cursor-grabbing" />
+                                  <h4 className="text-xl font-semibold text-indigo-700">
+                                    {section.title}
+                                  </h4>
+                                  {collapsedSections.has(section.id) && (
+                                    <span className="ml-2 text-xs text-gray-500 bg-yellow-100 px-2 py-1 rounded">
+                                      Collapsed
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleSectionCollapse(section.id);
+                                    }}
+                                    className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded hover:bg-gray-200"
+                                    title={
+                                      collapsedSections.has(section.id)
+                                        ? "Expand section"
+                                        : "Collapse section"
+                                    }
                                   >
-                                    <div className="flex items-center">
-                                      {video.video_resource?.media_url && (
-                                        <div
-                                          onClick={() =>
-                                            window.open(
-                                              video.video_resource.media_url,
-                                              "_blank"
-                                            )
-                                          }
-                                          className="cursor-pointer mr-3 rounded overflow-hidden shadow-sm flex-shrink-0"
+                                    {collapsedSections.has(section.id) ? (
+                                      <FaChevronDown className="w-4 h-4" />
+                                    ) : (
+                                      <FaChevronUp className="w-4 h-4" />
+                                    )}
+                                  </button>
+                                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                    Drag to reorder
+                                  </span>
+                                </div>
+                              </div>
+                              {section.description && (
+                                <p className="text-sm text-gray-600 mt-1">
+                                  {section.description}
+                                </p>
+                              )}
+                              <p className="text-xs text-gray-500 mt-1">
+                                Position: {section.order}
+                              </p>
+                            </div>
+
+                            {/* Collapsible content */}
+                            {!collapsedSections.has(section.id) && (
+                              <>
+                                {/* Display Videos for this section */}
+                                <div className="mb-4">
+                                  <h5 className="text-md font-semibold text-gray-700 mb-2">
+                                    Videos in this section:
+                                  </h5>
+                                  {section.videos &&
+                                  section.videos.length > 0 ? (
+                                    <ul className="divide-y divide-gray-200 border rounded-md">
+                                      {section.videos.map((video) => (
+                                        <li
+                                          key={video.id}
+                                          className="p-3 flex items-center justify-between hover:bg-gray-50"
                                         >
-                                          <video
-                                            width={100}
-                                            height={60}
-                                            className="border rounded"
-                                            controls={false}
-                                            muted
+                                          <div className="flex items-center">
+                                            {video.video_resource
+                                              ?.media_url && (
+                                              <div
+                                                onClick={() =>
+                                                  window.open(
+                                                    video.video_resource
+                                                      .media_url,
+                                                    "_blank"
+                                                  )
+                                                }
+                                                className="cursor-pointer mr-3 rounded overflow-hidden shadow-sm flex-shrink-0"
+                                              >
+                                                <video
+                                                  width={100}
+                                                  height={60}
+                                                  className="border rounded"
+                                                  controls={false}
+                                                  muted
+                                                >
+                                                  <source
+                                                    src={
+                                                      video.video_resource
+                                                        .media_url
+                                                    }
+                                                    type="video/mp4"
+                                                  />
+                                                  Your browser does not support
+                                                  the video tag.
+                                                </video>
+                                              </div>
+                                            )}
+                                            <div className="flex flex-col">
+                                              <h6 className="text-sm font-medium text-gray-800">
+                                                {video.title} (Order:{" "}
+                                                {video.order})
+                                              </h6>
+                                              <p className="text-xs text-gray-500">
+                                                Video No: {video.video_no} |
+                                                Duration: {video.duration}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <button
+                                            onClick={() =>
+                                              handleDeleteVideo(video.id)
+                                            }
+                                            className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 ml-2"
                                           >
-                                            <source
-                                              src={
-                                                video.video_resource.media_url
-                                              }
-                                              type="video/mp4"
-                                            />
-                                            Your browser does not support the
-                                            video tag.
-                                          </video>
-                                        </div>
-                                      )}
-                                      <div className="flex flex-col">
-                                        <h6 className="text-sm font-medium text-gray-800">
-                                          {video.title} (Order: {video.order})
-                                        </h6>
-                                        <p className="text-xs text-gray-500">
-                                          Video No: {video.video_no} | Duration:{" "}
-                                          {video.duration}
-                                        </p>
-                                      </div>
-                                    </div>
-                                    <button
-                                      onClick={() =>
-                                        handleDeleteVideo(video.id)
-                                      }
-                                      className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 ml-2"
-                                    >
-                                      Delete
-                                    </button>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <p className="px-3 py-2 text-xs text-gray-500 italic bg-gray-50 rounded-md">
-                                No videos in this section.
-                              </p>
-                            )}
-                          </div>
+                                            Delete
+                                          </button>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="px-3 py-2 text-xs text-gray-500 italic bg-gray-50 rounded-md">
+                                      No videos in this section.
+                                    </p>
+                                  )}
+                                </div>
 
-                          {/* Display Materials for this section */}
-                          <div>
-                            <h5 className="text-md font-semibold text-gray-700 mb-2">
-                              Materials in this section:
-                            </h5>
-                            {section.materials &&
-                            section.materials.length > 0 ? (
-                              <ul className="divide-y divide-gray-200 border rounded-md">
-                                {section.materials.map((material) => (
-                                  <li
-                                    key={material.id}
-                                    className="p-3 flex items-center justify-between hover:bg-gray-50"
-                                  >
-                                    <div className="flex items-center">
-                                      {material.material_resource?.media_url ? (
-                                        <div
-                                          onClick={() =>
-                                            window.open(
-                                              material.material_resource
-                                                .media_url,
-                                              "_blank"
-                                            )
-                                          }
-                                          className="cursor-pointer mr-3 flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                                {/* Display Materials for this section */}
+                                <div>
+                                  <h5 className="text-md font-semibold text-gray-700 mb-2">
+                                    Materials in this section:
+                                  </h5>
+                                  {section.materials &&
+                                  section.materials.length > 0 ? (
+                                    <ul className="divide-y divide-gray-200 border rounded-md">
+                                      {section.materials.map((material) => (
+                                        <li
+                                          key={material.id}
+                                          className="p-3 flex items-center justify-between hover:bg-gray-50"
                                         >
-                                          {material.material_resource.media_url.endsWith(
-                                            ".pdf"
-                                          ) ? (
-                                            <FaFilePdf className="w-6 h-6 text-red-500" />
-                                          ) : material.material_resource.media_url.match(
-                                              /\.(docx?|odt)$/i
-                                            ) ? (
-                                            <FaFileWord className="w-6 h-6 text-blue-500" />
-                                          ) : material.material_resource.media_url.match(
-                                              /\.(xlsx?|ods)$/i
-                                            ) ? (
-                                            <FaFileExcel className="w-6 h-6 text-green-500" />
-                                          ) : (
-                                            <FaFile className="w-6 h-6 text-gray-400" />
-                                          )}
-                                        </div>
-                                      ) : (
-                                        <FaFile className="w-6 h-6 text-gray-400 mr-3 flex-shrink-0" />
-                                      )}
-                                      <div className="flex flex-col">
-                                        <h6 className="text-sm font-medium text-gray-800">
-                                          {material.title} (Order:{" "}
-                                          {material.order})
-                                        </h6>
-                                        <p className="text-xs text-gray-500 italic">
-                                          Click icon to download/view
-                                        </p>
-                                      </div>
-                                    </div>
-                                    <button
-                                      onClick={() =>
-                                        handleDeleteMaterial(material.id)
-                                      }
-                                      className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 ml-2"
-                                    >
-                                      Delete
-                                    </button>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <p className="px-3 py-2 text-xs text-gray-500 italic bg-gray-50 rounded-md">
-                                No materials in this section.
-                              </p>
+                                          <div className="flex items-center">
+                                            {material.material_resource
+                                              ?.media_url ? (
+                                              <div
+                                                onClick={() =>
+                                                  window.open(
+                                                    material.material_resource
+                                                      .media_url,
+                                                    "_blank"
+                                                  )
+                                                }
+                                                className="cursor-pointer mr-3 flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                                              >
+                                                {material.material_resource.media_url.endsWith(
+                                                  ".pdf"
+                                                ) ? (
+                                                  <FaFilePdf className="w-6 h-6 text-red-500" />
+                                                ) : material.material_resource.media_url.match(
+                                                    /\.(docx?|odt)$/i
+                                                  ) ? (
+                                                  <FaFileWord className="w-6 h-6 text-blue-500" />
+                                                ) : material.material_resource.media_url.match(
+                                                    /\.(xlsx?|ods)$/i
+                                                  ) ? (
+                                                  <FaFileExcel className="w-6 h-6 text-green-500" />
+                                                ) : (
+                                                  <FaFile className="w-6 h-6 text-gray-400" />
+                                                )}
+                                              </div>
+                                            ) : (
+                                              <FaFile className="w-6 h-6 text-gray-400 mr-3 flex-shrink-0" />
+                                            )}
+                                            <div className="flex flex-col">
+                                              <h6 className="text-sm font-medium text-gray-800">
+                                                {material.title} (Order:{" "}
+                                                {material.order})
+                                              </h6>
+                                              <p className="text-xs text-gray-500 italic">
+                                                Click icon to download/view
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <button
+                                            onClick={() =>
+                                              handleDeleteMaterial(material.id)
+                                            }
+                                            className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 ml-2"
+                                          >
+                                            Delete
+                                          </button>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="px-3 py-2 text-xs text-gray-500 italic bg-gray-50 rounded-md">
+                                      No materials in this section.
+                                    </p>
+                                  )}
+                                </div>
+                              </>
                             )}
-                          </div>
-                        </li>
-                      ))}
+                          </li>
+                        ))}
                     </ul>
                   ) : (
                     <p className="text-gray-500 italic">

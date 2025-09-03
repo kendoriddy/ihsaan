@@ -126,7 +126,8 @@ const DashboardTab = () => {
             },
           }
         );
-        console.log("Programme added successfully");
+        toast.success("Programme added successfully");
+        dispatch(fetchProgrammes({ page: 1, pageSize: 10 }));
       }
       setProgrammeOpen(false); // Close the modal after successful submission
       console.log("Programme added successfully:", response.data);

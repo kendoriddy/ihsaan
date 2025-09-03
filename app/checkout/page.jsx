@@ -13,6 +13,18 @@ import { usePathname, useRouter } from "next/navigation";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import {
+  CreditCardIcon,
+  LockClosedIcon,
+  ShieldCheckIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
+import {
+  CreditCardIcon as CreditCardIconSolid,
+  LockClosedIcon as LockClosedIconSolid,
+  ShieldCheckIcon as ShieldCheckIconSolid,
+} from "@heroicons/react/24/solid";
 
 // Validation schema for checkout form
 const CheckoutSchema = Yup.object().shape({
@@ -20,19 +32,6 @@ const CheckoutSchema = Yup.object().shape({
   lastName: Yup.string().required("Last name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   phone: Yup.string().required("Phone number is required"),
-  address: Yup.string().required("Address is required"),
-  city: Yup.string().required("City is required"),
-  state: Yup.string().required("State is required"),
-  zipCode: Yup.string().required("ZIP code is required"),
-  cardNumber: Yup.string()
-    .matches(/^\d{16}$/, "Card number must be 16 digits")
-    .required("Card number is required"),
-  expiryDate: Yup.string()
-    .matches(/^(0[1-9]|1[0-2])\/([0-9]{2})$/, "Invalid expiry date (MM/YY)")
-    .required("Expiry date is required"),
-  cvv: Yup.string()
-    .matches(/^\d{3,4}$/, "CVV must be 3-4 digits")
-    .required("CVV is required"),
 });
 
 function Checkout() {
@@ -41,6 +40,8 @@ function Checkout() {
   const pathname = usePathname();
   const [currentRoute, setCurrentRoute] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentStep, setPaymentStep] = useState("form"); // form, processing, success, error
+  const [paymentReference, setPaymentReference] = useState("");
 
   const { cart, status, itemCount, totalAmount } = useSelector(
     (state) => state.cart
@@ -56,6 +57,13 @@ function Checkout() {
     dispatch(getOrCreateCart());
   }, [dispatch]);
 
+  // Generate payment reference
+  const generatePaymentReference = () => {
+    const timestamp = Date.now().toString();
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    return `PAY-${timestamp}-${random}`;
+  };
+
   const handleCheckout = async (values) => {
     if (itemCount === 0) {
       toast.error("Your cart is empty. Add some items first!");
@@ -63,17 +71,37 @@ function Checkout() {
     }
 
     setIsProcessing(true);
+    setPaymentStep("processing");
+    const ref = generatePaymentReference();
+    setPaymentReference(ref);
 
     try {
-      // Here you would typically integrate with a payment processor
-      // For now, we'll just simulate the checkout process
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      // Simulate Paystack payment flow
+      console.log("Initiating Paystack payment...");
+      console.log("Payment Reference:", ref);
+      console.log("Amount:", totalAmount);
+      console.log("Customer Email:", values.email);
+
+      // Simulate payment processing steps
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Initialize payment
+      console.log("Payment initialized...");
+
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // Process payment
+      console.log("Payment processed...");
+
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Verify payment
+      console.log("Payment verified...");
+
+      // Simulate successful payment
+      setPaymentStep("success");
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Show success message
 
       await dispatch(checkoutCart()).unwrap();
-      toast.success("Order placed successfully! Redirecting to orders...");
-      router.push("/dashboard/orders");
+      toast.success("Payment successful! Order placed successfully!");
+      router.push("/courses/my-courses");
     } catch (error) {
-      toast.error(error || "Failed to process checkout. Please try again.");
+      setPaymentStep("error");
+      toast.error(error || "Payment failed. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -155,226 +183,265 @@ function Checkout() {
                       lastName: "",
                       email: "",
                       phone: "",
-                      address: "",
-                      city: "",
-                      state: "",
-                      zipCode: "",
-                      cardNumber: "",
-                      expiryDate: "",
-                      cvv: "",
                     }}
                     validationSchema={CheckoutSchema}
                     onSubmit={handleCheckout}
                   >
                     {({ errors, touched }) => (
-                      <Form className="space-y-4">
+                      <Form className="space-y-6">
+                        {/* Paystack Security Notice */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <div className="flex items-start space-x-3">
+                            <ShieldCheckIcon className="h-5 w-5 text-blue-600 mt-0.5" />
+                            <div>
+                              <h3 className="text-sm font-medium text-blue-900">
+                                Secure Payment with Paystack
+                              </h3>
+                              <p className="text-sm text-blue-700 mt-1">
+                                Your payment will be processed securely through
+                                Paystack's payment gateway.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
                         {/* Personal Information */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              First Name
-                            </label>
-                            <Field
-                              name="firstName"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              placeholder="John"
-                            />
-                            {errors.firstName && touched.firstName && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors.firstName}
-                              </p>
-                            )}
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Last Name
-                            </label>
-                            <Field
-                              name="lastName"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              placeholder="Doe"
-                            />
-                            {errors.lastName && touched.lastName && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors.lastName}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Email
-                          </label>
-                          <Field
-                            name="email"
-                            type="email"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="john@example.com"
-                          />
-                          {errors.email && touched.email && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {errors.email}
-                            </p>
-                          )}
-                        </div>
+                          <h3 className="text-lg font-medium text-gray-900 mb-4">
+                            Personal Information
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                First Name
+                              </label>
+                              <Field
+                                name="firstName"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="John"
+                              />
+                              {errors.firstName && touched.firstName && (
+                                <p className="text-red-500 text-xs mt-1">
+                                  {errors.firstName}
+                                </p>
+                              )}
+                            </div>
 
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone Number
-                          </label>
-                          <Field
-                            name="phone"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="+234 123 456 7890"
-                          />
-                          {errors.phone && touched.phone && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {errors.phone}
-                            </p>
-                          )}
-                        </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Last Name
+                              </label>
+                              <Field
+                                name="lastName"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Doe"
+                              />
+                              {errors.lastName && touched.lastName && (
+                                <p className="text-red-500 text-xs mt-1">
+                                  {errors.lastName}
+                                </p>
+                              )}
+                            </div>
+                          </div>
 
-                        {/* Billing Address */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Address
-                          </label>
-                          <Field
-                            name="address"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="123 Main Street"
-                          />
-                          {errors.address && touched.address && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {errors.address}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
+                          <div className="mt-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              City
+                              Email Address
                             </label>
                             <Field
-                              name="city"
+                              name="email"
+                              type="email"
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              placeholder="Lagos"
+                              placeholder="john@example.com"
                             />
-                            {errors.city && touched.city && (
+                            {errors.email && touched.email && (
                               <p className="text-red-500 text-xs mt-1">
-                                {errors.city}
+                                {errors.email}
                               </p>
                             )}
                           </div>
 
-                          <div>
+                          <div className="mt-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              State
+                              Phone Number
                             </label>
                             <Field
-                              name="state"
+                              name="phone"
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              placeholder="Lagos"
+                              placeholder="+234 123 456 7890"
                             />
-                            {errors.state && touched.state && (
+                            {errors.phone && touched.phone && (
                               <p className="text-red-500 text-xs mt-1">
-                                {errors.state}
-                              </p>
-                            )}
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              ZIP Code
-                            </label>
-                            <Field
-                              name="zipCode"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              placeholder="100001"
-                            />
-                            {errors.zipCode && touched.zipCode && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors.zipCode}
+                                {errors.phone}
                               </p>
                             )}
                           </div>
                         </div>
 
-                        {/* Payment Information */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Card Number
-                          </label>
-                          <Field
-                            name="cardNumber"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="1234 5678 9012 3456"
-                          />
-                          {errors.cardNumber && touched.cardNumber && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {errors.cardNumber}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Expiry Date
-                            </label>
-                            <Field
-                              name="expiryDate"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              placeholder="MM/YY"
-                            />
-                            {errors.expiryDate && touched.expiryDate && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors.expiryDate}
-                              </p>
+                        {/* Payment Button */}
+                        <div className="pt-6">
+                          <button
+                            type="submit"
+                            disabled={isProcessing}
+                            className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                          >
+                            {isProcessing ? (
+                              <>
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                <span>Processing Payment...</span>
+                              </>
+                            ) : (
+                              <>
+                                <LockClosedIcon className="h-5 w-5" />
+                                <span>
+                                  Pay Now - {formatPrice(totalAmount)}
+                                </span>
+                              </>
                             )}
-                          </div>
+                          </button>
 
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              CVV
-                            </label>
-                            <Field
-                              name="cvv"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              placeholder="123"
-                            />
-                            {errors.cvv && touched.cvv && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors.cvv}
-                              </p>
-                            )}
-                          </div>
+                          <p className="text-xs text-gray-500 text-center mt-3">
+                            By clicking "Pay Now", you agree to our terms of
+                            service and privacy policy
+                          </p>
                         </div>
-
-                        <button
-                          type="submit"
-                          disabled={isProcessing}
-                          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isProcessing
-                            ? "Processing..."
-                            : `Pay ${formatPrice(totalAmount)}`}
-                        </button>
                       </Form>
                     )}
                   </Formik>
+
+                  {/* Payment Processing State */}
+                  {paymentStep === "processing" && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                      <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                        <div className="text-center">
+                          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            Processing Payment
+                          </h3>
+                          <p className="text-gray-600 mb-4">
+                            Please wait while we process your payment
+                            securely...
+                          </p>
+                          <div className="bg-gray-100 rounded-lg p-3 mb-4">
+                            <p className="text-sm text-gray-600">
+                              <span className="font-medium">Reference:</span>{" "}
+                              {paymentReference}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              <span className="font-medium">Amount:</span>{" "}
+                              {formatPrice(totalAmount)}
+                            </p>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                              <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                              <span>Initializing payment...</span>
+                            </div>
+                            <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                              <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                              <span>Processing with Paystack...</span>
+                            </div>
+                            <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                              <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                              <span>Verifying transaction...</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Payment Success State */}
+                  {paymentStep === "success" && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                      <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                        <div className="text-center">
+                          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <CheckCircleIcon className="h-8 w-8 text-green-600" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            Payment Successful!
+                          </h3>
+                          <p className="text-gray-600 mb-4">
+                            Your payment has been processed successfully. You
+                            will receive a confirmation email shortly.
+                          </p>
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                            <p className="text-sm text-green-800">
+                              <span className="font-medium">
+                                Transaction ID:
+                              </span>{" "}
+                              {paymentReference}
+                            </p>
+                            <p className="text-sm text-green-800">
+                              <span className="font-medium">Amount Paid:</span>{" "}
+                              {formatPrice(totalAmount)}
+                            </p>
+                          </div>
+                          <p className="text-sm text-gray-500">
+                            Redirecting to your orders...
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Payment Error State */}
+                  {paymentStep === "error" && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                      <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                        <div className="text-center">
+                          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <XCircleIcon className="h-8 w-8 text-red-600" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            Payment Failed
+                          </h3>
+                          <p className="text-gray-600 mb-4">
+                            We couldn't process your payment. Please check your
+                            payment details and try again.
+                          </p>
+                          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                            <p className="text-sm text-red-800">
+                              <span className="font-medium">Reference:</span>{" "}
+                              {paymentReference}
+                            </p>
+                          </div>
+                          <div className="space-y-3">
+                            <button
+                              onClick={() => setPaymentStep("form")}
+                              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                            >
+                              Try Again
+                            </button>
+                            <button
+                              onClick={() => router.push("/cart")}
+                              className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-300"
+                            >
+                              Back to Cart
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Order Summary */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                    Order Summary
-                  </h2>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                      Order Summary
+                    </h2>
+                    <div className="flex items-center space-x-2">
+                      <LockClosedIcon className="h-4 w-4 text-green-600" />
+                      <span className="text-xs text-green-600 font-medium">
+                        Secure
+                      </span>
+                    </div>
+                  </div>
 
                   {/* Cart Items */}
                   <div className="space-y-4 mb-6">
@@ -423,17 +490,28 @@ function Checkout() {
                       <span className="font-medium">₦0.00</span>
                     </div>
 
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Shipping</span>
-                      <span className="font-medium">Free</span>
-                    </div>
-
                     <div className="border-t border-gray-200 pt-3">
                       <div className="flex justify-between font-semibold text-lg">
                         <span>Total</span>
                         <span className="text-blue-600">
                           {formatPrice(totalAmount)}
                         </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Paystack Security Notice */}
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <div className="flex items-start space-x-3">
+                      <ShieldCheckIcon className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">
+                          Powered by Paystack
+                        </h4>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Your payment is processed securely by Paystack,
+                          Nigeria's leading payment processor.
+                        </p>
                       </div>
                     </div>
                   </div>

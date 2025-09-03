@@ -5,6 +5,7 @@ import { muiTheme } from "@/utils/muiTheme";
 import Provider from "./provider";
 import Toastify from "@/components/Toastify";
 import { Suspense } from "react";
+import { FrontendCartProvider } from "@/utils/FrontendCartContext";
 
 export const metadata = {
   title: "IHSAAN ACADEMIA",
@@ -18,10 +19,12 @@ export default function RootLayout({ children }) {
         <ThemeProvider theme={muiTheme}>
           <html lang="en">
             <Provider>
-              <body className={`font-nunito text-sm`}>
-                {children}
-                <Toastify />
-              </body>
+              <FrontendCartProvider>
+                <body className={`font-nunito text-sm`}>
+                  {children}
+                  <Toastify />
+                </body>
+              </FrontendCartProvider>
             </Provider>
           </html>
         </ThemeProvider>

@@ -55,8 +55,18 @@ function Store() {
   };
 
   const handleAddToCart = async (productId) => {
+    // Check if item already exists in cart
+    const existingItem = cart?.items?.find(
+      (item) => item.product.id === productId
+    );
+
+    if (existingItem) {
+      toast.info("This item is already in your cart!");
+      return;
+    }
+
     try {
-      await dispatch(addItemToCart({ productId })).unwrap();
+      await dispatch(addItemToCart({ productId, quantity: 1 })).unwrap();
       toast.success("Item added to cart successfully!");
     } catch (error) {
       console.log("error:::", error);
@@ -119,7 +129,7 @@ function Store() {
                   <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search for courses, books..."
+                    placeholder="Search..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -153,14 +163,14 @@ function Store() {
                 </select>
 
                 {/* Cart Badge */}
-                <div className="relative">
+                {/* <div className="relative">
                   <ShoppingCartIcon className="text-2xl text-gray-600" />
                   {itemCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                       {itemCount}
                     </span>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -235,15 +245,30 @@ function Store() {
                         </div>
 
                         {/* Add to Cart Button */}
-                        <button
-                          onClick={() => handleAddToCart(product.id)}
-                          disabled={cartStatus === "loading"}
-                          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {cartStatus === "loading"
-                            ? "Adding..."
-                            : "Add to Cart"}
-                        </button>
+                        {(() => {
+                          const existingItem = cart?.items?.find(
+                            (item) => item.product.id === product.id
+                          );
+                          const isInCart = !!existingItem;
+
+                          return (
+                            <button
+                              onClick={() => handleAddToCart(product.id)}
+                              disabled={cartStatus === "loading" || isInCart}
+                              className={`w-full py-2 px-4 rounded-lg transition-colors duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
+                                isInCart
+                                  ? "bg-green-600 text-white cursor-not-allowed"
+                                  : "bg-blue-600 text-white hover:bg-blue-700"
+                              }`}
+                            >
+                              {cartStatus === "loading"
+                                ? "Adding..."
+                                : isInCart
+                                ? "✓ In Cart"
+                                : "Add to Cart"}
+                            </button>
+                          );
+                        })()}
                       </div>
                     </div>
                   ))}

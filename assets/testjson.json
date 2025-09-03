@@ -286,7 +286,7 @@
       "max_attempts": 1,
       "is_open": false,
       "time_remaining": null,
-      "submission_status": "pending",
+      "submission_status": "submitted",
       "file_questions": [],
       "created_at": "2025-06-15T18:16:31.616196Z",
       "updated_at": "2025-06-15T18:16:31.616217Z"
@@ -315,7 +315,7 @@
       "max_attempts": 1,
       "is_open": false,
       "time_remaining": null,
-      "submission_status": "pending",
+      "submission_status": "submitted",
       "file_questions": [],
       "created_at": "2025-06-14T16:02:54.902169Z",
       "updated_at": "2025-06-14T16:02:54.902192Z"
@@ -344,7 +344,7 @@
       "max_attempts": 1,
       "is_open": false,
       "time_remaining": null,
-      "submission_status": "pending",
+      "submission_status": "submitted",
       "file_questions": [],
       "created_at": "2025-06-14T15:56:57.416936Z",
       "updated_at": "2025-06-14T15:58:02.493163Z"
@@ -373,7 +373,7 @@
       "max_attempts": 1,
       "is_open": false,
       "time_remaining": null,
-      "submission_status": "pending",
+      "submission_status": "submitted",
       "file_questions": [],
       "created_at": "2025-06-11T20:39:46.903997Z",
       "updated_at": "2025-06-11T20:39:46.904017Z"
@@ -401,7 +401,7 @@
       "is_active": true,
       "max_attempts": 1,
       "is_open": true,
-      "time_remaining": 313391800.009659,
+      "time_remaining": 307214670.779475,
       "submission_status": "pending",
       "file_questions": [],
       "created_at": "2025-05-30T17:15:07.608738Z",
@@ -430,7 +430,7 @@
       "is_active": true,
       "max_attempts": 1,
       "is_open": true,
-      "time_remaining": 313389042.994287,
+      "time_remaining": 307211913.595271,
       "submission_status": "pending",
       "file_questions": [],
       "created_at": "2025-05-30T16:29:10.652143Z",
@@ -459,7 +459,7 @@
       "is_active": true,
       "max_attempts": 1,
       "is_open": true,
-      "time_remaining": 313227254.747649,
+      "time_remaining": 307050124.957618,
       "submission_status": "pending",
       "file_questions": [],
       "created_at": "2025-05-28T19:32:42.443324Z",
@@ -488,8 +488,8 @@
       "is_active": true,
       "max_attempts": 1,
       "is_open": true,
-      "time_remaining": 312954105.188331,
-      "submission_status": "pending",
+      "time_remaining": 306776974.009364,
+      "submission_status": "submitted",
       "file_questions": [],
       "created_at": "2025-05-25T15:40:14.515525Z",
       "updated_at": "2025-05-25T15:40:14.515525Z"
@@ -518,7 +518,7 @@
       "max_attempts": 1,
       "is_open": false,
       "time_remaining": null,
-      "submission_status": "pending",
+      "submission_status": "submitted",
       "file_questions": [],
       "created_at": "2025-05-19T22:19:00.520970Z",
       "updated_at": "2025-05-19T22:19:00.520991Z"
@@ -894,6 +894,72 @@
       "first_name": "Test",
       "last_name": "Tutor",
       "tutor_full_name": "Test Tutor"
+    },
+    {
+      "id": 9,
+      "user": "7d083a90-1356-4637-a1fb-c6e79c7be71f",
+      "course": 1,
+      "term": null,
+      "assigned_at": "2025-07-07T16:59:39.880729Z",
+      "is_active": true,
+      "first_name": "Bruno",
+      "last_name": "Fernandes",
+      "tutor_full_name": "Bruno Fernandes"
+    },
+    {
+      "id": 10,
+      "user": "7d083a90-1356-4637-a1fb-c6e79c7be71f",
+      "course": 1,
+      "term": 3,
+      "assigned_at": "2025-07-07T19:38:53.351745Z",
+      "is_active": true,
+      "first_name": "Bruno",
+      "last_name": "Fernandes",
+      "tutor_full_name": "Bruno Fernandes"
+    },
+    {
+      "id": 11,
+      "user": "7d083a90-1356-4637-a1fb-c6e79c7be71f",
+      "course": 1,
+      "term": 1,
+      "assigned_at": "2025-07-07T19:39:46.389000Z",
+      "is_active": true,
+      "first_name": "Bruno",
+      "last_name": "Fernandes",
+      "tutor_full_name": "Bruno Fernandes"
+    },
+    {
+      "id": 15,
+      "user": "ca2aa119-32f7-4a94-9501-c8d47cfd4694",
+      "course": 1,
+      "term": 5,
+      "assigned_at": "2025-08-25T05:49:13.520759Z",
+      "is_active": true,
+      "first_name": "Ridwan",
+      "last_name": "Idris",
+      "tutor_full_name": "Ridwan Idris"
+    },
+    {
+      "id": 16,
+      "user": "4ac948f7-a17f-45ce-9351-4cc5a879373a",
+      "course": 1,
+      "term": 5,
+      "assigned_at": "2025-08-25T05:49:25.800078Z",
+      "is_active": true,
+      "first_name": "Person",
+      "last_name": "Bigger",
+      "tutor_full_name": "Person Bigger"
+    },
+    {
+      "id": 17,
+      "user": "8e5368ba-d7e8-4099-9e93-b7b8d3dc2d90",
+      "course": 1,
+      "term": 5,
+      "assigned_at": "2025-08-25T05:49:39.702270Z",
+      "is_active": true,
+      "first_name": "opueh",
+      "last_name": "opueh",
+      "tutor_full_name": "opueh opueh"
     }
   ],
   "groups": [
@@ -908,6 +974,62 @@
       "created_at": "2025-05-30T08:36:27.568711Z"
     }
   ],
+  "enrolled_users": [
+    {
+      "id": "50cf0eec-2453-4d88-a868-b70a5425ccb2",
+      "first_name": "First5",
+      "last_name": "Last5",
+      "email": "student5@gmail.com"
+    },
+    {
+      "id": "9a7d3243-7c03-4216-950b-c27ceb68636e",
+      "first_name": "First1",
+      "last_name": "Last1",
+      "email": "student1@gmail.com"
+    },
+    {
+      "id": "18c58e7c-84e2-4fc6-8fd9-bf5a15fc034d",
+      "first_name": "First2",
+      "last_name": "Last2",
+      "email": "student2@gmail.com"
+    },
+    {
+      "id": "593249ba-a5bb-4ad7-b8b7-4b95a26a67ca",
+      "first_name": "Queen",
+      "last_name": "Xander",
+      "email": "useruno@grr.la"
+    },
+    {
+      "id": "b012c1d6-95ea-4124-a27b-f12a6717accc",
+      "first_name": "Hassan",
+      "last_name": "Obi",
+      "email": "goodstudent@grr.la"
+    },
+    {
+      "id": "e00b23d2-8464-49b9-b711-0e8d9e7bb861",
+      "first_name": "student",
+      "last_name": "student",
+      "email": "student@grr.la"
+    },
+    {
+      "id": "572ee17c-76cc-499a-8482-155aaaec1a09",
+      "first_name": "Kamalideen",
+      "last_name": "Omotosho",
+      "email": "dapious99@gmail.com"
+    },
+    {
+      "id": "557f1c31-66a3-4ab6-aecf-181fdce4b817",
+      "first_name": "OmoKehinde",
+      "last_name": "Ishola",
+      "email": "student-one@grr.la"
+    },
+    {
+      "id": "583a0319-ec51-405d-8080-cfd1929a914d",
+      "first_name": "Kehinde",
+      "last_name": "Onifade",
+      "email": "user@example.com"
+    }
+  ],
   "title": "Introduction to Arabic Alphabet",
   "slug": "alif101-introduction-to-arabic-alphabet",
   "description": "Alif Ba Ta Tha Jim...............",
@@ -916,16 +1038,5 @@
   "image_url": null,
   "created_at": "2025-02-07T17:44:45.445789Z",
   "updated_at": "2025-04-15T18:54:36.727387Z",
-  "programme": "e4881f7d-298f-473d-acd9-012af4edc597",
-  "enrolled_users": [
-    "50cf0eec-2453-4d88-a868-b70a5425ccb2",
-    "9a7d3243-7c03-4216-950b-c27ceb68636e",
-    "18c58e7c-84e2-4fc6-8fd9-bf5a15fc034d",
-    "593249ba-a5bb-4ad7-b8b7-4b95a26a67ca",
-    "557f1c31-66a3-4ab6-aecf-181fdce4b817",
-    "b012c1d6-95ea-4124-a27b-f12a6717accc",
-    "e00b23d2-8464-49b9-b711-0e8d9e7bb861",
-    "572ee17c-76cc-499a-8482-155aaaec1a09",
-    "583a0319-ec51-405d-8080-cfd1929a914d"
-  ]
+  "programme": "e4881f7d-298f-473d-acd9-012af4edc597"
 }

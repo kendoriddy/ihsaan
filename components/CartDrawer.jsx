@@ -190,11 +190,6 @@ function CartDrawer({ isOpen, onClose }) {
                     <span className="font-medium">₦0.00</span>
                   </div>
 
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Shipping</span>
-                    <span className="font-medium">Free</span>
-                  </div>
-
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between font-semibold">
                       <span>Total</span>

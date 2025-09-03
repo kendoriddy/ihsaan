@@ -228,7 +228,7 @@ const MyCoursesPage = () => {
                 {myCourses.map((course) => (
                   <Link
                     key={course.id}
-                    href={`/courses/${course.id}`}
+                    href={`/courses/my-courses/${course.id}`}
                     legacyBehavior
                   >
                     <a className="block bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">

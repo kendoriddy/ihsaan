@@ -399,7 +399,7 @@ function Header() {
                 Why us
               </Link>
             </li>
-            <div>
+            <li>
               <Button
                 className="navlink"
                 onClick={handleQuranTutorsMenuOpen}
@@ -447,9 +447,9 @@ function Header() {
                   </MenuItem>
                 )}
               </Menu>
-            </div>
+            </li>
 
-            <div>
+            <li>
               <Button
                 className="navlink"
                 onClick={handleCoursesMenuOpen}
@@ -508,9 +508,9 @@ function Header() {
                   Upload and Sell a Course
                 </MenuItem>
               </Menu>
-            </div>
+            </li>
 
-            <div>
+            <li>
               <Button
                 className="navlink"
                 onClick={handleProgrammeMenuOpen}
@@ -583,7 +583,7 @@ function Header() {
                   Secondary Programmes
                 </MenuItem>
               </Menu>
-            </div>
+            </li>
 
             {isAuth && (
               <li>
@@ -619,7 +619,7 @@ function Header() {
                 </Badge>
               </button>
             </li>
-            <div>
+            <li>
               {isAuth ? (
                 <div className="navlink" onClick={logOut}>
                   Logout
@@ -629,10 +629,10 @@ function Header() {
                   Login
                 </Link>
               )}
-            </div>
+            </li>
             {/* Register Menu */}
             {isUserBoth ? null : (
-              <div>
+              <li>
                 <Button
                   style={{
                     backgroundColor: "#f97316",
@@ -697,7 +697,7 @@ function Header() {
                     Become a tutor
                   </MenuItem>
                 </Menu>
-              </div>
+              </li>
             )}
 
             {/* MODAL */}
@@ -706,7 +706,7 @@ function Header() {
               isOpen={open}
               handleClose={() => setOpen(false)}
             >
-              <div>
+              <li>
                 {type === "teacher" ? (
                   <BecomeTutorForm
                     onSubmit={handleSubmit}
@@ -943,7 +943,7 @@ function Header() {
                     }}
                   </Formik>
                 )}
-              </div>
+              </li>
             </Modal>
 
             <Modal

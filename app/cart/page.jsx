@@ -60,7 +60,7 @@ function Cart() {
     try {
       await dispatch(checkoutCart()).unwrap();
       toast.success("Checkout successful! Redirecting to orders...");
-      router.push("/dashboard/orders");
+      router.push("/courses/my-courses");
     } catch (error) {
       toast.error(error || "Failed to checkout. Please try again.");
     } finally {
@@ -252,11 +252,6 @@ function Cart() {
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Tax</span>
                         <span className="font-medium">₦0.00</span>
-                      </div>
-
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Shipping</span>
-                        <span className="font-medium">Free</span>
                       </div>
 
                       <div className="border-t border-gray-200 pt-3">
