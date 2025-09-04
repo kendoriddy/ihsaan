@@ -26,12 +26,19 @@ const groupGradesByCourse = (grades) => {
         individualAssignmentMax: 0,
         groupAssignmentScore: 0,
         groupAssignmentMax: 0,
+        examScore: 0,
+        examMax: 0,
       };
     }
 
     if (grade.assessment_question_type === "MCQ") {
       grouped[courseTitle].quizScore += parseFloat(grade.score);
       grouped[courseTitle].quizMax += parseFloat(grade.assessment_max_score);
+    }
+
+    if (grade.assessment_type === "EXAMINATION") {
+      grouped[courseTitle].examScore += parseFloat(grade.score);
+      grouped[courseTitle].examMax += parseFloat(grade.assessment_max_score);
     }
 
     if (grade.assessment_question_type === "FILE_UPLOAD") {
@@ -79,6 +86,9 @@ const GradesArea = ({ grades }) => {
               <TableCell className="font-medium md:font-semibold text-lg">
                 Group Assignment
               </TableCell>
+              <TableCell className="font-medium md:font-semibold text-lg">
+                Examination
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -96,6 +106,9 @@ const GradesArea = ({ grades }) => {
                 <TableCell className="text-nowrap">
                   {data.groupAssignmentScore.toFixed(2)} /{" "}
                   {data.groupAssignmentMax.toFixed(2)}
+                </TableCell>
+                <TableCell className="text-nowrap">
+                  {data.examScore.toFixed(2)} / {data.examMax.toFixed(2)}
                 </TableCell>
               </TableRow>
             ))}

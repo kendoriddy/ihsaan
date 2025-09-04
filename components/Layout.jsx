@@ -7,8 +7,9 @@ import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { currentlyLoggedInUser } from "@/utils/redux/slices/auth.reducer";
 import WavingHandIcon from "@mui/icons-material/WavingHand";
+import { useState } from "react";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, showWelcome = true }) => {
   const currentRoute = usePathname();
   const user = useSelector(currentlyLoggedInUser);
 
@@ -23,10 +24,12 @@ const Layout = ({ children }) => {
         <section className="flex flex-col md:flex-row w-full p-4 justify-self-center flex-1 min-h-screen">
           {/* Right */}
           <div className="md:px-4 w-full py-8 lg:py-0">
-            <div className="text-sm my-3">
-              Welcome <span className="text-lg">{user.name}</span>{" "}
-              <WavingHandIcon sx={{ color: "blue", fontSize: "2rem" }} />
-            </div>
+            {showWelcome && (
+              <div className="text-sm my-3">
+                Welcome <span className="text-lg">{user.name}</span>{" "}
+                <WavingHandIcon sx={{ color: "blue", fontSize: "2rem" }} />
+              </div>
+            )}
             {children}{" "}
           </div>
         </section>

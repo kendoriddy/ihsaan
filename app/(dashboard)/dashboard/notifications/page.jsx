@@ -19,6 +19,7 @@ import {
   resetDeleteStatus,
 } from "@/utils/redux/slices/notificationSlice";
 import Swal from "sweetalert2";
+import Layout from "@/components/Layout";
 
 function Page() {
   const dispatch = useDispatch();
@@ -174,58 +175,52 @@ function Page() {
     })) || [];
 
   return (
-    <>
-      <Header />
-      <main className="py-2 flex">
-        <DashboardSidebar currentRoute={currentRoute} />
-        <div className="px-4 w-full py-8 lg:py-0">
-          <div className="">
-            {/* Header */}
-            <div className="bg-white shadow-sm border-b border-gray-200">
-              <div className="max-w-6xl mx-auto px-4 py-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className="text-xl font-bold text-gray-800">
-                      Notifications
-                    </h1>
-                    <p className="text-gray-600 text-sm mt-1">
-                      Stay updated with your latest notifications
-                    </p>
-                  </div>
-                </div>
+    <Layout showWelcome={false}>
+      <div className="">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b border-gray-200">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold text-gray-800">
+                  Notifications
+                </h1>
+                <p className="text-gray-600 text-sm mt-1">
+                  Stay updated with your latest notifications
+                </p>
               </div>
-            </div>
-
-            {/* Content */}
-            <div className="py-8">
-              {status === "loading" ? (
-                <div className="max-w-6xl mx-auto px-4 py-8">
-                  <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
-                    <div className="w-20 h-20 bg-gradient-to-br from-red-800 to-red-900 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                      Loading Notifications
-                    </h2>
-                    <p className="text-gray-600">
-                      Please wait while we fetch your notifications...
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <StudentNotificationPage
-                  notifications={mappedNotifications}
-                  onMarkAsRead={handleMarkAsRead}
-                  onMarkAllAsRead={handleMarkAllAsRead}
-                  onDelete={handleDeleteNotification}
-                  onNavigateToCourse={handleNavigateToCourse}
-                />
-              )}
             </div>
           </div>
         </div>
-      </main>
-    </>
+
+        {/* Content */}
+        <div className="py-8">
+          {status === "loading" ? (
+            <div className="max-w-6xl mx-auto px-4 py-8">
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-red-800 to-red-900 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  Loading Notifications
+                </h2>
+                <p className="text-gray-600">
+                  Please wait while we fetch your notifications...
+                </p>
+              </div>
+            </div>
+          ) : (
+            <StudentNotificationPage
+              notifications={mappedNotifications}
+              onMarkAsRead={handleMarkAsRead}
+              onMarkAllAsRead={handleMarkAllAsRead}
+              onDelete={handleDeleteNotification}
+              onNavigateToCourse={handleNavigateToCourse}
+            />
+          )}
+        </div>
+      </div>
+    </Layout>
   );
 }
 
