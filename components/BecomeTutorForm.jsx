@@ -41,7 +41,6 @@ const initialValues = {
   country_of_origin: "",
   country_of_residence: "",
   gender: "",
-  years_of_experience: "",
   // Qur'an tutor fields
   display_profile_pic: true,
   ajzaa_memorized: "",
@@ -115,11 +114,6 @@ export default function BecomeTutorForm({ onSubmit, isLoading }) {
             control="select"
             options={genderOptions}
             placeholder="Gender"
-          />
-          <FormikControl
-            name="years_of_experience"
-            placeholder="Years of Experience"
-            type="number"
           />
 
           {/* Become Quran Tutor toggle */}

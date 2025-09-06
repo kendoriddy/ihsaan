@@ -21,6 +21,16 @@ const ManualGrading = () => {
   const [totalCourses, setTotalCourses] = useState(10);
   const [selectedAssessment, setSelectedAssessment] = useState(null);
 
+  const formatDate = (date) => {
+    return date
+      ? new Date(date).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "N/A";
+  };
+
   const {
     isLoading,
     data: AssessmentsList,
@@ -79,8 +89,21 @@ const ManualGrading = () => {
                       }}
                     >
                       <CardContent>
-                        <Typography variant="body2" color="textSecondary">
+                        <Typography variant="body1" color="textSecondary">
                           <strong>Course:</strong> {assessment.course_title}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          <strong>Title:</strong> {assessment.title}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          <strong>Type:</strong> {assessment.type}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          <strong>Description:</strong> {assessment.description}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          <strong>Question Type:</strong>{" "}
+                          {assessment.question_type}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
                           <strong>Max Score:</strong> {assessment.max_score}
@@ -88,6 +111,14 @@ const ManualGrading = () => {
                         <Typography variant="body2" color="textSecondary">
                           <strong>Passing Score:</strong>{" "}
                           {assessment.passing_score}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          <strong>Start Date:</strong>{" "}
+                          {formatDate(assessment.start_date)}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          <strong>End Date:</strong>{" "}
+                          {formatDate(assessment.end_date)}
                         </Typography>
                       </CardContent>
                     </Card>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -29,14 +29,9 @@ const CourseDetailPage = () => {
   const [error, setError] = useState(null);
   const [expandedSections, setExpandedSections] = useState(new Set());
   const [playingVideo, setPlayingVideo] = useState(null);
+  const [isPaid, setIsPaid] = useState(true); // Temporary for testing
 
-  useEffect(() => {
-    if (courseId) {
-      fetchCourseDetails();
-    }
-  }, [courseId]);
-
-  const fetchCourseDetails = async () => {
+  const fetchCourseDetails = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -67,7 +62,16 @@ const CourseDetailPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [courseId]);
+
+  useEffect(() => {
+    if (courseId) {
+      fetchCourseDetails();
+      // Simulate payment status based on course ID for testing
+      // Course ID 2 is unpaid, others are paid
+      setIsPaid(courseId !== "2");
+    }
+  }, [courseId, fetchCourseDetails]);
 
   const toggleSection = (sectionId) => {
     setExpandedSections((prev) => {
@@ -170,6 +174,70 @@ const CourseDetailPage = () => {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
+        {/* Payment Status Banner */}
+        {!isPaid && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-8">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Payment Required
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>
+                    This course requires payment to access the full content.
+                    Some sections may be restricted.
+                  </p>
+                </div>
+                <div className="mt-4">
+                  <div className="-mx-2 -my-1.5 flex">
+                    <button
+                      onClick={() => {
+                        // Redirect to payment page
+                        window.open(
+                          "https://checkout.flutterwave.com/v3/hosted/pay/course_" +
+                            courseId,
+                          "_blank"
+                        );
+                      }}
+                      className="bg-red-50 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600"
+                    >
+                      Complete Payment
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Test Toggle */}
+        <div className="mb-6 flex justify-end">
+          <div className="flex items-center gap-2 bg-gray-100 p-2 rounded-lg">
+            <span className="text-sm text-gray-600">Test Mode:</span>
+            <button
+              onClick={() => setIsPaid(!isPaid)}
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                isPaid ? "bg-green-500 text-white" : "bg-red-500 text-white"
+              }`}
+            >
+              {isPaid ? "Paid Mode" : "Unpaid Mode"}
+            </button>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="flex items-center mb-8">
           <Link
@@ -228,11 +296,21 @@ const CourseDetailPage = () => {
                   </p>
                 )}
               </div>
-              <div className="text-right ml-6">
+              <div className="text-right ml-6 space-y-2">
                 <div className="bg-primary text-white px-4 py-2 rounded-lg">
                   <p className="text-sm font-medium">Course ID</p>
                   <p className="text-lg font-bold">
                     {course.code || course.id}
+                  </p>
+                </div>
+                <div
+                  className={`px-4 py-2 rounded-lg ${
+                    isPaid ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                  }`}
+                >
+                  <p className="text-sm font-medium">Payment Status</p>
+                  <p className="text-lg font-bold">
+                    {isPaid ? "Paid" : "Unpaid"}
                   </p>
                 </div>
               </div>
@@ -252,7 +330,7 @@ const CourseDetailPage = () => {
               .map((section) => (
                 <div
                   key={section.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                  className="bg-white rounded-lg shadow-md overflow-hidden relative"
                 >
                   {/* Section Header */}
                   <div
@@ -289,7 +367,52 @@ const CourseDetailPage = () => {
 
                   {/* Section Content */}
                   {expandedSections.has(section.id) && (
-                    <div className="p-6 space-y-6">
+                    <div
+                      className={`p-6 space-y-6 ${
+                        !isPaid ? "opacity-50 pointer-events-none" : ""
+                      }`}
+                    >
+                      {/* Payment Required Overlay for Unpaid Content */}
+                      {!isPaid && (
+                        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-lg">
+                          <div className="text-center p-6">
+                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                              <svg
+                                className="w-8 h-8 text-red-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                />
+                              </svg>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                              Payment Required
+                            </h3>
+                            <p className="text-gray-600 mb-4">
+                              Complete your payment to access this course
+                              content.
+                            </p>
+                            <button
+                              onClick={() => {
+                                window.open(
+                                  "https://checkout.flutterwave.com/v3/hosted/pay/course_" +
+                                    courseId,
+                                  "_blank"
+                                );
+                              }}
+                              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                            >
+                              Complete Payment
+                            </button>
+                          </div>
+                        </div>
+                      )}
                       {/* Videos */}
                       {section.videos && section.videos.length > 0 && (
                         <div>
