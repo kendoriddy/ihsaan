@@ -27,7 +27,7 @@ const ActivitiesLogs = () => {
     refetch,
   } = useFetch(
     ["errorLogs", page],
-    `https://ihsaanlms.onrender.com/audit/api/trails/?page=${page}&page_size=10`,
+    `https://ihsaanlms.onrender.com/audit/api/logs/?page=${page}&page_size=10`,
     (data) => {
       console.log("all data", data);
       if (data?.total) {
@@ -37,6 +37,8 @@ const ActivitiesLogs = () => {
   );
 
   const ActivitiesData = Activities?.data?.results || [];
+
+  console.log("activities", ActivitiesData);
 
   const handlePageChange = (event, value) => {
     setPage(value);

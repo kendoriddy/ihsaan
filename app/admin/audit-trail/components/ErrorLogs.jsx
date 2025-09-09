@@ -144,6 +144,8 @@ import React, { useState } from "react";
 import animation from "../../../../assets/no_data.json";
 
 const tableHeaders = [
+  { id: "request_method", label: "Request Method" },
+  { id: "request_user_first_name", label: "Request By" },
   { id: "status_code", label: "Status Code" },
   { id: "message", label: "Error Message" },
   { id: "level", label: "Severity Level" },
@@ -227,6 +229,12 @@ const ErrorLogs = () => {
                       index % 2 === 0 ? "bg-gray-50" : "bg-white"
                     }`}
                   >
+                    <TableCell className="font-medium">
+                      {log.request_method}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {log.request_user_first_name}
+                    </TableCell>
                     <TableCell className="font-medium">
                       {log.status_code}
                     </TableCell>
