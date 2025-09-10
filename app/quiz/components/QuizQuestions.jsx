@@ -204,10 +204,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
 
   const handleSubmit = () => {
     const unansweredQuestions = answers.filter((answer) => answer === null);
-    // if (unansweredQuestions.length > 0) {
-    //   alert("All questions were not answered, are you sure want to submit?");
-    // }
-    if (unansweredQuestions.length > 0) {
+        if (unansweredQuestions.length > 0) {
       const confirmSubmit = window.confirm(
         "Some questions are unanswered. Are you sure you want to submit?"
       );

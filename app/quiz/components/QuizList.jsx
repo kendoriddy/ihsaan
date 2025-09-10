@@ -21,7 +21,7 @@ const QuizList = ({ setCurrentScreen }) => {
     refetch,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/base/?page_size=15&page=${page}`,
+    `https://ihsaanlms.onrender.com/assessment/base/?question_type=MCQ&page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
         setTotalQuiz(data.total);
@@ -51,12 +51,12 @@ const QuizList = ({ setCurrentScreen }) => {
 
   const Quizes = QuizesList && QuizesList?.data?.results;
 
-  const filteredQuizes = Quizes?.filter(
-    (quiz) => quiz.question_type === "MCQ"
-    // &&
-    //   new Date(quiz.end_date) > new Date() &&
-    //   quiz.is_open === true
-  );
+  // const filteredQuizes = Quizes?.filter(
+  //   (quiz) => quiz.course_section === null
+  //   // &&
+  //   //   new Date(quiz.end_date) > new Date() &&
+  //   //   quiz.is_open === true
+  // );
 
   useEffect(() => {
     const selectedQuiz = localStorage.getItem("selectedQuiz");
@@ -83,14 +83,14 @@ const QuizList = ({ setCurrentScreen }) => {
   return (
     <div className="w-full px-4">
       <h2 className="text-2xl font-semibold mb-6">Quiz List</h2>
-      {!filteredQuizes && (
+      {!Quizes && (
         <p className="py-8 font-bold text-lg animate-pulse">
           Loading quizzes...
         </p>
       )}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {filteredQuizes &&
-          filteredQuizes.map((filteredQuiz) => (
+        {Quizes &&
+          Quizes.map((filteredQuiz) => (
             <>
               <div
                 key={filteredQuiz.id}
@@ -106,17 +106,20 @@ const QuizList = ({ setCurrentScreen }) => {
                   </p>
                   <p className="text-sm text-gray-500">
                     <strong className="text-green-600">Start:</strong>{" "}
-                    {formatDate(filteredQuiz?.start_date) ||
+                    {(filteredQuiz.course_section === null &&
+                      formatDate(filteredQuiz?.start_date)) ||
                       "No start date available"}
                   </p>
                   <p className="text-sm text-gray-500">
                     <strong className="text-red-600">End:</strong>{" "}
-                    {formatDate(filteredQuiz?.end_date) ||
+                    {(filteredQuiz.course_section === null &&
+                      formatDate(filteredQuiz?.end_date)) ||
                       "No end date available"}
                   </p>
                   <p className="text-sm text-gray-500">
                     <strong className="">Duration:</strong>{" "}
-                    {formatDuration(filteredQuiz.mcq_duration) ||
+                    {(filteredQuiz.course_section === null &&
+                      formatDuration(filteredQuiz.mcq_duration)) ||
                       "No duration available"}
                   </p>
                   <p>
@@ -139,8 +142,11 @@ const QuizList = ({ setCurrentScreen }) => {
                     className="mt-4 px-10 py-2"
                     size="large"
                     color="secondary"
+                    disabled={filteredQuiz.course_section !== null}
                   >
-                    View Details
+                    {filteredQuiz.course_section === null
+                      ? "View Details"
+                      : "View from Course"}
                   </Button>
                 ) : (
                   <Button
@@ -156,12 +162,15 @@ const QuizList = ({ setCurrentScreen }) => {
                     color="secondary"
                     disabled={
                       filteredQuiz?.submission_status === "submitted" ||
-                      filteredQuiz?.is_open === false
+                      filteredQuiz?.is_open === false ||
+                      filteredQuiz.course_section !== null
                     }
                   >
                     {filteredQuiz?.is_open === false
                       ? "Quiz Closed"
-                      : "Take Quiz"}
+                      : filteredQuiz.course_section === null
+                      ? "Take Quiz"
+                      : "Take from Course"}
                   </Button>
                 )}
               </div>

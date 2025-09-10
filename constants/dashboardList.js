@@ -187,6 +187,11 @@ const DASHBOARD_LIST = {
       path: "/admin/notifications",
     },
     {
+      id: 16,
+      name: "Newsletter",
+      path: "/admin/newsletter",
+    },
+    {
       id: 17,
       name: "Feedback",
       icon: FeedbackIcon,
@@ -197,6 +202,11 @@ const DASHBOARD_LIST = {
       name: "Reports",
       icon: AssessmentIcon,
       path: "/admin/reports",
+    },
+    {
+      id: 18,
+      name: "Audit Trail",
+      path: "/admin/audit-trail",
     },
     { id: 19, name: "My Profile", path: "/admin/profile" },
   ],

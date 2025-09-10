@@ -21,7 +21,6 @@ const StudentQuiz = () => {
           <>
             <QuizQuestion setCurrentScreen={setCurrentScreen} />
           </>
-          // questions={Questions?.results}
         )}
       </div>
     </Layout>
