@@ -10,70 +10,28 @@ const countryOptions = countryNames.map((country) => ({
 }));
 
 const genderOptions = [
-  { key: "Male", value: "male" },
-  { key: "Female", value: "female" },
+  { key: "Male", value: "MALE" },
+  { key: "Female", value: "FEMALE" },
 ];
 
-const programmeOptions = [
-  { key: "Nahu Programme", value: "nahu" },
-  { key: "Primary Programme", value: "primary" },
-  { key: "Secondary Programme", value: "secondary" },
-];
-
-const getProgrammeDisplayName = (programme) => {
-  switch (programme) {
-    case "nahu":
-      return "Nahu Programme";
-    case "primary":
-      return "Primary Programme";
-    case "secondary":
-      return "Secondary Programme";
-    default:
-      return "Programme";
-  }
-};
-
-const getProgrammeOptions = (selectedProgramme) => {
-  if (selectedProgramme) {
-    // If a specific programme is selected, only show that option
-    return programmeOptions.filter(
-      (option) => option.value === selectedProgramme
-    );
-  }
-  // If no specific programme, show all options
-  return programmeOptions;
-};
+// Programme selection is now handled by the Header component
 
 const initialValues = {
   first_name: "",
-  middle_name: "",
   last_name: "",
   email: "",
   password: "",
   confirm_password: "",
   phone_number: "",
-  country_of_origin: "",
-  country_of_residence: "",
+  country: "",
   gender: "",
-  programme: "",
   date_of_birth: "",
-  additional_info: "",
 };
 
-export default function StudentRegistrationForm({
-  onSubmit,
-  isLoading,
-  selectedProgramme = "",
-}) {
-  // Set the programme value if provided
-  const formInitialValues = {
-    ...initialValues,
-    programme: selectedProgramme || initialValues.programme,
-  };
-
+export default function StudentRegistrationForm({ onSubmit, isLoading }) {
   return (
     <Formik
-      initialValues={formInitialValues}
+      initialValues={initialValues}
       enableReinitialize
       onSubmit={(values, { setSubmitting }) => {
         // Submit the form data with programme information
@@ -85,10 +43,6 @@ export default function StudentRegistrationForm({
         <Form className="flex flex-col gap-4">
           <div className="flex gap-2">
             <FormikControl name="first_name" placeholder="First Name" />
-            <FormikControl
-              name="middle_name"
-              placeholder="Middle Name (optional)"
-            />
             <FormikControl name="last_name" placeholder="Last Name" />
           </div>
 
@@ -108,55 +62,24 @@ export default function StudentRegistrationForm({
 
           <FormikControl name="phone_number" placeholder="Phone Number" />
 
-          <div className="flex gap-2">
-            <FormikControl
-              name="country_of_origin"
-              control="select"
-              options={countryOptions}
-              placeholder="Country of Origin"
-            />
-            <FormikControl
-              name="country_of_residence"
-              control="select"
-              options={countryOptions}
-              placeholder="Country of Residence"
-            />
-          </div>
+          <FormikControl
+            name="country"
+            control="select"
+            options={countryOptions}
+            placeholder="Country"
+          />
 
-          <div className="flex gap-2">
-            <FormikControl
-              name="gender"
-              control="select"
-              options={genderOptions}
-              placeholder="Gender"
-            />
-            <FormikControl
-              name="programme"
-              control="select"
-              options={getProgrammeOptions(selectedProgramme)}
-              placeholder={
-                selectedProgramme
-                  ? `${getProgrammeDisplayName(
-                      selectedProgramme
-                    )} (Pre-selected)`
-                  : "Select Programme"
-              }
-              disabled={!!selectedProgramme}
-            />
-          </div>
+          <FormikControl
+            name="gender"
+            control="select"
+            options={genderOptions}
+            placeholder="Gender"
+          />
 
           <FormikControl
             name="date_of_birth"
             control="date"
             placeholder="Date of Birth"
-          />
-
-          <FormikControl
-            name="additional_info"
-            control="textarea"
-            placeholder="Additional Information (optional)"
-            minRows={3}
-            maxLength={500}
           />
 
           <div className="flex justify-end mt-4">

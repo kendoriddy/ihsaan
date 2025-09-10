@@ -3,139 +3,56 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import Layout from "@/components/Layout"; // Assuming Layout component path
-import { getAuthToken } from "@/hooks/axios/axios"; // Assuming token utility path
 import { IMAGES } from "@/constants";
-
-// TODO: How to get current student's user ID?
-// const getCurrentStudentId = () => { /* ... logic to get student ID ... */ return "some-student-id"; };
-
-const LOGGED_IN_USER_ENDPOINT =
-  "https://ihsaanlms.onrender.com/api/auth/logged-in-user/";
-const PROGRAMMES_ENDPOINT = "https://ihsaanlms.onrender.com/programmes/";
+import {
+  fetchStudentCourses,
+  fetchStudentProgrammes,
+  fetchCoursesForProgramme,
+  setSelectedProgramme,
+  clearSelectedProgramme,
+  clearCoursesError,
+  clearProgrammesError,
+  clearProgrammeCoursesError,
+} from "@/utils/redux/slices/studentDashboardSlice";
 
 const MyCoursesPage = () => {
-  const [programmes, setProgrammes] = useState([]);
-  const [selectedProgramme, setSelectedProgramme] = useState(null);
-  const [myCourses, setMyCourses] = useState([]);
-  const [allCourses, setAllCourses] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const {
+    courses,
+    programmes,
+    programmeCourses,
+    coursesStatus,
+    programmesStatus,
+    programmeCoursesStatus,
+    coursesError,
+    programmesError,
+    programmeCoursesError,
+    selectedProgramme,
+    isLoading,
+  } = useSelector((state) => state.studentDashboard);
+
   const [activeTab, setActiveTab] = useState("courses"); // "courses" or "programmes"
-  const [isPaidMode, setIsPaidMode] = useState(true); // Temporary toggle for testing
 
+  // Fetch data on component mount
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        // 1. Fetch logged-in user's ID
-        const userResponse = await axios.get(LOGGED_IN_USER_ENDPOINT, {
-          headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-          },
-        });
-        const userId = userResponse.data?.id;
-
-        if (!userId) {
-          setError("Could not retrieve user information.");
-          setIsLoading(false);
-          return;
-        }
-
-        // 2. Fetch programmes for the user
-        const programmesResponse = await axios.get(
-          `${PROGRAMMES_ENDPOINT}?user=${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${getAuthToken()}`,
-            },
-          }
-        );
-        // Add payment status to programmes (simulated for now)
-        const programmesWithPaymentStatus = (
-          programmesResponse.data.results || []
-        ).map((programme) => ({
-          ...programme,
-          is_paid: isPaidMode, // For testing, all programmes are paid when toggle is on
-        }));
-        setProgrammes(programmesWithPaymentStatus);
-
-        // 3. Fetch all courses for the user (simulated for now)
-        // In a real implementation, this would be an API call
-        const mockCourses = [
-          {
-            id: 1,
-            title: "Introduction to Arabic Grammar",
-            description:
-              "Learn the basics of Arabic grammar and sentence structure",
-            programme_id: 1,
-            programme_name: "Nahu Programme",
-            is_paid: isPaidMode,
-            image_url: null,
-          },
-          {
-            id: 2,
-            title: "Advanced Grammar Concepts",
-            description: "Dive deeper into complex Arabic grammar rules",
-            programme_id: 1,
-            programme_name: "Nahu Programme",
-            is_paid: !isPaidMode, // This one is unpaid for testing
-            image_url: null,
-          },
-          {
-            id: 3,
-            title: "Quranic Arabic Basics",
-            description: "Understanding Arabic as used in the Quran",
-            programme_id: 2,
-            programme_name: "Primary Programme",
-            is_paid: isPaidMode,
-            image_url: null,
-          },
-        ];
-        setAllCourses(mockCourses);
-      } catch (err) {
-        setError(err.message || "Failed to fetch data.");
-        console.error("Error fetching data:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [isPaidMode]);
-
-  const fetchCoursesForProgramme = async (programmeId) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const coursesResponse = await axios.get(
-        `https://ihsaanlms.onrender.com/programmes/${programmeId}/courses/`,
-        {
-          headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-          },
-        }
-      );
-      console.log(coursesResponse, "coursesResponse:::");
-      setMyCourses(coursesResponse.data || []);
-    } catch (err) {
-      setError(err.message || "Failed to fetch courses for this programme.");
-      console.error("Error fetching courses:", err);
-    } finally {
-      setIsLoading(false);
+    // Only fetch if data is not already loaded
+    if (coursesStatus === "idle") {
+      dispatch(fetchStudentCourses());
     }
-  };
+    if (programmesStatus === "idle") {
+      dispatch(fetchStudentProgrammes());
+    }
+  }, [dispatch, coursesStatus, programmesStatus]);
 
   const handleProgrammeSelect = (programme) => {
-    setSelectedProgramme(programme);
-    fetchCoursesForProgramme(programme.id);
+    dispatch(setSelectedProgramme(programme));
+    dispatch(fetchCoursesForProgramme(programme.id));
   };
 
   const handleBackToProgrammes = () => {
-    setSelectedProgramme(null);
-    setMyCourses([]);
+    dispatch(clearSelectedProgramme());
   };
 
   return (
@@ -143,25 +60,10 @@ const MyCoursesPage = () => {
       <div className="container mx-auto px-4 py-8">
         {!selectedProgramme ? (
           <>
-            <div className="flex justify-between items-center mb-8">
+            <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-800">
                 My Courses & Programmes
               </h1>
-
-              {/* Temporary toggle for testing */}
-              <div className="flex items-center gap-2 bg-gray-100 p-2 rounded-lg">
-                <span className="text-sm text-gray-600">Test Mode:</span>
-                <button
-                  onClick={() => setIsPaidMode(!isPaidMode)}
-                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                    isPaidMode
-                      ? "bg-green-500 text-white"
-                      : "bg-red-500 text-white"
-                  }`}
-                >
-                  {isPaidMode ? "Paid Mode" : "Unpaid Mode"}
-                </button>
-              </div>
             </div>
 
             {/* Tab System */}
@@ -176,7 +78,7 @@ const MyCoursesPage = () => {
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                     }`}
                   >
-                    All Courses ({allCourses.length})
+                    All Courses ({courses.length})
                   </button>
                   <button
                     onClick={() => setActiveTab("programmes")}
@@ -192,52 +94,164 @@ const MyCoursesPage = () => {
               </div>
             </div>
 
-            {isLoading && (
+            {(coursesStatus === "loading" ||
+              programmesStatus === "loading") && (
               <div className="flex justify-center items-center py-10">
                 <p className="text-lg text-gray-600">Loading your data...</p>
               </div>
             )}
 
-            {error && (
+            {(coursesError || programmesError) && (
               <div
                 className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6"
                 role="alert"
               >
                 <strong className="font-bold">Error: </strong>
-                <span className="block sm:inline">{error}</span>
+                <span className="block sm:inline">
+                  {coursesError || programmesError}
+                </span>
+                <button
+                  onClick={() => {
+                    dispatch(clearCoursesError());
+                    dispatch(clearProgrammesError());
+                  }}
+                  className="absolute top-0 right-0 px-4 py-3"
+                >
+                  <span className="sr-only">Dismiss</span>×
+                </button>
               </div>
             )}
 
             {/* Courses Tab Content */}
-            {!isLoading && !error && activeTab === "courses" && (
-              <>
-                {allCourses.length === 0 ? (
-                  <div className="text-center py-10">
-                    <p className="text-lg text-gray-600">
-                      You are not currently enrolled in any courses.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {allCourses.map((course) => (
-                      <Link
-                        key={course.id}
-                        href={`/courses/my-courses/${course.id}`}
-                        legacyBehavior
-                      >
-                        <a className="block bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
+            {coursesStatus !== "loading" &&
+              programmesStatus !== "loading" &&
+              !coursesError &&
+              !programmesError &&
+              activeTab === "courses" && (
+                <>
+                  {courses.length === 0 ? (
+                    <div className="text-center py-10">
+                      <p className="text-lg text-gray-600">
+                        You are not currently enrolled in any courses.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {courses.map((course) => (
+                        <Link
+                          key={course.id}
+                          href={`/courses/my-courses/${course.id}`}
+                          legacyBehavior
+                        >
+                          <a className="block bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
+                            <div className="relative w-full h-48 bg-gray-200">
+                              {course.image_url ? (
+                                <Image
+                                  src={course.image_url}
+                                  alt={course.title || "Course image"}
+                                  layout="fill"
+                                  objectFit="cover"
+                                />
+                              ) : (
+                                <Image
+                                  src={IMAGES.logo}
+                                  alt={course.title || "Course image"}
+                                  layout="fill"
+                                  objectFit="cover"
+                                />
+                              )}
+                              {/* Payment Status Badge */}
+                              <div className="absolute top-2 right-2">
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    course.is_paid
+                                      ? "bg-green-500 text-white"
+                                      : "bg-red-500 text-white"
+                                  }`}
+                                >
+                                  {course.is_paid ? "Paid" : "Unpaid"}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="p-6">
+                              <h2 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-primary transition-colors">
+                                {course.title || "Untitled Course"}
+                              </h2>
+                              <p className="text-gray-600 text-sm mb-2">
+                                {course.programme_name}
+                              </p>
+                              {course.term_details && (
+                                <p className="text-gray-500 text-xs mb-2">
+                                  Term: {course.term_details.name} (
+                                  {course.term_details.start_date} -{" "}
+                                  {course.term_details.end_date})
+                                </p>
+                              )}
+                              <p className="text-gray-600 text-sm line-clamp-3">
+                                {course.description ||
+                                  "No description available."}
+                              </p>
+                              <div className="mt-4 flex justify-between items-center">
+                                <span className="text-xs text-gray-500">
+                                  Enrolled:{" "}
+                                  {new Date(
+                                    course.enrolled_at
+                                  ).toLocaleDateString()}
+                                </span>
+                                <span
+                                  className={`inline-block text-sm font-medium py-1 px-3 rounded-full transition-colors ${
+                                    course.is_paid
+                                      ? "bg-primary group-hover:bg-primary text-white"
+                                      : "bg-gray-300 text-gray-600"
+                                  }`}
+                                >
+                                  {course.is_paid
+                                    ? "View Course"
+                                    : "Payment Required"}
+                                </span>
+                              </div>
+                            </div>
+                          </a>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+
+            {/* Programmes Tab Content */}
+            {coursesStatus !== "loading" &&
+              programmesStatus !== "loading" &&
+              !coursesError &&
+              !programmesError &&
+              activeTab === "programmes" && (
+                <>
+                  {programmes.length === 0 ? (
+                    <div className="text-center py-10">
+                      <p className="text-lg text-gray-600">
+                        You are not currently enrolled in any programmes.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {programmes.map((programme) => (
+                        <button
+                          key={programme.id}
+                          onClick={() => handleProgrammeSelect(programme)}
+                          className="block w-full bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group text-left"
+                        >
                           <div className="relative w-full h-48 bg-gray-200">
-                            {course.image_url ? (
+                            {programme.image_url ? (
                               <Image
-                                src={course.image_url}
-                                alt={course.title || "Course image"}
+                                src={programme.image_url}
+                                alt={programme.name || "Programme image"}
                                 layout="fill"
                                 objectFit="cover"
                               />
                             ) : (
                               <Image
                                 src={IMAGES.logo}
-                                alt={course.title || "Course image"}
+                                alt={programme.name || "Programme image"}
                                 layout="fill"
                                 objectFit="cover"
                               />
@@ -246,114 +260,72 @@ const MyCoursesPage = () => {
                             <div className="absolute top-2 right-2">
                               <span
                                 className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  course.is_paid
+                                  programme.payment_status === "PAID" ||
+                                  programme.payment_status === "COMPLETED"
                                     ? "bg-green-500 text-white"
+                                    : programme.payment_status === "PENDING"
+                                    ? "bg-yellow-500 text-white"
                                     : "bg-red-500 text-white"
                                 }`}
                               >
-                                {course.is_paid ? "Paid" : "Unpaid"}
+                                {programme.payment_status === "PAID" ||
+                                programme.payment_status === "COMPLETED"
+                                  ? "Paid"
+                                  : programme.payment_status === "PENDING"
+                                  ? "Pending"
+                                  : "Unpaid"}
                               </span>
                             </div>
                           </div>
                           <div className="p-6">
                             <h2 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-primary transition-colors">
-                              {course.title || "Untitled Course"}
+                              {programme.name || "Untitled Programme"}
                             </h2>
                             <p className="text-gray-600 text-sm mb-2">
-                              {course.programme_name}
+                              Code: {programme.code}
                             </p>
-                            <p className="text-gray-600 text-sm line-clamp-3">
-                              {course.description ||
-                                "No description available."}
+                            <p className="text-gray-600 text-sm mb-2">
+                              {programme.description}
                             </p>
-                            <div className="mt-4 text-right">
-                              <span
-                                className={`inline-block text-sm font-medium py-1 px-3 rounded-full transition-colors ${
-                                  course.is_paid
-                                    ? "bg-primary group-hover:bg-primary text-white"
-                                    : "bg-gray-300 text-gray-600"
-                                }`}
-                              >
-                                {course.is_paid
-                                  ? "View Course"
-                                  : "Payment Required"}
+                            {programme.payment_status && (
+                              <div className="mb-2">
+                                <span
+                                  className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                                    programme.payment_status === "PAID" ||
+                                    programme.payment_status === "COMPLETED"
+                                      ? "bg-green-100 text-green-800"
+                                      : programme.payment_status === "PENDING"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-red-100 text-red-800"
+                                  }`}
+                                >
+                                  {programme.payment_status}
+                                </span>
+                                {programme.completed && (
+                                  <span className="ml-2 inline-block px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    Completed
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            <div className="mt-4 flex justify-between items-center">
+                              <span className="text-xs text-gray-500">
+                                Enrolled:{" "}
+                                {new Date(
+                                  programme.enrollment_date
+                                ).toLocaleDateString()}
+                              </span>
+                              <span className="inline-block bg-primary group-hover:bg-primary text-white text-sm font-medium py-1 px-3 rounded-full transition-colors">
+                                View Courses
                               </span>
                             </div>
                           </div>
-                        </a>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Programmes Tab Content */}
-            {!isLoading && !error && activeTab === "programmes" && (
-              <>
-                {programmes.length === 0 ? (
-                  <div className="text-center py-10">
-                    <p className="text-lg text-gray-600">
-                      You are not currently enrolled in any programmes.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {programmes.map((programme) => (
-                      <button
-                        key={programme.id}
-                        onClick={() => handleProgrammeSelect(programme)}
-                        className="block w-full bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group text-left"
-                      >
-                        <div className="relative w-full h-48 bg-gray-200">
-                          {programme.image_url ? (
-                            <Image
-                              src={programme.image_url}
-                              alt={programme.name || "Programme image"}
-                              layout="fill"
-                              objectFit="cover"
-                            />
-                          ) : (
-                            <Image
-                              src={IMAGES.logo}
-                              alt={programme.name || "Programme image"}
-                              layout="fill"
-                              objectFit="cover"
-                            />
-                          )}
-                          {/* Payment Status Badge */}
-                          <div className="absolute top-2 right-2">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                programme.is_paid
-                                  ? "bg-green-500 text-white"
-                                  : "bg-red-500 text-white"
-                              }`}
-                            >
-                              {programme.is_paid ? "Paid" : "Unpaid"}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="p-6">
-                          <h2 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-primary transition-colors">
-                            {programme.name || "Untitled Programme"}
-                          </h2>
-                          <p className="text-gray-600 text-sm line-clamp-3">
-                            {programme.description ||
-                              "No description available."}
-                          </p>
-                          <div className="mt-4 text-right">
-                            <span className="inline-block bg-primary group-hover:bg-primary text-white text-sm font-medium py-1 px-3 rounded-full transition-colors">
-                              View Courses
-                            </span>
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
           </>
         ) : (
           <>
@@ -382,74 +354,84 @@ const MyCoursesPage = () => {
               </h1>
             </div>
 
-            {isLoading && (
+            {programmeCoursesStatus === "loading" && (
               <div className="flex justify-center items-center py-10">
                 <p className="text-lg text-gray-600">Loading courses...</p>
               </div>
             )}
 
-            {error && (
+            {programmeCoursesError && (
               <div
                 className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6"
                 role="alert"
               >
                 <strong className="font-bold">Error: </strong>
-                <span className="block sm:inline">{error}</span>
+                <span className="block sm:inline">{programmeCoursesError}</span>
+                <button
+                  onClick={() => dispatch(clearProgrammeCoursesError())}
+                  className="absolute top-0 right-0 px-4 py-3"
+                >
+                  <span className="sr-only">Dismiss</span>×
+                </button>
               </div>
             )}
 
-            {!isLoading && !error && myCourses.length === 0 && (
-              <div className="text-center py-10">
-                <p className="text-lg text-gray-600">
-                  No courses available in this programme.
-                </p>
-              </div>
-            )}
+            {programmeCoursesStatus !== "loading" &&
+              !programmeCoursesError &&
+              programmeCourses.length === 0 && (
+                <div className="text-center py-10">
+                  <p className="text-lg text-gray-600">
+                    No courses available in this programme.
+                  </p>
+                </div>
+              )}
 
-            {!isLoading && !error && myCourses.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {myCourses.map((course) => (
-                  <Link
-                    key={course.id}
-                    href={`/courses/my-courses/${course.id}`}
-                    legacyBehavior
-                  >
-                    <a className="block bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
-                      <div className="relative w-full h-48 bg-gray-200">
-                        {course.image_url ? (
-                          <Image
-                            src={course.image_url}
-                            alt={course.title || "Course image"}
-                            layout="fill"
-                            objectFit="cover"
-                          />
-                        ) : (
-                          <Image
-                            src={IMAGES.logo}
-                            alt={course.title || "Course image"}
-                            layout="fill"
-                            objectFit="cover"
-                          />
-                        )}
-                      </div>
-                      <div className="p-6">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-primary transition-colors">
-                          {course.title || "Untitled Course"}
-                        </h2>
-                        <p className="text-gray-600 text-sm line-clamp-3">
-                          {course.description || "No description available."}
-                        </p>
-                        <div className="mt-4 text-right">
-                          <span className="inline-block bg-primary group-hover:bg-primary text-white text-sm font-medium py-1 px-3 rounded-full transition-colors">
-                            View Course
-                          </span>
+            {programmeCoursesStatus !== "loading" &&
+              !programmeCoursesError &&
+              programmeCourses.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {programmeCourses.map((course) => (
+                    <Link
+                      key={course.id}
+                      href={`/courses/my-courses/${course.id}`}
+                      legacyBehavior
+                    >
+                      <a className="block bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
+                        <div className="relative w-full h-48 bg-gray-200">
+                          {course.image_url ? (
+                            <Image
+                              src={course.image_url}
+                              alt={course.title || "Course image"}
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          ) : (
+                            <Image
+                              src={IMAGES.logo}
+                              alt={course.title || "Course image"}
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          )}
                         </div>
-                      </div>
-                    </a>
-                  </Link>
-                ))}
-              </div>
-            )}
+                        <div className="p-6">
+                          <h2 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-primary transition-colors">
+                            {course.title || "Untitled Course"}
+                          </h2>
+                          <p className="text-gray-600 text-sm line-clamp-3">
+                            {course.description || "No description available."}
+                          </p>
+                          <div className="mt-4 text-right">
+                            <span className="inline-block bg-primary group-hover:bg-primary text-white text-sm font-medium py-1 px-3 rounded-full transition-colors">
+                              View Course
+                            </span>
+                          </div>
+                        </div>
+                      </a>
+                    </Link>
+                  ))}
+                </div>
+              )}
           </>
         )}
       </div>

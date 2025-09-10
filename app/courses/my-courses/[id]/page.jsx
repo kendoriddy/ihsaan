@@ -8,6 +8,8 @@ import axios from "axios";
 import Layout from "@/components/Layout";
 import { getAuthToken } from "@/hooks/axios/axios";
 import { IMAGES } from "@/constants";
+import AssessmentModal from "@/components/AssessmentModal";
+import AssessmentButton from "@/components/AssessmentButton";
 import {
   FaPlay,
   FaPause,
@@ -30,6 +32,10 @@ const CourseDetailPage = () => {
   const [expandedSections, setExpandedSections] = useState(new Set());
   const [playingVideo, setPlayingVideo] = useState(null);
   const [isPaid, setIsPaid] = useState(true); // Temporary for testing
+  const [assessmentModal, setAssessmentModal] = useState({
+    isOpen: false,
+    section: null,
+  });
 
   const fetchCourseDetails = useCallback(async () => {
     setIsLoading(true);
@@ -87,6 +93,26 @@ const CourseDetailPage = () => {
 
   const handleVideoPlay = (videoId) => {
     setPlayingVideo(playingVideo === videoId ? null : videoId);
+  };
+
+  const handleStartAssessment = (section) => {
+    setAssessmentModal({
+      isOpen: true,
+      section: section,
+    });
+  };
+
+  const handleCloseAssessment = () => {
+    setAssessmentModal({
+      isOpen: false,
+      section: null,
+    });
+  };
+
+  const handleAssessmentComplete = (results) => {
+    // Assessment completed successfully
+    console.log("Assessment completed:", results);
+    // The assessment status will be updated automatically by Redux
   };
 
   const formatDuration = (duration) => {
@@ -609,6 +635,12 @@ const CourseDetailPage = () => {
                         </div>
                       )}
 
+                      {/* Assessment Section */}
+                      <AssessmentButton
+                        section={section}
+                        onStartAssessment={handleStartAssessment}
+                      />
+
                       {/* No Content Message */}
                       {(!section.videos || section.videos.length === 0) &&
                         (!section.materials ||
@@ -675,6 +707,14 @@ const CourseDetailPage = () => {
           </div>
         )}
       </div>
+
+      {/* Assessment Modal */}
+      <AssessmentModal
+        isOpen={assessmentModal.isOpen}
+        onClose={handleCloseAssessment}
+        sectionData={assessmentModal.section}
+        onAssessmentComplete={handleAssessmentComplete}
+      />
     </Layout>
   );
 };

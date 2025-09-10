@@ -15,6 +15,7 @@ import {
 } from "../utils/redux/slices/auth.reducer";
 import { logoutUser } from "@/utils/redux/slices/auth.reducer";
 import { useDispatch } from "react-redux";
+import { fetchProgrammes } from "@/utils/redux/slices/programmeSlice";
 import CartDrawer from "./CartDrawer";
 import Modal from "./validation/Modal";
 import { toast } from "react-toastify";
@@ -69,6 +70,9 @@ function Header() {
   const isAuth = useSelector(selectIsAuth);
   const signedInUserName = useSelector(currentlyLoggedInUser);
   const { itemCount } = useSelector((state) => state.cart);
+  const programmesState = useSelector((state) => state.programme);
+  const programmes = programmesState?.programmes || [];
+  const programmesStatus = programmesState?.status || "idle";
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
@@ -76,6 +80,7 @@ function Header() {
   const [programmeOpen, setProgrammeOpen] = useState(false);
   const [type, setType] = useState(null);
   const [userType, setUserType] = useState(null);
+  const [selectedProgramme, setSelectedProgramme] = useState(null);
   const [showPassword, setShowPassword] = useState(true);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -138,14 +143,24 @@ function Header() {
     };
   }, []);
 
+  // Fetch programmes on component mount
+  useEffect(() => {
+    if (programmesStatus === "idle") {
+      dispatch(fetchProgrammes({ page: 1, pageSize: 10 }));
+    }
+  }, [dispatch, programmesStatus]);
+
   const handleOpenModal = (mode) => {
     setOpen(true);
   };
 
   const [mode, setMode] = useState("");
-  const handleOpenProgrammeModal = (mode) => {
+  const handleOpenProgrammeModal = (mode, programme = null) => {
     setMode(mode);
     setProgrammeOpen(true);
+    if (programme) {
+      setSelectedProgramme(programme);
+    }
   };
 
   const handleCloseModal = () => {
@@ -360,7 +375,7 @@ function Header() {
 
   useEffect(() => {
     refetch();
-  }, [createNewaccounts]);
+  }, [createNewaccounts, refetch]);
   return (
     <header
       className="sticky top-0 text-sm z-20 bg-white py-3 px-2 md:px-12 max-w-[100vw]"
@@ -543,46 +558,31 @@ function Header() {
                   },
                 }}
               >
-                <MenuItem
-                  onClick={() => {
-                    handleOpenProgrammeModal("nahu programme");
-                    setType("student");
-                    handleProgrammeMenuClose();
-                  }}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "#f97316",
-                    },
-                  }}
-                >
-                  Nahu Programme
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    handleOpenProgrammeModal("Primary Programmes");
-                    handleProgrammeMenuClose();
-                  }}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "#f97316",
-                    },
-                  }}
-                >
-                  Primary Programmes
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    handleOpenProgrammeModal("Secondary Programmes");
-                    handleProgrammeMenuClose();
-                  }}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "#f97316",
-                    },
-                  }}
-                >
-                  Secondary Programmes
-                </MenuItem>
+                {programmes && programmes.length > 0 ? (
+                  programmes.map((programme) => (
+                    <MenuItem
+                      key={programme.id}
+                      onClick={() => {
+                        handleOpenProgrammeModal(programme.name, programme);
+                        setType("student");
+                        handleProgrammeMenuClose();
+                      }}
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "#f97316",
+                        },
+                      }}
+                    >
+                      {programme.name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>
+                    {programmesStatus === "loading"
+                      ? "Loading programmes..."
+                      : "No programmes available"}
+                  </MenuItem>
+                )}
               </Menu>
             </li>
 
@@ -720,9 +720,7 @@ function Header() {
                 ) : (
                   <StudentRegistrationFlow
                     setOpen={setOpen}
-                    selectedProgramme={
-                      mode === "nahu programme" ? "nahu" : "primary"
-                    }
+                    selectedProgramme={selectedProgramme}
                   />
                 )}
               </li>
@@ -733,13 +731,10 @@ function Header() {
               isOpen={programmeOpen}
               handleClose={() => setProgrammeOpen(false)}
             >
-              {mode === "nahu programme" && <NahuProgramme setOpen={setOpen} />}
-              {mode === "Primary Programmes" && (
-                <PrimaryProgramme setOpen={setOpen} />
-              )}
-              {mode === "Secondary Programmes" && (
-                <SecondaryProgramme setOpen={setOpen} />
-              )}
+              <StudentRegistrationFlow
+                setOpen={setProgrammeOpen}
+                selectedProgramme={selectedProgramme}
+              />
             </Modal>
             <QuranTutorApplicationModal
               isOpen={quranTutorModalOpen}
@@ -929,46 +924,31 @@ function Header() {
                       },
                     }}
                   >
-                    <MenuItem
-                      onClick={() => {
-                        handleOpenProgrammeModal("nahu programme");
-                        setType("student");
-                        handleMobileProgrammeMenuClose();
-                      }}
-                      sx={{
-                        "&:hover": {
-                          backgroundColor: "#f97316",
-                        },
-                      }}
-                    >
-                      Nahu Programme
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        handleOpenProgrammeModal("Primary Programmes");
-                        handleMobileProgrammeMenuClose();
-                      }}
-                      sx={{
-                        "&:hover": {
-                          backgroundColor: "#f97316",
-                        },
-                      }}
-                    >
-                      Primary Programmes
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        handleOpenProgrammeModal("Secondary Programmes");
-                        handleMobileProgrammeMenuClose();
-                      }}
-                      sx={{
-                        "&:hover": {
-                          backgroundColor: "#f97316",
-                        },
-                      }}
-                    >
-                      Secondary Programmes
-                    </MenuItem>
+                    {programmes && programmes.length > 0 ? (
+                      programmes.map((programme) => (
+                        <MenuItem
+                          key={programme.id}
+                          onClick={() => {
+                            handleOpenProgrammeModal(programme.name, programme);
+                            setType("student");
+                            handleMobileProgrammeMenuClose();
+                          }}
+                          sx={{
+                            "&:hover": {
+                              backgroundColor: "#f97316",
+                            },
+                          }}
+                        >
+                          {programme.name}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem disabled>
+                        {programmesStatus === "loading"
+                          ? "Loading programmes..."
+                          : "No programmes available"}
+                      </MenuItem>
+                    )}
                   </Menu>
                 </div>
                 <li>

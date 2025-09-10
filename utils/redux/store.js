@@ -16,6 +16,8 @@ import notificationReducer from "./slices/notificationSlice";
 import feedbackReducer from "./slices/feedbackSlice";
 import productReducer from "./slices/productSlice";
 import cartReducer from "./slices/cartSlice";
+import studentDashboardReducer from "./slices/studentDashboardSlice";
+import assessmentReducer from "./slices/assessmentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -35,5 +37,7 @@ export const store = configureStore({
     feedback: feedbackReducer,
     products: productReducer,
     cart: cartReducer,
+    studentDashboard: studentDashboardReducer,
+    assessments: assessmentReducer,
   },
 });

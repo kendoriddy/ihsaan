@@ -1,48 +1,143 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 import StudentRegistrationForm from "./StudentRegistrationForm";
 
 const getProgrammeDisplayName = (programme) => {
-  switch (programme) {
-    case "nahu":
-      return "Nahu Programme";
-    case "primary":
-      return "Primary Programme";
-    case "secondary":
-      return "Secondary Programme";
-    default:
-      return "Programme";
+  // If programme is a string (legacy support)
+  if (typeof programme === "string") {
+    switch (programme) {
+      case "nahu":
+        return "Nahu Programme";
+      case "primary":
+        return "Primary Programme";
+      case "secondary":
+        return "Secondary Programme";
+      default:
+        return "Programme";
+    }
   }
+
+  // If programme is an object with name property
+  if (programme && programme.name) {
+    return programme.name;
+  }
+
+  // Fallback
+  return "Programme";
 };
 
-const StudentRegistrationFlow = ({ setOpen, selectedProgramme = "nahu" }) => {
+const StudentRegistrationFlow = ({ setOpen, selectedProgramme = null }) => {
   const [registrationStatus, setRegistrationStatus] = useState(null); // null, 'success', 'error'
   const [isLoading, setIsLoading] = useState(false);
+  const [registrationData, setRegistrationData] = useState(null); // Store the full API response
 
   const handleRegistration = async (formData) => {
     setIsLoading(true);
 
     try {
-      // Simulate API call to backend
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Prepare payload according to new API structure
+      const payload = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        password: formData.password,
+        phone_number: formData.phone_number,
+        country: formData.country,
+        gender: formData.gender.toUpperCase(), // Convert to uppercase as per API
+        date_of_birth: formData.date_of_birth
+          ? new Date(formData.date_of_birth).toISOString().split("T")[0]
+          : null, // Format as YYYY-MM-DD
+        programme_id:
+          selectedProgramme?.id ||
+          selectedProgramme ||
+          "e4881f7d-298f-473d-acd9-012af4edc597", // Use programme ID
+        academic_session_id: "1", // Default to session 1, can be made dynamic
+      };
 
-      // Simulate successful registration
+      console.log("Sending registration payload:", payload);
+
+      // Make API call to the new endpoint
+      const response = await axios.post(
+        "https://ihsaanlms.onrender.com/api/auth/register-student-programme/",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Registration response:", response.data);
+
+      // Store the response data for the success screen
+      setRegistrationData(response.data);
+
+      // Show success message
+      toast.success(
+        response.data.message ||
+          "Registration successful! Welcome to the programme."
+      );
       setRegistrationStatus("success");
-
-      // In a real implementation, you would send the formData to your backend
-      console.log("Registration data:", formData);
     } catch (error) {
-      setRegistrationStatus("error");
       console.error("Registration error:", error);
+
+      // Handle different types of errors
+      let errorMessage = "Registration failed. Please try again.";
+      let specificErrors = [];
+
+      if (error.response?.data) {
+        const errorData = error.response.data;
+
+        // Handle field-specific validation errors
+        Object.keys(errorData).forEach((field) => {
+          if (Array.isArray(errorData[field])) {
+            errorData[field].forEach((errorMsg) => {
+              specificErrors.push(`${field.replace("_", " ")}: ${errorMsg}`);
+            });
+          } else if (typeof errorData[field] === "string") {
+            specificErrors.push(
+              `${field.replace("_", " ")}: ${errorData[field]}`
+            );
+          }
+        });
+
+        // If we have specific errors, show them
+        if (specificErrors.length > 0) {
+          errorMessage = specificErrors.join("\n");
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+      }
+
+      // Show error message(s)
+      if (specificErrors.length > 1) {
+        // Show multiple errors
+        specificErrors.forEach((error) => {
+          toast.error(error);
+        });
+      } else {
+        // Show single error
+        toast.error(errorMessage);
+      }
+
+      // Don't set error status - keep form open for user to fix issues
+      // setRegistrationStatus("error");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handlePaymentRedirect = () => {
-    // Redirect to Flutterwave payment page
-    // In a real implementation, you would generate this URL from your backend
-    const paymentUrl = `https://checkout.flutterwave.com/v3/hosted/pay/${selectedProgramme}_programme_${Date.now()}`;
-    window.open(paymentUrl, "_blank");
+    // Use the checkout URL from the API response
+    if (registrationData?.payment_link?.checkout_url) {
+      window.open(registrationData.payment_link.checkout_url, "_blank");
+    } else {
+      // Fallback if no payment link is available
+      toast.error("Payment link not available. Please contact support.");
+    }
   };
 
   if (registrationStatus === "success") {
@@ -70,46 +165,95 @@ const StudentRegistrationFlow = ({ setOpen, selectedProgramme = "nahu" }) => {
           </div>
 
           <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-            Welcome to the {getProgrammeDisplayName(selectedProgramme)}!
+            Welcome to the{" "}
+            {registrationData?.programme_pricing?.programme_name ||
+              getProgrammeDisplayName(selectedProgramme)}
+            !
           </h3>
 
           <div className="space-y-4 text-gray-700 mb-6">
             <p>
-              Your registration has been completed successfully. You are now
-              enrolled in our programme.
+              {registrationData?.message ||
+                "Your registration has been completed successfully. You are now enrolled in our programme."}
             </p>
 
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <h4 className="font-semibold text-blue-900 mb-2">
-                Next Step: Complete Your Payment
-              </h4>
-              <p className="text-blue-800">
-                To secure your spot in the programme, please complete your
-                payment using our secure payment gateway.
-              </p>
-            </div>
+            {registrationData?.payment_required &&
+              registrationData?.programme_pricing && (
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <h4 className="font-semibold text-blue-900 mb-2">
+                    Payment Required
+                  </h4>
+                  <div className="text-blue-800 space-y-2">
+                    <p>
+                      <strong>Programme:</strong>{" "}
+                      {registrationData.programme_pricing.programme_name} (
+                      {registrationData.programme_pricing.programme_code})
+                    </p>
+                    <p>
+                      <strong>Amount:</strong>{" "}
+                      {registrationData.programme_pricing.currency}{" "}
+                      {registrationData.programme_pricing.price?.toLocaleString()}
+                    </p>
+                    {registrationData.payment_link?.expires_in && (
+                      <p className="text-orange-600">
+                        <strong>Payment expires in:</strong>{" "}
+                        {registrationData.payment_link.expires_in}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+            {registrationData?.next_steps &&
+              registrationData.next_steps.length > 0 && (
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left">
+                  <h4 className="font-semibold text-gray-900 mb-3">
+                    Next Steps:
+                  </h4>
+                  <ul className="space-y-2 text-gray-700">
+                    {registrationData.next_steps.map((step, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="text-green-500 mr-2 mt-1">•</span>
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={handlePaymentRedirect}
-              className="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors shadow-md flex items-center justify-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                <line x1="1" y1="10" x2="23" y2="10"></line>
-              </svg>
-              Proceed to Payment
-            </button>
+            {registrationData?.payment_required &&
+              registrationData?.payment_link?.checkout_url && (
+                <button
+                  onClick={handlePaymentRedirect}
+                  className="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors shadow-md flex items-center justify-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect
+                      x="1"
+                      y="4"
+                      width="22"
+                      height="16"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                  </svg>
+                  Proceed to Payment (
+                  {registrationData.programme_pricing?.currency}{" "}
+                  {registrationData.programme_pricing?.price?.toLocaleString()})
+                </button>
+              )}
 
             <button
               onClick={() => setOpen(false)}
@@ -119,9 +263,18 @@ const StudentRegistrationFlow = ({ setOpen, selectedProgramme = "nahu" }) => {
             </button>
           </div>
 
-          <div className="mt-6 text-sm text-gray-500">
-            You can complete your payment later from your dashboard.
-          </div>
+          {registrationData?.payment_required && (
+            <div className="mt-6 text-sm text-gray-500">
+              {registrationData.payment_link?.payment_reference && (
+                <p className="mb-2">
+                  <strong>Payment Reference:</strong>{" "}
+                  {registrationData.payment_link.payment_reference}
+                </p>
+              )}
+              You can complete your payment later from your dashboard or use the
+              payment link sent to your email.
+            </div>
+          )}
         </div>
       </div>
     );

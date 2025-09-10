@@ -19,7 +19,6 @@ const StudentQuiz = () => {
         )}
         {currentScreen === "quiz" && (
           <>
-            hiiiii
             <QuizQuestion setCurrentScreen={setCurrentScreen} />
           </>
           // questions={Questions?.results}
