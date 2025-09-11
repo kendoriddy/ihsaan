@@ -1,6 +1,7 @@
+import Loader from "@/components/Loader";
 import React from "react";
 
-const AuditDashboard = ({ dashboardIndicators }) => {
+const AuditDashboard = ({ dashboardIndicators, isLoading, isFetching }) => {
   const getCardColors = (color) => {
     const colors = {
       red: "from-red-50 to-red-100 border-red-200",
@@ -36,39 +37,48 @@ const AuditDashboard = ({ dashboardIndicators }) => {
       <h2 className="text-2xl font-bold bg-gradient-to-r from-red-900 to-blue-600 bg-clip-text text-transparent mb-8">
         System Performance Indicators
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {dashboardIndicators.map((indicator, idx) => (
-          <div
-            key={idx}
-            className={`bg-gradient-to-br ${getCardColors(
-              indicator.color
-            )} border rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 p-6`}
-          >
-            <div className="flex items-center mb-4">
-              <div
-                className={`${getIconColors(
-                  indicator.color
-                )} p-3 rounded-full mr-4`}
-              >
-                {indicator.icon}
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-700">
-                  {indicator.title}
-                </h3>
-                <span className="text-sm text-gray-500">{indicator.trend}</span>
-              </div>
-            </div>
+      {isFetching || isLoading ? (
+        <div className="flex items-center gap-2">
+          <Loader size={20} />
+          <p className="animate-pulse">Fetching activity and errors logs...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {dashboardIndicators.map((indicator, idx) => (
             <div
-              className={`text-4xl font-bold ${getValueColors(
+              key={idx}
+              className={`bg-gradient-to-br ${getCardColors(
                 indicator.color
-              )}`}
+              )} border rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 p-6`}
             >
-              {indicator.value}
+              <div className="flex items-center mb-4">
+                <div
+                  className={`${getIconColors(
+                    indicator.color
+                  )} p-3 rounded-full mr-4`}
+                >
+                  {indicator.icon}
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">
+                    {indicator.title}
+                  </h3>
+                  <span className="text-sm text-gray-500">
+                    {indicator.trend}
+                  </span>
+                </div>
+              </div>
+              <div
+                className={`text-4xl font-bold ${getValueColors(
+                  indicator.color
+                )}`}
+              >
+                {indicator.value}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
