@@ -1510,7 +1510,7 @@ function EditCoursePage() {
                           className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
                       </div>
-                      <div>
+                      {/* <div>
                         <label
                           htmlFor="order"
                           className="block text-sm font-medium text-gray-700"
@@ -1531,7 +1531,7 @@ function EditCoursePage() {
                           className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                           placeholder="e.g., 1, 2, 3..."
                         />
-                      </div>
+                      </div> */}
                       <div>
                         <label
                           htmlFor="video_file"

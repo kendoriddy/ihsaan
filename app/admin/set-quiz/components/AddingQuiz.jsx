@@ -57,17 +57,23 @@ const AddingQuiz = () => {
     data: CoursesList,
     isFetching,
     refetch,
+    error: coursesError,
   } = useFetch(
     "courses",
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page_size=${
+    `https://ihsaanlms.onrender.com/course/courses/?page_size=${
       fetchAll ? totalCourses : 10
     }`,
     (data) => {
+      console.log("Courses data received:", data);
       if (data?.total && !fetchAll) {
         setTotalCourses(data.total);
         setFetchAll(true);
         refetch();
       }
+    },
+    (error) => {
+      console.error("Error fetching courses:", error);
+      toast.error("Failed to load courses. Please check your connection.");
     }
   );
 
@@ -79,7 +85,7 @@ const AddingQuiz = () => {
   } = useFetch(
     "courseSections",
     selectedCourseId
-      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-sections/?course=${selectedCourseId}`
+      ? `https://ihsaanlms.onrender.com/course/course-sections/?course=${selectedCourseId}`
       : null,
     (data) => {
       if (data?.total && !fetchAll) {
@@ -93,9 +99,16 @@ const AddingQuiz = () => {
   const Courses = CoursesList?.data?.results || [];
   const CourseSections = CourseSectionList?.data?.results || [];
 
+  // Debug logging
+  console.log("CoursesList:", CoursesList);
+  console.log("Courses array:", Courses);
+  console.log("isLoading:", isLoading);
+  console.log("isFetching:", isFetching);
+  console.log("coursesError:", coursesError);
+
   // Mutation to create quiz questions
   const { mutate: createQuestions, isLoading: isCreatingQuestions } = usePost(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/bulk-create/`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/bulk-create/`,
     {
       onSuccess: (response, variables, context) => {
         toast.success("Question(s) created successfully");
@@ -247,7 +260,7 @@ const AddingQuiz = () => {
     formData.append("file", excelFile);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/upload-mcq-questions/`,
+        `https://ihsaanlms.onrender.com/assessment/mcquestions/upload-mcq-questions/`,
         {
           method: "POST",
           headers: {
@@ -398,7 +411,7 @@ const AddingQuiz = () => {
       const token = localStorage.getItem("token") || "";
       // Fetch all courses with auth
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page_size=1000`,
+        `https://ihsaanlms.onrender.com/course/courses/?page_size=1000`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -413,7 +426,7 @@ const AddingQuiz = () => {
       const sectionFetches = courses.map(async (course) => {
         try {
           const secRes = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-sections/?course=${course.id}`,
+            `https://ihsaanlms.onrender.com/course/course-sections/?course=${course.id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -605,12 +618,23 @@ const AddingQuiz = () => {
         {({ values, setFieldValue, isValid }) => (
           <Form className="bg-white p-6 rounded-md shadow-md space-y-6">
             <div>
-              <label
-                htmlFor="course_id"
-                className="block md:text-lg font-medium mb-2"
-              >
-                Select Course
-              </label>
+              <div className="flex justify-between items-center mb-2">
+                <label
+                  htmlFor="course_id"
+                  className="block md:text-lg font-medium"
+                >
+                  Select Course
+                </label>
+                {coursesError && (
+                  <button
+                    type="button"
+                    onClick={() => refetch()}
+                    className="text-sm text-blue-600 hover:text-blue-800 underline"
+                  >
+                    Retry
+                  </button>
+                )}
+              </div>
               <Field
                 as="select"
                 id="course_id"
@@ -619,12 +643,26 @@ const AddingQuiz = () => {
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
                 disabled={isLoading || isFetching}
               >
-                <option value="">Select a course</option>
-                {Courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.name} ({course.code})
-                  </option>
-                ))}
+                <option value="">
+                  {isLoading || isFetching
+                    ? "Loading courses..."
+                    : coursesError
+                    ? "Error loading courses"
+                    : "Select a course"}
+                </option>
+                {Courses.length > 0
+                  ? Courses.map((course) => (
+                      <option key={course.id} value={course.id}>
+                        {course.name} ({course.code})
+                      </option>
+                    ))
+                  : !isLoading &&
+                    !isFetching &&
+                    !coursesError && (
+                      <option value="" disabled>
+                        No courses available
+                      </option>
+                    )}
               </Field>
               <ErrorMessage
                 name="course_id"
