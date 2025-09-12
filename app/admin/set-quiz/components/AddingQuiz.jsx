@@ -41,6 +41,10 @@ const AddingQuiz = () => {
   const [uploadErrors, setUploadErrors] = useState([]);
   const [isProcessingExcel, setIsProcessingExcel] = useState(false);
 
+  // Manual questions preview states
+  const [manualPreviewOpen, setManualPreviewOpen] = useState(false);
+  const [manualQuestionsToPreview, setManualQuestionsToPreview] = useState([]);
+
   // Modal for showing course and section IDs
   const [showIdModal, setShowIdModal] = useState(false);
   const [allCourses, setAllCourses] = useState([]);
@@ -439,6 +443,39 @@ const AddingQuiz = () => {
   };
   const handleCloseIdModal = () => setShowIdModal(false);
 
+  // Preview manual questions
+  const handlePreviewManualQuestions = (values) => {
+    // Filter out empty questions
+    const validQuestions = values.questions.filter(
+      (q) => q.question_text.trim() !== "" && q.correct_answer !== ""
+    );
+
+    if (validQuestions.length === 0) {
+      toast.error(
+        "Please add at least one complete question before previewing"
+      );
+      return;
+    }
+
+    // Get course and section names for display
+    const selectedCourse = Courses.find(
+      (c) => c.id.toString() === values.course_id
+    );
+    const selectedSection = CourseSections.find(
+      (s) => s.id.toString() === values.course_section_id
+    );
+
+    const questionsWithContext = validQuestions.map((q) => ({
+      ...q,
+      course_name: selectedCourse?.name || "Unknown Course",
+      course_code: selectedCourse?.code || "",
+      section_title: selectedSection?.title || "Unknown Section",
+    }));
+
+    setManualQuestionsToPreview(questionsWithContext);
+    setManualPreviewOpen(true);
+  };
+
   return (
     <div className="">
       <h2 className="text-2xl font-semibold mb-6 text-center">
@@ -747,6 +784,17 @@ const AddingQuiz = () => {
               </Button>
 
               <Button
+                type="button"
+                color="primary"
+                onClick={() => handlePreviewManualQuestions(values)}
+                disabled={!values.course_id || !values.course_section_id}
+                className="w-full px-4 py-2 rounded-md"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Preview Questions
+              </Button>
+
+              <Button
                 type="submit"
                 color="secondary"
                 disabled={
@@ -888,6 +936,96 @@ const AddingQuiz = () => {
         </DialogContent>
         <DialogActions>
           <MuiButton onClick={handleCloseIdModal}>Close</MuiButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Manual Questions Preview Dialog */}
+      <Dialog
+        open={manualPreviewOpen}
+        onClose={() => setManualPreviewOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>
+          <div className="flex justify-between items-center">
+            <Typography variant="h6">Preview Manual Questions</Typography>
+            <MuiButton
+              onClick={() => setManualPreviewOpen(false)}
+              startIcon={<X />}
+            >
+              Close
+            </MuiButton>
+          </div>
+        </DialogTitle>
+        <DialogContent>
+          {manualQuestionsToPreview.length > 0 && (
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+              <Typography variant="subtitle1" className="font-semibold">
+                Course: {manualQuestionsToPreview[0].course_name} (
+                {manualQuestionsToPreview[0].course_code})
+              </Typography>
+              <Typography variant="subtitle2" className="text-gray-600">
+                Section: {manualQuestionsToPreview[0].section_title}
+              </Typography>
+              <Typography variant="body2" className="text-gray-500">
+                Total Questions: {manualQuestionsToPreview.length}
+              </Typography>
+            </div>
+          )}
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Question</TableCell>
+                  <TableCell>Options</TableCell>
+                  <TableCell>Correct Answer</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {manualQuestionsToPreview.map((question, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <div className="max-w-md">
+                        <Typography
+                          variant="body2"
+                          className="font-medium mb-2"
+                        >
+                          Question {index + 1}
+                        </Typography>
+                        <div className="text-sm text-gray-700">
+                          {question.question_text}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        {Object.entries(question.options).map(
+                          ([key, value]) => (
+                            <div key={key} className="text-sm">
+                              <span className="font-semibold">{key}:</span>{" "}
+                              {value}
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={question.correct_answer}
+                        color="success"
+                        size="small"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <MuiButton onClick={() => setManualPreviewOpen(false)}>
+            Close
+          </MuiButton>
         </DialogActions>
       </Dialog>
     </div>

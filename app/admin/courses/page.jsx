@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
@@ -38,8 +38,45 @@ function Page() {
   const [currentRoute, setCurrentRoute] = useState("");
 
   useEffect(() => {
-    dispatch(fetchCourses({ page: 1, coursesPerPage: 10 }));
+    dispatch(
+      fetchCourses({
+        page: 1,
+        page_size: coursesPerPage,
+        programme: null,
+        search: null,
+      })
+    );
   }, [dispatch]);
+
+  // Fetch programmes for filter dropdown
+  useEffect(() => {
+    const fetchProgrammes = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/programmes/`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setProgrammes(response.data.results || []);
+      } catch (error) {
+        console.error("Error fetching programmes:", error);
+      }
+    };
+    fetchProgrammes();
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const {
     courses: allCourses,
@@ -63,6 +100,13 @@ function Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const coursesPerPage = 10;
 
+  // Search and filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProgramme, setSelectedProgramme] = useState("");
+  const [programmes, setProgrammes] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef(null);
+
   const toggleOption = (index) => {
     setOpenSubMenuIndex((prevIndex) => (prevIndex === index ? null : index));
   };
@@ -77,7 +121,76 @@ function Page() {
 
   const handleChange = (event, value) => {
     setCurrentPage(value);
-    dispatch(fetchCourses({ page: value, coursesPerPage: 10 }));
+    dispatch(
+      fetchCourses({
+        page: value,
+        page_size: coursesPerPage,
+        programme: selectedProgramme || null,
+        search: searchTerm || null,
+      })
+    );
+  };
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    (searchValue) => {
+      // Clear existing timeout
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+
+      // Set new timeout
+      searchTimeoutRef.current = setTimeout(() => {
+        setIsSearching(true);
+        dispatch(
+          fetchCourses({
+            page: 1,
+            page_size: coursesPerPage,
+            programme: selectedProgramme || null,
+            search: searchValue || null,
+          })
+        ).finally(() => {
+          setIsSearching(false);
+        });
+      }, 500); // 500ms delay
+    },
+    [dispatch, coursesPerPage, selectedProgramme]
+  );
+
+  // Handle search input change
+  const handleSearchInputChange = (value) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when searching
+    debouncedSearch(value);
+  };
+
+  // Handle programme filter
+  const handleProgrammeFilter = (value) => {
+    setSelectedProgramme(value);
+    setCurrentPage(1); // Reset to first page when filtering
+    dispatch(
+      fetchCourses({
+        page: 1,
+        page_size: coursesPerPage,
+        programme: value || null,
+        search: searchTerm || null,
+      })
+    );
+  };
+
+  // Clear filters
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSelectedProgramme("");
+    setCurrentPage(1);
+    dispatch(
+      fetchCourses({
+        page: 1,
+        page_size: coursesPerPage,
+        programme: null,
+        search: null,
+      })
+    );
   };
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -110,7 +223,14 @@ function Page() {
 
       if (response.status === 204) {
         toast.success("Course deleted successfully!");
-        dispatch(fetchCourses({ page: currentPage, coursesPerPage })); // Refresh the course list
+        dispatch(
+          fetchCourses({
+            page: currentPage,
+            page_size: coursesPerPage,
+            programme: selectedProgramme || null,
+            search: searchTerm || null,
+          })
+        ); // Refresh the course list
       } else {
         throw new Error("Failed to delete course");
       }
@@ -244,6 +364,82 @@ function Page() {
               </div>
             </div>
 
+            {/* Search and Filter Section */}
+            <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+              <div className="flex flex-col md:flex-row gap-4 items-center">
+                {/* Search Input */}
+                <div className="flex-1 min-w-0">
+                  <TextField
+                    fullWidth
+                    label="Search courses"
+                    variant="outlined"
+                    value={searchTerm}
+                    onChange={(e) => handleSearchInputChange(e.target.value)}
+                    placeholder="Search by course title, description..."
+                    size="small"
+                    InputProps={{
+                      endAdornment: isSearching && (
+                        <div className="flex items-center">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                        </div>
+                      ),
+                    }}
+                  />
+                </div>
+
+                {/* Programme Filter */}
+                <div className="min-w-[200px]">
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Filter by Programme</InputLabel>
+                    <Select
+                      value={selectedProgramme}
+                      onChange={(e) => handleProgrammeFilter(e.target.value)}
+                      label="Filter by Programme"
+                    >
+                      <MenuItem value="">
+                        <em>All Programmes</em>
+                      </MenuItem>
+                      {programmes.map((programme) => (
+                        <MenuItem key={programme.id} value={programme.id}>
+                          {programme.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
+
+                {/* Clear Filters Button */}
+                {(searchTerm || selectedProgramme) && (
+                  <Button
+                    variant="outlined"
+                    onClick={handleClearFilters}
+                    size="small"
+                    className="whitespace-nowrap"
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+
+              {/* Active Filters Display */}
+              {(searchTerm || selectedProgramme) && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {searchTerm && (
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+                      Search: "{searchTerm}"
+                    </span>
+                  )}
+                  {selectedProgramme && (
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                      Programme:{" "}
+                      {programmes.find((p) => p.id === selectedProgramme)
+                        ?.name || selectedProgramme}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Tutor Assignment Modal */}
             <Dialog
               open={openAssignModal}
@@ -360,7 +556,7 @@ function Page() {
             </Dialog>
 
             {/* Tutor Assignments Table */}
-            <div className="mt-8">
+            {/* <div className="mt-8">
               <h2 className="text-lg font-semibold mb-2">Tutor Assignments</h2>
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200">
@@ -426,7 +622,7 @@ function Page() {
                   </tbody>
                 </table>
               </div>
-            </div>
+            </div> */}
 
             {/* LIST COURSES */}
             <section className="py-12 ">

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import StudentRegistrationForm from "./StudentRegistrationForm";
+import { getAuthToken } from "@/hooks/axios/axios";
 
 const getProgrammeDisplayName = (programme) => {
   // If programme is a string (legacy support)
@@ -130,13 +131,39 @@ const StudentRegistrationFlow = ({ setOpen, selectedProgramme = null }) => {
     }
   };
 
-  const handlePaymentRedirect = () => {
-    // Use the checkout URL from the API response
-    if (registrationData?.payment_link?.checkout_url) {
-      window.open(registrationData.payment_link.checkout_url, "_blank");
-    } else {
-      // Fallback if no payment link is available
-      toast.error("Payment link not available. Please contact support.");
+  const handlePaymentRedirect = async () => {
+    try {
+      // First, mark the programme as paid in the backend
+      const programmeId =
+        selectedProgramme?.id ||
+        selectedProgramme ||
+        "e4881f7d-298f-473d-acd9-012af4edc597";
+
+      await axios.post(
+        "https://ihsaanlms.onrender.com/api/student/mark-programme-paid/",
+        {
+          programme_id: programmeId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+        }
+      );
+
+      console.log("Programme marked as paid successfully");
+
+      // Then proceed with payment redirect
+      if (registrationData?.payment_link?.checkout_url) {
+        window.open(registrationData.payment_link.checkout_url, "_blank");
+      } else {
+        // Fallback if no payment link is available
+        toast.error("Payment link not available. Please contact support.");
+      }
+    } catch (error) {
+      console.error("Error marking programme as paid:", error);
+      toast.error("Failed to process payment. Please try again.");
     }
   };
 
