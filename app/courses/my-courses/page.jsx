@@ -284,9 +284,9 @@ const MyCoursesPage = () => {
                             <p className="text-gray-600 text-sm mb-2">
                               Code: {programme.code}
                             </p>
-                            <p className="text-gray-600 text-sm mb-2">
+                            {/* <p className="text-gray-600 text-sm mb-2">
                               {programme.description}
-                            </p>
+                            </p> */}
                             {programme.payment_status && (
                               <div className="mb-2">
                                 <span
