@@ -21,10 +21,38 @@ const AuditTrail = () => {
   // Error logs state
   const [errorPage, setErrorPage] = useState(1);
   const [totalErrors, setTotalErrors] = useState(0);
+  const [errorFilters, setErrorFilters] = useState({});
 
   // Activity logs state
   const [activityPage, setActivityPage] = useState(1);
   const [totalActivities, setTotalActivities] = useState(0);
+  const [activityFilters, setActivityFilters] = useState({});
+
+  // Build error query string
+  const buildErrorQuery = () => {
+    const baseParams = {
+      page: errorPage,
+      page_size: 10,
+    };
+    const allParams = { ...baseParams, ...errorFilters };
+    return Object.entries(allParams)
+      .filter(([_, value]) => value !== "" && value !== undefined)
+      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+      .join("&");
+  };
+
+  // Build activity query string
+  const buildActivityQuery = () => {
+    const baseParams = {
+      page: activityPage,
+      limit: 10,
+    };
+    const allParams = { ...baseParams, ...activityFilters };
+    return Object.entries(allParams)
+      .filter(([_, value]) => value !== "" && value !== undefined)
+      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+      .join("&");
+  };
 
   // Error logs fetch
   const {
@@ -33,8 +61,8 @@ const AuditTrail = () => {
     isFetching: errorFetching,
     refetch: errorRefetch,
   } = useFetch(
-    ["errorLogs", errorPage],
-    `https://ihsaanlms.onrender.com/utils/api/logs/errors/?page=${errorPage}&page_size=10`,
+    ["errorLogs", errorPage, errorFilters],
+    `https://ihsaanlms.onrender.com/utils/api/logs/errors/?${buildErrorQuery()}`,
     (data) => {
       if (data?.total) {
         setTotalErrors(data.total);
@@ -49,8 +77,8 @@ const AuditTrail = () => {
     isFetching: activityFetching,
     refetch: activityRefetch,
   } = useFetch(
-    ["activitiesLogs", activityPage],
-    `https://ihsaanlms.onrender.com/audit/api/trails/?page=${activityPage}&limit=10`,
+    ["activitiesLogs", activityPage, activityFilters],
+    `https://ihsaanlms.onrender.com/audit/api/trails/?${buildActivityQuery()}`,
     (data) => {
       if (data?.pagination?.total) {
         setTotalActivities(data.pagination.total);
@@ -60,12 +88,24 @@ const AuditTrail = () => {
 
   const handleErrorPageChange = (event, value) => {
     setErrorPage(value);
-    errorRefetch();
+    // Refetch will be triggered automatically by the useFetch hook due to dependency change
   };
 
   const handleActivityPageChange = (event, value) => {
     setActivityPage(value);
-    activityRefetch();
+    // Refetch will be triggered automatically by the useFetch hook due to dependency change
+  };
+
+  const handleErrorFiltersChange = (newFilters) => {
+    setErrorFilters(newFilters);
+    setErrorPage(1); // Reset to first page when filters change
+    // Refetch will be triggered automatically by the useFetch hook due to dependency change
+  };
+
+  const handleActivityFiltersChange = (newFilters) => {
+    setActivityFilters(newFilters);
+    setActivityPage(1); // Reset to first page when filters change
+    // Refetch will be triggered automatically by the useFetch hook due to dependency change
   };
 
   // Dashboard indicators with dynamic data
@@ -97,13 +137,6 @@ const AuditTrail = () => {
       trend: totalErrors === 0 ? "Stable" : "Monitor closely",
       color: totalErrors === 0 ? "green" : totalErrors < 10 ? "blue" : "red",
     },
-    // {
-    //   title: "Active Users",
-    //   value: 342,
-    //   icon: <AccountCircle />,
-    //   trend: "+12%",
-    //   color: "purple",
-    // },
     {
       title: "Security Score",
       value: totalErrors === 0 ? "100%" : totalErrors < 5 ? "98%" : "95%",
@@ -111,16 +144,6 @@ const AuditTrail = () => {
       trend: totalErrors === 0 ? "Perfect" : "Good",
       color: "green",
     },
-    // {
-    //   title: "Error Rate",
-    //   value:
-    //     totalActivities > 0
-    //       ? `${((totalErrors / totalActivities) * 100).toFixed(2)}%`
-    //       : "0%",
-    //   icon: <CheckCircle />,
-    //   trend: totalErrors === 0 ? "Excellent" : "Monitor",
-    //   color: totalErrors === 0 ? "green" : totalErrors < 10 ? "blue" : "red",
-    // },
   ];
 
   return (
@@ -147,7 +170,7 @@ const AuditTrail = () => {
               label="Dashboard"
               iconPosition="start"
               className="normal-case font-semibold text-base min-w-32 data-[selected]:text-red-900"
-            />{" "}
+            />
             <Tab
               icon={<ErrorOutline />}
               label="Error Logs"
@@ -163,7 +186,7 @@ const AuditTrail = () => {
           </Tabs>
         </div>
 
-        {/* Error Log Tab */}
+        {/* Dashboard Tab */}
         {tab === 0 && (
           <AuditDashboard
             dashboardIndicators={dashboardIndicators}
@@ -172,7 +195,7 @@ const AuditTrail = () => {
           />
         )}
 
-        {/* Activity Log Tab */}
+        {/* Error Log Tab */}
         {tab === 1 && (
           <ErrorLogs
             errorData={errorData}
@@ -181,10 +204,11 @@ const AuditTrail = () => {
             totalErrors={totalErrors}
             currentPage={errorPage}
             onPageChange={handleErrorPageChange}
+            onFiltersChange={handleErrorFiltersChange}
           />
         )}
 
-        {/* Dashboard Indicators Tab */}
+        {/* Activity Log Tab */}
         {tab === 2 && (
           <ActivitiesLogs
             activityData={activityData}
@@ -193,6 +217,7 @@ const AuditTrail = () => {
             totalActivities={totalActivities}
             currentPage={activityPage}
             onPageChange={handleActivityPageChange}
+            onFiltersChange={handleActivityFiltersChange}
           />
         )}
       </div>
