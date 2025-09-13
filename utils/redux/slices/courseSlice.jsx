@@ -5,11 +5,27 @@ import axios from "axios";
 // Async thunk to fetch courses
 export const fetchCourses = createAsyncThunk(
   "courses/fetchCourses",
-  async ({ page = 1, coursesPerPage = 10 }, { rejectWithValue }) => {
+  async (
+    { page = 1, page_size = 10, programme = null, search = null },
+    { rejectWithValue }
+  ) => {
     const token = getAuthToken();
 
     try {
-      const url = `https://ihsaanlms.onrender.com/course/courses?page=${page}&limit=${coursesPerPage}`;
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append("page", page);
+      params.append("page_size", page_size);
+
+      if (programme) {
+        params.append("programme", programme);
+      }
+
+      if (search) {
+        params.append("search", search);
+      }
+
+      const url = `https://ihsaanlms.onrender.com/course/courses/?${params.toString()}`;
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,

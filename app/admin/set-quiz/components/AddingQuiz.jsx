@@ -41,6 +41,10 @@ const AddingQuiz = () => {
   const [uploadErrors, setUploadErrors] = useState([]);
   const [isProcessingExcel, setIsProcessingExcel] = useState(false);
 
+  // Manual questions preview states
+  const [manualPreviewOpen, setManualPreviewOpen] = useState(false);
+  const [manualQuestionsToPreview, setManualQuestionsToPreview] = useState([]);
+
   // Modal for showing course and section IDs
   const [showIdModal, setShowIdModal] = useState(false);
   const [allCourses, setAllCourses] = useState([]);
@@ -53,17 +57,23 @@ const AddingQuiz = () => {
     data: CoursesList,
     isFetching,
     refetch,
+    error: coursesError,
   } = useFetch(
     "courses",
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page_size=${
+    `https://ihsaanlms.onrender.com/course/courses/?page_size=${
       fetchAll ? totalCourses : 10
     }`,
     (data) => {
+      console.log("Courses data received:", data);
       if (data?.total && !fetchAll) {
         setTotalCourses(data.total);
         setFetchAll(true);
         refetch();
       }
+    },
+    (error) => {
+      console.error("Error fetching courses:", error);
+      toast.error("Failed to load courses. Please check your connection.");
     }
   );
 
@@ -75,7 +85,7 @@ const AddingQuiz = () => {
   } = useFetch(
     "courseSections",
     selectedCourseId
-      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-sections/?course=${selectedCourseId}`
+      ? `https://ihsaanlms.onrender.com/course/course-sections/?course=${selectedCourseId}`
       : null,
     (data) => {
       if (data?.total && !fetchAll) {
@@ -89,9 +99,16 @@ const AddingQuiz = () => {
   const Courses = CoursesList?.data?.results || [];
   const CourseSections = CourseSectionList?.data?.results || [];
 
+  // Debug logging
+  console.log("CoursesList:", CoursesList);
+  console.log("Courses array:", Courses);
+  console.log("isLoading:", isLoading);
+  console.log("isFetching:", isFetching);
+  console.log("coursesError:", coursesError);
+
   // Mutation to create quiz questions
   const { mutate: createQuestions, isLoading: isCreatingQuestions } = usePost(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/bulk-create/`,
+    `https://ihsaanlms.onrender.com/assessment/mcquestions/bulk-create/`,
     {
       onSuccess: (response, variables, context) => {
         toast.success("Question(s) created successfully");
@@ -243,7 +260,7 @@ const AddingQuiz = () => {
     formData.append("file", excelFile);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/upload-mcq-questions/`,
+        `https://ihsaanlms.onrender.com/assessment/mcquestions/upload-mcq-questions/`,
         {
           method: "POST",
           headers: {
@@ -394,7 +411,7 @@ const AddingQuiz = () => {
       const token = localStorage.getItem("token") || "";
       // Fetch all courses with auth
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page_size=1000`,
+        `https://ihsaanlms.onrender.com/course/courses/?page_size=1000`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -409,7 +426,7 @@ const AddingQuiz = () => {
       const sectionFetches = courses.map(async (course) => {
         try {
           const secRes = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-sections/?course=${course.id}`,
+            `https://ihsaanlms.onrender.com/course/course-sections/?course=${course.id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -438,6 +455,39 @@ const AddingQuiz = () => {
     }
   };
   const handleCloseIdModal = () => setShowIdModal(false);
+
+  // Preview manual questions
+  const handlePreviewManualQuestions = (values) => {
+    // Filter out empty questions
+    const validQuestions = values.questions.filter(
+      (q) => q.question_text.trim() !== "" && q.correct_answer !== ""
+    );
+
+    if (validQuestions.length === 0) {
+      toast.error(
+        "Please add at least one complete question before previewing"
+      );
+      return;
+    }
+
+    // Get course and section names for display
+    const selectedCourse = Courses.find(
+      (c) => c.id.toString() === values.course_id
+    );
+    const selectedSection = CourseSections.find(
+      (s) => s.id.toString() === values.course_section_id
+    );
+
+    const questionsWithContext = validQuestions.map((q) => ({
+      ...q,
+      course_name: selectedCourse?.name || "Unknown Course",
+      course_code: selectedCourse?.code || "",
+      section_title: selectedSection?.title || "Unknown Section",
+    }));
+
+    setManualQuestionsToPreview(questionsWithContext);
+    setManualPreviewOpen(true);
+  };
 
   return (
     <div className="">
@@ -568,12 +618,23 @@ const AddingQuiz = () => {
         {({ values, setFieldValue, isValid }) => (
           <Form className="bg-white p-6 rounded-md shadow-md space-y-6">
             <div>
-              <label
-                htmlFor="course_id"
-                className="block md:text-lg font-medium mb-2"
-              >
-                Select Course
-              </label>
+              <div className="flex justify-between items-center mb-2">
+                <label
+                  htmlFor="course_id"
+                  className="block md:text-lg font-medium"
+                >
+                  Select Course
+                </label>
+                {coursesError && (
+                  <button
+                    type="button"
+                    onClick={() => refetch()}
+                    className="text-sm text-blue-600 hover:text-blue-800 underline"
+                  >
+                    Retry
+                  </button>
+                )}
+              </div>
               <Field
                 as="select"
                 id="course_id"
@@ -582,12 +643,26 @@ const AddingQuiz = () => {
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
                 disabled={isLoading || isFetching}
               >
-                <option value="">Select a course</option>
-                {Courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.name} ({course.code})
-                  </option>
-                ))}
+                <option value="">
+                  {isLoading || isFetching
+                    ? "Loading courses..."
+                    : coursesError
+                    ? "Error loading courses"
+                    : "Select a course"}
+                </option>
+                {Courses.length > 0
+                  ? Courses.map((course) => (
+                      <option key={course.id} value={course.id}>
+                        {course.name} ({course.code})
+                      </option>
+                    ))
+                  : !isLoading &&
+                    !isFetching &&
+                    !coursesError && (
+                      <option value="" disabled>
+                        No courses available
+                      </option>
+                    )}
               </Field>
               <ErrorMessage
                 name="course_id"
@@ -747,6 +822,17 @@ const AddingQuiz = () => {
               </Button>
 
               <Button
+                type="button"
+                color="primary"
+                onClick={() => handlePreviewManualQuestions(values)}
+                disabled={!values.course_id || !values.course_section_id}
+                className="w-full px-4 py-2 rounded-md"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Preview Questions
+              </Button>
+
+              <Button
                 type="submit"
                 color="secondary"
                 disabled={
@@ -888,6 +974,96 @@ const AddingQuiz = () => {
         </DialogContent>
         <DialogActions>
           <MuiButton onClick={handleCloseIdModal}>Close</MuiButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Manual Questions Preview Dialog */}
+      <Dialog
+        open={manualPreviewOpen}
+        onClose={() => setManualPreviewOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>
+          <div className="flex justify-between items-center">
+            <Typography variant="h6">Preview Manual Questions</Typography>
+            <MuiButton
+              onClick={() => setManualPreviewOpen(false)}
+              startIcon={<X />}
+            >
+              Close
+            </MuiButton>
+          </div>
+        </DialogTitle>
+        <DialogContent>
+          {manualQuestionsToPreview.length > 0 && (
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+              <Typography variant="subtitle1" className="font-semibold">
+                Course: {manualQuestionsToPreview[0].course_name} (
+                {manualQuestionsToPreview[0].course_code})
+              </Typography>
+              <Typography variant="subtitle2" className="text-gray-600">
+                Section: {manualQuestionsToPreview[0].section_title}
+              </Typography>
+              <Typography variant="body2" className="text-gray-500">
+                Total Questions: {manualQuestionsToPreview.length}
+              </Typography>
+            </div>
+          )}
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Question</TableCell>
+                  <TableCell>Options</TableCell>
+                  <TableCell>Correct Answer</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {manualQuestionsToPreview.map((question, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <div className="max-w-md">
+                        <Typography
+                          variant="body2"
+                          className="font-medium mb-2"
+                        >
+                          Question {index + 1}
+                        </Typography>
+                        <div className="text-sm text-gray-700">
+                          {question.question_text}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        {Object.entries(question.options).map(
+                          ([key, value]) => (
+                            <div key={key} className="text-sm">
+                              <span className="font-semibold">{key}:</span>{" "}
+                              {value}
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={question.correct_answer}
+                        color="success"
+                        size="small"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <MuiButton onClick={() => setManualPreviewOpen(false)}>
+            Close
+          </MuiButton>
         </DialogActions>
       </Dialog>
     </div>

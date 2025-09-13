@@ -93,6 +93,21 @@ const CourseDetailPage = () => {
 
   const handleVideoPlay = (videoId) => {
     setPlayingVideo(playingVideo === videoId ? null : videoId);
+
+    // If starting to play (not pausing), request fullscreen
+    if (playingVideo !== videoId) {
+      // Use setTimeout to ensure the video element is rendered with controls
+      setTimeout(() => {
+        const videoElement = document.querySelector(
+          `video[data-video-id="${videoId}"]`
+        );
+        if (videoElement && videoElement.requestFullscreen) {
+          videoElement.requestFullscreen().catch((err) => {
+            console.log("Fullscreen request failed:", err);
+          });
+        }
+      }, 100);
+    }
   };
 
   const handleStartAssessment = (section) => {
@@ -465,6 +480,7 @@ const CourseDetailPage = () => {
                                             className="border rounded-lg"
                                             controls={playingVideo === video.id}
                                             muted={playingVideo !== video.id}
+                                            data-video-id={video.id}
                                           >
                                             <source
                                               src={

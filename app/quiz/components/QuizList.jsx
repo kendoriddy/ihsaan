@@ -51,12 +51,9 @@ const QuizList = ({ setCurrentScreen }) => {
 
   const Quizes = QuizesList && QuizesList?.data?.results;
 
-  // const filteredQuizes = Quizes?.filter(
-  //   (quiz) => quiz.course_section === null
-  //   // &&
-  //   //   new Date(quiz.end_date) > new Date() &&
-  //   //   quiz.is_open === true
-  // );
+  // Filter quizzes to show only those available for general quiz taking
+  const filteredQuizes =
+    Quizes?.filter((quiz) => quiz.course_section === null) || [];
 
   useEffect(() => {
     const selectedQuiz = localStorage.getItem("selectedQuiz");
