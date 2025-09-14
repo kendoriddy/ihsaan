@@ -140,7 +140,7 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
     student_name,
     submitted_at,
     submission_notes,
-    file_url,
+    file_resources,
   } = submissionData[0];
 
   return (
@@ -153,17 +153,17 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
               {formatDate(submitted_at) || "Unknown date"}
             </p>
             <p className="mt-2">{submission_notes || "No response text"}</p>
-            {file_url && (
+            {file_resources[0]?.media_url && (
               <div className="mt-2 flex space-x-2">
                 <a
-                  href={file_url}
+                  href={file_url.media_url}
                   download
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
                 >
                   Download
                 </a>
                 <a
-                  href={file_url}
+                  href={file_url.media_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
@@ -178,6 +178,7 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
             <Button
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               onClick={() => setOpenUpdateModal(true)}
+              disabled
             >
               Edit Assignment
             </Button>
