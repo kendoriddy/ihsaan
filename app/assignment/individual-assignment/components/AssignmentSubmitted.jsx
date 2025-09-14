@@ -8,8 +8,13 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import Comments from "./Comments";
+import Image from "next/image";
 
-const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
+const AssignmentSubmitted = ({
+  submissionData,
+  refetchSubmission,
+  endDate,
+}) => {
   const [dragActive, setDragActive] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [gradeId, setGradeId] = useState(null);
@@ -146,7 +151,7 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
   return (
     <div>
       <div className="space-y-4">
-        <div className="flex items-start space-x-4">
+        <div className="flex justify-center text-center items-start space-x-4">
           <div>
             <p className="font-medium">{student_name || "Unknown User"}</p>
             <p className="text-sm text-gray-500">
@@ -154,23 +159,39 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
             </p>
             <p className="mt-2">{submission_notes || "No response text"}</p>
             {file_resources[0]?.media_url && (
-              <div className="mt-2 flex space-x-2">
-                <a
-                  href={file_url.media_url}
-                  download
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                >
-                  Download
-                </a>
-                <a
-                  href={file_url.media_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                >
-                  Preview
-                </a>
-              </div>
+              <>
+                {file_resources[0].media_url.endsWith(".pdf") ? (
+                  <iframe
+                    src={file_resources[0].media_url}
+                    className="w-full h-96 border rounded"
+                    title="PDF Preview"
+                  />
+                ) : (
+                  <img
+                    src={file_resources[0].media_url}
+                    alt="Student submitted file"
+                    className="max-w-full h-auto rounded"
+                  />
+                )}
+
+                <div className="mt-2 flex justify-center space-x-2">
+                  <a
+                    href={file_resources[0].media_url}
+                    download
+                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-gray-300"
+                  >
+                    Download
+                  </a>
+                  <a
+                    href={file_resources[0].media_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-gray-300"
+                  >
+                    Preview
+                  </a>
+                </div>
+              </>
             )}
             <p className="mt-2">
               Marks: {score || "Not graded"} / {total_marks || "N/A"}
@@ -178,7 +199,7 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
             <Button
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               onClick={() => setOpenUpdateModal(true)}
-              disabled
+              disabled={new Date(endDate) <= new Date()}
             >
               Edit Assignment
             </Button>

@@ -69,7 +69,7 @@ const IndividualAssignmentPage = () => {
   const dueDate = AssignmentData?.data?.end_date
     ? new Date(AssignmentData.data.end_date)
     : null;
-  const isAssignmentClosed = dueDate ? new Date() > dueDate : false;
+  const isAssignmentClosed = dueDate ? new Date() >= dueDate : false;
   const hasSubmitted = SubmissionData?.data?.file_submissions.some(
     (submission) =>
       submission.assessment === assignmentId && submission.student === studentId
@@ -147,7 +147,9 @@ const IndividualAssignmentPage = () => {
         {/* Right Section: Submission Area */}
         <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
           <div className="flex justify-between items-center">
-            {showSubmissionForm && showClosedView ? (
+            {showClosedView ? (
+              <h3 className="text-lg font-medium mb-4">Assignment Closed</h3>
+            ) : showSubmissionForm ? (
               <h3 className="text-lg font-medium mb-4">
                 Assignment Submission
               </h3>
@@ -155,8 +157,9 @@ const IndividualAssignmentPage = () => {
               <h3 className="text-lg font-medium mb-4">
                 Submission & Comments
               </h3>
-            )}{" "}
+            )}
           </div>
+
           {showSubmissionForm && (
             <AssignmentSubmission
               assignmentId={assignmentId}
@@ -167,6 +170,7 @@ const IndividualAssignmentPage = () => {
             <AssignmentSubmitted
               submissionData={SubmissionData?.data?.file_submissions}
               refetchSubmission={refetchSubmission}
+              endDate={AssignmentData.data?.end_date}
             />
           )}
           {showClosedView && <AssignmentClosed />}
