@@ -180,8 +180,6 @@ export const termSchema = Yup.object({
 export const manualGradeSchema = Yup.object().shape({
   course: Yup.string().required("Course is required"),
   student: Yup.string().required("Student is required"),
-  session: Yup.string().required("Session is required"),
-  term: Yup.string().required("Term is required"),
   reason: Yup.string().required("Reason is required"),
   details: Yup.string().required("Details are required"),
   score: Yup.number()

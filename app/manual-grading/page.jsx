@@ -1,7 +1,7 @@
 "use client";
 
 import Layout from "@/components/Layout";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Formik, Form, Field } from "formik";
 import {
   TextField,
@@ -16,13 +16,6 @@ import { manualGradeSchema } from "@/components/validationSchemas/ValidationSche
 import Swal from "sweetalert2";
 
 const ManualGrading = () => {
-  const [tutorId, setTutorId] = useState("");
-
-  useEffect(() => {
-    const storedTutorId = localStorage.getItem("userId");
-    if (storedTutorId) setTutorId(storedTutorId);
-  }, []);
-
   const {
     isLoading: loadingCourses,
     data: coursesData,
@@ -39,12 +32,21 @@ const ManualGrading = () => {
   );
   const courses = coursesData?.data?.results || [];
 
-  // Fetch sessions
-  const { data: sessionsData } = useFetch(
-    "sessions",
-    "https://ihsaanlms.onrender.com/school/sessions/"
+  const {
+    isLoading: loadingReasons,
+    data: reasonsData,
+    refetch: refetchReasons,
+    isFetching: isFetchingReasons,
+  } = useFetch(
+    ["courses"],
+    `https://ihsaanlms.onrender.com/assessment/reason-options/`,
+    (data) => {
+      if (data?.total) {
+        // You can handle data.total here if needed
+      }
+    }
   );
-  const sessions = sessionsData?.results || [];
+  const reasons = reasonsData?.data?.results || [];
 
   const { mutate: submitManualGrade, isLoading } = usePost(
     "https://ihsaanlms.onrender.com/assessment/manual-grades/"
@@ -53,20 +55,13 @@ const ManualGrading = () => {
   const initialValues = {
     course: "",
     student: "",
-    session: "",
-    term: "",
     reason: "",
     details: "",
     score: "",
   };
 
   const handleSubmit = (values, { resetForm }) => {
-    const payload = {
-      ...values,
-      tutor: tutorId,
-    };
-
-    submitManualGrade(payload, {
+    submitManualGrade(values, {
       onSuccess: () => {
         Swal.fire({
           title: "Manual grade submitted successfully",
@@ -147,35 +142,15 @@ const ManualGrading = () => {
                 </Field>
               </FormControl>
 
-              {/* Session */}
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Session</InputLabel>
-                <Field as={Select} name="session">
-                  {sessions.map((s) => (
-                    <MenuItem key={s.id} value={s.id}>
-                      {s.name}
-                    </MenuItem>
-                  ))}
-                </Field>
-              </FormControl>
-
-              {/* Term */}
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Term</InputLabel>
-                <Field as={Select} name="term">
-                  <MenuItem value="1">First Term</MenuItem>
-                  <MenuItem value="2">Second Term</MenuItem>
-                  <MenuItem value="3">Third Term</MenuItem>
-                </Field>
-              </FormControl>
-
               {/* Reason */}
               <FormControl fullWidth margin="normal">
                 <InputLabel>Reason</InputLabel>
                 <Field as={Select} name="reason">
-                  <MenuItem value="EXAMINATION">Examination</MenuItem>
-                  <MenuItem value="FORUM">Forum</MenuItem>
-                  <MenuItem value="TEST">Test</MenuItem>
+                  {reasons?.map((reason) => (
+                    <MenuItem key={reason.id} value={reason.id}>
+                      {reason.description}
+                    </MenuItem>
+                  ))}
                 </Field>
               </FormControl>
 
