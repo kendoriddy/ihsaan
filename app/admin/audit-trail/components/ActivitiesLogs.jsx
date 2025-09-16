@@ -1,5 +1,5 @@
 import Loader from "@/components/Loader";
-import { AccessTime, Person } from "@mui/icons-material";
+import { AccessTime, Person, FilterList, Clear } from "@mui/icons-material";
 import {
   Table,
   TableBody,
@@ -9,10 +9,19 @@ import {
   TableRow,
   Paper,
   Pagination,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
+  Box,
+  Collapse,
 } from "@mui/material";
 import Lottie from "lottie-react";
-import React from "react";
+import React, { useState } from "react";
 import animation from "../../../../assets/no_data.json";
+import Button from "@/components/Button";
 
 const ActivitiesLogs = ({
   activityData,
@@ -21,14 +30,135 @@ const ActivitiesLogs = ({
   totalActivities,
   currentPage,
   onPageChange,
+  onFiltersChange,
 }) => {
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    action: "",
+    username: "",
+    days: "",
+  });
+
   const ActivitiesData = activityData?.data?.audit_trails || [];
+
+  const daysOptions = [
+    { value: "1", label: "Last 1 day" },
+    { value: "7", label: "Last 7 days" },
+    { value: "30", label: "Last 30 days" },
+    { value: "90", label: "Last 90 days" },
+    { value: "365", label: "Last year" },
+  ];
+
+  // Common actions - you might want to get these dynamically from your API
+  const actionOptions = [
+    { value: "LOGIN", label: "Login" },
+    { value: "LOGOUT", label: "Logout" },
+    { value: "CREATE", label: "Create" },
+    { value: "UPDATE", label: "Update" },
+    { value: "DELETE", label: "Delete" },
+    { value: "VIEW", label: "View" },
+    { value: "DOWNLOAD", label: "Download" },
+    { value: "UPLOAD", label: "Upload" },
+  ];
+
+  const handleFilterChange = (field, value) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const applyFilters = () => {
+    const activeFilters = Object.fromEntries(
+      Object.entries(filters).filter(([_, value]) => value !== "")
+    );
+    onFiltersChange(activeFilters);
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      action: "",
+      username: "",
+      days: "",
+    });
+    onFiltersChange({});
+  };
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-semibold text-blue-600 mb-6">
-        User Activity Logs
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-semibold text-blue-600">
+          User Activity Logs
+        </h2>
+        <Button color="secondary" onClick={() => setShowFilters(!showFilters)}>
+          {showFilters ? "Hide Filters" : "Show Filters"}
+        </Button>
+      </div>
+
+      {/* Filter Section */}
+      <Collapse in={showFilters}>
+        <Box sx={{ bgcolor: "grey.50", p: 3, borderRadius: 2, mb: 3 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Action</InputLabel>
+                <Select
+                  value={filters.action}
+                  onChange={(e) => handleFilterChange("action", e.target.value)}
+                  label="Action"
+                >
+                  <MenuItem value="">All actions</MenuItem>
+                  {actionOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <TextField
+                fullWidth
+                label="Username"
+                placeholder="Enter username..."
+                value={filters.username}
+                onChange={(e) => handleFilterChange("username", e.target.value)}
+                size="small"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Time Period</InputLabel>
+                <Select
+                  value={filters.days}
+                  onChange={(e) => handleFilterChange("days", e.target.value)}
+                  label="Time Period"
+                >
+                  <MenuItem value="">All time</MenuItem>
+                  {daysOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+
+          <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
+            <Button color="primary" onClick={applyFilters}>
+              Apply Filters
+            </Button>
+            <Button
+              color="secondary"
+              onClick={clearFilters}
+              icon={<Clear className="w-4 h-4" />}
+            >
+              Clear All
+            </Button>
+          </Box>
+        </Box>
+      </Collapse>
+
       {isFetching || isLoading ? (
         <div className="flex items-center gap-2">
           <Loader size={20} />
