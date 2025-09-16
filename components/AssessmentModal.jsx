@@ -39,6 +39,7 @@ const AssessmentModal = ({
   const [showResults, setShowResults] = useState(false);
   const [assessmentResults, setAssessmentResults] = useState(null);
   const [hasStarted, setHasStarted] = useState(false);
+  const [hasAlreadyTaken, setHasAlreadyTaken] = useState(false);
 
   // Assessment scheduling states
   const [assessmentSchedule, setAssessmentSchedule] = useState({
@@ -58,6 +59,54 @@ const AssessmentModal = ({
     maxQuestions: 10,
     difficultyLevel: "mixed", // 'easy', 'medium', 'hard', 'mixed'
   });
+
+  // Check if user has already taken the assessment
+  const checkAssessmentTaken = useCallback(async () => {
+    try {
+      // Get user ID from localStorage or fetch from API
+      let userId = localStorage.getItem("userId");
+
+      if (!userId) {
+        // If not in localStorage, fetch from API
+        const userResponse = await axios.get(
+          "https://ihsaanlms.onrender.com/api/auth/logged-in-user/",
+          {
+            headers: {
+              Authorization: `Bearer ${getAuthToken()}`,
+            },
+          }
+        );
+        userId = userResponse.data?.id;
+
+        if (userId) {
+          localStorage.setItem("userId", userId);
+        }
+      }
+
+      if (!userId) {
+        throw new Error("User ID not found");
+      }
+
+      // Check if user has already taken the assessment
+      const response = await axios.get(
+        `https://ihsaanlms.onrender.com/assessment/assessments/has-taken/`,
+        {
+          params: {
+            course_section: sectionData.id,
+            user_id: userId,
+          },
+          headers: {
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+        }
+      );
+
+      setHasAlreadyTaken(response.data?.has_taken || false);
+    } catch (error) {
+      console.error("Error checking assessment status:", error);
+      setHasAlreadyTaken(false);
+    }
+  }, [sectionData?.id]);
 
   // Check assessment scheduling
   const checkAssessmentSchedule = () => {
@@ -182,11 +231,17 @@ const AssessmentModal = ({
   useEffect(() => {
     if (isOpen && sectionData?.id) {
       checkAssessmentSchedule();
+      checkAssessmentTaken();
       fetchQuestions();
     }
-  }, [isOpen, sectionData?.id, fetchQuestions]);
+  }, [isOpen, sectionData?.id, fetchQuestions, checkAssessmentTaken]);
 
   const handleStartAssessment = () => {
+    if (hasAlreadyTaken) {
+      toast.error("You have already taken this assessment");
+      return;
+    }
+
     if (scheduleStatus !== "available") {
       toast.error("Assessment is not available at this time");
       return;
@@ -424,7 +479,9 @@ const AssessmentModal = ({
               )}
 
               <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                {scheduleStatus === "available"
+                {hasAlreadyTaken
+                  ? "Assessment Already Completed"
+                  : scheduleStatus === "available"
                   ? "Ready to Start Assessment?"
                   : "Assessment Information"}
               </h3>
@@ -562,14 +619,37 @@ const AssessmentModal = ({
                 </div>
               )} */}
 
-              {scheduleStatus === "available" && (
-                <button
-                  onClick={handleStartAssessment}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center mx-auto"
-                >
-                  <FaPlay className="w-4 h-4 mr-2" />
-                  Start Assessment
-                </button>
+              {hasAlreadyTaken ? (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6 max-w-md mx-auto">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FaCheckCircle className="w-8 h-8 text-green-600" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-green-800 mb-2">
+                      Assessment Completed
+                    </h4>
+                    <p className="text-green-700 mb-4">
+                      You have already completed this assessment. Only one
+                      attempt is allowed.
+                    </p>
+                    <button
+                      onClick={handleClose}
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                scheduleStatus === "available" && (
+                  <button
+                    onClick={handleStartAssessment}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center mx-auto"
+                  >
+                    <FaPlay className="w-4 h-4 mr-2" />
+                    Start Assessment
+                  </button>
+                )
               )}
             </div>
           ) : showResults ? (

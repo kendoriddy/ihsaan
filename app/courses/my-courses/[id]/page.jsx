@@ -31,7 +31,7 @@ const CourseDetailPage = () => {
   const [error, setError] = useState(null);
   const [expandedSections, setExpandedSections] = useState(new Set());
   const [playingVideo, setPlayingVideo] = useState(null);
-  const [isPaid, setIsPaid] = useState(true); // Temporary for testing
+  const [isPaid, setIsPaid] = useState(true);
   const [assessmentModal, setAssessmentModal] = useState({
     isOpen: false,
     section: null,
@@ -62,6 +62,11 @@ const CourseDetailPage = () => {
       });
 
       setCourse(courseData);
+
+      // Determine payment status based on course price
+      // If price is 0 or null, consider it paid/free
+      const coursePrice = parseFloat(courseData.price || 0);
+      setIsPaid(coursePrice === 0);
     } catch (err) {
       setError(err.message || "Failed to fetch course details.");
       console.error("Error fetching course details:", err);
@@ -73,9 +78,6 @@ const CourseDetailPage = () => {
   useEffect(() => {
     if (courseId) {
       fetchCourseDetails();
-      // Simulate payment status based on course ID for testing
-      // Course ID 2 is unpaid, others are paid
-      setIsPaid(courseId !== "2");
     }
   }, [courseId, fetchCourseDetails]);
 
@@ -238,8 +240,8 @@ const CourseDetailPage = () => {
                 </h3>
                 <div className="mt-2 text-sm text-red-700">
                   <p>
-                    This course requires payment to access the full content.
-                    Some sections may be restricted.
+                    This course costs ${course.price} and requires payment to
+                    access the full content. Some sections may be restricted.
                   </p>
                 </div>
                 <div className="mt-4">
@@ -263,21 +265,6 @@ const CourseDetailPage = () => {
             </div>
           </div>
         )}
-
-        {/* Test Toggle */}
-        <div className="mb-6 flex justify-end">
-          <div className="flex items-center gap-2 bg-gray-100 p-2 rounded-lg">
-            <span className="text-sm text-gray-600">Test Mode:</span>
-            <button
-              onClick={() => setIsPaid(!isPaid)}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                isPaid ? "bg-green-500 text-white" : "bg-red-500 text-white"
-              }`}
-            >
-              {isPaid ? "Paid Mode" : "Unpaid Mode"}
-            </button>
-          </div>
-        </div>
 
         {/* Header */}
         <div className="flex items-center mb-8">
@@ -349,9 +336,9 @@ const CourseDetailPage = () => {
                     isPaid ? "bg-green-500 text-white" : "bg-red-500 text-white"
                   }`}
                 >
-                  <p className="text-sm font-medium">Payment Status</p>
+                  <p className="text-sm font-medium">Course Price</p>
                   <p className="text-lg font-bold">
-                    {isPaid ? "Paid" : "Unpaid"}
+                    {isPaid ? "Free" : `$${course.price}`}
                   </p>
                 </div>
               </div>
@@ -436,8 +423,8 @@ const CourseDetailPage = () => {
                               Payment Required
                             </h3>
                             <p className="text-gray-600 mb-4">
-                              Complete your payment to access this course
-                              content.
+                              Complete your payment of ${course.price} to access
+                              this course content.
                             </p>
                             <button
                               onClick={() => {
@@ -613,7 +600,7 @@ const CourseDetailPage = () => {
                                         {material.title}
                                       </h5>
                                       <div className="space-y-1 text-sm text-gray-600">
-                                        <p>Order: {material.order}</p>
+                                        {/* <p>Order: {material.order}</p> */}
                                         {material.material_resource && (
                                           <p>
                                             Size:{" "}

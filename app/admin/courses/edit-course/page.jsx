@@ -20,7 +20,10 @@ import {
   FaFileWord,
   FaGripVertical,
 } from "react-icons/fa";
-import { convertDurationToSeconds } from "@/utils/utilFunctions";
+import {
+  getVideoDuration,
+  formatDurationFromSeconds,
+} from "@/utils/utilFunctions";
 import AdminDashboardHeader from "@/components/AdminDashboardHeader";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
 
@@ -91,6 +94,7 @@ function EditCoursePage() {
   });
   const [videoFile, setVideoFile] = useState(null);
   const [videoUploadLoading, setVideoUploadLoading] = useState(false);
+  const [durationExtracting, setDurationExtracting] = useState(false);
 
   const [courseMaterials, setCourseMaterials] = useState([]);
   const [newMaterialTitle, setNewMaterialTitle] = useState("");
@@ -305,6 +309,46 @@ function EditCoursePage() {
   const [videoToCloudinaryLoading, setVideoToCloudinaryLoading] =
     useState(false);
   const [videoToCloudinaryError, setVideoToCloudinaryError] = useState(null);
+
+  // Handle video file selection and extract duration
+  const handleVideoFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      setVideoFile(null);
+      setNewVideoData((prev) => ({ ...prev, duration: "" }));
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith("video/")) {
+      toast.error("Please select a valid video file");
+      e.target.value = "";
+      return;
+    }
+
+    setVideoFile(file);
+    setDurationExtracting(true);
+
+    try {
+      const durationInSeconds = await getVideoDuration(file);
+      const formattedDuration = formatDurationFromSeconds(durationInSeconds);
+
+      setNewVideoData((prev) => ({
+        ...prev,
+        duration: formattedDuration,
+      }));
+
+      toast.success(`Video duration detected: ${formattedDuration}`);
+    } catch (error) {
+      console.error("Error extracting video duration:", error);
+      toast.error(
+        "Failed to extract video duration. Please enter it manually."
+      );
+      setNewVideoData((prev) => ({ ...prev, duration: "" }));
+    } finally {
+      setDurationExtracting(false);
+    }
+  };
 
   const uploadVideoToCloudinary = async (file) => {
     const token = getAuthToken();
@@ -1494,7 +1538,10 @@ function EditCoursePage() {
                           htmlFor="duration"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Duration (in minutes)
+                          Duration{" "}
+                          {durationExtracting
+                            ? "(extracting...)"
+                            : "(auto-detected)"}
                         </label>
                         <input
                           type="text"
@@ -1506,9 +1553,14 @@ function EditCoursePage() {
                               duration: e.target.value,
                             })
                           }
+                          placeholder="e.g., 05:30 or 1:23:45"
                           required
                           className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
+                        <p className="mt-1 text-xs text-gray-500">
+                          Duration is automatically detected from the video
+                          file. Format: MM:SS or HH:MM:SS
+                        </p>
                       </div>
                       {/* <div>
                         <label
@@ -1543,10 +1595,16 @@ function EditCoursePage() {
                           <input
                             type="file"
                             id="video_file"
-                            onChange={(e) => setVideoFile(e.target.files[0])}
+                            onChange={handleVideoFileChange}
+                            accept="video/*"
                             required
                             className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                           />
+                          {durationExtracting && (
+                            <div className="absolute right-2 top-2">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                            </div>
+                          )}
                         </div>
                       </div>
                       <div>
@@ -1554,10 +1612,14 @@ function EditCoursePage() {
                           type="submit"
                           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors duration-200 ease-in-out"
                           disabled={
-                            videoToCloudinaryLoading || videoUploadLoading
+                            videoToCloudinaryLoading ||
+                            videoUploadLoading ||
+                            durationExtracting
                           }
                         >
-                          {videoToCloudinaryLoading
+                          {durationExtracting
+                            ? "Extracting duration..."
+                            : videoToCloudinaryLoading
                             ? "Uploading video..."
                             : videoUploadLoading
                             ? "Adding video..."
