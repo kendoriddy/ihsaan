@@ -1,196 +1,261 @@
 "use client";
-
-import Layout from "@/components/Layout";
-import React from "react";
-import { Formik, Form, Field } from "formik";
+import React, { useState } from "react";
+import { useFetch, useDelete } from "@/hooks/useHttp/useHttp";
+import { useQueryClient } from "@tanstack/react-query";
 import {
-  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Pagination,
   MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
+  Menu,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from "@mui/material";
+import { toast } from "react-toastify";
+import Layout from "@/components/Layout";
 import Button from "@/components/Button";
-import { usePost, useFetch } from "@/hooks/useHttp/useHttp";
-import { manualGradeSchema } from "@/components/validationSchemas/ValidationSchema";
-import Swal from "sweetalert2";
+import CustomModal from "@/components/CustomModal";
+import Loader from "@/components/Loader";
+import { MoreVert } from "@mui/icons-material";
+import ManualGradeForm from "./components/ManualGradeForm";
 
-const ManualGrading = () => {
-  const {
-    isLoading: loadingCourses,
-    data: coursesData,
-    refetch: refetchCourses,
-    isFetching: isFetchingCourses,
-  } = useFetch(
-    ["courses"],
-    `https://ihsaanlms.onrender.com/course/courses/`,
+const AllManualGrades = () => {
+  const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [selectedGrade, setSelectedGrade] = useState(null);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [totalGrades, setTotalGrades] = useState(0);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+
+  const { isLoading, data, refetch, isFetching } = useFetch(
+    "manual-grades",
+    `https://ihsaanlms.onrender.com/assessment/manual-grades/?page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
-        // You can handle data.total here if needed
+        setTotalGrades(data.total);
       }
     }
   );
-  const courses = coursesData?.data?.results || [];
 
-  const {
-    isLoading: loadingReasons,
-    data: reasonsData,
-    refetch: refetchReasons,
-    isFetching: isFetchingReasons,
-  } = useFetch(
-    ["courses"],
-    `https://ihsaanlms.onrender.com/assessment/reason-options/`,
-    (data) => {
-      if (data?.total) {
-        // You can handle data.total here if needed
-      }
-    }
-  );
-  const reasons = reasonsData?.data?.results || [];
+  const manualGrades = data?.data?.results || [];
 
-  const { mutate: submitManualGrade, isLoading } = usePost(
-    "https://ihsaanlms.onrender.com/assessment/manual-grades/"
-  );
-
-  const initialValues = {
-    course: "",
-    student: "",
-    reason: "",
-    details: "",
-    score: "",
-  };
-
-  const handleSubmit = (values, { resetForm }) => {
-    submitManualGrade(values, {
+  // DELETE MANUAL GRADE
+  const { mutate: deleteGrade, isLoading: isDeleting } = useDelete(
+    `https://ihsaanlms.onrender.com/assessment/manual-grades`,
+    {
       onSuccess: () => {
-        Swal.fire({
-          title: "Manual grade submitted successfully",
-          icon: "success",
-          customClass: {
-            confirmButton: "my-confirm-btn",
-          },
-        });
-        resetForm();
+        toast.success("Manual grade deleted successfully");
+        queryClient.refetchQueries("manual-grades");
+        refetch();
+        setOpenDeleteDialog(false);
       },
       onError: (error) => {
-        const errorData = error.response?.data;
-        if (typeof errorData === "string") {
-          Swal.fire({
-            title: errorData,
-            icon: "error",
-            customClass: {
-              confirmButton: "my-confirm-btn",
-            },
-          });
-        } else if (errorData && typeof errorData === "object") {
-          const messages = Object.values(errorData)
-            .map((msg) => (Array.isArray(msg) ? msg.join(" ") : msg))
-            .join(" ");
-          Swal.fire({
-            title: messages,
-            icon: "error",
-            customClass: {
-              confirmButton: "my-confirm-btn",
-            },
-          });
-        } else {
-          Swal.fire({
-            title: "Failed to submit manual grade",
-            icon: "error",
-            customClass: {
-              confirmButton: "my-confirm-btn",
-            },
-          });
-        }
+        toast.error(error.response?.data?.message || "Failed to delete");
       },
-    });
+    }
+  );
+
+  // Handle Page Change
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+    refetch();
+  };
+
+  const handleDelete = () => {
+    if (selectedGrade?.id) {
+      deleteGrade(`${selectedGrade.id}`);
+    }
+  };
+
+  // Handle Menu Open
+  const handleMenuOpen = (event, grade) => {
+    setSelectedGrade(grade);
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  // Handle Menu Close
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
   };
 
   return (
     <Layout>
-      <h1 className="text-xl font-bold mb-4">Manual Grading</h1>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={manualGradeSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ values, errors, touched }) => {
-          const selectedCourse = courses.find((c) => c.id === values.course);
-          return (
-            <Form>
-              {/* Course */}
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Course</InputLabel>
-                <Field as={Select} name="course">
-                  {courses.map((c) => (
-                    <MenuItem key={c.id} value={c.id}>
-                      {c.title}
-                    </MenuItem>
+      <div className="max-w-full">
+        <div className="w-full">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold">Manual Grades Management</h1>
+            <Button color="secondary" onClick={() => setOpenCreateModal(true)}>
+              Create Manual Grade
+            </Button>
+          </div>
+
+          <TableContainer
+            component={Paper}
+            className="overflow-x-auto max-w-full"
+          >
+            <Table className="table-auto">
+              <TableHead>
+                <TableRow>
+                  <TableCell className="text-nowrap">Student Name</TableCell>
+                  <TableCell className="text-nowrap">Course Name</TableCell>
+                  <TableCell className="text-nowrap">Course Code</TableCell>
+                  <TableCell className="text-nowrap">Reason</TableCell>
+                  <TableCell className="text-nowrap">Score</TableCell>
+                  <TableCell className="text-nowrap">Details</TableCell>
+                  <TableCell className="text-nowrap">Date Created</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {isFetching && (
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <div className="flex items-center justify-center gap-2 py-4">
+                        <Loader />
+                        <p className="animate-pulse">Loading...</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!isFetching && manualGrades.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8">
+                      No manual grades found
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!isFetching &&
+                  manualGrades.map((grade) => (
+                    <TableRow key={grade.id}>
+                      <TableCell>{grade.student_name}</TableCell>
+                      <TableCell>{grade.course_title}</TableCell>
+                      <TableCell>{grade.course_code}</TableCell>
+                      <TableCell>{grade.reason_name}</TableCell>
+                      <TableCell>
+                        <span className="font-semibold">{grade.score}</span>
+                      </TableCell>
+                      <TableCell>
+                        <div
+                          className="max-w-xs truncate"
+                          title={grade.details}
+                        >
+                          {grade.details}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(grade.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          onClick={(event) => handleMenuOpen(event, grade)}
+                        >
+                          <MoreVert />
+                        </IconButton>
+                        <Menu
+                          anchorEl={menuAnchorEl}
+                          open={Boolean(menuAnchorEl)}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem
+                            onClick={() => {
+                              setOpenUpdateModal(true);
+                              handleMenuClose();
+                            }}
+                          >
+                            Edit
+                          </MenuItem>
+                          <MenuItem
+                            onClick={() => {
+                              setOpenDeleteDialog(true);
+                              handleMenuClose();
+                            }}
+                          >
+                            Delete
+                          </MenuItem>
+                        </Menu>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </Field>
-              </FormControl>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
 
-              {/* Student */}
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Student</InputLabel>
-                <Field as={Select} name="student">
-                  {selectedCourse?.enrolled_users?.map((s) => (
-                    <MenuItem key={s.id} value={s.id}>
-                      {s.first_name} {s.last_name}
-                    </MenuItem>
-                  ))}
-                </Field>
-              </FormControl>
+        {/* Pagination */}
+        <Pagination
+          count={Math.ceil(totalGrades / 15)}
+          page={page}
+          onChange={handlePageChange}
+          color="primary"
+          sx={{ mt: 2, display: "flex", justifyContent: "center" }}
+        />
 
-              {/* Reason */}
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Reason</InputLabel>
-                <Field as={Select} name="reason">
-                  {reasons?.map((reason) => (
-                    <MenuItem key={reason.id} value={reason.id}>
-                      {reason.description}
-                    </MenuItem>
-                  ))}
-                </Field>
-              </FormControl>
+        {/* Delete Confirmation Modal */}
+        <CustomModal
+          open={openDeleteDialog}
+          onClose={() => setOpenDeleteDialog(false)}
+          title="Confirm Delete"
+          onConfirm={handleDelete}
+          confirmText="Delete"
+          isLoading={isDeleting}
+        >
+          <p>
+            Are you sure you want to delete this manual grade for{" "}
+            <strong>{selectedGrade?.student_name} </strong>?
+          </p>
+        </CustomModal>
 
-              {/* Details */}
-              <Field
-                as={TextField}
-                fullWidth
-                margin="normal"
-                multiline
-                rows={3}
-                label="Details"
-                name="details"
-                error={touched.details && Boolean(errors.details)}
-                helperText={touched.details && errors.details}
-              />
+        {/* Create Manual Grade Modal */}
+        <Dialog
+          open={openCreateModal}
+          onClose={() => setOpenCreateModal(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>Create Manual Grade</DialogTitle>
+          <DialogContent>
+            <ManualGradeForm
+              onClose={() => setOpenCreateModal(false)}
+              onSuccess={() => {
+                setOpenCreateModal(false);
+                refetch();
+              }}
+            />
+          </DialogContent>
+        </Dialog>
 
-              {/* Score */}
-              <Field
-                as={TextField}
-                fullWidth
-                margin="normal"
-                type="number"
-                label="Score"
-                name="score"
-                error={touched.score && Boolean(errors.score)}
-                helperText={touched.score && errors.score}
-              />
-
-              {/* Submit */}
-              <div className="flex justify-center mt-6">
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Submitting..." : "Submit Grade"}
-                </Button>
-              </div>
-            </Form>
-          );
-        }}
-      </Formik>
+        {/* Update Manual Grade Modal */}
+        <Dialog
+          open={openUpdateModal}
+          onClose={() => setOpenUpdateModal(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>Edit Manual Grade</DialogTitle>
+          <DialogContent>
+            <ManualGradeForm
+              grade={selectedGrade}
+              isEdit={true}
+              onClose={() => setOpenUpdateModal(false)}
+              onSuccess={() => {
+                setOpenUpdateModal(false);
+                refetch();
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
     </Layout>
   );
 };
 
-export default ManualGrading;
+export default AllManualGrades;

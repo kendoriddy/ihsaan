@@ -32,7 +32,7 @@ const AssignmentSubmitted = ({
 
   useEffect(() => {
     if (gradeData?.data?.results?.length > 0) {
-      setGradeId(gradeData.data.results[0].id);
+      setGradeId(gradeData.data.results[0]);
     }
   }, [gradeData]);
 
@@ -148,6 +148,10 @@ const AssignmentSubmitted = ({
     file_resources,
   } = submissionData[0];
 
+  const isPastDeadline = new Date(endDate) <= new Date();
+  const isGraded = !!gradeId?.score && gradeId?.score !== "0.00";
+
+  const disableEdit = isPastDeadline || isGraded;
   return (
     <div>
       <div className="space-y-4">
@@ -194,12 +198,15 @@ const AssignmentSubmitted = ({
               </>
             )}
             <p className="mt-2">
-              Marks: {score || "Not graded"} / {total_marks || "N/A"}
+              Marks:{" "}
+              {gradeId?.score && gradeId?.assessment_max_score
+                ? `${gradeId?.score} / ${gradeId?.assessment_max_score}`
+                : "Not graded"}
             </p>
             <Button
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               onClick={() => setOpenUpdateModal(true)}
-              disabled={new Date(endDate) <= new Date()}
+              disabled={disableEdit}
             >
               Edit Assignment
             </Button>
@@ -208,7 +215,7 @@ const AssignmentSubmitted = ({
       </div>
 
       {/* Comments Section */}
-      {gradeId && <Comments gradeId={gradeId} />}
+      {gradeId && <Comments gradeId={gradeId?.id} />}
 
       <CustomModal
         open={openUpdateModal}

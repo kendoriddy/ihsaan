@@ -14,7 +14,6 @@ import Button from "@/components/Button";
 const IndividualAssignmentPage = () => {
   const { id } = useParams();
   const assignmentId = id ? String(id) : null;
-  const [studentId, setStudentId] = useState("");
 
   const {
     isLoading: isLoadingAssignment,
@@ -54,17 +53,8 @@ const IndividualAssignmentPage = () => {
     }
   );
 
-  const fetchStudentId = () => {
-    const storedStudentId = localStorage.getItem("userId");
-    console.log("storedStudentId", storedStudentId);
-    if (storedStudentId) {
-      setStudentId(storedStudentId);
-    }
-  };
-
-  useEffect(() => {
-    fetchStudentId();
-  });
+  const studentId =
+    typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
 
   const dueDate = AssignmentData?.data?.end_date
     ? new Date(AssignmentData.data.end_date)
@@ -75,8 +65,8 @@ const IndividualAssignmentPage = () => {
       submission.assessment === assignmentId && submission.student === studentId
   );
   const showSubmissionForm = !hasSubmitted && !isAssignmentClosed;
-  const showSubmittedView = hasSubmitted && !isAssignmentClosed;
-  const showClosedView = isAssignmentClosed;
+  const showSubmittedView = hasSubmitted;
+  const showClosedView = isAssignmentClosed && !hasSubmitted;
 
   // Render based on loading, error, or data
   if (
@@ -147,9 +137,7 @@ const IndividualAssignmentPage = () => {
         {/* Right Section: Submission Area */}
         <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
           <div className="flex justify-between items-center">
-            {showClosedView ? (
-              <h3 className="text-lg font-medium mb-4">Assignment Closed</h3>
-            ) : showSubmissionForm ? (
+            {showSubmissionForm ? (
               <h3 className="text-lg font-medium mb-4">
                 Assignment Submission
               </h3>

@@ -22,7 +22,7 @@ import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
 import EditAssignmentQuestion from "./components/EditAssignment";
 import Link from "next/link";
-import { MoreVert } from "@mui/icons-material";
+import { Cancel, MoreVert } from "@mui/icons-material";
 import GroupStudents from "./components/GroupStudents";
 import { getAuthToken } from "@/hooks/axios/axios";
 import AddingQuiz from "../admin/set-quiz/components/AddingQuiz";
@@ -236,7 +236,21 @@ const AllAssignment = () => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>Add Quiz Questions</DialogTitle>
+        <DialogTitle>
+          Add Quiz Questions{" "}
+          <IconButton
+            aria-label="close"
+            onClick={() => setOpenQuizModal(false)}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 10,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <Cancel />
+          </IconButton>
+        </DialogTitle>
         <DialogContent>
           <AddingQuiz />
         </DialogContent>

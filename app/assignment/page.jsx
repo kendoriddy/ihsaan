@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -44,7 +44,7 @@ const AssignmentTable = () => {
     data: AssignmentsList,
     refetch,
   } = useFetch(
-    "courses",
+    "assignmentsList",
     `https://ihsaanlms.onrender.com/assessment/base/?question_type=FILE_UPLOAD&page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
@@ -55,9 +55,12 @@ const AssignmentTable = () => {
 
   const Assignments = AssignmentsList?.data?.results || [];
 
+  useEffect(() => {
+    refetch();
+  }, [page, refetch]);
+
   const handlePageChange = (event, value) => {
     setPage(value);
-    refetch();
   };
 
   return (
