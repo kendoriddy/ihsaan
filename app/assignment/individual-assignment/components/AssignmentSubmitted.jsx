@@ -14,21 +14,11 @@ const AssignmentSubmitted = ({
   submissionData,
   refetchSubmission,
   endDate,
+  gradeData,
 }) => {
   const [dragActive, setDragActive] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [gradeId, setGradeId] = useState(null);
-
-  // Extract assignmentId from submissionData
-  const assignmentId = submissionData?.[0]?.assessment;
-
-  // Fetch grade for the submission
-  const { data: gradeData } = useFetch(
-    "grade",
-    assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/grades/?assessment=${assignmentId}`
-      : null
-  );
 
   useEffect(() => {
     if (gradeData?.data?.results?.length > 0) {

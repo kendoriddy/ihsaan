@@ -3,7 +3,6 @@ import Layout from "@/components/Layout";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
 import { formatDate } from "@/utils/utilFunctions";
 import AssignmentSubmission from "../components/AssignmentSubmission";
 import AssignmentSubmitted from "../components/AssignmentSubmitted";
@@ -53,6 +52,18 @@ const IndividualAssignmentPage = () => {
     }
   );
 
+  // Fetch grade for the submission
+  const {
+    data: gradeData,
+    isLoading: isLoadingGrades,
+    isFetching: isFetchingGrades,
+  } = useFetch(
+    "grade",
+    assignmentId
+      ? `https://ihsaanlms.onrender.com/assessment/grades/?assessment=${assignmentId}`
+      : null
+  );
+
   const studentId =
     typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
 
@@ -73,7 +84,10 @@ const IndividualAssignmentPage = () => {
     isLoadingAssignment ||
     isFetchingAssignment ||
     isLoadingSubmission ||
-    isFetchingSubmission
+    isFetchingSubmission ||
+    !studentId ||
+    isLoadingGrades ||
+    isFetchingGrades
   ) {
     return (
       <Layout>
@@ -159,6 +173,7 @@ const IndividualAssignmentPage = () => {
               submissionData={SubmissionData?.data?.file_submissions}
               refetchSubmission={refetchSubmission}
               endDate={AssignmentData.data?.end_date}
+              gradeData={gradeData}
             />
           )}
           {showClosedView && <AssignmentClosed />}
