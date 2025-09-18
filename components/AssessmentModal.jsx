@@ -367,6 +367,14 @@ const AssessmentModal = ({
     return () => clearInterval(timer);
   }, [hasStarted, timeLeft, handleSubmit]);
 
+  // Handle pre-loaded results when sectionData contains results
+  useEffect(() => {
+    if (isOpen && sectionData?.showResults && sectionData?.results) {
+      setAssessmentResults(sectionData.results);
+      setShowResults(true);
+    }
+  }, [isOpen, sectionData]);
+
   const handleClose = () => {
     if (hasStarted && !showResults) {
       const confirm = window.confirm(

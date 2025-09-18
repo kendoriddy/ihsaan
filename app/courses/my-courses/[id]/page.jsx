@@ -723,6 +723,7 @@ const CourseDetailPage = () => {
                             <div className="p-2">
                               <AssessmentButton
                                 section={section}
+                                course={course}
                                 onStartAssessment={handleStartAssessment}
                               />
                             </div>

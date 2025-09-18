@@ -12,12 +12,13 @@ import { selectAssessmentResults } from "@/utils/redux/slices/assessmentSlice";
 import { getAuthToken } from "@/hooks/axios/axios";
 import axios from "axios";
 
-const AssessmentButton = ({ section, onStartAssessment }) => {
+const AssessmentButton = ({ section, onStartAssessment, course }) => {
   const assessmentResults = useSelector((state) =>
     selectAssessmentResults(state, section.id)
   );
   const [hasTakenAssessment, setHasTakenAssessment] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
+  const [userAssessmentResults, setUserAssessmentResults] = useState(null);
 
   // Check if user has already taken the assessment
   useEffect(() => {
@@ -66,7 +67,38 @@ const AssessmentButton = ({ section, onStartAssessment }) => {
           }
         );
 
-        setHasTakenAssessment(response.data?.has_taken || false);
+        const hasTaken = response.data?.has_taken || false;
+        setHasTakenAssessment(hasTaken);
+
+        // If user has taken the assessment, fetch their results
+        if (hasTaken && course?.assessments) {
+          // Find the assessment for this section
+          const sectionAssessment = course.assessments.find(
+            (assessment) => assessment.course_section === section.id
+          );
+
+          if (sectionAssessment) {
+            try {
+              // Get user's assessment results
+              const resultsResponse = await axios.get(
+                `https://ihsaanlms.onrender.com/assessment/mcq-responses/?assessment=${sectionAssessment.id}&student=${userId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${getAuthToken()}`,
+                  },
+                }
+              );
+
+              if (resultsResponse.data?.results?.length > 0) {
+                // Get the latest result
+                const latestResult = resultsResponse.data.results[0];
+                setUserAssessmentResults(latestResult);
+              }
+            } catch (resultsError) {
+              console.error("Error fetching assessment results:", resultsError);
+            }
+          }
+        }
       } catch (error) {
         console.error("Error checking assessment status:", error);
         setHasTakenAssessment(false);
@@ -76,21 +108,30 @@ const AssessmentButton = ({ section, onStartAssessment }) => {
     };
 
     checkAssessmentStatus();
-  }, [section.id, section.has_mcq_assessment]);
+  }, [section.id, section.has_mcq_assessment, course?.assessments]);
 
   const handleClick = () => {
-    onStartAssessment(section);
+    // If user has already taken the assessment, show results instead of starting new assessment
+    if (isCompleted && (assessmentResults || userAssessmentResults)) {
+      // Show the assessment results modal
+      const resultsToShow = assessmentResults || userAssessmentResults;
+      onStartAssessment({ ...section, showResults: true, results: resultsToShow });
+    } else {
+      // Start new assessment
+      onStartAssessment(section);
+    }
   };
 
   if (!section.has_mcq_assessment) {
     return null;
   }
 
-  // Use Redux results if available, otherwise use the has-taken status
-  const isCompleted = assessmentResults && assessmentResults.id ? true : hasTakenAssessment;
-  const score = assessmentResults?.score || 0;
-  const totalQuestions = assessmentResults?.total_questions || 0;
-  const passed = assessmentResults?.passed || false;
+  // Use Redux results if available, otherwise use the fetched user results
+  const isCompleted =
+    assessmentResults && assessmentResults.id ? true : hasTakenAssessment;
+  const score = assessmentResults?.score || userAssessmentResults?.score || 0;
+  const totalQuestions = assessmentResults?.total_questions || userAssessmentResults?.total_questions || 0;
+  const passed = assessmentResults?.passed || userAssessmentResults?.passed || false;
 
   return (
     <div
@@ -172,7 +213,7 @@ const AssessmentButton = ({ section, onStartAssessment }) => {
           {isCompleted ? (
             <>
               <FaRedo className="w-3 h-3 mr-1" />
-              Retake
+              View
             </>
           ) : (
             <>
