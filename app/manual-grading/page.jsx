@@ -105,14 +105,28 @@ const AllManualGrades = () => {
             <Table className="table-auto">
               <TableHead>
                 <TableRow>
-                  <TableCell className="text-nowrap">Student Name</TableCell>
-                  <TableCell className="text-nowrap">Course Name</TableCell>
-                  <TableCell className="text-nowrap">Course Code</TableCell>
-                  <TableCell className="text-nowrap">Reason</TableCell>
-                  <TableCell className="text-nowrap">Score</TableCell>
-                  <TableCell className="text-nowrap">Details</TableCell>
-                  <TableCell className="text-nowrap">Date Created</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell className="text-nowrap font-bold">
+                    Student Name
+                  </TableCell>
+                  <TableCell className="text-nowrap font-bold">
+                    Course Name
+                  </TableCell>
+                  <TableCell className="text-nowrap font-bold">
+                    Course Code
+                  </TableCell>
+                  <TableCell className="text-nowrap font-bold">
+                    Reason
+                  </TableCell>
+                  <TableCell className="text-nowrap font-bold">Score</TableCell>
+                  <TableCell className="text-nowrap font-bold">
+                    Details
+                  </TableCell>
+                  <TableCell className="text-nowrap font-bold">
+                    Date Created
+                  </TableCell>
+                  <TableCell className="text-nowrap font-bold">
+                    Actions
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
