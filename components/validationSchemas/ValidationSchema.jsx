@@ -176,3 +176,13 @@ export const termSchema = Yup.object({
   start_date: Yup.date().required("Start date is required"),
   end_date: Yup.date().required("End date is required"),
 });
+
+export const manualGradeSchema = Yup.object().shape({
+  course: Yup.string().required("Course is required"),
+  student: Yup.string().required("Student is required"),
+  reason: Yup.string().required("Reason is required"),
+  details: Yup.string().required("Details are required"),
+  score: Yup.number()
+    .min(0, "Score must be >= 0")
+    .required("Score is required"),
+});

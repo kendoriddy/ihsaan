@@ -8,26 +8,21 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import Comments from "./Comments";
+import Image from "next/image";
 
-const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
+const AssignmentSubmitted = ({
+  submissionData,
+  refetchSubmission,
+  endDate,
+  gradeData,
+}) => {
   const [dragActive, setDragActive] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [gradeId, setGradeId] = useState(null);
 
-  // Extract assignmentId from submissionData
-  const assignmentId = submissionData?.[0]?.assessment;
-
-  // Fetch grade for the submission
-  const { data: gradeData } = useFetch(
-    "grade",
-    assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/grades/?assessment=${assignmentId}`
-      : null
-  );
-
   useEffect(() => {
     if (gradeData?.data?.results?.length > 0) {
-      setGradeId(gradeData.data.results[0].id);
+      setGradeId(gradeData.data.results[0]);
     }
   }, [gradeData]);
 
@@ -140,44 +135,68 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
     student_name,
     submitted_at,
     submission_notes,
-    file_url,
+    file_resources,
   } = submissionData[0];
 
+  const isPastDeadline = new Date(endDate) <= new Date();
+  const isGraded = !!gradeId?.score && gradeId?.score !== "0.00";
+
+  const disableEdit = isPastDeadline || isGraded;
   return (
     <div>
       <div className="space-y-4">
-        <div className="flex items-start space-x-4">
+        <div className="flex justify-center text-center items-start space-x-4">
           <div>
             <p className="font-medium">{student_name || "Unknown User"}</p>
             <p className="text-sm text-gray-500">
               {formatDate(submitted_at) || "Unknown date"}
             </p>
             <p className="mt-2">{submission_notes || "No response text"}</p>
-            {file_url && (
-              <div className="mt-2 flex space-x-2">
-                <a
-                  href={file_url}
-                  download
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                >
-                  Download
-                </a>
-                <a
-                  href={file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                >
-                  Preview
-                </a>
-              </div>
+            {file_resources[0]?.media_url && (
+              <>
+                {file_resources[0].media_url.endsWith(".pdf") ? (
+                  <iframe
+                    src={file_resources[0].media_url}
+                    className="w-full h-96 border rounded"
+                    title="PDF Preview"
+                  />
+                ) : (
+                  <img
+                    src={file_resources[0].media_url}
+                    alt="Student submitted file"
+                    className="max-w-full h-auto rounded"
+                  />
+                )}
+
+                <div className="mt-2 flex justify-center space-x-2">
+                  <a
+                    href={file_resources[0].media_url}
+                    download
+                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-gray-300"
+                  >
+                    Download
+                  </a>
+                  <a
+                    href={file_resources[0].media_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-gray-300"
+                  >
+                    Preview
+                  </a>
+                </div>
+              </>
             )}
             <p className="mt-2">
-              Marks: {score || "Not graded"} / {total_marks || "N/A"}
+              Marks:{" "}
+              {gradeId?.score && gradeId?.assessment_max_score
+                ? `${gradeId?.score} / ${gradeId?.assessment_max_score}`
+                : "Not graded"}
             </p>
             <Button
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               onClick={() => setOpenUpdateModal(true)}
+              disabled={disableEdit}
             >
               Edit Assignment
             </Button>
@@ -186,7 +205,7 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
       </div>
 
       {/* Comments Section */}
-      {gradeId && <Comments gradeId={gradeId} />}
+      {gradeId && <Comments gradeId={gradeId?.id} />}
 
       <CustomModal
         open={openUpdateModal}

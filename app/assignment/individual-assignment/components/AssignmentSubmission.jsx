@@ -6,9 +6,11 @@ import Button from "@/components/Button";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { getFileType } from "@/utils/utilFunctions";
+import { useQueryClient } from "@tanstack/react-query";
 
 const AssignmentSubmission = ({ assignmentId, refetchSubmission }) => {
   const [dragActive, setDragActive] = useState(false);
+  const queryClient = useQueryClient();
 
   const { mutate: uploadFile, isLoading: isUploading } = usePost(
     `https://ihsaanlms.onrender.com/resource/assessment-resource/`,
@@ -27,6 +29,7 @@ const AssignmentSubmission = ({ assignmentId, refetchSubmission }) => {
     {
       onSuccess: () => {
         toast.success("Assignment submitted successfully");
+        queryClient.refetchQueries("assignmentsList");
         refetchSubmission();
       },
       onError: (error) => {

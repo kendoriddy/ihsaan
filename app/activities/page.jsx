@@ -15,6 +15,7 @@ import GradesArea from "./components/GradesArea";
 import Loader from "@/components/Loader";
 import animation from "../../assets/no_data.json";
 import Lottie from "lottie-react";
+import OtherGrades from "./components/OtherGrades";
 
 const StudentInfoPage = () => {
   const [coursesOrGrade, setCoursesOrGrade] = useState("courses");
@@ -22,6 +23,7 @@ const StudentInfoPage = () => {
   const [selectedTerm, setSelectedTerm] = useState("");
   const [studentId, setStudentId] = useState("");
   const [gradePageSize, setGradePageSize] = useState(null);
+  const [manualGradePageSize, setManualGradePageSize] = useState(null);
 
   const fetchStudentId = () => {
     const storedStudentId = localStorage.getItem("userId");
@@ -76,6 +78,25 @@ const StudentInfoPage = () => {
     selectedSession && selectedTerm
       ? `https://ihsaanlms.onrender.com/assessment/grades/?student=${studentId}${
           gradePageSize ? `&page_size=${gradePageSize}` : ""
+        }`
+      : null,
+    (data) => {
+      if (data?.total && !gradePageSize) {
+        setGradePageSize(data.total);
+      }
+    }
+  );
+
+  const {
+    isLoading: loadingManualGrade,
+    data: manualGrades,
+    refetch: refetchManualGrade,
+    isFetching: isFetchingManualGrades,
+  } = useFetch(
+    ["grades", selectedSession, manualGradePageSize], // include pageSize in key
+    selectedSession && selectedTerm
+      ? `https://ihsaanlms.onrender.com/assessment/manual-grades/?${
+          manualGradePageSize ? `&page_size=${manualGradePageSize}` : ""
         }`
       : null,
     (data) => {
@@ -182,6 +203,16 @@ const StudentInfoPage = () => {
             >
               Grades
             </button>
+            <button
+              className={`px-4 py-2 font-medium ${
+                coursesOrGrade === "other_grades"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500"
+              }`}
+              onClick={() => setCoursesOrGrade("other_grades")}
+            >
+              Other Grades
+            </button>
           </div>
         </div>
         <div>
@@ -199,7 +230,9 @@ const StudentInfoPage = () => {
                 for a specific year
               </p>
             </div>
-          ) : isFetchingCourses || isFetchingGrades ? (
+          ) : isFetchingCourses ||
+            isFetchingGrades ||
+            isFetchingManualGrades ? (
             <div className="flex gap-2">
               <Loader size={20} />
               <p className="animate-pulse">
@@ -228,7 +261,7 @@ const StudentInfoPage = () => {
 
               {coursesOrGrade === "grades" &&
                 (Grades?.data?.results?.length > 0 ? (
-                  <GradesArea grades={Grades.data} />
+                  <GradesArea grades={Grades.data.results} />
                 ) : (
                   <div className="text-center py-8">
                     <Lottie
@@ -239,6 +272,23 @@ const StudentInfoPage = () => {
                     />
                     <p className="mt-4 text-gray-600">
                       No grades available for this session & term.
+                    </p>
+                  </div>
+                ))}
+
+              {coursesOrGrade === "other_grades" &&
+                (manualGrades?.data?.results?.length > 0 ? (
+                  <OtherGrades grades={manualGrades.data.results} />
+                ) : (
+                  <div className="text-center py-8">
+                    <Lottie
+                      animationData={animation}
+                      loop={false}
+                      autoPlay
+                      className="w-48 h-48 mx-auto"
+                    />
+                    <p className="mt-4 text-gray-600">
+                      No extra/other grades available for this session & term.
                     </p>
                   </div>
                 ))}

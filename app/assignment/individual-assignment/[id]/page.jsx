@@ -3,7 +3,6 @@ import Layout from "@/components/Layout";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
 import { formatDate } from "@/utils/utilFunctions";
 import AssignmentSubmission from "../components/AssignmentSubmission";
 import AssignmentSubmitted from "../components/AssignmentSubmitted";
@@ -14,7 +13,6 @@ import Button from "@/components/Button";
 const IndividualAssignmentPage = () => {
   const { id } = useParams();
   const assignmentId = id ? String(id) : null;
-  const [studentId, setStudentId] = useState("");
 
   const {
     isLoading: isLoadingAssignment,
@@ -54,36 +52,42 @@ const IndividualAssignmentPage = () => {
     }
   );
 
-  const fetchStudentId = () => {
-    const storedStudentId = localStorage.getItem("userId");
-    console.log("storedStudentId", storedStudentId);
-    if (storedStudentId) {
-      setStudentId(storedStudentId);
-    }
-  };
+  // Fetch grade for the submission
+  const {
+    data: gradeData,
+    isLoading: isLoadingGrades,
+    isFetching: isFetchingGrades,
+  } = useFetch(
+    "grade",
+    assignmentId
+      ? `https://ihsaanlms.onrender.com/assessment/grades/?assessment=${assignmentId}`
+      : null
+  );
 
-  useEffect(() => {
-    fetchStudentId();
-  });
+  const studentId =
+    typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
 
   const dueDate = AssignmentData?.data?.end_date
     ? new Date(AssignmentData.data.end_date)
     : null;
-  const isAssignmentClosed = dueDate ? new Date() > dueDate : false;
+  const isAssignmentClosed = dueDate ? new Date() >= dueDate : false;
   const hasSubmitted = SubmissionData?.data?.file_submissions.some(
     (submission) =>
       submission.assessment === assignmentId && submission.student === studentId
   );
   const showSubmissionForm = !hasSubmitted && !isAssignmentClosed;
-  const showSubmittedView = hasSubmitted && !isAssignmentClosed;
-  const showClosedView = isAssignmentClosed;
+  const showSubmittedView = hasSubmitted;
+  const showClosedView = isAssignmentClosed && !hasSubmitted;
 
   // Render based on loading, error, or data
   if (
     isLoadingAssignment ||
     isFetchingAssignment ||
     isLoadingSubmission ||
-    isFetchingSubmission
+    isFetchingSubmission ||
+    !studentId ||
+    isLoadingGrades ||
+    isFetchingGrades
   ) {
     return (
       <Layout>
@@ -147,7 +151,7 @@ const IndividualAssignmentPage = () => {
         {/* Right Section: Submission Area */}
         <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
           <div className="flex justify-between items-center">
-            {showSubmissionForm && showClosedView ? (
+            {showSubmissionForm ? (
               <h3 className="text-lg font-medium mb-4">
                 Assignment Submission
               </h3>
@@ -155,8 +159,9 @@ const IndividualAssignmentPage = () => {
               <h3 className="text-lg font-medium mb-4">
                 Submission & Comments
               </h3>
-            )}{" "}
+            )}
           </div>
+
           {showSubmissionForm && (
             <AssignmentSubmission
               assignmentId={assignmentId}
@@ -167,6 +172,8 @@ const IndividualAssignmentPage = () => {
             <AssignmentSubmitted
               submissionData={SubmissionData?.data?.file_submissions}
               refetchSubmission={refetchSubmission}
+              endDate={AssignmentData.data?.end_date}
+              gradeData={gradeData}
             />
           )}
           {showClosedView && <AssignmentClosed />}

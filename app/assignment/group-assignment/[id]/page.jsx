@@ -190,7 +190,7 @@ const GroupAssignmentPage = () => {
         {isGroupLeader && (
           <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
             <div className="flex justify-between items-center">
-              {showSubmissionForm && showClosedView ? (
+              {showSubmissionForm && !showClosedView ? (
                 <h3 className="text-lg font-medium mb-4">
                   Assignment Submission
                 </h3>
