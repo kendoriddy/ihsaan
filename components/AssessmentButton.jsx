@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaPlay,
   FaQuestionCircle,
@@ -9,11 +9,74 @@ import {
 } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { selectAssessmentResults } from "@/utils/redux/slices/assessmentSlice";
+import { getAuthToken } from "@/hooks/axios/axios";
+import axios from "axios";
 
 const AssessmentButton = ({ section, onStartAssessment }) => {
   const assessmentResults = useSelector((state) =>
     selectAssessmentResults(state, section.id)
   );
+  const [hasTakenAssessment, setHasTakenAssessment] = useState(false);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(true);
+
+  // Check if user has already taken the assessment
+  useEffect(() => {
+    const checkAssessmentStatus = async () => {
+      if (!section.has_mcq_assessment) {
+        setIsCheckingStatus(false);
+        return;
+      }
+
+      try {
+        // Get user ID from localStorage or fetch from API
+        let userId = localStorage.getItem("userId");
+
+        if (!userId) {
+          // If not in localStorage, fetch from API
+          const userResponse = await axios.get(
+            "https://ihsaanlms.onrender.com/api/auth/logged-in-user/",
+            {
+              headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+              },
+            }
+          );
+          userId = userResponse.data?.id;
+
+          if (userId) {
+            localStorage.setItem("userId", userId);
+          }
+        }
+
+        if (!userId) {
+          throw new Error("User ID not found");
+        }
+
+        // Check if user has already taken the assessment
+        const response = await axios.get(
+          `https://ihsaanlms.onrender.com/assessment/assessments/has-taken/`,
+          {
+            params: {
+              course_section: section.id,
+              user_id: userId,
+            },
+            headers: {
+              Authorization: `Bearer ${getAuthToken()}`,
+            },
+          }
+        );
+
+        setHasTakenAssessment(response.data?.has_taken || false);
+      } catch (error) {
+        console.error("Error checking assessment status:", error);
+        setHasTakenAssessment(false);
+      } finally {
+        setIsCheckingStatus(false);
+      }
+    };
+
+    checkAssessmentStatus();
+  }, [section.id, section.has_mcq_assessment]);
 
   const handleClick = () => {
     onStartAssessment(section);
@@ -23,7 +86,8 @@ const AssessmentButton = ({ section, onStartAssessment }) => {
     return null;
   }
 
-  const isCompleted = assessmentResults && assessmentResults.id;
+  // Use Redux results if available, otherwise use the has-taken status
+  const isCompleted = assessmentResults && assessmentResults.id ? true : hasTakenAssessment;
   const score = assessmentResults?.score || 0;
   const totalQuestions = assessmentResults?.total_questions || 0;
   const passed = assessmentResults?.passed || false;
@@ -32,9 +96,11 @@ const AssessmentButton = ({ section, onStartAssessment }) => {
     <div
       className={`border rounded-lg p-3 mt-2 ${
         isCompleted
-          ? passed
-            ? "bg-green-50 border-green-200"
-            : "bg-red-50 border-red-200"
+          ? assessmentResults && assessmentResults.id
+            ? passed
+              ? "bg-green-50 border-green-200"
+              : "bg-red-50 border-red-200"
+            : "bg-gray-50 border-gray-200"
           : "bg-blue-50 border-blue-200"
       }`}
     >
@@ -43,17 +109,23 @@ const AssessmentButton = ({ section, onStartAssessment }) => {
           <div
             className={`mr-3 ${
               isCompleted
-                ? passed
-                  ? "text-green-600"
-                  : "text-red-600"
+                ? assessmentResults && assessmentResults.id
+                  ? passed
+                    ? "text-green-600"
+                    : "text-red-600"
+                  : "text-gray-600"
                 : "text-blue-600"
             }`}
           >
             {isCompleted ? (
-              passed ? (
-                <FaCheckCircle className="w-4 h-4" />
+              assessmentResults && assessmentResults.id ? (
+                passed ? (
+                  <FaCheckCircle className="w-4 h-4" />
+                ) : (
+                  <FaRedo className="w-4 h-4" />
+                )
               ) : (
-                <FaRedo className="w-4 h-4" />
+                <FaCheckCircle className="w-4 h-4" />
               )
             ) : (
               <FaQuestionCircle className="w-4 h-4" />
@@ -66,16 +138,20 @@ const AssessmentButton = ({ section, onStartAssessment }) => {
             <p
               className={`text-xs ${
                 isCompleted
-                  ? passed
-                    ? "text-green-600"
-                    : "text-red-600"
+                  ? assessmentResults && assessmentResults.id
+                    ? passed
+                      ? "text-green-600"
+                      : "text-red-600"
+                    : "text-gray-600"
                   : "text-blue-600"
               }`}
             >
               {isCompleted
-                ? `Score: ${score}/${totalQuestions} ${
-                    passed ? "(Passed)" : "(Failed)"
-                  }`
+                ? assessmentResults && assessmentResults.id
+                  ? `Score: ${score}/${totalQuestions} ${
+                      passed ? "(Passed)" : "(Failed)"
+                    }`
+                  : "Assessment completed"
                 : "Take the assessment for this section"}
             </p>
           </div>
@@ -85,9 +161,11 @@ const AssessmentButton = ({ section, onStartAssessment }) => {
           onClick={handleClick}
           className={`px-3 py-1.5 rounded text-sm font-medium transition-colors flex items-center ${
             isCompleted
-              ? passed
-                ? "bg-green-500 hover:bg-green-600 text-white"
-                : "bg-red-500 hover:bg-red-600 text-white"
+              ? assessmentResults && assessmentResults.id
+                ? passed
+                  ? "bg-green-500 hover:bg-green-600 text-white"
+                  : "bg-red-500 hover:bg-red-600 text-white"
+                : "bg-gray-500 hover:bg-gray-600 text-white"
               : "bg-blue-500 hover:bg-blue-600 text-white"
           }`}
         >

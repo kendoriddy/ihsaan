@@ -67,45 +67,13 @@ const CourseDetailPage = () => {
       });
 
       setCourse(courseData);
-
-      // Fetch existing assessment results for all sections with assessments
-      if (courseData.sections) {
-        for (const section of courseData.sections) {
-          if (section.has_mcq_assessment) {
-            try {
-              const assessmentResponse = await axios.get(
-                `https://ihsaanlms.onrender.com/assessment/mcq-responses/section/${section.id}/latest/`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${getAuthToken()}`,
-                  },
-                }
-              );
-
-              if (assessmentResponse.data) {
-                dispatch(
-                  setAssessmentResults({
-                    sectionId: section.id,
-                    results: assessmentResponse.data,
-                  })
-                );
-              }
-            } catch (err) {
-              // No existing assessment results found, which is fine
-              console.log(
-                `No existing assessment results for section ${section.id}`
-              );
-            }
-          }
-        }
-      }
     } catch (err) {
       setError(err.message || "Failed to fetch course details.");
       console.error("Error fetching course details:", err);
     } finally {
       setIsLoading(false);
     }
-  }, [courseId, dispatch]);
+  }, [courseId]);
 
   useEffect(() => {
     if (courseId) {
