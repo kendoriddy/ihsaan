@@ -115,7 +115,11 @@ const AssessmentButton = ({ section, onStartAssessment, course }) => {
     if (isCompleted && (assessmentResults || userAssessmentResults)) {
       // Show the assessment results modal
       const resultsToShow = assessmentResults || userAssessmentResults;
-      onStartAssessment({ ...section, showResults: true, results: resultsToShow });
+      onStartAssessment({
+        ...section,
+        showResults: true,
+        results: resultsToShow,
+      });
     } else {
       // Start new assessment
       onStartAssessment(section);
@@ -130,8 +134,12 @@ const AssessmentButton = ({ section, onStartAssessment, course }) => {
   const isCompleted =
     assessmentResults && assessmentResults.id ? true : hasTakenAssessment;
   const score = assessmentResults?.score || userAssessmentResults?.score || 0;
-  const totalQuestions = assessmentResults?.total_questions || userAssessmentResults?.total_questions || 0;
-  const passed = assessmentResults?.passed || userAssessmentResults?.passed || false;
+  const totalQuestions =
+    assessmentResults?.total_questions ||
+    userAssessmentResults?.total_questions ||
+    0;
+  const passed =
+    assessmentResults?.passed || userAssessmentResults?.passed || false;
 
   return (
     <div

@@ -14,16 +14,14 @@ export default function FeedbackMain({ userRole }) {
   const { status, error } = useSelector((state) => state.feedback);
 
   useEffect(() => {
-    // Fetch feedbacks when component mounts
-    if (userRole !== "admin") {
-      dispatch(fetchFeedbacks());
-    }
+    // Fetch feedbacks when component mounts for all roles
+    dispatch(fetchFeedbacks());
 
     // Clear errors when component unmounts
     return () => {
       dispatch(clearErrors());
     };
-  }, [dispatch, userRole]);
+  }, [dispatch]);
 
   const handleSubmitFeedback = (feedbackData) => {
     console.log("Submitting feedback:", feedbackData);

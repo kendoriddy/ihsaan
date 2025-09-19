@@ -229,12 +229,18 @@ const AssessmentModal = ({
   }, [sectionData, createRandomizedQuestionSet]);
 
   useEffect(() => {
-    if (isOpen && sectionData?.id) {
+    if (isOpen && sectionData?.id && !sectionData?.showResults) {
       checkAssessmentSchedule();
       checkAssessmentTaken();
       fetchQuestions();
     }
-  }, [isOpen, sectionData?.id, fetchQuestions, checkAssessmentTaken]);
+  }, [
+    isOpen,
+    sectionData?.id,
+    sectionData?.showResults,
+    fetchQuestions,
+    checkAssessmentTaken,
+  ]);
 
   const handleStartAssessment = () => {
     if (hasAlreadyTaken) {
@@ -372,6 +378,8 @@ const AssessmentModal = ({
     if (isOpen && sectionData?.showResults && sectionData?.results) {
       setAssessmentResults(sectionData.results);
       setShowResults(true);
+      // Don't check if already taken when showing results
+      setHasAlreadyTaken(false);
     }
   }, [isOpen, sectionData]);
 
@@ -487,8 +495,10 @@ const AssessmentModal = ({
               )}
 
               <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                {hasAlreadyTaken
+                {hasAlreadyTaken && !showResults
                   ? "Assessment Already Completed"
+                  : showResults
+                  ? "Assessment Results"
                   : scheduleStatus === "available"
                   ? "Ready to Start Assessment?"
                   : "Assessment Information"}
@@ -627,7 +637,7 @@ const AssessmentModal = ({
                 </div>
               )} */}
 
-              {hasAlreadyTaken ? (
+              {hasAlreadyTaken && !showResults ? (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6 max-w-md mx-auto">
                   <div className="text-center">
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">

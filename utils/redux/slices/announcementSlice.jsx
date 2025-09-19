@@ -101,7 +101,7 @@ export const fetchCoursesForAnnouncements = createAsyncThunk(
   "announcements/fetchCoursesForAnnouncements",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await http2.get("/courses/");
+      const response = await http2.get("/course/courses/");
       return response.data;
     } catch (error) {
       return rejectWithValue(
