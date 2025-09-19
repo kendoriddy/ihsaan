@@ -187,7 +187,7 @@ const AssignmentSubmitted = ({
               </>
             )}
             <p className="mt-2">
-              Marks:{" "}
+              Your score:{" "}
               {gradeId?.score && gradeId?.assessment_max_score
                 ? `${gradeId?.score} / ${gradeId?.assessment_max_score}`
                 : "Not graded"}

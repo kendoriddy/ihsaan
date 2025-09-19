@@ -106,7 +106,7 @@ const AdminManualGrading = () => {
               <TableHead>
                 <TableRow>
                   <TableCell className="text-nowrap font-bold">
-                    Tutor's Name
+                    Tutor's/Admin's Name
                   </TableCell>
                   <TableCell className="text-nowrap font-bold">
                     Student Name
