@@ -21,21 +21,21 @@ const StudentInfoPage = () => {
   const [coursesOrGrade, setCoursesOrGrade] = useState("courses");
   const [selectedSession, setSelectedSession] = useState("");
   const [selectedTerm, setSelectedTerm] = useState("");
-  const [studentId, setStudentId] = useState("");
-  const [gradePageSize, setGradePageSize] = useState(null);
-  const [manualGradePageSize, setManualGradePageSize] = useState(null);
 
-  const fetchStudentId = () => {
-    const storedStudentId = localStorage.getItem("userId");
-    console.log("tutorIdStored", storedStudentId);
-    if (storedStudentId) {
-      setStudentId(storedStudentId);
-    }
-  };
+  // Pagination states
+  const [gradesPage, setGradesPage] = useState(1);
+  const [manualGradesPage, setManualGradesPage] = useState(1);
+  const [totalGrades, setTotalGrades] = useState(0);
+  const [totalManualGrades, setTotalManualGrades] = useState(0);
 
+  const studentId =
+    typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+
+  // Reset pagination when session or term changes
   useEffect(() => {
-    fetchStudentId();
-  });
+    setGradesPage(1);
+    setManualGradesPage(1);
+  }, [selectedSession, selectedTerm]);
 
   const {
     isLoading: loadingSession,
@@ -47,6 +47,7 @@ const StudentInfoPage = () => {
     `https://ihsaanlms.onrender.com/academic-sessions/`,
     (data) => {
       if (data?.total) {
+        // Handle session data if needed
       }
     }
   );
@@ -63,7 +64,7 @@ const StudentInfoPage = () => {
       : null,
     (data) => {
       if (data?.total) {
-        // You can handle data.total here if needed
+        // Handle terms data if needed
       }
     }
   );
@@ -74,15 +75,13 @@ const StudentInfoPage = () => {
     refetch: refetchGrade,
     isFetching: isFetchingGrades,
   } = useFetch(
-    ["grades", selectedSession, gradePageSize], // include pageSize in key
+    ["grades", selectedSession, selectedTerm, gradesPage],
     selectedSession && selectedTerm
-      ? `https://ihsaanlms.onrender.com/assessment/grades/?student=${studentId}${
-          gradePageSize ? `&page_size=${gradePageSize}` : ""
-        }`
+      ? `https://ihsaanlms.onrender.com/assessment/grades/?student=${studentId}&page=${gradesPage}&page_size=10`
       : null,
     (data) => {
-      if (data?.total && !gradePageSize) {
-        setGradePageSize(data.total);
+      if (data?.total) {
+        setTotalGrades(data.total);
       }
     }
   );
@@ -93,15 +92,13 @@ const StudentInfoPage = () => {
     refetch: refetchManualGrade,
     isFetching: isFetchingManualGrades,
   } = useFetch(
-    ["grades", selectedSession, manualGradePageSize], // include pageSize in key
+    ["manual-grades", selectedSession, selectedTerm, manualGradesPage],
     selectedSession && selectedTerm
-      ? `https://ihsaanlms.onrender.com/assessment/manual-grades/?${
-          manualGradePageSize ? `&page_size=${manualGradePageSize}` : ""
-        }`
+      ? `https://ihsaanlms.onrender.com/assessment/manual-grades/?student=${studentId}&page=${manualGradesPage}&page_size=10`
       : null,
     (data) => {
-      if (data?.total && !gradePageSize) {
-        setGradePageSize(data.total);
+      if (data?.total) {
+        setTotalManualGrades(data.total);
       }
     }
   );
@@ -112,19 +109,27 @@ const StudentInfoPage = () => {
     refetch: refetchCourses,
     isFetching: isFetchingCourses,
   } = useFetch(
-    ["terms", selectedSession],
+    ["courses", selectedSession, selectedTerm],
     selectedSession && selectedTerm
       ? `https://ihsaanlms.onrender.com/course/course-enrollments/?user_id=${studentId}`
       : null,
     (data) => {
       if (data?.total) {
-        // You can handle data.total here if needed
+        // Handle courses data if needed
       }
     }
   );
 
-  const Terms = TermData?.data?.results || [];
+  // Handle page changes
+  const handleGradesPageChange = (newPage) => {
+    setGradesPage(newPage);
+  };
 
+  const handleManualGradesPageChange = (newPage) => {
+    setManualGradesPage(newPage);
+  };
+
+  const Terms = TermData?.data?.results || [];
   const Sessions = SessionData?.data?.results || [];
 
   return (
@@ -180,6 +185,7 @@ const StudentInfoPage = () => {
           </FormControl>
         </Box>
       </div>
+
       <>
         <div className="flex justify- mb-6">
           <div className="flex gap-4 border-b border-gray-300">
@@ -215,6 +221,7 @@ const StudentInfoPage = () => {
             </button>
           </div>
         </div>
+
         <div>
           {!selectedSession || !selectedTerm ? (
             <div>
@@ -232,7 +239,8 @@ const StudentInfoPage = () => {
             </div>
           ) : isFetchingCourses ||
             isFetchingGrades ||
-            isFetchingManualGrades ? (
+            isFetchingManualGrades ||
+            !studentId ? (
             <div className="flex gap-2">
               <Loader size={20} />
               <p className="animate-pulse">
@@ -259,39 +267,25 @@ const StudentInfoPage = () => {
                   </div>
                 ))}
 
-              {coursesOrGrade === "grades" &&
-                (Grades?.data?.results?.length > 0 ? (
-                  <GradesArea grades={Grades.data.results} />
-                ) : (
-                  <div className="text-center py-8">
-                    <Lottie
-                      animationData={animation}
-                      loop={false}
-                      autoPlay
-                      className="w-48 h-48 mx-auto"
-                    />
-                    <p className="mt-4 text-gray-600">
-                      No grades available for this session & term.
-                    </p>
-                  </div>
-                ))}
+              {coursesOrGrade === "grades" && (
+                <GradesArea
+                  grades={Grades?.data?.results || []}
+                  totalGrades={totalGrades}
+                  onPageChange={handleGradesPageChange}
+                  isLoading={isFetchingGrades}
+                  currentPage={gradesPage}
+                />
+              )}
 
-              {coursesOrGrade === "other_grades" &&
-                (manualGrades?.data?.results?.length > 0 ? (
-                  <OtherGrades grades={manualGrades.data.results} />
-                ) : (
-                  <div className="text-center py-8">
-                    <Lottie
-                      animationData={animation}
-                      loop={false}
-                      autoPlay
-                      className="w-48 h-48 mx-auto"
-                    />
-                    <p className="mt-4 text-gray-600">
-                      No extra/other grades available for this session & term.
-                    </p>
-                  </div>
-                ))}
+              {coursesOrGrade === "other_grades" && (
+                <OtherGrades
+                  grades={manualGrades?.data?.results || []}
+                  totalGrades={totalManualGrades}
+                  onPageChange={handleManualGradesPageChange}
+                  isLoading={isFetchingManualGrades}
+                  currentPage={manualGradesPage}
+                />
+              )}
             </>
           )}
         </div>

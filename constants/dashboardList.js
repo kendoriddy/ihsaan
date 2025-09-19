@@ -179,42 +179,48 @@ const DASHBOARD_LIST = {
     },
     {
       id: 14,
+      name: "Manual Grading",
+      icon: GradingOutlined,
+      path: "/admin/manual-grading",
+    },
+    {
+      id: 15,
       name: "Blog Categories",
       path: "/admin/blog-categories",
     },
     {
-      id: 15,
+      id: 16,
       name: "Blog",
       path: "/admin/blog",
     },
     {
-      id: 16,
+      id: 17,
       name: "Notifications and Announcements",
       path: "/admin/notifications",
     },
     {
-      id: 16,
+      id: 18,
       name: "Newsletter",
       path: "/admin/newsletter",
     },
     {
-      id: 17,
+      id: 19,
       name: "Feedback",
       icon: FeedbackIcon,
       path: "/admin/feedback",
     },
     {
-      id: 18,
+      id: 20,
       name: "Reports",
       icon: AssessmentIcon,
       path: "/admin/reports",
     },
     {
-      id: 18,
+      id: 21,
       name: "Audit Trail",
       path: "/admin/audit-trail",
     },
-    { id: 19, name: "My Profile", path: "/admin/profile" },
+    { id: 22, name: "My Profile", path: "/admin/profile" },
   ],
 };
 

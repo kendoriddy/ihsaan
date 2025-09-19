@@ -1,4 +1,5 @@
 "use client";
+import AdminLayout from "@/components/AdminLayout";
 import React, { useState } from "react";
 import { useFetch, useDelete } from "@/hooks/useHttp/useHttp";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,14 +20,13 @@ import {
   DialogContent,
 } from "@mui/material";
 import { toast } from "react-toastify";
-import Layout from "@/components/Layout";
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
 import { MoreVert } from "@mui/icons-material";
-import ManualGradeForm from "./components/ManualGradeForm";
+import ManualGradeForm from "@/app/manual-grading/components/ManualGradeForm";
 
-const AllManualGrades = () => {
+const AdminManualGrading = () => {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [selectedGrade, setSelectedGrade] = useState(null);
@@ -88,7 +88,7 @@ const AllManualGrades = () => {
   };
 
   return (
-    <Layout>
+    <AdminLayout>
       <div className="max-w-full">
         <div className="w-full">
           <div className="flex justify-between items-center mb-6">
@@ -105,6 +105,9 @@ const AllManualGrades = () => {
             <Table className="table-auto">
               <TableHead>
                 <TableRow>
+                  <TableCell className="text-nowrap font-bold">
+                    Tutor's/Admin's Name
+                  </TableCell>
                   <TableCell className="text-nowrap font-bold">
                     Student Name
                   </TableCell>
@@ -150,6 +153,7 @@ const AllManualGrades = () => {
                 {!isFetching &&
                   manualGrades.map((grade) => (
                     <TableRow key={grade.id}>
+                      <TableCell>{grade.created_by_name}</TableCell>
                       <TableCell>{grade.student_name}</TableCell>
                       <TableCell>{grade.course_title}</TableCell>
                       <TableCell>{grade.course_code}</TableCell>
@@ -268,8 +272,8 @@ const AllManualGrades = () => {
           </DialogContent>
         </Dialog>
       </div>
-    </Layout>
+    </AdminLayout>
   );
 };
 
-export default AllManualGrades;
+export default AdminManualGrading;

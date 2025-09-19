@@ -1,14 +1,13 @@
 "use client";
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
-import { usePatch, usePost, useFetch } from "@/hooks/useHttp/useHttp";
+import { usePatch, usePost } from "@/hooks/useHttp/useHttp";
 import { formatDate, getFileType } from "@/utils/utilFunctions";
 import { Field, Form, Formik } from "formik";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import Comments from "./Comments";
-import Image from "next/image";
 
 const AssignmentSubmitted = ({
   submissionData,
@@ -188,7 +187,7 @@ const AssignmentSubmitted = ({
               </>
             )}
             <p className="mt-2">
-              Marks:{" "}
+              Your score:{" "}
               {gradeId?.score && gradeId?.assessment_max_score
                 ? `${gradeId?.score} / ${gradeId?.assessment_max_score}`
                 : "Not graded"}
