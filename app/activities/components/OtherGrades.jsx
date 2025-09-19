@@ -74,8 +74,8 @@ const OtherGrades = ({
                   <TableCell>{grade.course_code}</TableCell>
                   <TableCell>{grade.course_title}</TableCell>
                   <TableCell className="text-nowrap">{grade.score}</TableCell>
-                  <TableCell className="text-nowrap">
-                    {grade.reason_name}
+                  <TableCell className="text-nowrap capitalize">
+                    {grade.reason_name.toLowerCase()}
                   </TableCell>
                   <TableCell className="text-nowrap">{grade.details}</TableCell>
                 </TableRow>

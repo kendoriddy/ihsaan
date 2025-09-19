@@ -132,18 +132,18 @@ const IndividualAssignmentPage = () => {
           </p>
           <div className="text-sm text-gray-500">
             <p>
-              <strong>Start:</strong>
+              <strong>Start:</strong>{" "}
               {formatDate(AssignmentData.data?.start_date) ||
                 "No start date available"}
             </p>
             <p>
-              <strong>End:</strong>
+              <strong>End:</strong>{" "}
               {formatDate(AssignmentData.data?.end_date) ||
                 "No end date available"}
             </p>
             <p>
-              <strong>Mark Obtainable:</strong>
-              {AssignmentData.data?.marks || "N/A"}
+              <strong>Mark Obtainable:</strong>{" "}
+              {AssignmentData.data?.max_score || "N/A"}
             </p>
           </div>
         </div>

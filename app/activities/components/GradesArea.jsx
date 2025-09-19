@@ -40,7 +40,10 @@ const GradesArea = ({
                 Course Title
               </TableCell>
               <TableCell className="font-bold md:font-semibold text-lg">
-                Assessment Score
+                Assessment Type
+              </TableCell>
+              <TableCell className="font-bold md:font-semibold text-lg">
+                Maximum Score
               </TableCell>
               <TableCell className="font-bold md:font-semibold text-lg">
                 Your Score
@@ -73,11 +76,23 @@ const GradesArea = ({
                 <TableRow key={index}>
                   <TableCell>{grade?.course_code}</TableCell>
                   <TableCell>{grade.course_title}</TableCell>
+                  <TableCell>
+                    {grade.assessment_type === "INDIVIDUAL"
+                      ? "Individual File Upload"
+                      : grade.assessment_type === "GROUP"
+                      ? "Group File Upload"
+                      : grade.assessment_type === "TEST" ||
+                        grade.assessment_question_type
+                      ? "Quiz"
+                      : "-"}
+                  </TableCell>
                   <TableCell className="text-nowrap">
                     {grade?.assessment_max_score}
                   </TableCell>
                   <TableCell className="text-nowrap">{grade?.score}</TableCell>
-                  <TableCell className="text-">{grade.feedback}</TableCell>
+                  <TableCell className="text-">
+                    {grade.feedback ? grade.feedback : "---"}
+                  </TableCell>
                 </TableRow>
               ))}
           </TableBody>
