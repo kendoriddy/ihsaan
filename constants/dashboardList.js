@@ -18,7 +18,6 @@ import {
   LocalActivityTwoTone,
 } from "@mui/icons-material";
 import GradingOutlined from "@mui/icons-material/GradingOutlined";
-import { TbActivity } from "react-icons/tb";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 
 const DASHBOARD_LIST = {
