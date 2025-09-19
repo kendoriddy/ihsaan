@@ -1548,6 +1548,7 @@ function EditCoursePage() {
                           type="text"
                           id="duration"
                           value={newVideoData.duration}
+                          readOnly
                           onChange={(e) =>
                             setNewVideoData({
                               ...newVideoData,
