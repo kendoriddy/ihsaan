@@ -23,6 +23,7 @@ import {
 import {
   getVideoDuration,
   formatDurationFromSeconds,
+  convertDurationToSeconds,
 } from "@/utils/utilFunctions";
 import AdminDashboardHeader from "@/components/AdminDashboardHeader";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
