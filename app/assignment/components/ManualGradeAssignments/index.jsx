@@ -45,7 +45,7 @@ const ManualGradeAssignemnts = () => {
     refetch,
   } = useFetch(
     "assignmentsList",
-    `https://ihsaanlms.onrender.com/assessment/base/?question_type=MANUAL_GRADING&page_size=15&page=${page}`,
+    `https://ihsaanlms.onrender.com/assessment/base/?question_type=MANUAL&page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
         setTotalAssignments(data.total);

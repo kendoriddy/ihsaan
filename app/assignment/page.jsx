@@ -70,105 +70,106 @@ const AssignmentTable = () => {
 
   return (
     <Layout>
-      {/* Tabs for navigation */}
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-        <Tabs
-          value={toShow}
-          onChange={(e, newValue) => setToShow(newValue)}
-          textColor="primary"
-          indicatorColor="primary"
-        >
-          <Tab value="file-upload" label="File Uploads Assignment" />
-          <Tab value="manual-grade" label="Manual Grade Appointments" />
-        </Tabs>
-      </Box>
-
-      {/* File Upload Table */}
-      {toShow === "file-upload" && (
-        <div className="p-6 bg-white shadow-lg rounded-lg">
-          <h2 className="text-xl font-bold text-center mb-4">
-            Assignment List
-          </h2>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {tableHeaders.map((header) => (
-                    <TableCell
-                      key={header.id}
-                      className="font-semibold text-nowrap"
-                    >
-                      {header.label}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Assignments.map((assignment) => (
-                  <TableRow key={assignment.id}>
-                    <TableCell>{assignment.title}</TableCell>
-                    <TableCell>{assignment.tutor_name}</TableCell>
-                    <TableCell>{assignment.course_code}</TableCell>
-                    <TableCell className="capitalize">
-                      {assignment.type.toLowerCase()}
-                    </TableCell>
-                    <TableCell>{assignment.max_score}</TableCell>
-                    <TableCell className="p-3 space-x-2">
-                      {assignment.submission_status === "submitted" ? (
-                        <span className={statusColors.submitted}>
-                          Submitted
-                        </span>
-                      ) : assignment.is_open ? (
-                        <span className={statusColors.pending}>Pending</span>
-                      ) : (
-                        <span className="bg-red-600 rounded-md text-white py-2 px-[1.4rem]">
-                          Closed
-                        </span>
-                      )}
-                    </TableCell>
-
-                    <TableCell>{formatDate(assignment.start_date)}</TableCell>
-                    <TableCell>{formatDate(assignment.end_date)}</TableCell>
-                    <TableCell>
-                      {assignment.question_type === "FILE_UPLOAD"
-                        ? "Yes"
-                        : "No"}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        color="secondary"
-                        variant="text"
-                        onClick={() => {
-                          router.push(
-                            `/assignment/${
-                              assignment.type === "INDIVIDUAL"
-                                ? "individual-assignment"
-                                : "group-assignment"
-                            }/${assignment.id}`
-                          );
-                        }}
+      <>
+        {" "}
+        {/* Tabs for navigation */}
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+          <Tabs
+            value={toShow}
+            onChange={(e, newValue) => setToShow(newValue)}
+            textColor="primary"
+            indicatorColor="primary"
+          >
+            <Tab value="file-upload" label="File Uploads Assignment" />
+            <Tab value="manual-grade" label="Manual Grade Appointments" />
+          </Tabs>
+        </Box>
+        {/* File Upload Table */}
+        {toShow === "file-upload" && (
+          <div className="p-6 bg-white shadow-lg rounded-lg">
+            <h2 className="text-xl font-bold text-center mb-4">
+              Assignment List
+            </h2>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    {tableHeaders.map((header) => (
+                      <TableCell
+                        key={header.id}
+                        className="font-semibold text-nowrap"
                       >
-                        View
-                      </Button>
-                    </TableCell>
+                        {header.label}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <div className="flex justify-center mt-4">
-            <Pagination
-              count={Math.ceil(totalAssignments / 15)}
-              page={page}
-              onChange={handlePageChange}
-              color="primary"
-            />
-          </div>
-        </div>
-      )}
+                </TableHead>
+                <TableBody>
+                  {Assignments.map((assignment) => (
+                    <TableRow key={assignment.id}>
+                      <TableCell>{assignment.title}</TableCell>
+                      <TableCell>{assignment.tutor_name}</TableCell>
+                      <TableCell>{assignment.course_code}</TableCell>
+                      <TableCell className="capitalize">
+                        {assignment.type.toLowerCase()}
+                      </TableCell>
+                      <TableCell>{assignment.max_score}</TableCell>
+                      <TableCell className="p-3 space-x-2">
+                        {assignment.submission_status === "submitted" ? (
+                          <span className={statusColors.submitted}>
+                            Submitted
+                          </span>
+                        ) : assignment.is_open ? (
+                          <span className={statusColors.pending}>Pending</span>
+                        ) : (
+                          <span className="bg-red-600 rounded-md text-white py-2 px-[1.4rem]">
+                            Closed
+                          </span>
+                        )}
+                      </TableCell>
 
-      {/* Manual Grading */}
-      {toShow === "manual-grade" && <ManualGradeAssignemnts />}
+                      <TableCell>{formatDate(assignment.start_date)}</TableCell>
+                      <TableCell>{formatDate(assignment.end_date)}</TableCell>
+                      <TableCell>
+                        {assignment.question_type === "FILE_UPLOAD"
+                          ? "Yes"
+                          : "No"}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          color="secondary"
+                          variant="text"
+                          onClick={() => {
+                            router.push(
+                              `/assignment/${
+                                assignment.type === "INDIVIDUAL"
+                                  ? "individual-assignment"
+                                  : "group-assignment"
+                              }/${assignment.id}`
+                            );
+                          }}
+                        >
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <div className="flex justify-center mt-4">
+              <Pagination
+                count={Math.ceil(totalAssignments / 15)}
+                page={page}
+                onChange={handlePageChange}
+                color="primary"
+              />
+            </div>
+          </div>
+        )}
+        {/* Manual Grading */}
+        {toShow === "manual-grade" && <ManualGradeAssignemnts />}
+      </>
     </Layout>
   );
 };
