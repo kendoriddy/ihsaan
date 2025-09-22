@@ -14,7 +14,6 @@ import Button from "@/components/Button";
 const GroupAssignmentPage = () => {
   const { id } = useParams();
   const assignmentId = id ? String(id) : null;
-  const [studentId, setStudentId] = useState("");
 
   const {
     isLoading: isLoadingAssignment,
@@ -73,17 +72,8 @@ const GroupAssignmentPage = () => {
     }
   );
 
-  const fetchStudentId = () => {
-    const storedStudentId = localStorage.getItem("userId");
-    console.log("storedStudentId", storedStudentId);
-    if (storedStudentId) {
-      setStudentId(storedStudentId);
-    }
-  };
-
-  useEffect(() => {
-    fetchStudentId();
-  });
+  const studentId =
+    typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
 
   const leaderGroup = GroupData?.data?.results.find(
     (group) =>
@@ -119,7 +109,8 @@ const GroupAssignmentPage = () => {
     isLoadingAssignment ||
     isFetchingAssignment ||
     isLoadingSubmission ||
-    isFetchingSubmission
+    isFetchingSubmission ||
+    !studentId
   ) {
     return (
       <Layout>
