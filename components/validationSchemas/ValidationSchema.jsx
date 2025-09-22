@@ -1,3 +1,4 @@
+import { DescriptionSharp } from "@mui/icons-material";
 import { string, object, array, number, mixed, bool, ref } from "yup";
 import * as Yup from "yup";
 
@@ -177,12 +178,7 @@ export const termSchema = Yup.object({
   end_date: Yup.date().required("End date is required"),
 });
 
-export const manualGradeSchema = Yup.object().shape({
-  course: Yup.string().required("Course is required"),
-  student: Yup.string().required("Student is required"),
-  reason: Yup.string().required("Reason is required"),
-  details: Yup.string().required("Details are required"),
-  score: Yup.number()
-    .min(0, "Score must be >= 0")
-    .required("Score is required"),
+export const manualGradeReasonSchema = Yup.object().shape({
+  name: Yup.string().required("Reason name is required"),
+  description: Yup.string().required("Reason description is required"),
 });

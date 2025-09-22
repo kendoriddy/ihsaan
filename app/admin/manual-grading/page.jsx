@@ -18,6 +18,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  Box,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import Button from "@/components/Button";
@@ -25,6 +28,7 @@ import CustomModal from "@/components/CustomModal";
 import Loader from "@/components/Loader";
 import { MoreVert } from "@mui/icons-material";
 import ManualGradeForm from "@/app/manual-grading/components/ManualGradeForm";
+import Reasons from "./components/Reasons";
 
 const AdminManualGrading = () => {
   const queryClient = useQueryClient();
@@ -35,6 +39,8 @@ const AdminManualGrading = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [totalGrades, setTotalGrades] = useState(0);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [currentScreen, setCurrentScreen] = useState("grades");
+  const [openReasonCreateModal, setReasonOpenCreateModal] = useState(false);
 
   const { isLoading, data, refetch, isFetching } = useFetch(
     "manual-grades",
@@ -89,133 +95,169 @@ const AdminManualGrading = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-full">
+      <div className="w-full">
         <div className="w-full">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col gap-4 mb-6">
             <h1 className="text-2xl font-bold">Manual Grades Management</h1>
-            <Button color="secondary" onClick={() => setOpenCreateModal(true)}>
-              Create Manual Grade
-            </Button>
+            <div className="flex justify-between items-center">
+              <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+                <Tabs
+                  value={currentScreen}
+                  onChange={(e, newValue) => setCurrentScreen(newValue)}
+                  textColor="primary"
+                  indicatorColor="primary"
+                >
+                  <Tab value="grades" label="Manual Grades" />
+                  <Tab value="reasons" label="Manual Grade Reasons" />
+                </Tabs>
+              </Box>
+              {currentScreen === "grades" ? (
+                <Button
+                  color="secondary"
+                  onClick={() => setOpenCreateModal(true)}
+                >
+                  Create Manual Grade
+                </Button>
+              ) : (
+                <Button
+                  color="secondary"
+                  onClick={() => setReasonOpenCreateModal(true)}
+                >
+                  Create Reason
+                </Button>
+              )}
+            </div>
           </div>
-
-          <TableContainer
-            component={Paper}
-            className="overflow-x-auto max-w-full"
-          >
-            <Table className="table-auto">
-              <TableHead>
-                <TableRow>
-                  <TableCell className="text-nowrap font-bold">
-                    Tutor's/Admin's Name
-                  </TableCell>
-                  <TableCell className="text-nowrap font-bold">
-                    Student Name
-                  </TableCell>
-                  <TableCell className="text-nowrap font-bold">
-                    Course Name
-                  </TableCell>
-                  <TableCell className="text-nowrap font-bold">
-                    Course Code
-                  </TableCell>
-                  <TableCell className="text-nowrap font-bold">
-                    Reason
-                  </TableCell>
-                  <TableCell className="text-nowrap font-bold">Score</TableCell>
-                  <TableCell className="text-nowrap font-bold">
-                    Details
-                  </TableCell>
-                  <TableCell className="text-nowrap font-bold">
-                    Date Created
-                  </TableCell>
-                  <TableCell className="text-nowrap font-bold">
-                    Actions
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {isFetching && (
+        </div>
+        {currentScreen === "grades" && (
+          <>
+            <TableContainer
+              component={Paper}
+              className="overflow-x-auto max-w-full"
+            >
+              <Table className="table-auto">
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={7}>
-                      <div className="flex items-center justify-center gap-2 py-4">
-                        <Loader />
-                        <p className="animate-pulse">Loading...</p>
-                      </div>
+                    <TableCell className="text-nowrap font-bold">
+                      Tutor's/Admin's Name
+                    </TableCell>
+                    <TableCell className="text-nowrap font-bold">
+                      Student Name
+                    </TableCell>
+                    <TableCell className="text-nowrap font-bold">
+                      Course Name
+                    </TableCell>
+                    <TableCell className="text-nowrap font-bold">
+                      Course Code
+                    </TableCell>
+                    <TableCell className="text-nowrap font-bold">
+                      Reason
+                    </TableCell>
+                    <TableCell className="text-nowrap font-bold">
+                      Score
+                    </TableCell>
+                    <TableCell className="text-nowrap font-bold">
+                      Details
+                    </TableCell>
+                    <TableCell className="text-nowrap font-bold">
+                      Date Created
+                    </TableCell>
+                    <TableCell className="text-nowrap font-bold">
+                      Actions
                     </TableCell>
                   </TableRow>
-                )}
-                {!isFetching && manualGrades.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
-                      No manual grades found
-                    </TableCell>
-                  </TableRow>
-                )}
-                {!isFetching &&
-                  manualGrades.map((grade) => (
-                    <TableRow key={grade.id}>
-                      <TableCell>{grade.created_by_name}</TableCell>
-                      <TableCell>{grade.student_name}</TableCell>
-                      <TableCell>{grade.course_title}</TableCell>
-                      <TableCell>{grade.course_code}</TableCell>
-                      <TableCell>{grade.reason_name}</TableCell>
-                      <TableCell>
-                        <span className="font-semibold">{grade.score}</span>
-                      </TableCell>
-                      <TableCell>
-                        <div
-                          className="max-w-xs truncate"
-                          title={grade.details}
-                        >
-                          {grade.details}
+                </TableHead>
+                <TableBody>
+                  {isFetching && (
+                    <TableRow>
+                      <TableCell colSpan={7}>
+                        <div className="flex items-center justify-center gap-2 py-4">
+                          <Loader />
+                          <p className="animate-pulse">Loading...</p>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        {new Date(grade.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <IconButton
-                          onClick={(event) => handleMenuOpen(event, grade)}
-                        >
-                          <MoreVert />
-                        </IconButton>
-                        <Menu
-                          anchorEl={menuAnchorEl}
-                          open={Boolean(menuAnchorEl)}
-                          onClose={handleMenuClose}
-                        >
-                          <MenuItem
-                            onClick={() => {
-                              setOpenUpdateModal(true);
-                              handleMenuClose();
-                            }}
-                          >
-                            Edit
-                          </MenuItem>
-                          <MenuItem
-                            onClick={() => {
-                              setOpenDeleteDialog(true);
-                              handleMenuClose();
-                            }}
-                          >
-                            Delete
-                          </MenuItem>
-                        </Menu>
+                    </TableRow>
+                  )}
+                  {!isFetching && manualGrades.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8">
+                        No manual grades found
                       </TableCell>
                     </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
+                  )}
+                  {!isFetching &&
+                    manualGrades.map((grade) => (
+                      <TableRow key={grade.id}>
+                        <TableCell>{grade.created_by_name}</TableCell>
+                        <TableCell>{grade.student_name}</TableCell>
+                        <TableCell>{grade.course_title}</TableCell>
+                        <TableCell>{grade.course_code}</TableCell>
+                        <TableCell>{grade.reason_name}</TableCell>
+                        <TableCell>
+                          <span className="font-semibold">{grade.score}</span>
+                        </TableCell>
+                        <TableCell>
+                          <div
+                            className="max-w-xs truncate"
+                            title={grade.details}
+                          >
+                            {grade.details}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(grade.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <IconButton
+                            onClick={(event) => handleMenuOpen(event, grade)}
+                          >
+                            <MoreVert />
+                          </IconButton>
+                          <Menu
+                            anchorEl={menuAnchorEl}
+                            open={Boolean(menuAnchorEl)}
+                            onClose={handleMenuClose}
+                          >
+                            <MenuItem
+                              onClick={() => {
+                                setOpenUpdateModal(true);
+                                handleMenuClose();
+                              }}
+                            >
+                              Edit
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                setOpenDeleteDialog(true);
+                                handleMenuClose();
+                              }}
+                            >
+                              Delete
+                            </MenuItem>
+                          </Menu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {/* Pagination */}
+            <Pagination
+              count={Math.ceil(totalGrades / 15)}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              sx={{ mt: 2, display: "flex", justifyContent: "center" }}
+            />
+          </>
+        )}
 
-        {/* Pagination */}
-        <Pagination
-          count={Math.ceil(totalGrades / 15)}
-          page={page}
-          onChange={handlePageChange}
-          color="primary"
-          sx={{ mt: 2, display: "flex", justifyContent: "center" }}
-        />
+        {currentScreen === "reasons" && (
+          <Reasons
+            openReasonCreateModal={openReasonCreateModal}
+            setReasonOpenCreateModal={setReasonOpenCreateModal}
+          />
+        )}
 
         {/* Delete Confirmation Modal */}
         <CustomModal

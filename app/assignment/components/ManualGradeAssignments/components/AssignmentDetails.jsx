@@ -76,23 +76,18 @@ const AssignmentDetails = ({
         sx: { borderRadius: 2 },
       }}
     >
-      <DialogTitle sx={{ pb: 1 }}>
+      <DialogTitle sx={{ pb: 1 }} className="border-b-2">
         <Typography variant="h5" component="div" fontWeight="bold">
           Assignment Details
         </Typography>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2 }}>
+      <DialogContent sx={{ pt: 4 }}>
         {selectedAssignment && (
           <Box>
             {/* Title and Description */}
             <Box mb={3}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                color="primary"
-                fontWeight="semibold"
-              >
+              <Typography variant="h6" gutterBottom color="" fontWeight="bold">
                 {selectedAssignment.title}
               </Typography>
               <Paper
@@ -165,11 +160,9 @@ const AssignmentDetails = ({
                   >
                     Assignment Type
                   </Typography>
-                  <Chip
-                    label={selectedAssignment.type}
-                    variant="outlined"
-                    sx={{ fontWeight: "medium" }}
-                  />
+                  <Typography variant="body1" className="capitalize">
+                    {selectedAssignment.type.toLowerCase()}
+                  </Typography>
                 </Box>
               </Grid>
 
@@ -182,11 +175,10 @@ const AssignmentDetails = ({
                   >
                     Question Type
                   </Typography>
-                  <Chip
-                    label={selectedAssignment.question_type}
-                    variant="outlined"
-                    sx={{ fontWeight: "medium" }}
-                  />
+                  <Typography variant="body1" className="capitalize">
+                    {selectedAssignment.question_type === "MANUAL" &&
+                      "Manual Grading"}
+                  </Typography>
                 </Box>
               </Grid>
 
@@ -201,25 +193,10 @@ const AssignmentDetails = ({
                   </Typography>
                   <Typography variant="body1">
                     <span style={{ fontWeight: "bold" }}>Max Score:</span>{" "}
-                    {selectedAssignment.max_score} points
+                    {selectedAssignment.max_score}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Passing Score: {selectedAssignment.passing_score} points
-                  </Typography>
-                </Box>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    color="text.secondary"
-                    gutterBottom
-                  >
-                    Attempts
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {selectedAssignment.max_attempts} attempt(s) allowed
+                    Passing Score: {selectedAssignment.passing_score}
                   </Typography>
                 </Box>
               </Grid>
@@ -284,39 +261,6 @@ const AssignmentDetails = ({
                 </Box>
               </Grid>
             </Grid>
-
-            {/* Additional Information */}
-            <Box mt={3}>
-              <Typography
-                variant="subtitle2"
-                color="text.secondary"
-                gutterBottom
-              >
-                Additional Information
-              </Typography>
-              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
-                <Chip
-                  label={selectedAssignment.is_active ? "Active" : "Inactive"}
-                  color={selectedAssignment.is_active ? "success" : "error"}
-                  variant="outlined"
-                  size="small"
-                />
-                <Chip
-                  label={`Created: ${formatDate(
-                    selectedAssignment.created_at
-                  )}`}
-                  variant="outlined"
-                  size="small"
-                />
-                <Chip
-                  label={`Updated: ${formatDate(
-                    selectedAssignment.updated_at
-                  )}`}
-                  variant="outlined"
-                  size="small"
-                />
-              </Box>
-            </Box>
           </Box>
         )}
       </DialogContent>
