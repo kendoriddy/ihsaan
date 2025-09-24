@@ -28,7 +28,7 @@ const ManualGradeForm = ({
     isFetching: isFetchingCourses,
   } = useFetch(
     ["courses"],
-    `https://ihsaanlms.onrender.com/course/courses/`,
+    `https://ihsaanlms.onrender.com/course/courses/?page=1&page_size=100`,
     (data) => {
       if (data?.total) {
         // You can handle data.total here if needed

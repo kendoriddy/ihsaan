@@ -45,6 +45,7 @@ const DashboardTab = () => {
     class_group: "",
     duration_months: "",
     level: "",
+    price: "",
   });
   const [programmeTypeForm, setProgrammeTypeForm] = useState({
     name: "",
@@ -144,6 +145,7 @@ const DashboardTab = () => {
         class_group: "",
         duration_months: "",
         level: "",
+        price: "",
       }); // Reset form fields
       setSelectedProgramme(null); // Reset selected programme
     }
@@ -808,6 +810,19 @@ const DashboardTab = () => {
                 </option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Price
+            </label>
+            <input
+              type="number"
+              name="price"
+              value={programmeForm.price}
+              onChange={handleInputChange}
+              className="mt-1 block w-full p-2 border rounded-md"
+              required
+            />
           </div>
           <div className="flex justify-end">
             <button

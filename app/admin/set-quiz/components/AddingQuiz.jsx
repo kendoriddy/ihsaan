@@ -644,7 +644,7 @@ const AddingQuiz = () => {
                 disabled={isLoading || isFetching}
               >
                 <option value="">
-                  {isLoading || isFetching
+                  {!CoursesList && (isLoading || isFetching)
                     ? "Loading courses..."
                     : coursesError
                     ? "Error loading courses"

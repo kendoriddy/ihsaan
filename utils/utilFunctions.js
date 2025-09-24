@@ -79,6 +79,51 @@ const formatTime = (ms) => {
     </div>
   );
 };
+// Helper function to extract video duration from file
+const getVideoDuration = (file) => {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith("video/")) {
+      reject(new Error("Invalid video file"));
+      return;
+    }
+
+    const video = document.createElement("video");
+    video.preload = "metadata";
+
+    video.onloadedmetadata = () => {
+      window.URL.revokeObjectURL(video.src);
+      const duration = video.duration;
+      resolve(duration);
+    };
+
+    video.onerror = () => {
+      window.URL.revokeObjectURL(video.src);
+      reject(new Error("Failed to load video metadata"));
+    };
+
+    video.src = URL.createObjectURL(file);
+  });
+};
+
+// Helper function to format duration from seconds to readable format
+const formatDurationFromSeconds = (seconds) => {
+  if (!seconds || isNaN(seconds)) return "00:00";
+
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  } else {
+    return `${minutes.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  }
+};
+
 // Helper function to convert duration to seconds
 const convertDurationToSeconds = (duration) => {
   if (!duration) return 0; // Handle empty or null input
@@ -447,6 +492,8 @@ export {
   logoutAfterSixHours,
   isLoggedIn,
   convertDurationToSeconds,
+  getVideoDuration,
+  formatDurationFromSeconds,
   countryNames,
   allPossibleQualifications,
   countriesList,
