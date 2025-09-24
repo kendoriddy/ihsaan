@@ -10,6 +10,8 @@ import AssignmentSubmitted from "../components/AssignmentSubmitted";
 import AssignmentClosed from "../components/AssignmentClosed";
 import Link from "next/link";
 import Button from "@/components/Button";
+import { getAuthToken } from "@/hooks/axios/axios";
+import axios from "axios";
 
 const GroupAssignmentPage = () => {
   const { id } = useParams();
@@ -42,12 +44,16 @@ const GroupAssignmentPage = () => {
     error,
   } = useFetch(
     "groups",
-    `https://ihsaanlms.onrender.com/assessment/groups/`,
+    assignmentId
+      ? `https://ihsaanlms.onrender.com/assessment/groups/?assessment=${assignmentId}`
+      : null,
     (data) => {
       toast.success("Assignment fetched successfully");
     },
     (error) => {
-      toast.error(error.response?.data?.message || "Error fetching assignment");
+      toast.error(
+        error.response?.data?.message || "Error fetching assignment groups"
+      );
     }
   );
 
