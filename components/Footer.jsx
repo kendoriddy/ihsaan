@@ -23,15 +23,18 @@ function Footer() {
     return year;
   };
 
-  const { mutate: subscribe, isLoading } = usePost("/subscribe-newsletter/", {
-    onSuccess: (response, { resetForm }) => {
-      toast.success("Subscribed successfully");
-      resetForm();
-    },
-    onError: (error) => {
-      toast.error(error.response.data.message);
-    },
-  });
+  const { mutate: subscribe, isLoading } = usePost(
+    "https://ihsaanlms.onrender.com/newsletter/api/subscribers/",
+    {
+      onSuccess: (response, { resetForm }) => {
+        toast.success("Subscribed successfully");
+        resetForm();
+      },
+      onError: (error) => {
+        toast.error(error.response.data.message);
+      },
+    }
+  );
 
   const initialValues = {
     email: "",
