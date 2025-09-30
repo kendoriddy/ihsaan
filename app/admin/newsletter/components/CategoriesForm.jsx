@@ -2,24 +2,30 @@
 
 import React from "react";
 import { Formik, Form, Field } from "formik";
-import { TextField, Box, Paper, Typography } from "@mui/material";
+import { TextField, Paper, Typography, MenuItem } from "@mui/material";
 import Button from "@/components/Button";
 import { usePost, usePatch } from "@/hooks/useHttp/useHttp";
-import { manualGradeReasonSchema } from "@/components/validationSchemas/ValidationSchema";
+import { categorySchema } from "@/components/validationSchemas/ValidationSchema";
 import Swal from "sweetalert2";
 
-const ReasonsForm = ({ reason = null, isEdit = false, onClose, onSuccess }) => {
-  const { mutate: createManualGradeReason, isLoading: isCreating } = usePost(
-    "https://ihsaanlms.onrender.com/assessment/reason-options/"
+const CategoriesForm = ({
+  category = null,
+  isEdit = false,
+  onClose,
+  onSuccess,
+}) => {
+  const { mutate: createCategory, isLoading: isCreating } = usePost(
+    "https://ihsaanlms.onrender.com/newsletter/api/categories/"
   );
 
-  const { mutate: updateManualGradeReason, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/assessment/reason-options/${reason?.id}/`
+  const { mutate: updateCategory, isLoading: isUpdating } = usePatch(
+    `https://ihsaanlms.onrender.com/newsletter/api/categories/${category?.id}/`
   );
 
   const initialValues = {
-    name: reason?.name || "",
-    description: reason?.description || "",
+    name: category?.name || "",
+    description: category?.description || "",
+    frequency: category?.frequency || "DAILY", // default to daily
   };
 
   const handleSubmit = (values, { resetForm }) => {
@@ -27,9 +33,7 @@ const ReasonsForm = ({ reason = null, isEdit = false, onClose, onSuccess }) => {
 
     const onSuccessCallback = () => {
       Swal.fire({
-        title: `Manual grade reason ${
-          isEdit ? "updated" : "created"
-        } successfully`,
+        title: `Category ${isEdit ? "updated" : "created"} successfully`,
         icon: "success",
         customClass: { confirmButton: "my-confirm-btn" },
       });
@@ -55,12 +59,12 @@ const ReasonsForm = ({ reason = null, isEdit = false, onClose, onSuccess }) => {
     };
 
     if (isEdit) {
-      updateManualGradeReason(submitData, {
+      updateCategory(submitData, {
         onSuccess: onSuccessCallback,
         onError: onErrorCallback,
       });
     } else {
-      createManualGradeReason(submitData, {
+      createCategory(submitData, {
         onSuccess: onSuccessCallback,
         onError: onErrorCallback,
       });
@@ -72,12 +76,12 @@ const ReasonsForm = ({ reason = null, isEdit = false, onClose, onSuccess }) => {
   return (
     <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
       <Typography variant="h6" gutterBottom fontWeight="bold">
-        {isEdit ? "Edit Reason" : "Create Reason"}
+        {isEdit ? "Edit Category" : "Create Category"}
       </Typography>
 
       <Formik
         initialValues={initialValues}
-        validationSchema={manualGradeReasonSchema}
+        validationSchema={categorySchema}
         onSubmit={handleSubmit}
         enableReinitialize
       >
@@ -107,6 +111,22 @@ const ReasonsForm = ({ reason = null, isEdit = false, onClose, onSuccess }) => {
               helperText={touched.description && errors.description}
             />
 
+            {/* Frequency Dropdown */}
+            <Field
+              as={TextField}
+              select
+              fullWidth
+              margin="normal"
+              label="Frequency"
+              name="frequency"
+              error={touched.frequency && Boolean(errors.frequency)}
+              helperText={touched.frequency && errors.frequency}
+            >
+              <MenuItem value="DAILY">Daily</MenuItem>
+              <MenuItem value="WEEKLY">Weekly</MenuItem>
+              <MenuItem value="MONTHLY">Monthly</MenuItem>
+            </Field>
+
             {/* Buttons */}
             <div className="flex justify-end gap-3 mt-6">
               <Button
@@ -124,8 +144,8 @@ const ReasonsForm = ({ reason = null, isEdit = false, onClose, onSuccess }) => {
                     ? "Updating..."
                     : "Creating..."
                   : isEdit
-                  ? "Update Reason"
-                  : "Create Reason"}
+                  ? "Update Category"
+                  : "Create Category"}
               </Button>
             </div>
           </Form>
@@ -135,4 +155,4 @@ const ReasonsForm = ({ reason = null, isEdit = false, onClose, onSuccess }) => {
   );
 };
 
-export default ReasonsForm;
+export default CategoriesForm;

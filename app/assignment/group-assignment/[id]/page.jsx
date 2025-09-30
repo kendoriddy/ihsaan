@@ -16,6 +16,8 @@ import axios from "axios";
 const GroupAssignmentPage = () => {
   const { id } = useParams();
   const assignmentId = id ? String(id) : null;
+  const [loading, setLoading] = useState();
+  const [groups, setGroups] = useState([]);
 
   const {
     isLoading: isLoadingAssignment,
@@ -36,28 +38,47 @@ const GroupAssignmentPage = () => {
     }
   );
 
-  const {
-    isLoading: isLoadingGroups,
-    data: GroupData,
-    refetch: refetchGropus,
-    isFetching: isFetchingGroups,
-    error,
-  } = useFetch(
-    "groups",
-    assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/groups/?assessment=${assignmentId}`
-      : null,
-    (data) => {
-      toast.success("Assignment fetched successfully");
-    },
-    (error) => {
-      toast.error(
-        error.response?.data?.message || "Error fetching assignment groups"
-      );
-    }
-  );
+  // const {
+  //   isLoading: isLoadingGroups,
+  //   data: GroupData,
+  //   refetch: refetchGropus,
+  //   isFetching: isFetchingGroups,
+  //   error,
+  // } = useFetch(
+  //   ["groups", assignmentId],
+  //   assignmentId
+  //     ? `https://ihsaanlms.onrender.com/assessment/groups/?assessment=${assignmentId}`
+  //     : null,
+  //   (data) => {
+  //     toast.success("Assignment fetched successfully");
+  //   },
+  //   (error) => {
+  //     toast.error(
+  //       error.response?.data?.message || "Error fetching assignment groups"
+  //     );
+  //   }
+  // );
 
-  console.log("groups", GroupData);
+  const fetchGroups = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `https://ihsaanlms.onrender.com/assessment/groups/`,
+        {
+          headers: {
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+          params: { assessment: assignmentId }, // Pass assessment_id as params
+        }
+      );
+      console.log("response is", response);
+      setGroups(response.data.results || []);
+    } catch (error) {
+      toast.error("Failed to fetch groups");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const {
     isLoading: isLoadingSubmission,
@@ -78,10 +99,14 @@ const GroupAssignmentPage = () => {
     }
   );
 
+  useEffect(() => {
+    fetchGroups();
+  }, [assignmentId]);
+
   const studentId =
     typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
 
-  const leaderGroup = GroupData?.data?.results.find(
+  const leaderGroup = groups.find(
     (group) =>
       group.leader === studentId && String(group.assessment) === assignmentId
   );
@@ -116,7 +141,8 @@ const GroupAssignmentPage = () => {
     isFetchingAssignment ||
     isLoadingSubmission ||
     isFetchingSubmission ||
-    !studentId
+    !studentId ||
+    loading
   ) {
     return (
       <Layout>
@@ -172,71 +198,67 @@ const GroupAssignmentPage = () => {
             </p>
             <p>
               <strong>Mark Obtainable:</strong>
-              {AssignmentData.data?.marks || "N/A"}
+              {AssignmentData.data?.max_score || "N/A"}
             </p>
           </div>
         </div>
 
         {/* Right Section: Submission Area */}
-        {!isGroupLeader && (
-          <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
-            <p>You are not allowed to perform this action</p>
-            <p>Contact your group leader to submit the assignment</p>
-          </div>
-        )}
-        {isGroupLeader && (
-          <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
-            <div className="flex justify-between items-center">
-              {showSubmissionForm && !showClosedView ? (
-                <h3 className="text-lg font-medium mb-4">
-                  Assignment Submission
-                </h3>
-              ) : (
-                <h3 className="text-lg font-medium mb-4">
-                  Submission & Comments
-                </h3>
-              )}
-            </div>
-            {showSubmissionForm && (
-              <AssignmentSubmission
-                assignmentId={assignmentId}
-                groupId={groupId}
-                refetchSubmission={refetchSubmission}
-              />
-            )}
-            {showSubmittedView && (
-              <AssignmentSubmitted
-                submissionData={SubmissionData?.data?.file_submissions}
-                refetchSubmission={refetchSubmission}
-              />
-            )}
-
-            {showClosedView && <AssignmentClosed />}
-          </div>
-        )}
         <div className="md:w-2/3 bg-white p-4 rounded-md shadow-md">
-          <div className="flex justify-between items-center">
-            {showSubmissionForm && showClosedView ? (
-              <h3 className="text-lg font-medium mb-4">
-                Assignment Submission
-              </h3>
-            ) : (
-              <h3 className="text-lg font-medium mb-4">
-                Submission & Comments
-              </h3>
-            )}
-          </div>
-          <AssignmentSubmission
-            assignmentId={assignmentId}
-            groupId={groupId}
-            refetchSubmission={refetchSubmission}
-          />
-          <AssignmentSubmitted
-            submissionData={SubmissionData?.data?.file_submissions}
-            refetchSubmission={refetchSubmission}
-          />
+          {/* Case 1: Student not in any group */}
+          {groups.length === 0 && (
+            <div>
+              <p className="text-red-500 font-medium">
+                You have not been assigned to any group for this assignment.
+              </p>
+              <p>Please contact your instructor.</p>
+            </div>
+          )}
 
-          {showClosedView && <AssignmentClosed />}
+          {/* Case 2: Student is in a group but not the leader */}
+          {groups.length > 0 && !isGroupLeader && (
+            <div>
+              <p className="text-gray-700">
+                You are a group member. Only your group leader can submit this
+                assignment.
+              </p>
+              <p>Contact your group leader to handle submission.</p>
+            </div>
+          )}
+
+          {/* Case 3: Student is the group leader */}
+          {isGroupLeader && (
+            <div>
+              <div className="flex justify-between items-center">
+                {showSubmissionForm && !showClosedView ? (
+                  <h3 className="text-lg font-medium mb-4">
+                    Assignment Submission
+                  </h3>
+                ) : (
+                  <h3 className="text-lg font-medium mb-4">
+                    Submission & Comments
+                  </h3>
+                )}
+              </div>
+
+              {showSubmissionForm && (
+                <AssignmentSubmission
+                  assignmentId={assignmentId}
+                  groupId={groupId}
+                  refetchSubmission={refetchSubmission}
+                />
+              )}
+
+              {showSubmittedView && (
+                <AssignmentSubmitted
+                  submissionData={SubmissionData?.data?.file_submissions}
+                  refetchSubmission={refetchSubmission}
+                />
+              )}
+
+              {showClosedView && <AssignmentClosed />}
+            </div>
+          )}
         </div>
       </div>
     </Layout>
