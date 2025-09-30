@@ -12,8 +12,10 @@ import {
 } from "@mui/material";
 import Button from "@/components/Button";
 import { usePost, useFetch, usePatch } from "@/hooks/useHttp/useHttp";
-import { manualGradeSchema } from "@/components/validationSchemas/ValidationSchema";
-import Swal from "sweetalert2";
+import {
+  manualGradeSchema,
+  newsLetterSchema,
+} from "@/components/validationSchemas/ValidationSchema";
 import { toast } from "react-toastify";
 
 const NewsletterForm = ({
@@ -89,7 +91,7 @@ const NewsletterForm = ({
     <Box sx={{ pt: 2 }}>
       <Formik
         initialValues={initialValues}
-        validationSchema={manualGradeSchema}
+        validationSchema={newsLetterSchema}
         onSubmit={handleSubmit}
         enableReinitialize
       >
