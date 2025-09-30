@@ -43,8 +43,11 @@ function Footer() {
   const handleSubmit = (values, { resetForm }) => {
     const { email } = values;
     const payload = { email: email };
-    subscribe(payload);
-    resetForm();
+    subscribe(payload, {
+      onSuccess: () => {
+        resetForm();
+      },
+    });
   };
 
   return (
