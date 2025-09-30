@@ -6,7 +6,6 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Avatar,
   Button,
   Dialog,
   DialogTitle,
@@ -220,9 +219,6 @@ const NewsletterAdmin = () => {
                   <TableHead>
                     <TableRow className="bg-gradient-to-r from-gray-50 to-gray-100">
                       <TableCell className="font-bold text-gray-700">
-                        Avatar
-                      </TableCell>
-                      <TableCell className="font-bold text-gray-700">
                         Name
                       </TableCell>
                       <TableCell className="font-bold text-gray-700">
@@ -250,11 +246,6 @@ const NewsletterAdmin = () => {
                           index % 2 === 0 ? "bg-gray-50" : "bg-white"
                         }`}
                       >
-                        <TableCell>
-                          <Avatar className="bg-gradient-to-r from-blue-400 to-purple-500 text-white font-semibold">
-                            {subscriber?.firstname?.charAt(0)}
-                          </Avatar>
-                        </TableCell>
                         <TableCell>
                           <div className="font-medium text-gray-900">
                             {subscriber?.full_name}
