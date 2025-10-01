@@ -67,7 +67,11 @@ export default function FeedbackForm({ isOpen, onClose, userRole, onSubmit }) {
       try {
         dispatch(fetchCourses({ page: 1, coursesPerPage: 100 }));
         dispatch(
-          fetchTutors({ page: 1, pageSize: 100, endpoint: "/tutor/tutors/" })
+          fetchTutors({
+            page: 1,
+            pageSize: 100,
+            endpoint: "/student-get-my-tutors/",
+          })
         );
       } catch (error) {
         console.error("Error fetching dropdown data:", error);
@@ -303,7 +307,7 @@ export default function FeedbackForm({ isOpen, onClose, userRole, onSubmit }) {
         subject_id: formData.subject_id || "",
         country: formData.country || "",
         message: formData.message,
-        rating: formData.rating,
+        rating: formData.rating > 0 ? formData.rating : null,
         ...(resourceId && { resource: resourceId }),
       };
 
@@ -555,7 +559,7 @@ export default function FeedbackForm({ isOpen, onClose, userRole, onSubmit }) {
                               fetchTutors({
                                 page: 1,
                                 pageSize: 100,
-                                endpoint: "/tutor/tutors/",
+                                endpoint: "/student-get-my-tutors/",
                               })
                             );
                           }
