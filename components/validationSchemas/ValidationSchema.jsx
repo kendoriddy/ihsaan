@@ -1,3 +1,5 @@
+import { DescriptionSharp } from "@mui/icons-material";
+import { strict } from "assert";
 import { string, object, array, number, mixed, bool, ref } from "yup";
 import * as Yup from "yup";
 
@@ -14,8 +16,12 @@ export const catSchema = object({
   name: string().required("Required"),
 });
 
-export const newsLetterSchema = object({
-  email: string().email("Enter  Valid Email").required("Required"),
+export const newsLetterSchema = Yup.object().shape({
+  email: Yup.string().email("Enter  Valid Email").required("Email is Required"),
+  firstname: Yup.string(),
+  lastname: Yup.string(),
+  category: Yup.string(),
+  country: Yup.string(),
 });
 
 export const faqSchema = object({
@@ -177,12 +183,29 @@ export const termSchema = Yup.object({
   end_date: Yup.date().required("End date is required"),
 });
 
-export const manualGradeSchema = Yup.object().shape({
-  course: Yup.string().required("Course is required"),
-  student: Yup.string().required("Student is required"),
-  reason: Yup.string().required("Reason is required"),
-  details: Yup.string().required("Details are required"),
-  score: Yup.number()
-    .min(0, "Score must be >= 0")
-    .required("Score is required"),
+export const manualGradeReasonSchema = Yup.object().shape({
+  name: Yup.string().required("Reason name is required"),
+  description: Yup.string().required("Reason description is required"),
+});
+
+export const categorySchema = Yup.object().shape({
+  name: Yup.string().required("Name is required"),
+  description: Yup.string().required("Description is required"),
+  frequency: Yup.string()
+    .oneOf(["DAILY", "WEEKLY", "MONTHLY"], "Invalid frequency")
+    .required("Frequency is required"),
+});
+
+export const bulkUploadSchema = Yup.object().shape({
+  category: Yup.string().required("Category is required"),
+  csv_file: Yup.mixed()
+    .required("CSV file is required")
+    .test("fileType", "Only CSV files are allowed", (value) => {
+      if (!value) return false;
+      return value.type === "text/csv" || value.name.endsWith(".csv");
+    })
+    .test("fileSize", "File size must be less than 5MB", (value) => {
+      if (!value) return false;
+      return value.size <= 5 * 1024 * 1024; // 5MB
+    }),
 });
