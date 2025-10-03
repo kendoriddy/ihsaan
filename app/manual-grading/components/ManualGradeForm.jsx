@@ -28,7 +28,7 @@ const ManualGradeForm = ({
     isFetching: isFetchingCourses,
   } = useFetch(
     ["courses"],
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page=1&page_size=100`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/`,
     (data) => {
       if (data?.total) {
         // You can handle data.total here if needed
