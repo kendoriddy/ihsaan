@@ -37,7 +37,7 @@ const ManualGrading = () => {
     refetch,
   } = useFetch(
     "assessments",
-    `https://ihsaanlms.onrender.com/assessment/base/?page_size=${
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/?page_size=${
       fetchAll ? totalCourses : 10
     }`,
     (data) => {

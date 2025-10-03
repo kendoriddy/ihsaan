@@ -29,7 +29,7 @@ const ListTerms = () => {
 
   const { isLoading, data, refetch, isFetching } = useFetch(
     "terms",
-    `https://ihsaanlms.onrender.com/terms/?page_size=15&page=${page}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms/?page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
         setTotalTerms(data.total);
@@ -39,9 +39,9 @@ const ListTerms = () => {
 
   const Terms = data?.data?.results || [];
 
-  // DELETE QUESTION
+  // DELETE TERM
   const { mutate: sessionDelete, isLoading: isDeleting } = useDelete(
-    `https://ihsaanlms.onrender.com/terms`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms`,
     {
       onSuccess: () => {
         toast.success("Deleted successfully");

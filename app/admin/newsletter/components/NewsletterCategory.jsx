@@ -38,7 +38,7 @@ const NewsletterCategories = () => {
 
   const { isLoading, data, refetch, isFetching } = useFetch(
     "categories",
-    `https://ihsaanlms.onrender.com/newsletter/api/categories/?page_size=15&page=${categoryPage}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/categories/?page_size=15&page=${categoryPage}`,
     (data) => {
       if (data?.total) {
         setCategoryTotalCount(data.total);
@@ -50,7 +50,7 @@ const NewsletterCategories = () => {
 
   // DELETE CATEGORY
   const { mutate: deleteCategory, isLoading: isDeleting } = useDelete(
-    `https://ihsaanlms.onrender.com/newsletter/api/categories`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/categories`,
     {
       onSuccess: () => {
         toast.success("Category deleted successfully");

@@ -73,7 +73,9 @@ const NewsletterAdmin = () => {
     refetch: newsletterRefetch,
   } = useFetch(
     ["subscribers", newsletterPage, newsletterFilters],
-    `https://ihsaanlms.onrender.com/newsletter/api/subscribers/?${buildNewsletterQuery()}`,
+    `${
+      process.env.NEXT_PUBLIC_API_BASE_URL
+    }/newsletter/api/subscribers/?${buildNewsletterQuery()}`,
     (data) => {
       if (data?.total) {
         setTotalNewsletters(data.total);
@@ -91,7 +93,7 @@ const NewsletterAdmin = () => {
 
   // DELETE MANUAL GRADE
   const { mutate: deleteSubscriber, isLoading: isDeleting } = useDelete(
-    `https://ihsaanlms.onrender.com/newsletter/api/subscribers`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/subscribers`,
     {
       onSuccess: () => {
         toast.success("Subscriber deleted successfully");

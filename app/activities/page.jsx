@@ -44,7 +44,7 @@ const StudentInfoPage = () => {
     isFetching: isFetchingSession,
   } = useFetch(
     "academicSession",
-    `https://ihsaanlms.onrender.com/academic-sessions/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/academic-sessions/`,
     (data) => {
       if (data?.total) {
         // Handle session data if needed
@@ -60,7 +60,7 @@ const StudentInfoPage = () => {
   } = useFetch(
     ["terms", selectedSession],
     selectedSession
-      ? `https://ihsaanlms.onrender.com/terms/?session__year=${selectedSession}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms/?session__year=${selectedSession}`
       : null,
     (data) => {
       if (data?.total) {
@@ -77,7 +77,7 @@ const StudentInfoPage = () => {
   } = useFetch(
     ["grades", selectedSession, selectedTerm, gradesPage],
     selectedSession && selectedTerm
-      ? `https://ihsaanlms.onrender.com/assessment/grades/?student=${studentId}&page=${gradesPage}&page_size=10`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grades/?student=${studentId}&page=${gradesPage}&page_size=10`
       : null,
     (data) => {
       if (data?.total) {
@@ -94,7 +94,7 @@ const StudentInfoPage = () => {
   } = useFetch(
     ["manual-grades", selectedSession, selectedTerm, manualGradesPage],
     selectedSession && selectedTerm
-      ? `https://ihsaanlms.onrender.com/assessment/manual-grades/?student=${studentId}&page=${manualGradesPage}&page_size=10`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/manual-grades/?student=${studentId}&page=${manualGradesPage}&page_size=10`
       : null,
     (data) => {
       if (data?.total) {
@@ -111,7 +111,7 @@ const StudentInfoPage = () => {
   } = useFetch(
     ["courses", selectedSession, selectedTerm],
     selectedSession && selectedTerm
-      ? `https://ihsaanlms.onrender.com/course/course-enrollments/?user_id=${studentId}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-enrollments/?user_id=${studentId}`
       : null,
     (data) => {
       if (data?.total) {

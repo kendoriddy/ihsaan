@@ -15,11 +15,11 @@ const CategoriesForm = ({
   onSuccess,
 }) => {
   const { mutate: createCategory, isLoading: isCreating } = usePost(
-    "https://ihsaanlms.onrender.com/newsletter/api/categories/"
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/categories/`
   );
 
   const { mutate: updateCategory, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/newsletter/api/categories/${category?.id}/`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/categories/${category?.id}/`
   );
 
   const initialValues = {

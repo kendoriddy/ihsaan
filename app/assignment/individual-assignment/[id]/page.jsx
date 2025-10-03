@@ -23,7 +23,7 @@ const IndividualAssignmentPage = () => {
   } = useFetch(
     `assignment-${assignmentId}`,
     assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/base/${assignmentId}/`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/${assignmentId}/`
       : null,
     (data) => {
       toast.success("Assignment fetched successfully");
@@ -42,7 +42,7 @@ const IndividualAssignmentPage = () => {
   } = useFetch(
     `submission-${assignmentId}`,
     assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/base/${assignmentId}/student_submissions/`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/${assignmentId}/student_submissions/`
       : null,
     (data) => {
       toast.success("Submission fetched successfully");
@@ -60,7 +60,7 @@ const IndividualAssignmentPage = () => {
   } = useFetch(
     "grade",
     assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/grades/?assessment=${assignmentId}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grades/?assessment=${assignmentId}`
       : null
   );
 

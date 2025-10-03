@@ -26,18 +26,18 @@ const NewsletterForm = ({
 }) => {
   const { isLoading: loadingCategories, data: categoriesData } = useFetch(
     ["newsletter-categories"],
-    `https://ihsaanlms.onrender.com/newsletter/api/categories/`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/categories/`
   );
   const categories = categoriesData?.data?.results || [];
 
   // Create mutation
   const { mutate: createSubscriber, isLoading: isCreating } = usePost(
-    "https://ihsaanlms.onrender.com/newsletter/api/subscribers/"
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/subscribers/`
   );
 
   // Update mutation
   const { mutate: updateSubscriber, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/newsletter/api/subscribers/${subscriber?.id}/`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/subscribers/${subscriber?.id}/`
   );
 
   const initialValues = {

@@ -50,7 +50,7 @@ const AssignmentTable = () => {
     refetch,
   } = useFetch(
     "assignmentsList",
-    `https://ihsaanlms.onrender.com/assessment/base/?question_type=FILE_UPLOAD&page_size=15&page=${page}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/?question_type=FILE_UPLOAD&page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
         setTotalAssignments(data.total);

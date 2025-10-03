@@ -43,7 +43,7 @@ const AllAssignment = () => {
 
   const { isLoading, data, refetch, isFetching } = useFetch(
     "assignments",
-    `https://ihsaanlms.onrender.com/assessment/base/?page_size=15&page=${page}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/?page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
         setTotalAssignments(data.total);
@@ -55,7 +55,7 @@ const AllAssignment = () => {
 
   // DELETE QUESTION
   const { mutate: questionDelete, isLoading: isDeleting } = useDelete(
-    `https://ihsaanlms.onrender.com/assessment/base`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base`,
     {
       onSuccess: () => {
         toast.success("Assessnment deleted successfully");

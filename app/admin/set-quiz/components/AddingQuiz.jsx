@@ -60,7 +60,7 @@ const AddingQuiz = () => {
     error: coursesError,
   } = useFetch(
     "courses",
-    `https://ihsaanlms.onrender.com/course/courses/?page_size=${
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page_size=${
       fetchAll ? totalCourses : 10
     }`,
     (data) => {
@@ -85,7 +85,7 @@ const AddingQuiz = () => {
   } = useFetch(
     "courseSections",
     selectedCourseId
-      ? `https://ihsaanlms.onrender.com/course/course-sections/?course=${selectedCourseId}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-sections/?course=${selectedCourseId}`
       : null,
     (data) => {
       if (data?.total && !fetchAll) {
@@ -108,7 +108,7 @@ const AddingQuiz = () => {
 
   // Mutation to create quiz questions
   const { mutate: createQuestions, isLoading: isCreatingQuestions } = usePost(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/bulk-create/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/bulk-create/`,
     {
       onSuccess: (response, variables, context) => {
         toast.success("Question(s) created successfully");
@@ -260,7 +260,7 @@ const AddingQuiz = () => {
     formData.append("file", excelFile);
     try {
       const response = await fetch(
-        `https://ihsaanlms.onrender.com/assessment/mcquestions/upload-mcq-questions/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/upload-mcq-questions/`,
         {
           method: "POST",
           headers: {
@@ -411,7 +411,7 @@ const AddingQuiz = () => {
       const token = localStorage.getItem("token") || "";
       // Fetch all courses with auth
       const res = await fetch(
-        `https://ihsaanlms.onrender.com/course/courses/?page_size=1000`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page_size=1000`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -426,7 +426,7 @@ const AddingQuiz = () => {
       const sectionFetches = courses.map(async (course) => {
         try {
           const secRes = await fetch(
-            `https://ihsaanlms.onrender.com/course/course-sections/?course=${course.id}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-sections/?course=${course.id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

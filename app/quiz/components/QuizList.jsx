@@ -21,7 +21,7 @@ const QuizList = ({ setCurrentScreen }) => {
     refetch,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/base/?question_type=MCQ&page_size=15&page=${page}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/?question_type=MCQ&page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
         setTotalQuiz(data.total);
@@ -38,7 +38,7 @@ const QuizList = ({ setCurrentScreen }) => {
   } = useFetch(
     `submission-${quizId}`,
     quizId
-      ? `https://ihsaanlms.onrender.com/assessment/mcq-responses/?assessment=${quizId}&student=${studentId}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcq-responses/?assessment=${quizId}&student=${studentId}`
       : null,
     (data) => {},
     (error) => {}

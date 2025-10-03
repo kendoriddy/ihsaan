@@ -29,7 +29,7 @@ const AllSessions = () => {
 
   const { isLoading, data, refetch, isFetching } = useFetch(
     "academicSession",
-    `https://ihsaanlms.onrender.com/academic-sessions/?page_size=15&page=${page}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/academic-sessions/?page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
         setTotalSession(data.total);
@@ -41,7 +41,7 @@ const AllSessions = () => {
 
   // DELETE QUESTION
   const { mutate: sessionDelete, isLoading: isDeleting } = useDelete(
-    `https://ihsaanlms.onrender.com/academic-sessions`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/academic-sessions`,
     {
       onSuccess: () => {
         toast.success("Deleted successfully");

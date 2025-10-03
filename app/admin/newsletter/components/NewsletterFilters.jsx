@@ -30,7 +30,7 @@ const NewsletterFilters = ({ showFilters, onFiltersChange }) => {
 
   const { isLoading: loadingCategories, data: categoriesData } = useFetch(
     ["newsletter-categories"],
-    `https://ihsaanlms.onrender.com/newsletter/api/categories/`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/categories/`
   );
   const categories = categoriesData?.data?.results || [];
 

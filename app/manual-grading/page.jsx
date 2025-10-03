@@ -38,7 +38,7 @@ const AllManualGrades = () => {
 
   const { isLoading, data, refetch, isFetching } = useFetch(
     "manual-grades",
-    `https://ihsaanlms.onrender.com/assessment/manual-grades/?page_size=15&page=${page}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/manual-grades/?page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
         setTotalGrades(data.total);
@@ -50,7 +50,7 @@ const AllManualGrades = () => {
 
   // DELETE MANUAL GRADE
   const { mutate: deleteGrade, isLoading: isDeleting } = useDelete(
-    `https://ihsaanlms.onrender.com/assessment/manual-grades`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/manual-grades`,
     {
       onSuccess: () => {
         toast.success("Manual grade deleted successfully");

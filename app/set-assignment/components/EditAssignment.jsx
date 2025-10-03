@@ -44,7 +44,7 @@ const EditAssignmentQuestion = ({
     refetch: refetchCourses,
   } = useFetch(
     "courses",
-    `https://ihsaanlms.onrender.com/course/courses/?page_size=${
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page_size=${
       fetchAll ? totalCourses : 10
     }`,
     (data) => {
@@ -60,7 +60,7 @@ const EditAssignmentQuestion = ({
 
   // Update function with body
   const { mutate: updateQuestion, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/assessment/base/${selectedAssignment?.id}/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/${selectedAssignment?.id}/`,
     {
       onSuccess: () => {
         toast.success("Quiz question updated successfully");

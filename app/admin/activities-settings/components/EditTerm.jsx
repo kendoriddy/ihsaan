@@ -28,7 +28,7 @@ const EditTerm = ({
   console.log(editedTerm, "term selected", selectedTerm);
   // Update function with body
   const { mutate: updateTerm, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/terms/${selectedTerm?.id}/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms/${selectedTerm?.id}/`,
     {
       onSuccess: () => {
         toast.success("Session Updated successfully");
@@ -43,7 +43,7 @@ const EditTerm = ({
 
   const { isLoading, data, refetch, isFetching } = useFetch(
     "academicSession",
-    `https://ihsaanlms.onrender.com/academic-sessions/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/academic-sessions/`,
     (data) => {}
   );
   const Sessions = data?.data?.results || [];

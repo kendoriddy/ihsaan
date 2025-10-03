@@ -23,13 +23,13 @@ const BulkUploadForm = ({ onClose, onSuccess }) => {
   // Fetch categories
   const { isLoading: loadingCategories, data: categoriesData } = useFetch(
     ["newsletter-categories"],
-    `https://ihsaanlms.onrender.com/newsletter/api/categories/`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/categories/`
   );
   const categories = categoriesData?.data?.results || [];
 
   // Create mutation for bulk upload
   const { mutate: uploadBulk, isLoading: isUploading } = usePost(
-    "https://ihsaanlms.onrender.com/newsletter/api/subscribers/bulk_upload/"
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/newsletter/api/subscribers/bulk_upload/`
   );
 
   const initialValues = {

@@ -18,7 +18,7 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
 
   console.log("submitted data", submissionData);
   const { mutate: uploadFile, isLoading: isUploading } = usePost(
-    `https://ihsaanlms.onrender.com/resource/assessment-resource/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/resource/assessment-resource/`,
     {
       onSuccess: () => {
         toast.success("File uploaded successfully");
@@ -30,7 +30,7 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
   );
 
   const { mutate: updateAssignment, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/assessment/uploads/${submissionData?.[0]?.id}/`, // Include the submission ID in the URL
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/uploads/${submissionData?.[0]?.id}/`, // Include the submission ID in the URL
     {
       onSuccess: () => {
         toast.success("Assignment updated successfully");

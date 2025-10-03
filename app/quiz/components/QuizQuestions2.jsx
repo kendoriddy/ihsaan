@@ -35,7 +35,7 @@ const QuizQuestion2 = ({ sectionData, setOpenQuizModal }) => {
     isFetching,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionData?.id}/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/course-section/${sectionData?.id}/`,
     () => {},
     (error) => {
       toast.error(error.error || "Failed to load questions.");
@@ -52,7 +52,7 @@ const QuizQuestion2 = ({ sectionData, setOpenQuizModal }) => {
   }, [Questions]);
 
   const { mutate: submitQuiz, isLoading: submittingQuiz } = usePost(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionData?.id}/submit/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/course-section/${sectionData?.id}/submit/`,
     {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");
@@ -61,7 +61,7 @@ const QuizQuestion2 = ({ sectionData, setOpenQuizModal }) => {
         const token = getAuthToken();
         axios
           .get(
-            `https://ihsaanlms.onrender.com/assessment/mcq-responses/${response.data.mcq_response_id}/`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcq-responses/${response.data.mcq_response_id}/`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

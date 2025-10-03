@@ -28,7 +28,7 @@ const ManualGradeForm = ({
     isFetching: isFetchingCourses,
   } = useFetch(
     ["courses"],
-    `https://ihsaanlms.onrender.com/course/courses/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/`,
     (data) => {
       if (data?.total) {
         // You can handle data.total here if needed
@@ -44,7 +44,7 @@ const ManualGradeForm = ({
     isFetching: isFetchingReasons,
   } = useFetch(
     ["reasons"],
-    `https://ihsaanlms.onrender.com/assessment/reason-options/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/reason-options/`,
     (data) => {
       if (data?.total) {
         // You can handle data.total here if needed
@@ -55,12 +55,12 @@ const ManualGradeForm = ({
 
   // Create mutation
   const { mutate: createManualGrade, isLoading: isCreating } = usePost(
-    "https://ihsaanlms.onrender.com/assessment/manual-grades/"
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/manual-grades/`
   );
 
   // Update mutation
   const { mutate: updateManualGrade, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/assessment/manual-grades/${grade?.id}/`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/manual-grades/${grade?.id}/`
   );
 
   const initialValues = {

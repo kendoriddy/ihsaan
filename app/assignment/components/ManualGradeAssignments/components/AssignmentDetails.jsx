@@ -45,27 +45,6 @@ const AssignmentDetails = ({
     }
   };
 
-  const getSubmissionStatusChip = (status) => {
-    const statusConfig = {
-      pending: { color: "#ed6c02", label: "Pending" },
-      submitted: { color: "#2e7d32", label: "Submitted" },
-      graded: { color: "#1976d2", label: "Graded" },
-    };
-
-    const config = statusConfig[status] || statusConfig.pending;
-
-    return (
-      <Chip
-        label={config.label}
-        sx={{
-          backgroundColor: config.color,
-          color: "white",
-          fontWeight: "medium",
-        }}
-      />
-    );
-  };
-
   return (
     <Dialog
       open={modalOpen}

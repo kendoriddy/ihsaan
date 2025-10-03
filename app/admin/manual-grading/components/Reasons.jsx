@@ -35,7 +35,7 @@ const Reasons = ({ openReasonCreateModal, setReasonOpenCreateModal }) => {
 
   const { isLoading, data, refetch, isFetching } = useFetch(
     "reasons",
-    `https://ihsaanlms.onrender.com/assessment/reason-options/?page_size=15&page=${reasonPage}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/reason-options/?page_size=15&page=${reasonPage}`,
     (data) => {
       if (data?.total) {
         setReasonTotalGrades(data.total);
@@ -47,7 +47,7 @@ const Reasons = ({ openReasonCreateModal, setReasonOpenCreateModal }) => {
 
   // DELETE MANUAL GRADE
   const { mutate: deleteReason, isLoading: isDeleting } = useDelete(
-    `https://ihsaanlms.onrender.com/assessment/reason-options`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/reason-options`,
     {
       onSuccess: () => {
         toast.success("Manual grade reason deleted successfully");
