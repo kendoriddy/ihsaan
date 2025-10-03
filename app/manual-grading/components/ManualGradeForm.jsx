@@ -186,11 +186,17 @@ const ManualGradeForm = ({
                   disabled={!selectedCourse || isEdit}
                   error={touched.student && Boolean(errors.student)}
                 >
-                  {selectedCourse?.enrolled_users?.map((s) => (
-                    <MenuItem key={s.id} value={s.id}>
-                      {s.first_name} {s.last_name}
+                  {selectedCourse?.enrolled_users?.length > 0 ? (
+                    selectedCourse?.enrolled_users?.map((s) => (
+                      <MenuItem key={s.id} value={s.id}>
+                        {s.first_name} {s.last_name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem value="" disabled>
+                      There is no student assigned to this course.
                     </MenuItem>
-                  ))}
+                  )}
                 </Field>
                 {touched.student && errors.student && (
                   <div className="text-red-500 text-sm mt-1">
