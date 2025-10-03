@@ -28,7 +28,7 @@ const ManualGradeForm = ({
     isFetching: isFetchingCourses,
   } = useFetch(
     ["courses"],
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page=1&page_size=100`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/`,
     (data) => {
       if (data?.total) {
         // You can handle data.total here if needed
@@ -186,11 +186,17 @@ const ManualGradeForm = ({
                   disabled={!selectedCourse || isEdit}
                   error={touched.student && Boolean(errors.student)}
                 >
-                  {selectedCourse?.enrolled_users?.map((s) => (
-                    <MenuItem key={s.id} value={s.id}>
-                      {s.first_name} {s.last_name}
+                  {selectedCourse?.enrolled_users?.length > 0 ? (
+                    selectedCourse?.enrolled_users?.map((s) => (
+                      <MenuItem key={s.id} value={s.id}>
+                        {s.first_name} {s.last_name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem value="" disabled>
+                      There is no student assigned to this course.
                     </MenuItem>
-                  ))}
+                  )}
                 </Field>
                 {touched.student && errors.student && (
                   <div className="text-red-500 text-sm mt-1">
