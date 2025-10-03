@@ -12,12 +12,12 @@ const Comments = ({ gradeId }) => {
   const { data: commentsData, refetch: refetchComments } = useFetch(
     "comments",
     gradeId
-      ? `https://ihsaanlms.onrender.com/assessment/grade-comments/?grade_id=${gradeId}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grade-comments/?grade=${gradeId}`
       : null
   );
 
   const { mutate: submitComment, isLoading: submittingComment } = usePost(
-    "https://ihsaanlms.onrender.com/assessment/grade-comments/"
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grade-comments/`
   );
 
   const handleCommentSubmit = () => {

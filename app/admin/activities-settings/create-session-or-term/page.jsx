@@ -16,7 +16,7 @@ const CreateSession = () => {
   const {
     mutate: createAcademicSession,
     isLoading: isCreatingAcademicSession,
-  } = usePost("https://ihsaanlms.onrender.com/academic-sessions/", {
+  } = usePost(`${process.env.NEXT_PUBLIC_API_BASE_URL}/academic-sessions/`, {
     onSuccess: (response) => {
       toast.success("Academic session created successfully");
       resetForm();

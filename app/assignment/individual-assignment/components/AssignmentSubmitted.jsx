@@ -26,7 +26,7 @@ const AssignmentSubmitted = ({
   }, [gradeData]);
 
   const { mutate: uploadFile, isLoading: isUploading } = usePost(
-    `https://ihsaanlms.onrender.com/resource/assessment-resource/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/resource/assessment-resource/`,
     {
       onSuccess: () => {
         toast.success("File uploaded successfully");
@@ -38,7 +38,7 @@ const AssignmentSubmitted = ({
   );
 
   const { mutate: updateAssignment, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/assessment/uploads/${submissionData?.[0]?.id}/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/uploads/${submissionData?.[0]?.id}/`,
     {
       onSuccess: () => {
         toast.success("Assignment updated successfully");

@@ -10,7 +10,7 @@ const AssignmentSubmission = ({ assignmentId, groupId, refetchSubmission }) => {
   const [dragActive, setDragActive] = useState(false);
 
   const { mutate: uploadFile, isLoading: isUploading } = usePost(
-    `https://ihsaanlms.onrender.com/resource/assessment-resource/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/resource/assessment-resource/`,
     {
       onSuccess: () => {
         // Success handler for file upload
@@ -22,7 +22,7 @@ const AssignmentSubmission = ({ assignmentId, groupId, refetchSubmission }) => {
   );
 
   const { mutate: submitAssignment, isLoading: isSubmitting } = usePost(
-    `https://ihsaanlms.onrender.com/assessment/uploads/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/uploads/`,
     {
       onSuccess: () => {
         toast.success("Assignment submitted successfully");

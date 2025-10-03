@@ -60,7 +60,9 @@ const AuditTrail = () => {
     refetch: errorRefetch,
   } = useFetch(
     ["errorLogs", errorPage, errorFilters],
-    `https://ihsaanlms.onrender.com/utils/api/logs/errors/?${buildErrorQuery()}`,
+    `${
+      process.env.NEXT_PUBLIC_API_BASE_URL
+    }/utils/api/logs/errors/?${buildErrorQuery()}`,
     (data) => {
       if (data?.total) {
         setTotalErrors(data.total);
@@ -76,7 +78,9 @@ const AuditTrail = () => {
     refetch: activityRefetch,
   } = useFetch(
     ["activitiesLogs", activityPage, activityFilters],
-    `https://ihsaanlms.onrender.com/audit/api/trails/?${buildActivityQuery()}`,
+    `${
+      process.env.NEXT_PUBLIC_API_BASE_URL
+    }/audit/api/trails/?${buildActivityQuery()}`,
     (data) => {
       if (data?.pagination?.total) {
         setTotalActivities(data.pagination.total);

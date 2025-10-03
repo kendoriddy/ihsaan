@@ -1,6 +1,6 @@
 "use client";
 import CustomModal from "@/components/CustomModal";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { usePatch } from "@/hooks/useHttp/useHttp";
 import { toast } from "react-toastify";
 import { Formik, Form, Field } from "formik";
@@ -15,7 +15,7 @@ const EditQuizQuestion = ({
   refetchQuestions,
 }) => {
   const { mutate: updateQuestion, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/${selectedQuestion?.id}/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/${selectedQuestion?.id}/`,
     {
       onSuccess: () => {
         toast.success("Quiz question updated successfully");

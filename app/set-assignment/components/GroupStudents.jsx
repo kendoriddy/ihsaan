@@ -44,7 +44,7 @@ const GroupStudents = ({
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/assessment/groups/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/groups/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -66,8 +66,8 @@ const GroupStudents = ({
     try {
       setLoading(true);
       const url = search
-        ? `https://ihsaanlms.onrender.com/course/course-enrollments/?course_id=${assessment.course}&search=${search}`
-        : `https://ihsaanlms.onrender.com/course/course-enrollments/?course_id=${assessment.course}`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-enrollments/?course_id=${assessment.course}&search=${search}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-enrollments/?course_id=${assessment.course}`;
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${getAuthToken()}`,
@@ -86,7 +86,7 @@ const GroupStudents = ({
     try {
       setLoading(true);
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/assessment/groups/auto_split/",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/groups/auto_split/`,
         {
           assessment_id: assessmentId,
           group_size: groupSize === "" ? 0 : Number(groupSize),
@@ -130,7 +130,7 @@ const GroupStudents = ({
     try {
       setCreateGroupLoading(true);
       await axios.post(
-        "https://ihsaanlms.onrender.com/assessment/groups/",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/groups/`,
         {
           name: newGroupName,
           assessment: assessmentId,
@@ -163,7 +163,7 @@ const GroupStudents = ({
     try {
       setAddLoading(true);
       await axios.post(
-        `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/add_members/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/groups/${groupId}/add_members/`,
         {
           student_ids: memberIds,
         },
@@ -188,7 +188,7 @@ const GroupStudents = ({
     try {
       setRemovingMemberId(memberIds[0]);
       await axios.post(
-        `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/remove_members/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/groups/${groupId}/remove_members/`,
         {
           student_ids: memberIds,
         },
@@ -218,7 +218,7 @@ const GroupStudents = ({
   const updateGroupLeader = async (groupId, newLeaderId) => {
     try {
       await axios.patch(
-        `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/groups/${groupId}/`,
         { leader: newLeaderId, assessment: assessmentId },
         {
           headers: {
@@ -237,7 +237,7 @@ const GroupStudents = ({
   const updateGroupName = async (groupId, newName) => {
     try {
       const response = await axios.patch(
-        `https://ihsaanlms.onrender.com/assessment/groups/${groupId}/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/groups/${groupId}/`,
         { name: newName, assessment: assessmentId },
         {
           headers: {

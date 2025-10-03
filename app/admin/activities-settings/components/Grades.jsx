@@ -33,14 +33,14 @@ const Grades = () => {
 
   const { data: sessionData, isFetching: isFetchingSessions } = useFetch(
     "academicSession",
-    `https://ihsaanlms.onrender.com/academic-sessions/`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/academic-sessions/`
   );
   const Sessions = sessionData?.data?.results || [];
 
   const { data: termData, isFetching: isFetchingTerms } = useFetch(
     "terms",
     selectedSession
-      ? `https://ihsaanlms.onrender.com/terms/?session=${selectedSession}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/?session=${selectedSession}`
       : null
   );
   const Terms = termData?.data?.results || [];
@@ -52,7 +52,7 @@ const Grades = () => {
   } = useFetch(
     ["grades", selectedSession, selectedTerm, page],
     selectedSession && selectedTerm
-      ? `https://ihsaanlms.onrender.com/assessment/grades/?session=${selectedSession}&term=${selectedTerm}&page=${page}&page_size=15`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grades/?session=${selectedSession}&term=${selectedTerm}&page=${page}&page_size=15`
       : null,
     (data) => {
       if (data?.total) setTotalGrades(data.total);
@@ -62,7 +62,7 @@ const Grades = () => {
   const Grades = gradeData?.data?.results || [];
 
   const { mutate: deleteGrade, isLoading: isDeleting } = useDelete(
-    "https://ihsaanlms.onrender.com/assessment/grades",
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grades`,
     {
       onSuccess: () => {
         toast.success("Grade deleted successfully");

@@ -46,7 +46,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
     refetch,
   } = useFetch(
     "questions",
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/random-for-assessment/?page_size=${quizData?.mcq_question_count}&assessment_id=${quizData?.id}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/random-for-assessment/?page_size=${quizData?.mcq_question_count}&assessment_id=${quizData?.id}`,
     (data) => {},
     (error) => {
       toast.error(
@@ -122,7 +122,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
 
   // Mutation for submitting the quiz
   const { mutate: submitQuiz, isLoading: submittingQuiz } = usePost(
-    `https://ihsaanlms.onrender.com/assessment/mcquestions/submit-answers/?assessment_id=${quizData?.id}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/mcquestions/submit-answers/?assessment_id=${quizData?.id}`,
     {
       onSuccess: (response) => {
         toast.success("Quiz submitted successfully");

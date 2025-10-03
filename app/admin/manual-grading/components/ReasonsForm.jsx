@@ -10,11 +10,11 @@ import Swal from "sweetalert2";
 
 const ReasonsForm = ({ reason = null, isEdit = false, onClose, onSuccess }) => {
   const { mutate: createManualGradeReason, isLoading: isCreating } = usePost(
-    "https://ihsaanlms.onrender.com/assessment/reason-options/"
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/reason-options/`
   );
 
   const { mutate: updateManualGradeReason, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/assessment/reason-options/${reason?.id}/`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/reason-options/${reason?.id}/`
   );
 
   const initialValues = {

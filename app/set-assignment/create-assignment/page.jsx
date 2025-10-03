@@ -40,7 +40,7 @@ const CreateAssignment = () => {
     refetch,
   } = useFetch(
     "courses",
-    `https://ihsaanlms.onrender.com/course/courses/?page_size=${
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page_size=${
       fetchAll ? totalCourses : 10
     }`,
     (data) => {
@@ -56,7 +56,7 @@ const CreateAssignment = () => {
 
   // usePost for form submission
   const { mutate: submitAssignment, isLoading: submittingAssignment } = usePost(
-    "https://ihsaanlms.onrender.com/assessment/base/"
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/`
   );
 
   const initialValues = {

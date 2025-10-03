@@ -28,7 +28,7 @@ const GroupAssignmentPage = () => {
   } = useFetch(
     `assignment-${assignmentId}`,
     assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/base/${assignmentId}/`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/${assignmentId}/`
       : null,
     (data) => {
       toast.success("Assignment fetched successfully");
@@ -38,32 +38,11 @@ const GroupAssignmentPage = () => {
     }
   );
 
-  // const {
-  //   isLoading: isLoadingGroups,
-  //   data: GroupData,
-  //   refetch: refetchGropus,
-  //   isFetching: isFetchingGroups,
-  //   error,
-  // } = useFetch(
-  //   ["groups", assignmentId],
-  //   assignmentId
-  //     ? `https://ihsaanlms.onrender.com/assessment/groups/?assessment=${assignmentId}`
-  //     : null,
-  //   (data) => {
-  //     toast.success("Assignment fetched successfully");
-  //   },
-  //   (error) => {
-  //     toast.error(
-  //       error.response?.data?.message || "Error fetching assignment groups"
-  //     );
-  //   }
-  // );
-
   const fetchGroups = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/assessment/groups/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/groups/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -89,7 +68,7 @@ const GroupAssignmentPage = () => {
   } = useFetch(
     `submission-${assignmentId}`,
     assignmentId
-      ? `https://ihsaanlms.onrender.com/assessment/base/${assignmentId}/student_submissions/`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/${assignmentId}/student_submissions/`
       : null,
     (data) => {
       toast.success("Submission fetched successfully");
@@ -220,9 +199,11 @@ const GroupAssignmentPage = () => {
             <div>
               <p className="text-gray-700">
                 You are a group member. Only your group leader can submit this
-                assignment.
+                assignment or do anything relating to it.
               </p>
-              <p>Contact your group leader to handle submission.</p>
+              <p>
+                Contact your group leader to handle submission or view score.
+              </p>
             </div>
           )}
 

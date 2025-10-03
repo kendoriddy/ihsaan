@@ -54,7 +54,7 @@ const AllQuiz = () => {
   // Fetch courses for filter
   const { data: coursesData, isLoading: coursesLoading } = useFetch(
     "courses",
-    `https://ihsaanlms.onrender.com/course/courses/?page_size=${
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page_size=${
       fetchAllCourses ? totalCourses : 10
     }`,
     (data) => {
@@ -69,7 +69,7 @@ const AllQuiz = () => {
   const { data: courseSectionsData, isLoading: sectionsLoading } = useFetch(
     "courseSections",
     selectedCourseId
-      ? `https://ihsaanlms.onrender.com/course/course-sections/?course=${selectedCourseId}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-sections/?course=${selectedCourseId}`
       : null
   );
 

@@ -9,7 +9,7 @@ import React from "react";
 
 const CreateTerm = () => {
   const { mutate: createTerm, isLoading: isCreatingTerm } = usePost(
-    "https://ihsaanlms.onrender.com/terms/",
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms/`,
     {
       onSuccess: (response) => {
         toast.success("Term created successfully");
@@ -36,7 +36,7 @@ const CreateTerm = () => {
   };
   const { isLoading, data, refetch, isFetching } = useFetch(
     "academicSession",
-    `https://ihsaanlms.onrender.com/academic-sessions/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/academic-sessions/`,
     (data) => {}
   );
   const Sessions = data?.data?.results || [];

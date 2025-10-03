@@ -18,7 +18,7 @@ const EditGrade = ({
   refetchGrades,
 }) => {
   const { mutate: updateGrade, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/assessment/grades/${selectedGrade?.id}/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grades/${selectedGrade?.id}/`,
     {
       onSuccess: () => {
         toast.success("Grade updated successfully");

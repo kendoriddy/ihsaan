@@ -21,7 +21,7 @@ const EditSession = ({
 
   // Update function with body
   const { mutate: updateSession, isLoading: isUpdating } = usePatch(
-    `https://ihsaanlms.onrender.com/academic-sessions/${selectedSession?.id}/`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/academic-sessions/${selectedSession?.id}/`,
     {
       onSuccess: () => {
         toast.success("Session Updated successfully");

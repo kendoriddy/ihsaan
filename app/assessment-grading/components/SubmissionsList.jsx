@@ -36,7 +36,7 @@ const SubmissionsList = ({ assessmentId }) => {
   } = useFetch(
     "submissions",
     assessmentId
-      ? `https://ihsaanlms.onrender.com/assessment/uploads/?assessment=${assessmentId}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/uploads/?assessment=${assessmentId}`
       : null
   );
 
@@ -44,7 +44,7 @@ const SubmissionsList = ({ assessmentId }) => {
   const { data: gradesData, refetch: refetchGrades } = useFetch(
     "grades",
     assessmentId
-      ? `https://ihsaanlms.onrender.com/assessment/grades/?assessment=${assessmentId}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grades/?assessment=${assessmentId}`
       : null
   );
 
@@ -52,20 +52,21 @@ const SubmissionsList = ({ assessmentId }) => {
   const { data: commentsData, refetch: refetchComments } = useFetch(
     "comments",
     selectedSubmission?.grade_id
-      ? `https://ihsaanlms.onrender.com/assessment/grade-comments/?grade_id=${selectedSubmission.grade_id}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grade-comments/?grade=${selectedSubmission.grade_id}`
+
       : null
   );
 
   const { mutate: submitGrade, isLoading: submittingGrade } = usePost(
-    "https://ihsaanlms.onrender.com/assessment/grades/"
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grades/`
   );
 
   const { mutate: updateGrade, isLoading: updatingGrade } = usePut2(
-    `https://ihsaanlms.onrender.com/assessment/grades/`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grades/`
   );
 
   const { mutate: submitComment, isLoading: submittingComment } = usePost(
-    "https://ihsaanlms.onrender.com/assessment/grade-comments/"
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grade-comments/`
   );
 
   // keep grades updated
@@ -115,7 +116,7 @@ const SubmissionsList = ({ assessmentId }) => {
       // PATCH existing grade
       updateGrade(
         {
-          url: `https://ihsaanlms.onrender.com/assessment/grades/${existingGrade.id}/`,
+          url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grades/${existingGrade.id}/`,
           // id: existingGrade.id,
           data: payload,
         },
