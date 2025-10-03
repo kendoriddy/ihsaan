@@ -198,9 +198,9 @@ export default function StudentNotificationPage({
             >
               <Refresh className="w-5 h-5" />
             </button>
-            <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+            {/* <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
               <Settings className="w-5 h-5" />
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

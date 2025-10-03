@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import Header from "@/components/Header";
 import StudentNotificationPage from "@/components/notifications/student-notification-page";
@@ -17,6 +17,7 @@ import {
   resetMarkReadStatus,
   resetMarkAllReadStatus,
   resetDeleteStatus,
+  fetchNotificationById,
 } from "@/utils/redux/slices/notificationSlice";
 import Swal from "sweetalert2";
 import Layout from "@/components/Layout";
@@ -37,6 +38,7 @@ function Page() {
   } = useSelector((state) => state.notifications);
 
   const currentRoute = usePathname();
+  const searchParams = useSearchParams();
 
   // Fetch notifications, recent notifications, and unread count on component mount
   useEffect(() => {
@@ -44,6 +46,14 @@ function Page() {
     dispatch(fetchRecentNotifications());
     dispatch(fetchUnreadCount());
   }, [dispatch]);
+
+  // Handle selected notification from URL parameter
+  useEffect(() => {
+    const selectedNotificationId = searchParams.get("selected");
+    if (selectedNotificationId) {
+      dispatch(fetchNotificationById(selectedNotificationId));
+    }
+  }, [dispatch, searchParams]);
 
   // Handle success/error messages
   useEffect(() => {

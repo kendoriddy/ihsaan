@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 
 const Comments = ({ gradeId }) => {
   const [comment, setComment] = useState("");
-
+  console.log("gradeId:::", gradeId);
   // Fetch comments for the grade
   const { data: commentsData, refetch: refetchComments } = useFetch(
     "comments",

@@ -32,7 +32,7 @@ const StudentRegistrationFlow = ({ setOpen, selectedProgramme = null }) => {
   const [registrationStatus, setRegistrationStatus] = useState(null); // null, 'success', 'error'
   const [isLoading, setIsLoading] = useState(false);
   const [registrationData, setRegistrationData] = useState(null); // Store the full API response
-
+  console.log("registrationData:", registrationData);
   const handleRegistration = async (formData) => {
     setIsLoading(true);
 

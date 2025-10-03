@@ -31,6 +31,61 @@ export const fetchFeedbacks = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch feedbacks using current state filters
+export const fetchFeedbacksWithCurrentFilters = createAsyncThunk(
+  "feedback/fetchFeedbacksWithCurrentFilters",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState();
+      const { filters } = state.feedback;
+
+      // Check cache first
+      const cacheKey = JSON.stringify(filters);
+      const cached = state.feedback.cache[cacheKey];
+
+      // Return cached data if it's less than 5 minutes old
+      if (cached && Date.now() - cached.timestamp < 5 * 60 * 1000) {
+        return {
+          results: cached.feedbacks,
+          count: cached.total_count,
+          next: cached.next,
+          previous: cached.previous,
+          fromCache: true,
+        };
+      }
+
+      const params = new URLSearchParams();
+
+      // Add filters to query params, excluding 'all' values
+      Object.keys(filters).forEach((key) => {
+        const value = filters[key];
+        if (
+          value !== undefined &&
+          value !== null &&
+          value !== "" &&
+          value !== "all"
+        ) {
+          // Handle special cases
+          if (key === "is_resolved") {
+            params.append(key, value === "resolved");
+          } else {
+            params.append(key, value);
+          }
+        }
+      });
+
+      const response = await http2.get(
+        `/feedback-ticket/feedbacks/?${params.toString()}`
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch feedbacks"
+      );
+    }
+  }
+);
+
 // Async thunk to fetch single feedback by ID
 export const fetchFeedbackById = createAsyncThunk(
   "feedback/fetchFeedbackById",
@@ -137,6 +192,9 @@ const feedbackSlice = createSlice({
     total_count: 0,
     next: null,
     previous: null,
+    current_page: 1,
+    total_pages: 1,
+    page_size: 10,
     status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     fetchDetailStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     createStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
@@ -149,6 +207,16 @@ const feedbackSlice = createSlice({
     updateError: null,
     deleteError: null,
     uploadResourceError: null,
+    // Filter state management
+    filters: {
+      subject: "all", // 'all' | 'course' | 'book' | 'platform' | 'tutor' | 'other'
+      is_resolved: "all", // 'all' | 'resolved' | 'active'
+      search: "",
+      page: 1,
+      page_size: 10,
+    },
+    // Cache for different filter combinations
+    cache: {},
   },
   reducers: {
     clearErrors: (state) => {
@@ -183,7 +251,34 @@ const feedbackSlice = createSlice({
       state.selectedFeedback = null;
     },
     setFeedbackFilters: (state, action) => {
-      // This can be used to store current filters in state if needed
+      state.filters = { ...state.filters, ...action.payload };
+    },
+    setSubjectFilter: (state, action) => {
+      state.filters.subject = action.payload;
+      state.filters.page = 1; // Reset to first page when filter changes
+    },
+    setStatusFilter: (state, action) => {
+      state.filters.is_resolved = action.payload;
+      state.filters.page = 1; // Reset to first page when filter changes
+    },
+    setSearchFilter: (state, action) => {
+      state.filters.search = action.payload;
+      state.filters.page = 1; // Reset to first page when filter changes
+    },
+    setPage: (state, action) => {
+      state.filters.page = action.payload;
+    },
+    clearFilters: (state) => {
+      state.filters = {
+        subject: "all",
+        is_resolved: "all",
+        search: "",
+        page: 1,
+        page_size: 10,
+      };
+    },
+    clearCache: (state) => {
+      state.cache = {};
     },
   },
   extraReducers: (builder) => {
@@ -195,13 +290,64 @@ const feedbackSlice = createSlice({
       })
       .addCase(fetchFeedbacks.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.feedbacks = action.payload.results || action.payload;
-        state.total_count = action.payload.count || 0;
-        state.next = action.payload.next;
-        state.previous = action.payload.previous;
+        state.feedbacks = action.payload.results || [];
+        state.total_count = action.payload.total || 0;
+        state.next = action.payload.links?.next;
+        state.previous = action.payload.links?.previous;
+        state.current_page = action.payload.current_page || 1;
+        state.total_pages = action.payload.total_pages || 1;
+        state.page_size = action.payload.page_size || 10;
         state.error = null;
+
+        // Cache the results for this filter combination
+        const cacheKey = JSON.stringify(state.filters);
+        state.cache[cacheKey] = {
+          feedbacks: action.payload.results || [],
+          total_count: action.payload.total || 0,
+          next: action.payload.links?.next,
+          previous: action.payload.links?.previous,
+          current_page: action.payload.current_page || 1,
+          total_pages: action.payload.total_pages || 1,
+          page_size: action.payload.page_size || 10,
+          timestamp: Date.now(),
+        };
       })
       .addCase(fetchFeedbacks.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to fetch feedbacks";
+      })
+      // Fetch feedbacks with current filters
+      .addCase(fetchFeedbacksWithCurrentFilters.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchFeedbacksWithCurrentFilters.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.feedbacks = action.payload.results || [];
+        state.total_count = action.payload.total || 0;
+        state.next = action.payload.links?.next;
+        state.previous = action.payload.links?.previous;
+        state.current_page = action.payload.current_page || 1;
+        state.total_pages = action.payload.total_pages || 1;
+        state.page_size = action.payload.page_size || 10;
+        state.error = null;
+
+        // Only cache if not from cache
+        if (!action.payload.fromCache) {
+          const cacheKey = JSON.stringify(state.filters);
+          state.cache[cacheKey] = {
+            feedbacks: action.payload.results || [],
+            total_count: action.payload.total || 0,
+            next: action.payload.links?.next,
+            previous: action.payload.links?.previous,
+            current_page: action.payload.current_page || 1,
+            total_pages: action.payload.total_pages || 1,
+            page_size: action.payload.page_size || 10,
+            timestamp: Date.now(),
+          };
+        }
+      })
+      .addCase(fetchFeedbacksWithCurrentFilters.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to fetch feedbacks";
       })
@@ -285,6 +431,12 @@ export const {
   resetUploadResourceStatus,
   clearSelectedFeedback,
   setFeedbackFilters,
+  setSubjectFilter,
+  setStatusFilter,
+  setSearchFilter,
+  setPage,
+  clearFilters,
+  clearCache,
 } = feedbackSlice.actions;
 
 export default feedbackSlice.reducer;

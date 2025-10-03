@@ -11,7 +11,7 @@ import {
   CalendarToday,
   Save,
   Edit,
-  Eye,
+  Visibility,
 } from "@mui/icons-material";
 
 // Debug icon imports
@@ -25,7 +25,7 @@ console.log("Icon imports:", {
   CalendarToday: !!CalendarToday,
   Save: !!Save,
   Edit: !!Edit,
-  Eye: !!Eye,
+  Visibility: !!Visibility,
 });
 
 export default function AnnouncementViewEditModal({
@@ -279,7 +279,7 @@ export default function AnnouncementViewEditModal({
                 {isEditing ? (
                   <Edit className="w-6 h-6 text-red-800" />
                 ) : (
-                  <Eye className="w-6 h-6 text-red-800" />
+                  <Visibility className="w-6 h-6 text-red-800" />
                 )}
               </div>
               <div>
