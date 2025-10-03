@@ -4,7 +4,7 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import Badge from "@mui/material/Badge";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { IMAGES } from "@/constants";
 import Image from "next/image";
@@ -16,6 +16,10 @@ import {
 import { logoutUser } from "@/utils/redux/slices/auth.reducer";
 import { useDispatch } from "react-redux";
 import { fetchProgrammes } from "@/utils/redux/slices/programmeSlice";
+import {
+  fetchRecentNotifications,
+  fetchUnreadCount,
+} from "@/utils/redux/slices/notificationSlice";
 import CartDrawer from "./CartDrawer";
 import Modal from "./validation/Modal";
 import { toast } from "react-toastify";
@@ -26,7 +30,12 @@ import { countryNames, allPossibleQualifications } from "@/utils/utilFunctions";
 import { useFetch, usePost, useProfileUpdate } from "@/hooks/useHttp/useHttp";
 import Loader from "./Loader";
 import { useQueryClient } from "@tanstack/react-query";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import {
+  Visibility,
+  VisibilityOff,
+  Notifications,
+  Refresh,
+} from "@mui/icons-material";
 import {
   IconButton,
   InputAdornment,
@@ -71,8 +80,77 @@ function Header() {
   const signedInUserName = useSelector(currentlyLoggedInUser);
   const { itemCount } = useSelector((state) => state.cart);
   const programmesState = useSelector((state) => state.programme);
-  const programmes = programmesState?.programmes || [];
+  const { recentNotifications, unreadCount, recentStatus, unreadCountStatus } =
+    useSelector((state) => state.notifications);
+  const rawProgrammes = programmesState?.programmes || [];
   const programmesStatus = programmesState?.status || "idle";
+
+  // Filter and modify programmes data
+  const programmes = (() => {
+    // Only keep Nahu programme from backend data
+    const nahuProgramme = rawProgrammes.find(
+      (p) => p.name && p.name.toLowerCase().includes("nahu")
+    );
+
+    // Create the modified programmes array
+    const modifiedProgrammes = [];
+
+    // Add Nahu programme with Arabic name if found
+    if (nahuProgramme) {
+      modifiedProgrammes.push({
+        ...nahuProgramme,
+        name: "نحو", // Arabic name for Nahu
+      });
+    }
+
+    // Add manual programmes with Arabic names
+    const manualProgrammes = [
+      {
+        id: "primary-programme-001",
+        name: "الابتدائية", // Primary in Arabic
+        code: "PRM001",
+        type: 1,
+        type_name: "STANDARD",
+        class_group: 1,
+        class_group_name: "Primary",
+        special_type: null,
+        level: null,
+        duration_months: 12,
+        price: "0.00",
+        courses: [],
+      },
+      {
+        id: "junior-sec-programme-002",
+        name: "والإعدادية", // Junior Secondary in Arabic
+        code: "JSC001",
+        type: 2,
+        type_name: "STANDARD",
+        class_group: 2,
+        class_group_name: "Junior Secondary",
+        special_type: null,
+        level: null,
+        duration_months: 12,
+        price: "0.00",
+        courses: [],
+      },
+      {
+        id: "senior-sec-programme-003",
+        name: "والثانوية", // Senior Secondary in Arabic
+        code: "SSC001",
+        type: 3,
+        type_name: "STANDARD",
+        class_group: 3,
+        class_group_name: "Senior Secondary",
+        special_type: null,
+        level: null,
+        duration_months: 12,
+        price: "0.00",
+        courses: [],
+      },
+    ];
+
+    return [...modifiedProgrammes, ...manualProgrammes];
+  })();
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
@@ -97,6 +175,9 @@ function Header() {
     useState(null);
   const [mobileQuranTutorsMenuAnchorEl, setMobileQuranTutorsMenuAnchorEl] =
     useState(null);
+  const [notificationMenuAnchorEl, setNotificationMenuAnchorEl] =
+    useState(null);
+  const mobileNotificationRef = useRef(null);
 
   const intialValues = {
     first_name: authenticatedUsersPayload?.first_name || "",
@@ -149,6 +230,26 @@ function Header() {
       dispatch(fetchProgrammes({ page: 1, pageSize: 10 }));
     }
   }, [dispatch, programmesStatus]);
+
+  // Fetch notifications if user is authenticated
+  useEffect(() => {
+    if (isAuth && token) {
+      dispatch(fetchRecentNotifications());
+      dispatch(fetchUnreadCount());
+    }
+  }, [dispatch, isAuth, token]);
+
+  // Refresh notifications periodically
+  useEffect(() => {
+    if (isAuth && token) {
+      const interval = setInterval(() => {
+        dispatch(fetchRecentNotifications());
+        dispatch(fetchUnreadCount());
+      }, 30000); // Refresh every 30 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [dispatch, isAuth, token]);
 
   const handleOpenModal = (mode) => {
     setOpen(true);
@@ -229,6 +330,31 @@ function Header() {
 
   const handleMobileQuranTutorsMenuClose = () => {
     setMobileQuranTutorsMenuAnchorEl(null);
+  };
+
+  // Notification menu handlers
+  const handleNotificationMenuOpen = (event) => {
+    setNotificationMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationMenuClose = () => {
+    setNotificationMenuAnchorEl(null);
+  };
+
+  const handleNotificationClick = (notification) => {
+    handleNotificationMenuClose();
+    // Navigate to notifications page with the selected notification
+    router.push(`/dashboard/notifications?selected=${notification.id}`);
+  };
+
+  const handleViewAllNotifications = () => {
+    handleNotificationMenuClose();
+    router.push("/dashboard/notifications");
+  };
+
+  const handleRefreshNotifications = () => {
+    dispatch(fetchRecentNotifications());
+    dispatch(fetchUnreadCount());
   };
 
   console.log(token, "getAuthUserInformation", getAuthUserInformation);
@@ -610,6 +736,136 @@ function Header() {
               </Link>
             </li>
 
+            {isAuth && (
+              <li>
+                <button
+                  onClick={handleNotificationMenuOpen}
+                  className="navlink cursor-pointer"
+                >
+                  <Badge badgeContent={unreadCount || 0} color="error">
+                    <Notifications />
+                  </Badge>
+                </button>
+                <Menu
+                  anchorEl={notificationMenuAnchorEl}
+                  open={Boolean(notificationMenuAnchorEl)}
+                  onClose={handleNotificationMenuClose}
+                  PaperProps={{
+                    sx: {
+                      mt: 1,
+                      minWidth: 350,
+                      maxWidth: 400,
+                      maxHeight: 500,
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                      borderRadius: 2,
+                    },
+                  }}
+                >
+                  <div className="p-4 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-800">
+                          Notifications
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {unreadCount > 0
+                            ? `${unreadCount} unread`
+                            : "All caught up!"}
+                        </p>
+                      </div>
+                      <IconButton
+                        onClick={handleRefreshNotifications}
+                        size="small"
+                        sx={{
+                          color: "#6b7280",
+                          "&:hover": {
+                            backgroundColor: "#f3f4f6",
+                            color: "#374151",
+                          },
+                        }}
+                      >
+                        <Refresh className="w-4 h-4" />
+                      </IconButton>
+                    </div>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {recentStatus === "loading" ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-2"></div>
+                        <p className="text-sm">Loading notifications...</p>
+                      </div>
+                    ) : recentNotifications &&
+                      recentNotifications.length > 0 ? (
+                      recentNotifications.slice(0, 5).map((notification) => (
+                        <MenuItem
+                          key={notification.id}
+                          onClick={() => handleNotificationClick(notification)}
+                          sx={{
+                            padding: "12px 16px",
+                            borderBottom: "1px solid #f3f4f6",
+                            "&:hover": {
+                              backgroundColor: "#f9fafb",
+                            },
+                          }}
+                        >
+                          <div className="flex items-start gap-3 w-full">
+                            <div
+                              className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                                !notification.is_read
+                                  ? "bg-blue-500"
+                                  : "bg-gray-300"
+                              }`}
+                            ></div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-800 truncate">
+                                {notification.title}
+                              </p>
+                              <p
+                                className="text-xs text-gray-600 mt-1"
+                                style={{
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: "vertical",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {notification.time_since_created || "Just now"}
+                              </p>
+                            </div>
+                          </div>
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-gray-500">
+                        <Notifications className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                        <p className="text-sm">No recent notifications</p>
+                      </div>
+                    )}
+                  </div>
+                  {recentNotifications && recentNotifications.length > 0 && (
+                    <div className="p-2 border-t border-gray-200">
+                      <Button
+                        onClick={handleViewAllNotifications}
+                        fullWidth
+                        sx={{
+                          textTransform: "none",
+                          color: "#f97316",
+                          fontWeight: "medium",
+                          "&:hover": {
+                            backgroundColor: "#fef3f2",
+                          },
+                        }}
+                      >
+                        View All Notifications
+                      </Button>
+                    </div>
+                  )}
+                </Menu>
+              </li>
+            )}
             <li>
               <button
                 onClick={() => setIsCartDrawerOpen(true)}
@@ -749,6 +1005,18 @@ function Header() {
             <div className="flex items-center gap-2">
               <div className={`  flex items-center gap-2`}>
                 <ul className="hidden gap-2 md:flex items-center">
+                  {isAuth && (
+                    <li>
+                      <button
+                        onClick={handleNotificationMenuOpen}
+                        className="navlink cursor-pointer"
+                      >
+                        <Badge badgeContent={unreadCount || 0} color="error">
+                          <Notifications />
+                        </Badge>
+                      </button>
+                    </li>
+                  )}
                   <li>
                     <button
                       onClick={() => setIsCartDrawerOpen(true)}
@@ -989,6 +1257,29 @@ function Header() {
                     Blog
                   </Link>
                 </li>
+
+                {/* Mobile Notifications */}
+                {isAuth && (
+                  <li>
+                    <button
+                      ref={mobileNotificationRef}
+                      onClick={() => {
+                        handleNotificationMenuOpen({
+                          currentTarget: mobileNotificationRef.current,
+                        });
+                      }}
+                      className="navlink cursor-pointer flex items-center gap-2"
+                    >
+                      <Notifications />
+                      <span>Notifications</span>
+                      {unreadCount > 0 && (
+                        <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                )}
 
                 {!isAuth && (
                   <li>

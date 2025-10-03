@@ -53,6 +53,7 @@ const SubmissionsList = ({ assessmentId }) => {
     "comments",
     selectedSubmission?.grade_id
       ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grade-comments/?grade=${selectedSubmission.grade_id}`
+
       : null
   );
 

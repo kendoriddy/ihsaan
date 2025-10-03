@@ -70,51 +70,6 @@ function AdminDashboardHeader({ toggleSidebar }) {
 
       {/* right */}
       <div className="flex items-center  gap-6">
-        {/* Notification */}
-        <div className="relative ">
-          <Badge
-            badgeContent={4}
-            color="primary"
-            className="navlink cursor-pointer"
-            onClick={toggleNotification}
-          >
-            <NotificationsActiveIcon />
-          </Badge>
-          <div
-            className={`absolute left-[-250px] lg:left-[-275px] overflow-hidden bg-gray-300 transition-all duration-300 rounded-md border  ${
-              isNotificationOpen
-                ? "h-[320px] w-[280px] lg:w-[300px]"
-                : "h-0 w-0 overflow-hidden"
-            }`}
-          >
-            <div className="h-full w-full relative">
-              {/* Top */}
-              <div className="flex justify-between items-center h-[40px] bg-gray-400 px-2">
-                <span>Notifications</span>
-                <span className="link ">Clear</span>
-              </div>
-              {/* Mid */}
-              <div className="flex-1 h-[240px] overflow-y-scroll ">
-                {ADMINDASHBOARD.notifications?.map((notification, index) => (
-                  <div
-                    key={index}
-                    className="even:bg-gray-200 px-4 py-2 cursor-pointer hover:bg-gray-100"
-                  >
-                    <div>{notification.message}</div>
-                    <div className="text-xs text-gray-900">
-                      {notification.time}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* Bottom */}
-              <div className="flex justify-center items-center text-center h-[40px] bg-gray-400 absolute left-0 bottom-0 w-full cursor-pointer hover:bg-gray-500 hover:text-white">
-                <Link href="/admin/notifications">View all notifications</Link>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div>
           <div
             id="basic-button"

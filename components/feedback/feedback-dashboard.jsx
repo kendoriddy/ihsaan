@@ -32,11 +32,124 @@ export default function FeedbackDashboard({
   const [filterType, setFilterType] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
+  const [userData, setUserData] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
+  const [receivedFeedbacks, setReceivedFeedbacks] = useState([]);
+  const [receivedFeedbacksStatus, setReceivedFeedbacksStatus] =
+    useState("idle");
+  const [receivedFeedbacksError, setReceivedFeedbacksError] = useState(null);
+  const [receivedFeedbacksPagination, setReceivedFeedbacksPagination] =
+    useState({
+      count: 0,
+      next: null,
+      previous: null,
+    });
 
   const dispatch = useDispatch();
   const { feedbacks, total_count, next, previous } = useSelector(
     (state) => state.feedback
   );
+
+  // Helper function to get user email from localStorage
+  const getUserEmail = () => {
+    if (typeof window !== "undefined") {
+      const userData = localStorage.getItem("userFullData");
+      if (userData) {
+        try {
+          const parsedUserData = JSON.parse(userData);
+          const email = parsedUserData.email;
+          setUserEmail(email); // Update state
+          return email;
+        } catch (error) {
+          console.error("Error parsing user data from localStorage:", error);
+        }
+      }
+    }
+    return null;
+  };
+
+  // Fetch user data and email on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userResponse = await fetch(
+          "https://ihsaanlms.onrender.com/api/auth/logged-in-user/",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          setUserData(userData);
+          // Also set user email from API response if not already set
+          if (!userEmail && userData.email) {
+            setUserEmail(userData.email);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    // Get user email from localStorage immediately
+    const email = getUserEmail();
+    if (email) {
+      setUserEmail(email);
+    }
+
+    fetchUserData();
+  }, [userEmail]);
+
+  // Fetch received feedbacks for tutors
+  useEffect(() => {
+    const fetchReceivedFeedbacks = async () => {
+      if (userData && userRole === "tutor" && activeTab === "received") {
+        setReceivedFeedbacksStatus("loading");
+        try {
+          const params = new URLSearchParams({
+            subject: "tutor",
+            subject_id: userData.id,
+            page: currentPage,
+            page_size: pageSize,
+          });
+
+          const response = await fetch(
+            `https://ihsaanlms.onrender.com/feedback-ticket/feedbacks/?${params.toString()}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            setReceivedFeedbacks(data.results || []);
+            setReceivedFeedbacksPagination({
+              count: data.count || 0,
+              next: data.next,
+              previous: data.previous,
+            });
+            setReceivedFeedbacksError(null);
+          } else {
+            throw new Error("Failed to fetch received feedbacks");
+          }
+        } catch (error) {
+          console.error("Error fetching received feedbacks:", error);
+          setReceivedFeedbacksError(error.message);
+        } finally {
+          setReceivedFeedbacksStatus("succeeded");
+        }
+      }
+    };
+
+    fetchReceivedFeedbacks();
+  }, [userData, userRole, activeTab, currentPage, pageSize]);
 
   useEffect(() => {
     // Fetch feedbacks when filters change
@@ -44,10 +157,11 @@ export default function FeedbackDashboard({
       page: currentPage,
       page_size: pageSize,
       ...(filterType !== "all" && { subject: filterType }),
+      ...(userEmail && { user_email: userEmail }),
     };
 
     dispatch(fetchFeedbacks(filters));
-  }, [dispatch, filterType, currentPage, pageSize]);
+  }, [dispatch, filterType, currentPage, pageSize, userEmail]);
 
   const handleDeleteFeedback = (feedbackId) => {
     if (window.confirm("Are you sure you want to delete this feedback?")) {
@@ -56,12 +170,28 @@ export default function FeedbackDashboard({
   };
 
   const handleRefresh = () => {
-    const filters = {
-      page: currentPage,
-      page_size: pageSize,
-      ...(filterType !== "all" && { subject: filterType }),
-    };
-    dispatch(fetchFeedbacks(filters));
+    if (activeTab === "received" && userRole === "tutor") {
+      // Refresh received feedbacks - reset to page 1
+      setCurrentPage(1);
+      setReceivedFeedbacksStatus("loading");
+      setReceivedFeedbacksError(null);
+      // The useEffect will handle the actual fetch
+    } else {
+      // Refresh regular feedbacks
+      const filters = {
+        page: currentPage,
+        page_size: pageSize,
+        ...(filterType !== "all" && { subject: filterType }),
+        ...(userEmail && { user_email: userEmail }),
+      };
+      dispatch(fetchFeedbacks(filters));
+    }
+  };
+
+  // Handle tab change - reset pagination
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    setCurrentPage(1); // Reset to first page when switching tabs
   };
 
   const getEntityIcon = (entityType) => {
@@ -139,6 +269,12 @@ export default function FeedbackDashboard({
   };
 
   const getFeedbackData = () => {
+    // Handle received feedbacks for tutors
+    if (activeTab === "received" && userRole === "tutor") {
+      return receivedFeedbacks || [];
+    }
+
+    // Handle regular feedbacks (sent feedbacks)
     if (!feedbacks || feedbacks.length === 0) return [];
 
     // Debug: Log the feedback data structure
@@ -156,6 +292,18 @@ export default function FeedbackDashboard({
 
   const filteredFeedback = getFeedbackData();
 
+  // Check user roles from localStorage
+  const getUserRoles = () => {
+    if (typeof window !== "undefined") {
+      return JSON.parse(localStorage.getItem("roles") || "[]");
+    }
+    return [];
+  };
+
+  const userRoles = getUserRoles();
+  const isStudent = userRoles.includes("STUDENT");
+  const isTutor = userRoles.includes("TUTOR");
+
   const tabs = [
     {
       id: "sent",
@@ -167,7 +315,7 @@ export default function FeedbackDashboard({
       id: "received",
       label: "Feedback Received",
       icon: <Inbox className="w-4 h-4" />,
-      show: userRole === "student" || userRole === "tutor",
+      show: isTutor && !isStudent, // Only show for tutors, not for students
     },
     {
       id: "all",
@@ -199,7 +347,7 @@ export default function FeedbackDashboard({
               .map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => handleTabChange(tab.id)}
                   className={`px-6 py-4 font-medium transition-colors flex items-center gap-2 ${
                     activeTab === tab.id
                       ? "text-red-800 border-b-2 border-red-800 bg-red-50"
@@ -232,13 +380,25 @@ export default function FeedbackDashboard({
                 <option value="other">Other</option>
               </select>
               <span className="text-sm text-gray-600">
-                Showing {filteredFeedback.length} of {total_count} feedback
-                {total_count !== 1 ? "s" : ""}
+                Showing {filteredFeedback.length} of{" "}
+                {activeTab === "received" && userRole === "tutor"
+                  ? receivedFeedbacksPagination.count
+                  : total_count}{" "}
+                feedback
+                {(activeTab === "received" && userRole === "tutor"
+                  ? receivedFeedbacksPagination.count
+                  : total_count) !== 1
+                  ? "s"
+                  : ""}
               </span>
             </div>
             <button
               onClick={handleRefresh}
-              disabled={status === "loading"}
+              disabled={
+                status === "loading" ||
+                (activeTab === "received" &&
+                  receivedFeedbacksStatus === "loading")
+              }
               className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
               title="Refresh"
             >
@@ -249,18 +409,22 @@ export default function FeedbackDashboard({
 
         {/* Feedback List */}
         <div className="divide-y divide-gray-200">
-          {status === "loading" ? (
+          {status === "loading" ||
+          (activeTab === "received" &&
+            receivedFeedbacksStatus === "loading") ? (
             <div className="p-12 text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-800 mx-auto mb-4"></div>
               <p className="text-gray-500">Loading feedbacks...</p>
             </div>
-          ) : error ? (
+          ) : error || (activeTab === "received" && receivedFeedbacksError) ? (
             <div className="p-12 text-center">
               <FeedbackIcon className="w-16 h-16 text-red-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-red-800 mb-2">
                 Error loading feedbacks
               </h3>
-              <p className="text-red-500 mb-4">{error}</p>
+              <p className="text-red-500 mb-4">
+                {activeTab === "received" ? receivedFeedbacksError : error}
+              </p>
               <button
                 onClick={handleRefresh}
                 className="px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-900 transition-colors"
@@ -372,25 +536,47 @@ export default function FeedbackDashboard({
         </div>
 
         {/* Pagination */}
-        {total_count > pageSize && (
+        {((activeTab === "received" &&
+          userRole === "tutor" &&
+          receivedFeedbacksPagination.count > pageSize) ||
+          (activeTab !== "received" && total_count > pageSize)) && (
           <div className="p-4 bg-gray-50 border-t border-gray-200">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">
-                Page {currentPage} of {Math.ceil(total_count / pageSize)}
+                Page {currentPage} of{" "}
+                {Math.ceil(
+                  (activeTab === "received" && userRole === "tutor"
+                    ? receivedFeedbacksPagination.count
+                    : total_count) / pageSize
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() =>
                     setCurrentPage((prev) => Math.max(1, prev - 1))
                   }
-                  disabled={!previous || status === "loading"}
+                  disabled={
+                    (activeTab === "received" && userRole === "tutor"
+                      ? !receivedFeedbacksPagination.previous
+                      : !previous) ||
+                    status === "loading" ||
+                    (activeTab === "received" &&
+                      receivedFeedbacksStatus === "loading")
+                  }
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => setCurrentPage((prev) => prev + 1)}
-                  disabled={!next || status === "loading"}
+                  disabled={
+                    (activeTab === "received" && userRole === "tutor"
+                      ? !receivedFeedbacksPagination.next
+                      : !next) ||
+                    status === "loading" ||
+                    (activeTab === "received" &&
+                      receivedFeedbacksStatus === "loading")
+                  }
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next

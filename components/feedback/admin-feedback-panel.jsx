@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Feedback as FeedbackIcon,
   Person,
@@ -15,55 +16,53 @@ import {
   CheckCircle,
   Warning,
 } from "@mui/icons-material";
+import { CircularProgress } from "@mui/material";
+import {
+  fetchFeedbacksWithCurrentFilters,
+  updateFeedback,
+  deleteFeedback,
+  clearErrors,
+  setSubjectFilter,
+  setStatusFilter,
+  setSearchFilter,
+  setPage,
+  clearFilters,
+} from "@/utils/redux/slices/feedbackSlice";
 
 export default function AdminFeedbackPanel() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [filterType, setFilterType] = useState("all");
+  const dispatch = useDispatch();
   const [selectedFeedback, setSelectedFeedback] = useState(null);
 
-  // Mock data - replace with actual API calls
-  const mockFeedback = [
-    {
-      id: "1",
-      senderName: "Sarah Ahmed",
-      senderRole: "student",
-      receiverName: "Ahmad Hassan",
-      receiverRole: "tutor",
-      entityType: "tutor",
-      entityId: "tutor-123",
-      content: "Excellent teacher! Very patient and knowledgeable.",
-      rating: 5,
-      createdAt: "2024-01-15T10:30:00Z",
-      status: "active",
-    },
-    {
-      id: "2",
-      senderName: "Omar Khan",
-      senderRole: "student",
-      entityType: "platform",
-      entityId: "platform",
-      content: "The platform is great but needs better mobile optimization.",
-      rating: 4,
-      createdAt: "2024-01-14T14:20:00Z",
-      status: "active",
-    },
-    {
-      id: "3",
-      senderName: "Fatima Ali",
-      senderRole: "ordinary",
-      entityType: "course",
-      entityId: "course-456",
-      content:
-        "This course content is inappropriate and not suitable for children.",
-      rating: 1,
-      createdAt: "2024-01-13T09:15:00Z",
-      status: "flagged",
-    },
-  ];
+  // Redux state
+  const {
+    feedbacks,
+    total_count,
+    status,
+    error,
+    updateStatus,
+    deleteStatus,
+    filters,
+    current_page,
+    total_pages,
+    page_size,
+    next,
+    previous,
+  } = useSelector((state) => state.feedback);
 
-  const getEntityIcon = (entityType) => {
-    switch (entityType) {
+  // Fetch feedbacks on component mount and when filters change
+  useEffect(() => {
+    dispatch(fetchFeedbacksWithCurrentFilters());
+  }, [dispatch, filters]);
+
+  // Clear errors on component unmount
+  useEffect(() => {
+    return () => {
+      dispatch(clearErrors());
+    };
+  }, [dispatch]);
+
+  const getEntityIcon = (subject) => {
+    switch (subject) {
       case "course":
         return <MenuBook className="w-4 h-4" />;
       case "tutor":
@@ -79,29 +78,19 @@ export default function AdminFeedbackPanel() {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "flagged":
-        return "bg-red-100 text-red-800";
-      case "resolved":
-        return "bg-blue-100 text-blue-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  const getStatusColor = (isResolved) => {
+    if (isResolved) {
+      return "bg-blue-100 text-blue-800";
+    } else {
+      return "bg-green-100 text-green-800";
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "active":
-        return <CheckCircle className="w-4 h-4" />;
-      case "flagged":
-        return <Flag className="w-4 h-4" />;
-      case "resolved":
-        return <CheckCircle className="w-4 h-4" />;
-      default:
-        return <Warning className="w-4 h-4" />;
+  const getStatusIcon = (isResolved) => {
+    if (isResolved) {
+      return <CheckCircle className="w-4 h-4" />;
+    } else {
+      return <Warning className="w-4 h-4" />;
     }
   };
 
@@ -125,34 +114,95 @@ export default function AdminFeedbackPanel() {
     });
   };
 
-  const filteredFeedback = mockFeedback.filter((feedback) => {
-    const matchesSearch =
-      feedback.senderName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      feedback.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      feedback.entityType.toLowerCase().includes(searchTerm.toLowerCase());
+  // Since we're fetching filtered data from the API, we don't need client-side filtering
+  const filteredFeedback = feedbacks || [];
 
-    const matchesStatus =
-      filterStatus === "all" || feedback.status === filterStatus;
-    const matchesType =
-      filterType === "all" || feedback.entityType === filterType;
-
-    return matchesSearch && matchesStatus && matchesType;
-  });
-
-  const handleStatusChange = (feedbackId, newStatus) => {
-    console.log(`Changing feedback ${feedbackId} status to ${newStatus}`);
-    // Implement status change logic
+  const handleStatusChange = (feedbackId, isResolved) => {
+    dispatch(
+      updateFeedback({
+        feedbackId,
+        feedbackData: { is_resolved: isResolved },
+      })
+    );
   };
 
   const handleDelete = (feedbackId) => {
-    console.log(`Deleting feedback ${feedbackId}`);
-    // Implement delete logic
+    if (window.confirm("Are you sure you want to delete this feedback?")) {
+      dispatch(deleteFeedback(feedbackId));
+    }
   };
+
+  // Filter handlers using Redux actions
+  const handleSubjectFilterChange = (subject) => {
+    dispatch(setSubjectFilter(subject));
+  };
+
+  const handleStatusFilterChange = (status) => {
+    dispatch(setStatusFilter(status));
+  };
+
+  const handleSearchChange = (search) => {
+    dispatch(setSearchFilter(search));
+  };
+
+  const handleClearFilters = () => {
+    dispatch(clearFilters());
+  };
+
+  // Pagination handlers
+  const handlePageChange = (page) => {
+    dispatch(setPage(page));
+  };
+
+  const handleNextPage = () => {
+    if (next) {
+      dispatch(setPage(current_page + 1));
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (previous) {
+      dispatch(setPage(current_page - 1));
+    }
+  };
+
+  // Show loading state
+  if (status === "loading") {
+    return (
+      <div className="w-full flex items-center justify-center py-12">
+        <div className="flex flex-col items-center gap-4">
+          <CircularProgress size={40} />
+          <p className="text-gray-600">Loading feedback data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (status === "failed" && error) {
+    return (
+      <div className="w-full flex items-center justify-center py-12">
+        <div className="text-center">
+          <Warning className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-800 mb-2">
+            Failed to load feedback
+          </h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => dispatch(fetchFeedbacksWithCurrentFilters())}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -160,37 +210,9 @@ export default function AdminFeedbackPanel() {
             </div>
             <div>
               <div className="text-2xl font-bold text-gray-800">
-                {mockFeedback.length}
+                {total_count || 0}
               </div>
               <div className="text-sm text-gray-600">Total Feedback</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-800">
-                {mockFeedback.filter((f) => f.status === "active").length}
-              </div>
-              <div className="text-sm text-gray-600">Active</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-              <Flag className="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-800">
-                {mockFeedback.filter((f) => f.status === "flagged").length}
-              </div>
-              <div className="text-sm text-gray-600">Flagged</div>
             </div>
           </div>
         </div>
@@ -202,12 +224,16 @@ export default function AdminFeedbackPanel() {
             </div>
             <div>
               <div className="text-2xl font-bold text-gray-800">
-                {(
-                  mockFeedback.reduce((sum, f) => sum + f.rating, 0) /
-                  mockFeedback.length
-                ).toFixed(1)}
+                {feedbacks.length > 0
+                  ? (
+                      feedbacks.reduce((sum, f) => sum + (f.rating || 0), 0) /
+                      feedbacks.length
+                    ).toFixed(1)
+                  : "0.0"}
               </div>
-              <div className="text-sm text-gray-600">Avg Rating</div>
+              <div className="text-sm text-gray-600">
+                Avg Rating (Current Page)
+              </div>
             </div>
           </div>
         </div>
@@ -223,8 +249,8 @@ export default function AdminFeedbackPanel() {
               <input
                 type="text"
                 placeholder="Search feedback..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={filters.search}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700"
               />
             </div>
@@ -232,28 +258,35 @@ export default function AdminFeedbackPanel() {
             {/* Filters */}
             <div className="flex gap-3">
               <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                value={filters.is_resolved}
+                onChange={(e) => handleStatusFilterChange(e.target.value)}
                 className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
-                <option value="flagged">Flagged</option>
                 <option value="resolved">Resolved</option>
               </select>
 
               <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
+                value={filters.subject}
+                onChange={(e) => handleSubjectFilterChange(e.target.value)}
                 className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
               >
                 <option value="all">All Types</option>
                 <option value="course">Courses</option>
                 <option value="tutor">Tutors</option>
-                <option value="student">Students</option>
+                <option value="book">Books</option>
                 <option value="platform">Platform</option>
-                <option value="resource">Resources</option>
+                <option value="other">Other</option>
               </select>
+
+              <button
+                onClick={handleClearFilters}
+                className="px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600"
+                title="Clear all filters"
+              >
+                Clear
+              </button>
             </div>
           </div>
         </div>
@@ -261,7 +294,7 @@ export default function AdminFeedbackPanel() {
         {/* Results */}
         <div className="p-4 bg-gray-50">
           <p className="text-sm text-gray-600">
-            Showing {filteredFeedback.length} of {mockFeedback.length} feedback
+            Showing {filteredFeedback.length} of {total_count || 0} feedback
             entries
           </p>
         </div>
@@ -287,36 +320,45 @@ export default function AdminFeedbackPanel() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                      {getEntityIcon(feedback.entityType)}
+                      {getEntityIcon(feedback.subject)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-medium text-gray-800">
-                          {feedback.senderName} ({feedback.senderRole})
+                          {feedback.email}
                         </span>
-                        {feedback.receiverName && (
+                        {feedback.subject_detail && (
                           <>
                             <span className="text-gray-400">→</span>
                             <span className="text-gray-600">
-                              {feedback.receiverName} ({feedback.receiverRole})
+                              {typeof feedback.subject_detail === "string"
+                                ? feedback.subject_detail
+                                : feedback.subject_detail.title ||
+                                  (feedback.subject_detail.first_name &&
+                                  feedback.subject_detail.last_name
+                                    ? `${feedback.subject_detail.first_name} ${feedback.subject_detail.last_name}`
+                                    : feedback.subject_detail.name ||
+                                      `ID: ${
+                                        feedback.subject_detail.id || "Unknown"
+                                      }`)}
                             </span>
                           </>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full capitalize">
-                          {feedback.entityType}
+                          {feedback.subject}
                         </span>
                         <span
                           className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${getStatusColor(
-                            feedback.status
+                            feedback.is_resolved
                           )}`}
                         >
-                          {getStatusIcon(feedback.status)}
-                          {feedback.status}
+                          {getStatusIcon(feedback.is_resolved)}
+                          {feedback.is_resolved ? "Resolved" : "Active"}
                         </span>
                         <span className="text-sm text-gray-500">
-                          {formatDate(feedback.createdAt)}
+                          {formatDate(feedback.created_at)}
                         </span>
                       </div>
                     </div>
@@ -336,34 +378,49 @@ export default function AdminFeedbackPanel() {
                     </button>
                     <button
                       onClick={() => handleDelete(feedback.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      disabled={deleteStatus === "loading"}
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Delete className="w-4 h-4" />
+                      {deleteStatus === "loading" ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        <Delete className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                 </div>
 
                 <div className="bg-gray-50 rounded-xl p-4 mb-4">
                   <p className="text-gray-700 leading-relaxed">
-                    {feedback.content}
+                    {feedback.message}
                   </p>
                 </div>
 
-                {feedback.status === "flagged" && (
+                {!feedback.is_resolved && (
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleStatusChange(feedback.id, "active")}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors"
+                      onClick={() => handleStatusChange(feedback.id, true)}
+                      disabled={updateStatus === "loading"}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
-                      Mark as Active
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleStatusChange(feedback.id, "resolved")
-                      }
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
-                    >
+                      {updateStatus === "loading" && (
+                        <CircularProgress size={16} color="inherit" />
+                      )}
                       Mark as Resolved
+                    </button>
+                  </div>
+                )}
+                {feedback.is_resolved && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleStatusChange(feedback.id, false)}
+                      disabled={updateStatus === "loading"}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      {updateStatus === "loading" && (
+                        <CircularProgress size={16} color="inherit" />
+                      )}
+                      Mark as Active
                     </button>
                   </div>
                 )}
@@ -371,6 +428,66 @@ export default function AdminFeedbackPanel() {
             ))
           )}
         </div>
+
+        {/* Pagination */}
+        {total_pages > 1 && (
+          <div className="p-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Page {current_page} of {total_pages} • Showing{" "}
+                {feedbacks.length} of {total_count} feedback entries
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handlePreviousPage}
+                  disabled={!previous || status === "loading"}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+
+                {/* Page numbers */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, total_pages) }, (_, i) => {
+                    let pageNum;
+                    if (total_pages <= 5) {
+                      pageNum = i + 1;
+                    } else if (current_page <= 3) {
+                      pageNum = i + 1;
+                    } else if (current_page >= total_pages - 2) {
+                      pageNum = total_pages - 4 + i;
+                    } else {
+                      pageNum = current_page - 2 + i;
+                    }
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        disabled={status === "loading"}
+                        className={`px-3 py-2 text-sm border rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                          current_page === pageNum
+                            ? "bg-red-800 text-white border-red-800"
+                            : "border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={handleNextPage}
+                  disabled={!next || status === "loading"}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
