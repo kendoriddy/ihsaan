@@ -310,19 +310,59 @@ const CourseDetailPage = () => {
             {/* Video Player Section */}
             <div className="bg-black relative">
               {selectedVideo ? (
+                // <div className="relative w-full h-[400px]">
+                //   <video
+                //     className="w-full h-full"
+                //     controls
+                //     autoPlay
+                //     data-video-id={selectedVideo.id}
+                //   >
+                //     <source
+                //       src={
+                //         selectedVideo.video_resource?.stream_url !== null
+                //           ? selectedVideo.video_resource?.stream_url
+                //           : selectedVideo.video_resource?.media_url
+                //       }
+                //       type="video/mp4"
+                //     />
+                //     Your browser does not support the video tag.
+                //   </video>
+                // </div>
                 <div className="relative w-full h-[400px]">
-                  <video
-                    className="w-full h-full"
-                    controls
-                    autoPlay
-                    data-video-id={selectedVideo.id}
-                  >
-                    <source
-                      src={selectedVideo.video_resource?.media_url}
-                      type="video/mp4"
+                  {selectedVideo?.video_resource?.stream_url?.includes(
+                    "iframe.mediadelivery.net"
+                  ) ? (
+                    <iframe
+                      className="w-full h-full"
+                      src={
+                        selectedVideo.video_resource?.stream_url !== null
+                          ? selectedVideo.video_resource?.stream_url
+                          : selectedVideo.video_resource?.media_url
+                      }
+                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                      autoPlay
+                      data-video-id={selectedVideo.id}
                     />
-                    Your browser does not support the video tag.
-                  </video>
+                  ) : (
+                    // Direct MP4 - use video tag
+                    <video
+                      className="w-full h-full"
+                      controls
+                      autoPlay
+                      data-video-id={selectedVideo.id}
+                    >
+                      <source
+                        src={
+                          selectedVideo.video_resource?.stream_url !== null
+                            ? selectedVideo.video_resource?.stream_url
+                            : selectedVideo.video_resource?.media_url
+                        }
+                        type="video/mp4"
+                      />
+                      Your browser does not support the video tag.
+                    </video>
+                  )}
                 </div>
               ) : (
                 <div className="w-full h-[400px] bg-gray-900 flex items-center justify-center">
@@ -581,9 +621,9 @@ const CourseDetailPage = () => {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center">
                               {expandedSections.has(section.id) ? (
-                                <FaChevronDown className="w-4 h-4 text-gray-500 mr-2" />
-                              ) : (
                                 <FaChevronUp className="w-4 h-4 text-gray-500 mr-2" />
+                              ) : (
+                                <FaChevronDown className="w-4 h-4 text-gray-500 mr-2" />
                               )}
                               <div>
                                 <h3 className="font-medium text-gray-900 text-sm">
@@ -616,7 +656,18 @@ const CourseDetailPage = () => {
                                           ? "bg-blue-50 border-l-4 border-blue-500"
                                           : "hover:bg-gray-50"
                                       }`}
-                                      onClick={() => setSelectedVideo(video)}
+                                      // onClick={() => setSelectedVideo(video)}
+                                      onClick={() => {
+                                        console.log(
+                                          "selected video details",
+                                          video
+                                        );
+                                        console.log(
+                                          "Stream URL:",
+                                          video.video_resource?.stream_url
+                                        );
+                                        setSelectedVideo(video);
+                                      }}
                                     >
                                       <div className="flex items-center space-x-3">
                                         <div className="flex-shrink-0">

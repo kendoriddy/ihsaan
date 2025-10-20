@@ -8,6 +8,7 @@ const nextConfig = {
       "images.unsplash.com",
       "encrypted-tbn0.gstatic.com",
       "via.placeholder.com",
+      "iframe.mediadelivery.net",
     ],
   },
 };

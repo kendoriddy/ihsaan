@@ -357,12 +357,13 @@ function EditCoursePage() {
     formData.append("file", file);
     formData.append("title", file.name);
     formData.append("type", "VIDEO");
+    formData.append("use_streaming", true);
 
     try {
       setVideoToCloudinaryLoading(true);
       setVideoToCloudinaryError(null);
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/resource/course-video/",
+        `https://ihsaanlms.onrender.com/resource/course-video/`,
         formData,
         {
           headers: {
