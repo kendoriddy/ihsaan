@@ -9,6 +9,7 @@ const nextConfig = {
       "encrypted-tbn0.gstatic.com",
       "via.placeholder.com",
       "iframe.mediadelivery.net",
+      "ihsaan-new-pullzone.b-cdn.net",
     ],
   },
 };

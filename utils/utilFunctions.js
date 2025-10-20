@@ -1,3 +1,34 @@
+// Utility function to validate and normalize URLs
+const normalizeUrl = (string) => {
+  if (!string || typeof string !== "string" || string.trim() === "") {
+    return null;
+  }
+
+  const trimmedString = string.trim();
+
+  // If it already has a protocol, return as is
+  if (
+    trimmedString.startsWith("http://") ||
+    trimmedString.startsWith("https://")
+  ) {
+    try {
+      new URL(trimmedString);
+      return trimmedString;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // If it doesn't have a protocol, try adding https://
+  const urlWithProtocol = `https://${trimmedString}`;
+  try {
+    new URL(urlWithProtocol);
+    return urlWithProtocol;
+  } catch (_) {
+    return null;
+  }
+};
+
 // Format date to be displayed on the UI
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -486,6 +517,7 @@ export const decimalToFraction = (decimal) => {
 };
 
 export {
+  normalizeUrl,
   formatDate,
   serverDateFormat,
   logout,

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { normalizeUrl } from "@/utils/utilFunctions";
 import {
   Box,
   Paper,
@@ -403,7 +404,11 @@ const CoursesReport = () => {
                                 </p>
                                 <p>
                                   <a
-                                    href={video.video_resource.media_url}
+                                    href={
+                                      normalizeUrl(
+                                        video.video_resource.media_url
+                                      ) || video.video_resource.media_url
+                                    }
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blue-600 underline"
@@ -428,7 +433,11 @@ const CoursesReport = () => {
                                 </p>
                                 <p>
                                   <a
-                                    href={material.material_resource.media_url}
+                                    href={
+                                      normalizeUrl(
+                                        material.material_resource.media_url
+                                      ) || material.material_resource.media_url
+                                    }
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blue-600 underline"

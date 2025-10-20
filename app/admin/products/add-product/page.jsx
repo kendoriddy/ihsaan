@@ -13,6 +13,7 @@ import { IMAGES } from "@/constants";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
 import AdminDashboardHeader from "@/components/AdminDashboardHeader";
 import { usePathname } from "next/navigation";
+import { normalizeUrl } from "@/utils/utilFunctions";
 
 function Page() {
   const dispatch = useDispatch();
@@ -86,11 +87,12 @@ function Page() {
 
       const data = await response.json();
       if (data.media_url) {
+        const normalizedUrl = normalizeUrl(data.media_url);
         setProductData((prev) => ({
           ...prev,
-          image: data.media_url,
+          image: normalizedUrl || data.media_url,
         }));
-        setPreviewImage(data.media_url);
+        setPreviewImage(normalizedUrl || data.media_url);
         setImageUploadSuccessful(true);
         toast.success("Image uploaded successfully!");
       } else {

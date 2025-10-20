@@ -9,6 +9,7 @@ import { fetchProgrammes } from "@/utils/redux/slices/programmeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
 import { getAuthToken } from "@/hooks/axios/axios";
+import { normalizeUrl } from "@/utils/utilFunctions";
 
 function Page() {
   const dispatch = useDispatch();
@@ -68,8 +69,9 @@ function Page() {
       console.log("Upload result:", response);
       toast.success("Image uploaded successfully!");
       setImageUploadSuccessful(true);
-      setPreviewImage(response.data.media_url);
-      return response.data.media_url;
+      const normalizedUrl = normalizeUrl(response.data.media_url);
+      setPreviewImage(normalizedUrl || response.data.media_url);
+      return normalizedUrl || response.data.media_url;
     } catch (error) {
       console.error("Image upload error:", error.message);
       throw new Error("Failed to upload image: " + error.message);

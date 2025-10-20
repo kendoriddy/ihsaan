@@ -22,6 +22,7 @@ import {
   FaChevronDown,
   FaChevronUp,
 } from "react-icons/fa";
+import { normalizeUrl } from "@/utils/utilFunctions";
 
 const CourseDetailPage = () => {
   const params = useParams();
@@ -337,7 +338,9 @@ const CourseDetailPage = () => {
                       src={
                         selectedVideo.video_resource?.stream_url !== null
                           ? selectedVideo.video_resource?.stream_url
-                          : selectedVideo.video_resource?.media_url
+                          : normalizeUrl(
+                              selectedVideo.video_resource?.media_url
+                            ) || selectedVideo.video_resource?.media_url
                       }
                       allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                       allowFullScreen
@@ -356,7 +359,9 @@ const CourseDetailPage = () => {
                         src={
                           selectedVideo.video_resource?.stream_url !== null
                             ? selectedVideo.video_resource?.stream_url
-                            : selectedVideo.video_resource?.media_url
+                            : normalizeUrl(
+                                selectedVideo.video_resource?.media_url
+                              ) || selectedVideo.video_resource?.media_url
                         }
                         type="video/mp4"
                       />
@@ -742,6 +747,10 @@ const CourseDetailPage = () => {
                                           <div className="flex-shrink-0">
                                             <a
                                               href={
+                                                normalizeUrl(
+                                                  material.material_resource
+                                                    ?.media_url
+                                                ) ||
                                                 material.material_resource
                                                   ?.media_url
                                               }
