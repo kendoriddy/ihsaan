@@ -28,6 +28,37 @@ import {
 import AdminDashboardHeader from "@/components/AdminDashboardHeader";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
 
+// Utility function to validate and normalize URLs
+const normalizeUrl = (string) => {
+  if (!string || typeof string !== "string" || string.trim() === "") {
+    return null;
+  }
+
+  const trimmedString = string.trim();
+
+  // If it already has a protocol, return as is
+  if (
+    trimmedString.startsWith("http://") ||
+    trimmedString.startsWith("https://")
+  ) {
+    try {
+      new URL(trimmedString);
+      return trimmedString;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // If it doesn't have a protocol, try adding https://
+  const urlWithProtocol = `https://${trimmedString}`;
+  try {
+    new URL(urlWithProtocol);
+    return urlWithProtocol;
+  } catch (_) {
+    return null;
+  }
+};
+
 // Utility function to extract error messages from API responses
 const extractErrorMessage = (error, defaultMessage = "An error occurred") => {
   let errorMessage = defaultMessage;
@@ -299,8 +330,11 @@ function EditCoursePage() {
         image_url: course.image_url,
       });
       if (course.image_url) {
-        setPreviewImage(course.image_url);
-        setImageUploadSuccessful(true);
+        const normalizedUrl = normalizeUrl(course.image_url);
+        if (normalizedUrl) {
+          setPreviewImage(normalizedUrl);
+          setImageUploadSuccessful(true);
+        }
       }
     } catch (error) {
       toast.error("Failed to fetch course data");
@@ -357,12 +391,13 @@ function EditCoursePage() {
     formData.append("file", file);
     formData.append("title", file.name);
     formData.append("type", "VIDEO");
+    formData.append("use_streaming", true);
 
     try {
       setVideoToCloudinaryLoading(true);
       setVideoToCloudinaryError(null);
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/resource/course-video/",
+        `https://ihsaanlms.onrender.com/resource/course-video/`,
         formData,
         {
           headers: {
@@ -491,8 +526,9 @@ function EditCoursePage() {
       try {
         const { media_url } = await uploadImageToCloudinary(file);
         console.log("hereee", media_url);
-        setCourseData({ ...courseData, image_url: media_url });
-        setPreviewImage(media_url);
+        const normalizedUrl = normalizeUrl(media_url);
+        setCourseData({ ...courseData, image_url: normalizedUrl || media_url });
+        setPreviewImage(normalizedUrl || media_url);
         URL.revokeObjectURL(preview);
       } catch (error) {
         toast.error(extractErrorMessage(error, "Image upload failed"));
@@ -935,13 +971,22 @@ function EditCoursePage() {
                       className="mt-1 block w-full p-2 border rounded-md"
                     />
                     {previewImage && imageUploadSuccessful ? (
-                      <Image
-                        width={40}
-                        height={40}
-                        src={previewImage}
-                        alt="Preview"
-                        className="mt-3 w-40 h-40 object-cover border rounded-md"
-                      />
+                      (() => {
+                        const normalizedUrl = normalizeUrl(previewImage);
+                        return normalizedUrl ? (
+                          <Image
+                            width={40}
+                            height={40}
+                            src={normalizedUrl}
+                            alt="Preview"
+                            className="mt-3 w-40 h-40 object-cover border rounded-md"
+                          />
+                        ) : (
+                          <div className="mt-3 w-40 h-40 border rounded-md flex items-center justify-center text-gray-500">
+                            Invalid image URL
+                          </div>
+                        );
+                      })()
                     ) : imageUploadLoading ? (
                       <div>Uploading image...</div>
                     ) : null}
@@ -1161,8 +1206,12 @@ function EditCoursePage() {
                                               <div
                                                 onClick={() =>
                                                   window.open(
-                                                    video.video_resource
-                                                      .media_url,
+                                                    normalizeUrl(
+                                                      video.video_resource
+                                                        .media_url
+                                                    ) ||
+                                                      video.video_resource
+                                                        .media_url,
                                                     "_blank"
                                                   )
                                                 }
@@ -1177,6 +1226,10 @@ function EditCoursePage() {
                                                 >
                                                   <source
                                                     src={
+                                                      normalizeUrl(
+                                                        video.video_resource
+                                                          .media_url
+                                                      ) ||
                                                       video.video_resource
                                                         .media_url
                                                     }
@@ -1235,8 +1288,12 @@ function EditCoursePage() {
                                               <div
                                                 onClick={() =>
                                                   window.open(
-                                                    material.material_resource
-                                                      .media_url,
+                                                    normalizeUrl(
+                                                      material.material_resource
+                                                        .media_url
+                                                    ) ||
+                                                      material.material_resource
+                                                        .media_url,
                                                     "_blank"
                                                   )
                                                 }

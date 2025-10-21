@@ -41,9 +41,12 @@ const AllAssignment = () => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null); // Anchor for the dropdown menu
   const [openQuizModal, setOpenQuizModal] = useState(false);
 
+  const tutorId =
+    typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+
   const { isLoading, data, refetch, isFetching } = useFetch(
     "assignments",
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/?page_size=15&page=${page}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/?tutor=${tutorId}&page_size=15&page=${page}`,
     (data) => {
       if (data?.total) {
         setTotalAssignments(data.total);

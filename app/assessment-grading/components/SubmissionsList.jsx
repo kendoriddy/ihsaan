@@ -15,7 +15,7 @@ import {
 import { Close } from "@mui/icons-material";
 import { usePost, useFetch, usePatch, usePut2 } from "@/hooks/useHttp/useHttp";
 import { toast } from "react-toastify";
-import { formatDate } from "@/utils/utilFunctions";
+import { formatDate, normalizeUrl } from "@/utils/utilFunctions";
 import Swal from "sweetalert2";
 
 const SubmissionsList = ({ assessmentId }) => {
@@ -53,7 +53,6 @@ const SubmissionsList = ({ assessmentId }) => {
     "comments",
     selectedSubmission?.grade_id
       ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grade-comments/?grade=${selectedSubmission.grade_id}`
-
       : null
   );
 
@@ -220,7 +219,7 @@ const SubmissionsList = ({ assessmentId }) => {
                   {submission.file_resources?.map((file) => (
                     <Button
                       key={file.id}
-                      href={file.media_url}
+                      href={normalizeUrl(file.media_url) || file.media_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       sx={{ mr: 1, bg: "white", color: "indigo.700" }}

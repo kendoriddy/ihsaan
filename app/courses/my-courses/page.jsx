@@ -145,7 +145,7 @@ const MyCoursesPage = () => {
                         >
                           <a className="block bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
                             <div className="relative w-full h-48 bg-gray-200">
-                              {course.image_url ? (
+                              {/*} {course.image_url ? (
                                 <Image
                                   src={course.image_url}
                                   alt={course.title || "Course image"}
@@ -159,7 +159,7 @@ const MyCoursesPage = () => {
                                   layout="fill"
                                   objectFit="cover"
                                 />
-                              )}
+                              )}*/}
                               {/* Payment Status Badge */}
                               <div className="absolute top-2 right-2">
                                 <span

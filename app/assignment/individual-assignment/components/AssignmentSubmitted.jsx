@@ -2,7 +2,7 @@
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import { usePatch, usePost } from "@/hooks/useHttp/useHttp";
-import { formatDate, getFileType } from "@/utils/utilFunctions";
+import { formatDate, getFileType, normalizeUrl } from "@/utils/utilFunctions";
 import { Field, Form, Formik } from "formik";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
@@ -155,13 +155,19 @@ const AssignmentSubmitted = ({
               <>
                 {file_resources[0].media_url.endsWith(".pdf") ? (
                   <iframe
-                    src={file_resources[0].media_url}
+                    src={
+                      normalizeUrl(file_resources[0].media_url) ||
+                      file_resources[0].media_url
+                    }
                     className="w-full h-96 border rounded"
                     title="PDF Preview"
                   />
                 ) : (
                   <img
-                    src={file_resources[0].media_url}
+                    src={
+                      normalizeUrl(file_resources[0].media_url) ||
+                      file_resources[0].media_url
+                    }
                     alt="Student submitted file"
                     className="max-w-full h-auto rounded"
                   />
@@ -169,14 +175,20 @@ const AssignmentSubmitted = ({
 
                 <div className="mt-2 flex justify-center space-x-2">
                   <a
-                    href={file_resources[0].media_url}
+                    href={
+                      normalizeUrl(file_resources[0].media_url) ||
+                      file_resources[0].media_url
+                    }
                     download
                     className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-gray-300"
                   >
                     Download
                   </a>
                   <a
-                    href={file_resources[0].media_url}
+                    href={
+                      normalizeUrl(file_resources[0].media_url) ||
+                      file_resources[0].media_url
+                    }
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-gray-300"

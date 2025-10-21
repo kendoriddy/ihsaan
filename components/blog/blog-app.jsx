@@ -6,6 +6,7 @@ import BlogPostDisplay from "./blog-post-display";
 import CommentSystem from "./comment-system";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { normalizeUrl } from "@/utils/utilFunctions";
 import { useDispatch } from "react-redux";
 import {
   patchBlogPublishStatus,
@@ -80,7 +81,10 @@ export default function BlogApp() {
         slug: item.slug,
         content: item.content,
         display_pic_id: item.display_pic?.id || 0,
-        display_pic_url: item.display_pic?.media_url || null,
+        display_pic_url:
+          normalizeUrl(item.display_pic?.media_url) ||
+          item.display_pic?.media_url ||
+          null,
         category: item.category,
         category_name: item.blog_category?.name || null,
         category_slug: item.blog_category?.slug || null,

@@ -31,13 +31,18 @@ const ManualGrading = () => {
       : "N/A";
   };
 
+  const tutorId =
+    typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+
   const {
     isLoading,
     data: AssessmentsList,
     refetch,
   } = useFetch(
     "assessments",
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/?page_size=${
+    `${
+      process.env.NEXT_PUBLIC_API_BASE_URL
+    }/assessment/base/?tutor=${tutorId}&question_type=FILE_UPLOAD&page_size=${
       fetchAll ? totalCourses : 10
     }`,
     (data) => {
@@ -51,10 +56,6 @@ const ManualGrading = () => {
 
   const Assessments = AssessmentsList?.data?.results || [];
 
-  const filteredAssessment = Assessments.filter(
-    (assessment) => assessment.question_type !== "MCQ"
-  );
-
   return (
     <Layout>
       <Box sx={{ p: 3 }}>
@@ -64,15 +65,15 @@ const ManualGrading = () => {
             value={selectedAssessmentId}
             onChange={(e) => {
               const selectedAssessmentId = e.target.value;
-              const selected = filteredAssessment.find(
+              const selected = Assessments.find(
                 (a) => a.id === selectedAssessmentId
               );
               setSelectedAssessment(selected);
               setSelectedAssessmentId(selectedAssessmentId);
             }}
           >
-            {filteredAssessment.length > 0 ? (
-              filteredAssessment.map((assessment) => (
+            {Assessments.length > 0 ? (
+              Assessments.map((assessment) => (
                 <MenuItem key={assessment.id} value={assessment.id}>
                   <Box display="flex" flexDirection="column" width="100%">
                     <Typography variant="h6" fontWeight="bold">
