@@ -311,24 +311,6 @@ const CourseDetailPage = () => {
             {/* Video Player Section */}
             <div className="bg-black relative">
               {selectedVideo ? (
-                // <div className="relative w-full h-[400px]">
-                //   <video
-                //     className="w-full h-full"
-                //     controls
-                //     autoPlay
-                //     data-video-id={selectedVideo.id}
-                //   >
-                //     <source
-                //       src={
-                //         selectedVideo.video_resource?.stream_url !== null
-                //           ? selectedVideo.video_resource?.stream_url
-                //           : selectedVideo.video_resource?.media_url
-                //       }
-                //       type="video/mp4"
-                //     />
-                //     Your browser does not support the video tag.
-                //   </video>
-                // </div>
                 <div className="relative w-full h-[400px]">
                   {selectedVideo?.video_resource?.stream_url?.includes(
                     "iframe.mediadelivery.net"

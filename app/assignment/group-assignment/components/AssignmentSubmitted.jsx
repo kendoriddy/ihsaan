@@ -2,7 +2,7 @@
 import Button from "@/components/Button";
 import CustomModal from "@/components/CustomModal";
 import { usePatch, usePost } from "@/hooks/useHttp/useHttp";
-import { formatDate, getFileType } from "@/utils/utilFunctions";
+import { formatDate, getFileType, normalizeUrl } from "@/utils/utilFunctions";
 import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
@@ -129,7 +129,7 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
     student_name,
     submitted_at,
     submission_notes,
-    file_url,
+    file_resources,
   } = submissionData[0];
 
   return (
@@ -142,24 +142,52 @@ const AssignmentSubmitted = ({ submissionData, refetchSubmission }) => {
               {formatDate(submitted_at) || "Unknown date"}
             </p>
             <p className="mt-2">{submission_notes || "No response text"}</p>
-            {file_url && (
-              <div className="mt-2 flex space-x-2">
-                <a
-                  href={file_url}
-                  download
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                >
-                  Download
-                </a>
-                <a
-                  href={file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                >
-                  Preview
-                </a>
-              </div>
+            {file_resources[0]?.media_url && (
+              <>
+                {file_resources[0].media_url.endsWith(".pdf") ? (
+                  <iframe
+                    src={
+                      normalizeUrl(file_resources[0].media_url) ||
+                      file_resources[0].media_url
+                    }
+                    className="w-full h-96 border rounded"
+                    title="PDF Preview"
+                  />
+                ) : (
+                  <img
+                    src={
+                      normalizeUrl(file_resources[0].media_url) ||
+                      file_resources[0].media_url
+                    }
+                    alt="Student submitted file"
+                    className="max-w-full h-auto rounded"
+                  />
+                )}
+
+                <div className="mt-2 flex justify-center space-x-2">
+                  <a
+                    href={
+                      normalizeUrl(file_resources[0].media_url) ||
+                      file_resources[0].media_url
+                    }
+                    download
+                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-gray-300"
+                  >
+                    Download
+                  </a>
+                  <a
+                    href={
+                      normalizeUrl(file_resources[0].media_url) ||
+                      file_resources[0].media_url
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-gray-300"
+                  >
+                    Preview
+                  </a>
+                </div>
+              </>
             )}
             <Button
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
