@@ -35,7 +35,7 @@ const AssessmentButton = ({ section, onStartAssessment, course }) => {
         if (!userId) {
           // If not in localStorage, fetch from API
           const userResponse = await axios.get(
-            "https://ihsaanlms.onrender.com/api/auth/logged-in-user/",
+            "https://api.ihsaanacademia.com/api/auth/logged-in-user/",
             {
               headers: {
                 Authorization: `Bearer ${getAuthToken()}`,
@@ -55,7 +55,7 @@ const AssessmentButton = ({ section, onStartAssessment, course }) => {
 
         // Check if user has already taken the assessment
         const response = await axios.get(
-          `https://ihsaanlms.onrender.com/assessment/assessments/has-taken/`,
+          `https://api.ihsaanacademia.com/assessment/assessments/has-taken/`,
           {
             params: {
               course_section: section.id,
@@ -81,7 +81,7 @@ const AssessmentButton = ({ section, onStartAssessment, course }) => {
             try {
               // Get user's assessment results
               const resultsResponse = await axios.get(
-                `https://ihsaanlms.onrender.com/assessment/mcq-responses/?assessment=${sectionAssessment.id}&student=${userId}`,
+                `https://api.ihsaanacademia.com/assessment/mcq-responses/?assessment=${sectionAssessment.id}&student=${userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${getAuthToken()}`,

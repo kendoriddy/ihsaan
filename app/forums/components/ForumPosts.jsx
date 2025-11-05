@@ -21,18 +21,18 @@ const ForumPosts = ({ forumId, forumTitle, onBack }) => {
 
   const { isLoading, data, refetch } = useFetch(
     ['forum-comments', forumId],
-    `https://ihsaanlms.onrender.com/forum/forums/${forumId}/comments/`
+    `https://api.ihsaanacademia.com/forum/forums/${forumId}/comments/`
   )
 
   const comments = data?.data?.results || []
 
   const { mutate: submitComment } = usePost(
-    `https://ihsaanlms.onrender.com/forum/forums/${forumId}/comments/`
+    `https://api.ihsaanacademia.com/forum/forums/${forumId}/comments/`
   )
 
   const { mutate: submitReply } = usePost(
     selectedCommentId
-      ? `https://ihsaanlms.onrender.com/forum/forums/${forumId}/comments/${selectedCommentId}/replies/`
+      ? `https://api.ihsaanacademia.com/forum/forums/${forumId}/comments/${selectedCommentId}/replies/`
       : null
   )
 

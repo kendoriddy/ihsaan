@@ -7,7 +7,7 @@ const QuizSummary = ({ summaryId, startDate, endDate, duration }) => {
   const { isLoading: isLoadingQuizData, data: QuizSummary } = useFetch(
     `summary`,
     summaryId
-      ? `https://ihsaanlms.onrender.com/assessment/mcq-responses/${summaryId}/`
+      ? `https://api.ihsaanacademia.com/assessment/mcq-responses/${summaryId}/`
       : null,
     () => {},
     () => {}

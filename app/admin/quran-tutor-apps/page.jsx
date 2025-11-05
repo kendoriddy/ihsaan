@@ -39,7 +39,7 @@ export default function AdminQuranTutorAppsPage() {
         if (statusFilter) params.push(`application_status=${statusFilter}`);
         if (search) params.push(`search=${encodeURIComponent(search)}`);
         if (page) params.push(`page=${page}`);
-        const url = `https://ihsaanlms.onrender.com/api/list-quran-tutor-applications/?${params.join(
+        const url = `https://api.ihsaanacademia.com/api/list-quran-tutor-applications/?${params.join(
           "&"
         )}`;
         const res = await fetch(url, {
@@ -63,7 +63,7 @@ export default function AdminQuranTutorAppsPage() {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `https://ihsaanlms.onrender.com/api/quran-tutors/${id}/`,
+        `https://api.ihsaanacademia.com/api/quran-tutors/${id}/`,
         {
           method: "PATCH",
           headers: {
@@ -90,7 +90,7 @@ export default function AdminQuranTutorAppsPage() {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `https://ihsaanlms.onrender.com/api/admin/quran-tutors/${id}/`,
+        `https://api.ihsaanacademia.com/api/admin/quran-tutors/${id}/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -113,7 +113,7 @@ export default function AdminQuranTutorAppsPage() {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `https://ihsaanlms.onrender.com/api/admin/quran-tutors/${selectedTutorId}/status/`,
+        `https://api.ihsaanacademia.com/api/admin/quran-tutors/${selectedTutorId}/status/`,
         {
           method: "PATCH",
           headers: {

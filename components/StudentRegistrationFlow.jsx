@@ -60,7 +60,7 @@ const StudentRegistrationFlow = ({ setOpen, selectedProgramme = null }) => {
 
       // Make API call to the new endpoint
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/api/auth/register-student-programme/",
+        "https://api.ihsaanacademia.com/api/auth/register-student-programme/",
         payload,
         {
           headers: {
@@ -140,7 +140,7 @@ const StudentRegistrationFlow = ({ setOpen, selectedProgramme = null }) => {
         "e4881f7d-298f-473d-acd9-012af4edc597";
 
       await axios.post(
-        "https://ihsaanlms.onrender.com/api/student/mark-programme-paid/",
+        "https://api.ihsaanacademia.com/api/student/mark-programme-paid/",
         {
           programme_id: programmeId,
         },

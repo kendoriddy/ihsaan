@@ -89,7 +89,7 @@
 // //     refetch
 // //   } = useFetch(
 // //     'courses',
-// //     `https://ihsaanlms.onrender.com/course/courses/?page_size=${
+// //     `https://api.ihsaanacademia.com/course/courses/?page_size=${
 // //       fetchAll ? totalCourses : 10
 // //     }`,
 // //     data => {
@@ -105,7 +105,7 @@
 
 // //   // usePost for form submission
 // //   const { mutate: submitForum, isLoading: submittingForum } = usePost(
-// //     'https://ihsaanlms.onrender.com/forum/forums/'
+// //     'https://api.ihsaanacademia.com/forum/forums/'
 // //   )
 
 // //   // Submit function
@@ -433,7 +433,7 @@
 //     refetch
 //   } = useFetch(
 //     'courses',
-//     `https://ihsaanlms.onrender.com/course/courses/?page_size=${
+//     `https://api.ihsaanacademia.com/course/courses/?page_size=${
 //       fetchAll ? totalCourses : 10
 //     }`,
 //     data => {
@@ -449,7 +449,7 @@
 
 //   // usePost for form submission
 //   const { mutate: submitForum, isLoading: submittingForum } = usePost(
-//     'https://ihsaanlms.onrender.com/forum/forums/'
+//     'https://api.ihsaanacademia.com/forum/forums/'
 //   )
 
 //   // Submit function
@@ -763,7 +763,7 @@ const ForumCreationModal = ({
     refetch
   } = useFetch(
     'courses',
-    `https://ihsaanlms.onrender.com/course/courses/?page_size=${
+    `https://api.ihsaanacademia.com/course/courses/?page_size=${
       fetchAll ? totalCourses : 10
     }`,
     data => {
@@ -779,12 +779,12 @@ const ForumCreationModal = ({
 
   // usePost for forum creation
   const { mutate: createForum, isLoading: creatingForum } = usePost(
-    'https://ihsaanlms.onrender.com/forum/forums/'
+    'https://api.ihsaanacademia.com/forum/forums/'
   )
 
   // usePut for forum updates
   const { mutate: updateForum, isLoading: updatingForum } = usePut(
-    'https://ihsaanlms.onrender.com/forum/forums',
+    'https://api.ihsaanacademia.com/forum/forums',
     {
       onSuccess: data => {
         toast.success('Forum updated successfully')

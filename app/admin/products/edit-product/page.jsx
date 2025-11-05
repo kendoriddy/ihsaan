@@ -102,7 +102,7 @@ function Page() {
 
     try {
       const response = await fetch(
-        "https://ihsaanlms.onrender.com/resource/course-materials/",
+        "https://api.ihsaanacademia.com/resource/course-materials/",
         {
           method: "POST",
           headers: {

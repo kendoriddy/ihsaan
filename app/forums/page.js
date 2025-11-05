@@ -74,7 +74,7 @@ const Forums = () => {
     isFetching: isFetchingGeneral,
   } = useFetch(
     "general-forums",
-    `https://ihsaanlms.onrender.com/forum/forums/?forum_type=GENERAL&page_size=15&page=${generalPage}`,
+    `https://api.ihsaanacademia.com/forum/forums/?forum_type=GENERAL&page_size=15&page=${generalPage}`,
     (data) => {
       if (data?.total) {
         setTotalGeneralForums(data.total);
@@ -90,7 +90,7 @@ const Forums = () => {
     isFetching: isFetchingStudent,
   } = useFetch(
     "student-forums",
-    `https://ihsaanlms.onrender.com/forum/forums/?forum_type=STUDENT&page_size=15&page=${studentPage}`,
+    `https://api.ihsaanacademia.com/forum/forums/?forum_type=STUDENT&page_size=15&page=${studentPage}`,
     (data) => {
       if (data?.total) {
         setTotalStudentForums(data.total);
@@ -100,7 +100,7 @@ const Forums = () => {
 
   // Delete hook
   const { mutate: deleteForum, isLoading: isDeleting } = useDelete(
-    "https://ihsaanlms.onrender.com/forum/forums",
+    "https://api.ihsaanacademia.com/forum/forums",
     {
       onSuccess: () => {
         console.log("Forum deleted successfully");
@@ -120,7 +120,7 @@ const Forums = () => {
 
   // Update hook - Fixed to include forum ID in URL
   const { mutate: updateForum, isLoading: isUpdating } = usePut(
-    "https://ihsaanlms.onrender.com/forum/forums",
+    "https://api.ihsaanacademia.com/forum/forums",
     {
       onSuccess: () => {
         console.log("Forum updated successfully");
