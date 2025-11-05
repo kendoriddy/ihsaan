@@ -11,6 +11,13 @@ import { fetchProgrammes } from "@/utils/redux/slices/programmeSlice";
 import Image from "next/image";
 import { getAuthToken } from "@/hooks/axios/axios";
 import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
+import {
   FaCaretDown,
   FaChevronDown,
   FaChevronUp,
@@ -160,6 +167,11 @@ function EditCoursePage() {
   const [terms, setTerms] = useState([]);
   const [selectedTerm, setSelectedTerm] = useState("");
   const [isEnrollLoading, setIsEnrollLoading] = useState(false);
+  const [isUnenrollModalOpen, setIsUnenrollModalOpen] = useState(false);
+  const [unenrollStudentData, setUnenrollStudentData] = useState({
+    userId: null,
+    termId: null,
+  });
 
   const [sections, setSections] = useState({
     courseDetails: true,
@@ -659,13 +671,19 @@ function EditCoursePage() {
     }
   };
 
-  const handleUnenrollStudent = async (userId, termId) => {
-    try {
-      const confirmUnenroll = window.confirm(
-        "Are you sure you want to unenroll this student?"
-      );
-      if (!confirmUnenroll) return;
+  const handleOpenUnenrollModal = (userId, termId) => {
+    setUnenrollStudentData({ userId, termId });
+    setIsUnenrollModalOpen(true);
+  };
 
+  const handleCloseUnenrollModal = () => {
+    setIsUnenrollModalOpen(false);
+    setUnenrollStudentData({ userId: null, termId: null });
+  };
+
+  const handleConfirmUnenroll = async () => {
+    const { userId, termId } = unenrollStudentData;
+    try {
       const response = await axios.post(
         `https://api.ihsaanacademia.com/course/courses/${courseId}/unenroll/`,
         {
@@ -682,10 +700,15 @@ function EditCoursePage() {
       console.log("Unenroll response:", response.data);
       toast.success("Student unenrolled successfully!");
       fetchEnrolledStudents();
+      handleCloseUnenrollModal();
     } catch (error) {
       console.log(error, "error here");
       toast.error("Failed to unenroll student");
     }
+  };
+
+  const handleUnenrollStudent = async (userId, termId) => {
+    handleOpenUnenrollModal(userId, termId);
   };
 
   const fetchCourseSections = async () => {
@@ -1860,6 +1883,38 @@ function EditCoursePage() {
 
           <hr className="my-6 mb-16 border-t-4 border-blue-600 shadow-md" />
         </div>
+
+        {/* Unenroll Confirmation Modal */}
+        <Dialog
+          open={isUnenrollModalOpen}
+          onClose={handleCloseUnenrollModal}
+          aria-labelledby="unenroll-student-dialog-title"
+          aria-describedby="unenroll-student-dialog-description"
+        >
+          <DialogTitle id="unenroll-student-dialog-title">
+            Are you sure you want to unenroll this student?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="unenroll-student-dialog-description">
+              This action will remove the student from the course. They will no
+              longer have access to course materials and videos.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <button
+              onClick={handleCloseUnenrollModal}
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-100 transition-all duration-300"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmUnenroll}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-800 transition-all duration-300"
+            >
+              Unenroll
+            </button>
+          </DialogActions>
+        </Dialog>
       </main>
     </div>
   );
