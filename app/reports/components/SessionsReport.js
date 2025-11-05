@@ -49,7 +49,7 @@ const SessionsReport = () => {
       if (filters.year) params.append("year", filters.year);
 
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/academic-sessions/?${params.toString()}`,
+        `https://api.ihsaanacademia.com/academic-sessions/?${params.toString()}`,
         { headers }
       );
       setSessions(response.data.results);

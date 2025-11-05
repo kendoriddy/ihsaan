@@ -1,6 +1,6 @@
 {
   "links": {
-    "next": "https://ihsaanlms.onrender.com/feedback-ticket/feedbacks/?page=2&page_size=10",
+    "next": "https://api.ihsaanacademia.com/feedback-ticket/feedbacks/?page=2&page_size=10",
     "previous": null
   },
   "total": 23,

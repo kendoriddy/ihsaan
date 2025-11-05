@@ -103,7 +103,7 @@ const DashboardTab = () => {
       if (editMode) {
         // PATCH request for editing
         await axios.patch(
-          `https://ihsaanlms.onrender.com/programmes/${selectedProgramme.id}/`,
+          `https://api.ihsaanacademia.com/programmes/${selectedProgramme.id}/`,
           programmeForm,
           {
             headers: {
@@ -118,7 +118,7 @@ const DashboardTab = () => {
       } else {
         // POST request for adding a new programme
         await axios.post(
-          "https://ihsaanlms.onrender.com/programmes/",
+          "https://api.ihsaanacademia.com/programmes/",
           programmeForm,
           {
             headers: {
@@ -158,7 +158,7 @@ const DashboardTab = () => {
       if (editMode) {
         // PATCH request for editing
         await axios.patch(
-          `https://ihsaanlms.onrender.com/programme-types/${selectedProgrammeType.id}/`,
+          `https://api.ihsaanacademia.com/programme-types/${selectedProgrammeType.id}/`,
           programmeTypeForm,
           {
             headers: {
@@ -173,7 +173,7 @@ const DashboardTab = () => {
       } else {
         // POST request for adding a new programme
         await axios.post(
-          "https://ihsaanlms.onrender.com/programme-types/",
+          "https://api.ihsaanacademia.com/programme-types/",
           programmeTypeForm,
           {
             headers: {
@@ -213,7 +213,7 @@ const DashboardTab = () => {
       if (editClassMode) {
         // PATCH request for editing
         await axios.patch(
-          `https://ihsaanlms.onrender.com/classes/${selectedClass.id}/`,
+          `https://api.ihsaanacademia.com/classes/${selectedClass.id}/`,
           payload,
           {
             headers: {
@@ -227,7 +227,7 @@ const DashboardTab = () => {
         dispatch(fetchClasses({ page: 1, pageSize: 10 }));
       } else {
         // POST request for adding a new programme
-        await axios.post("https://ihsaanlms.onrender.com/classes/", payload, {
+        await axios.post("https://api.ihsaanacademia.com/classes/", payload, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -264,7 +264,7 @@ const DashboardTab = () => {
       if (editClassMode) {
         // PATCH request for editing
         await axios.patch(
-          `https://ihsaanlms.onrender.com/levels/${selectedLevel.id}/`,
+          `https://api.ihsaanacademia.com/levels/${selectedLevel.id}/`,
           payload,
           {
             headers: {
@@ -278,7 +278,7 @@ const DashboardTab = () => {
         dispatch(fetchLevels({ page: 1, pageSize: 10 }));
       } else {
         // POST request for adding a new programme
-        await axios.post("https://ihsaanlms.onrender.com/levels/", payload, {
+        await axios.post("https://api.ihsaanacademia.com/levels/", payload, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -394,7 +394,7 @@ const DashboardTab = () => {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `https://ihsaanlms.onrender.com/programmes/${selectedProgramme.id}/`,
+        `https://api.ihsaanacademia.com/programmes/${selectedProgramme.id}/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -415,7 +415,7 @@ const DashboardTab = () => {
   const handlePTDelete = async () => {
     try {
       await axios.delete(
-        `https://ihsaanlms.onrender.com/programme-types/${selectedProgrammeType.id}/`,
+        `https://api.ihsaanacademia.com/programme-types/${selectedProgrammeType.id}/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -439,7 +439,7 @@ const DashboardTab = () => {
   const handleClassDelete = async () => {
     try {
       await axios.delete(
-        `https://ihsaanlms.onrender.com/classes/${selectedClass.id}/`,
+        `https://api.ihsaanacademia.com/classes/${selectedClass.id}/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -463,7 +463,7 @@ const DashboardTab = () => {
   const handleLevelDelete = async () => {
     try {
       await axios.delete(
-        `https://ihsaanlms.onrender.com/levels/${selectedLevel.id}/`,
+        `https://api.ihsaanacademia.com/levels/${selectedLevel.id}/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

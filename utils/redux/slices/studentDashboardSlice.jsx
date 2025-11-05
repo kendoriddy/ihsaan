@@ -4,10 +4,10 @@ import axios from "axios";
 
 // API endpoints
 const LOGGED_IN_USER_ENDPOINT =
-  "https://ihsaanlms.onrender.com/api/auth/logged-in-user/";
+  "https://api.ihsaanacademia.com/api/auth/logged-in-user/";
 const COURSE_ENROLLMENTS_ENDPOINT =
-  "https://ihsaanlms.onrender.com/course/course-enrollments/";
-const PROGRAMMES_ENDPOINT = "https://ihsaanlms.onrender.com/api/me/programmes/";
+  "https://api.ihsaanacademia.com/course/course-enrollments/";
+const PROGRAMMES_ENDPOINT = "https://api.ihsaanacademia.com/api/me/programmes/";
 
 // Async thunk to fetch student's course enrollments
 export const fetchStudentCourses = createAsyncThunk(
@@ -127,7 +127,7 @@ export const fetchCoursesForProgramme = createAsyncThunk(
   async (programmeId, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/programmes/${programmeId}/courses/`,
+        `https://api.ihsaanacademia.com/programmes/${programmeId}/courses/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,

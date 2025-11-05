@@ -119,7 +119,7 @@ const QuranTutorApplicationModal = ({ isOpen, handleClose }) => {
         // Fetch existing application
         const token = localStorage.getItem("token");
         const res = await fetch(
-          "https://ihsaanlms.onrender.com/api/my-quran-tutor-application/",
+          "https://api.ihsaanacademia.com/api/my-quran-tutor-application/",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -155,7 +155,7 @@ const QuranTutorApplicationModal = ({ isOpen, handleClose }) => {
     try {
       const token = localStorage.getItem("token");
       const method = application ? "PATCH" : "POST";
-      const url = "https://ihsaanlms.onrender.com/api/apply-quran-tutor/";
+      const url = "https://api.ihsaanacademia.com/api/apply-quran-tutor/";
       const res = await fetch(url, {
         method,
         headers: {

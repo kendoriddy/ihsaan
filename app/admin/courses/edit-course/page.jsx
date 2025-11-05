@@ -209,7 +209,7 @@ function EditCoursePage() {
   const fetchAllStudents = async () => {
     try {
       const response = await axios.get(
-        "https://ihsaanlms.onrender.com/api/all-student",
+        "https://api.ihsaanacademia.com/api/all-student",
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -225,7 +225,7 @@ function EditCoursePage() {
   const fetchEnrolledStudents = async () => {
     try {
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/course/courses/${courseId}/enrolled_students/`,
+        `https://api.ihsaanacademia.com/course/courses/${courseId}/enrolled_students/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -263,7 +263,7 @@ function EditCoursePage() {
       await Promise.all(
         enrollments.map((enrollment) =>
           axios.post(
-            "https://ihsaanlms.onrender.com/course/course-enrollments/",
+            "https://api.ihsaanacademia.com/course/course-enrollments/",
             enrollment,
             {
               headers: {
@@ -296,7 +296,7 @@ function EditCoursePage() {
   const fetchTerms = async () => {
     try {
       const response = await axios.get(
-        "https://ihsaanlms.onrender.com/terms/",
+        "https://api.ihsaanacademia.com/terms/",
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -312,7 +312,7 @@ function EditCoursePage() {
   const fetchCourse = async () => {
     try {
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/course/courses/${courseId}/`,
+        `https://api.ihsaanacademia.com/course/courses/${courseId}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -397,7 +397,7 @@ function EditCoursePage() {
       setVideoToCloudinaryLoading(true);
       setVideoToCloudinaryError(null);
       const response = await axios.post(
-        `https://ihsaanlms.onrender.com/resource/course-video/`,
+        `https://api.ihsaanacademia.com/resource/course-video/`,
         formData,
         {
           headers: {
@@ -449,7 +449,7 @@ function EditCoursePage() {
       );
 
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/course/course-videos/",
+        "https://api.ihsaanacademia.com/course/course-videos/",
         {
           ...newVideoData,
           course: parseInt(courseId),
@@ -498,7 +498,7 @@ function EditCoursePage() {
 
     try {
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/resource/course-materials/",
+        "https://api.ihsaanacademia.com/resource/course-materials/",
         formData,
         {
           headers: {
@@ -542,7 +542,7 @@ function EditCoursePage() {
 
     try {
       const response = await axios.put(
-        `https://ihsaanlms.onrender.com/course/courses/${courseId}/`,
+        `https://api.ihsaanacademia.com/course/courses/${courseId}/`,
         courseData,
         {
           headers: {
@@ -586,7 +586,7 @@ function EditCoursePage() {
       const { id: materialResourceId } = await uploadImageToCloudinary(file);
 
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/course/course-materials/",
+        "https://api.ihsaanacademia.com/course/course-materials/",
         {
           course: parseInt(courseId),
           section: parseInt(newMaterialData.section),
@@ -621,7 +621,7 @@ function EditCoursePage() {
       if (!confirmDelete) return;
 
       await axios.delete(
-        `https://ihsaanlms.onrender.com/course/course-videos/${videoId}/`,
+        `https://api.ihsaanacademia.com/course/course-videos/${videoId}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -644,7 +644,7 @@ function EditCoursePage() {
       if (!confirmDelete) return;
 
       await axios.delete(
-        `https://ihsaanlms.onrender.com/course/course-materials/${materialId}/`,
+        `https://api.ihsaanacademia.com/course/course-materials/${materialId}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -667,7 +667,7 @@ function EditCoursePage() {
       if (!confirmUnenroll) return;
 
       const response = await axios.post(
-        `https://ihsaanlms.onrender.com/course/courses/${courseId}/unenroll/`,
+        `https://api.ihsaanacademia.com/course/courses/${courseId}/unenroll/`,
         {
           user_id: userId,
           term_id: termId,
@@ -692,7 +692,7 @@ function EditCoursePage() {
     if (!courseId) return;
     try {
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/course/course-sections/?course=${courseId}`,
+        `https://api.ihsaanacademia.com/course/course-sections/?course=${courseId}`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -762,7 +762,7 @@ function EditCoursePage() {
 
       // Send update to API
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/course/course-sections/update_order/",
+        "https://api.ihsaanacademia.com/course/course-sections/update_order/",
         payload,
         {
           headers: {
@@ -814,7 +814,7 @@ function EditCoursePage() {
     setIsLoading(true); // Use a general loading state or create a new one for sections
     try {
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/course/course-sections/",
+        "https://api.ihsaanacademia.com/course/course-sections/",
         {
           ...newSectionData,
           course: parseInt(courseId), // Ensure courseId is an integer

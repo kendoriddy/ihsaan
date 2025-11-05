@@ -48,7 +48,7 @@ const CourseDetailPage = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/course/courses/${courseId}/`,
+        `https://api.ihsaanacademia.com/course/courses/${courseId}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,

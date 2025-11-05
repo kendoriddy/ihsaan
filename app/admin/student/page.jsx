@@ -195,7 +195,7 @@ const StudentApplication = () => {
       const token = localStorage.getItem("token");
       updateApplicationStatus(
         {
-          url: `https://ihsaanlms.onrender.com/api/admin/student/application/${studentToEdit?.id}/update/`,
+          url: `https://api.ihsaanacademia.com/api/admin/student/application/${studentToEdit?.id}/update/`,
           data,
           headers: {
             Authorization: `Bearer ${token}`,

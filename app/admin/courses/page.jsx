@@ -213,7 +213,7 @@ function Page() {
       const token = localStorage.getItem("token"); // Retrieve token from local storage
 
       const response = await axios.delete(
-        `https://ihsaanlms.onrender.com/course/courses/${courseToDelete}/`,
+        `https://api.ihsaanacademia.com/course/courses/${courseToDelete}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`, // Add token to headers

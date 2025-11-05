@@ -65,7 +65,7 @@ const ProgrammesReport = () => {
       if (filters.level) params.append("level", filters.level);
 
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/programmes/?${params.toString()}`,
+        `https://api.ihsaanacademia.com/programmes/?${params.toString()}`,
         { headers }
       );
       setProgrammes(response.data.results);

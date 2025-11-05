@@ -43,8 +43,8 @@ const UsersReport = () => {
       };
       const endpoint =
         userType === "student"
-          ? "https://ihsaanlms.onrender.com/api/all-student"
-          : "https://ihsaanlms.onrender.com/api/all-tutor";
+          ? "https://api.ihsaanacademia.com/api/all-student"
+          : "https://api.ihsaanacademia.com/api/all-tutor";
 
       const response = await axios.get(endpoint, { headers });
 

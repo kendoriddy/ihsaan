@@ -194,7 +194,7 @@ const TutorApplication = () => {
       const token = localStorage.getItem("token");
       updateApplicationStatus(
         {
-          url: `https://ihsaanlms.onrender.com/api/admin/tutor/application/${tutorToEdit?.id}/update/`,
+          url: `https://api.ihsaanacademia.com/api/admin/tutor/application/${tutorToEdit?.id}/update/`,
           data,
           headers: {
             Authorization: `Bearer ${token}`,

@@ -69,7 +69,7 @@ const AssessmentModal = ({
       if (!userId) {
         // If not in localStorage, fetch from API
         const userResponse = await axios.get(
-          "https://ihsaanlms.onrender.com/api/auth/logged-in-user/",
+          "https://api.ihsaanacademia.com/api/auth/logged-in-user/",
           {
             headers: {
               Authorization: `Bearer ${getAuthToken()}`,
@@ -89,7 +89,7 @@ const AssessmentModal = ({
 
       // Check if user has already taken the assessment
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/assessment/assessments/has-taken/`,
+        `https://api.ihsaanacademia.com/assessment/assessments/has-taken/`,
         {
           params: {
             course_section: sectionData.id,
@@ -203,7 +203,7 @@ const AssessmentModal = ({
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionData.id}/`,
+        `https://api.ihsaanacademia.com/assessment/mcquestions/course-section/${sectionData.id}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -320,7 +320,7 @@ const AssessmentModal = ({
       }, {});
 
       const response = await axios.post(
-        `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionData.id}/submit/`,
+        `https://api.ihsaanacademia.com/assessment/mcquestions/course-section/${sectionData.id}/submit/`,
         { answers: formattedAnswers },
         {
           headers: {
@@ -332,7 +332,7 @@ const AssessmentModal = ({
 
       // Fetch detailed results
       const resultsResponse = await axios.get(
-        `https://ihsaanlms.onrender.com/assessment/mcq-responses/${response.data.mcq_response_id}/`,
+        `https://api.ihsaanacademia.com/assessment/mcq-responses/${response.data.mcq_response_id}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,

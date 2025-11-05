@@ -8,9 +8,9 @@ This document outlines the implementation of the feedback system for the Ihsaan 
 
 ### Base URLs
 
-- **Feedback API**: `https://ihsaanlms.onrender.com/feedback-ticket/feedbacks/`
-- **Resource API**: `https://ihsaanlms.onrender.com/resource/feedback-resource/`
-- **User Info API**: `https://ihsaanlms.onrender.com/api/auth/logged-in-user/`
+- **Feedback API**: `https://api.ihsaanacademia.com/feedback-ticket/feedbacks/`
+- **Resource API**: `https://api.ihsaanacademia.com/resource/feedback-resource/`
+- **User Info API**: `https://api.ihsaanacademia.com/api/auth/logged-in-user/`
 
 ### Feedback API Endpoints
 
@@ -189,7 +189,7 @@ The feedback form now includes intelligent dropdowns for subject IDs:
 
 #### **Courses**
 
-- **Source**: API endpoint `https://ihsaanlms.onrender.com/course/courses`
+- **Source**: API endpoint `https://api.ihsaanacademia.com/course/courses`
 - **Data**: Fetched via Redux `fetchCourses` action
 - **Display**: Course title with fallback to "Course {ID}"
 
