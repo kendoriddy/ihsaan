@@ -6,17 +6,26 @@ import { useFetch, usePost } from "@/hooks/useHttp/useHttp";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import React from "react";
+import Swal from "sweetalert2";
 
 const CreateTerm = () => {
   const { mutate: createTerm, isLoading: isCreatingTerm } = usePost(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms/`,
     {
       onSuccess: (response) => {
-        toast.success("Term created successfully");
+        Swal.fire({
+          title: "Terms created successfully",
+          icon: "success",
+          customClass: { confirmButton: "my-confirm-btn" },
+        });
         resetForm();
       },
       onError: (error) => {
-        toast.error(error.response?.data?.message || "Failed to create term");
+        Swal.fire({
+          title: error.response?.data?.message || "Failed to delete",
+          icon: "error",
+          customClass: { confirmButton: "my-confirm-btn" },
+        });
       },
     }
   );

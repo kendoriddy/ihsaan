@@ -18,13 +18,20 @@ const CreateSession = () => {
     isLoading: isCreatingAcademicSession,
   } = usePost(`${process.env.NEXT_PUBLIC_API_BASE_URL}/academic-sessions/`, {
     onSuccess: (response) => {
-      toast.success("Academic session created successfully");
+      Swal.fire({
+        title: "Academic session created successfully",
+        icon: "success",
+        customClass: { confirmButton: "my-confirm-btn" },
+      });
       resetForm();
     },
     onError: (error) => {
-      toast.error(
-        error.response?.data?.message || "Failed to create academic session"
-      );
+      Swal.fire({
+        title:
+          error.response?.data?.message || "Failed to create academic session",
+        icon: "error",
+        customClass: { confirmButton: "my-confirm-btn" },
+      });
     },
   });
 

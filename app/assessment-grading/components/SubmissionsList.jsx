@@ -127,15 +127,6 @@ const SubmissionsList = ({ assessmentId }) => {
             refetchGrades();
           },
           onError: () => {
-            // Swal.fire({
-            //   title:
-            //     "Failed to update grade, make sure score is not greate than assessment score and try again",
-            //   icon: "error",
-            //   target: document.body,
-            //   customClass: {
-            //     confirmButton: "my-confirm-btn",
-            //   },
-            // });
             toast.error(
               "Failed to update grade, make sure score is not greater than assessment score and try again"
             );

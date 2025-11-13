@@ -11,7 +11,7 @@ import {
   Box,
 } from "@mui/material";
 import Layout from "@/components/Layout";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import SubmissionsList from "./components/SubmissionsList";
 

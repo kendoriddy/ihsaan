@@ -128,8 +128,6 @@ const QuizQuestion = ({ setCurrentScreen }) => {
         toast.success("Quiz submitted successfully");
         setShowModal(true);
         setShowResponse(response.data);
-        console.log("submission response", response);
-        console.log("show response", showResponse);
       },
       onError: (error) => {
         // toast.error(error.error || "Failed to submit quiz");
@@ -204,7 +202,7 @@ const QuizQuestion = ({ setCurrentScreen }) => {
 
   const handleSubmit = () => {
     const unansweredQuestions = answers.filter((answer) => answer === null);
-        if (unansweredQuestions.length > 0) {
+    if (unansweredQuestions.length > 0) {
       const confirmSubmit = window.confirm(
         "Some questions are unanswered. Are you sure you want to submit?"
       );
