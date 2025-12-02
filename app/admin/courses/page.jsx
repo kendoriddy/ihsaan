@@ -269,7 +269,7 @@ function Page() {
 
   // Tutor Assignment Modal State
   const [openAssignModal, setOpenAssignModal] = useState(false);
-  const [selectedTutor, setSelectedTutor] = useState("");
+  const [selectedTutors, setSelectedTutors] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedTerm, setSelectedTerm] = useState("");
 
@@ -356,33 +356,116 @@ function Page() {
   );
   const allStudents = allStudentsData?.data?.results || [];
 
-  // Assign tutor mutation
-  const { mutate: assignTutor, isLoading: assigning } = usePost(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-tutor-assignments/`,
-    {
-      onSuccess: () => {
-        toast.success("Tutor assigned successfully");
+  // Handle multiple tutor assignments
+  const [assigningTutors, setAssigningTutors] = useState(false);
+
+  const handleAssignMultipleTutors = async (e) => {
+    e.preventDefault();
+
+    if (!selectedTerm) {
+      toast.error("Please select a term");
+      return;
+    }
+
+    if (!selectedCourse) {
+      toast.error("Please select a course");
+      return;
+    }
+
+    if (selectedTutors.length === 0) {
+      toast.error("Please select at least one tutor");
+      return;
+    }
+
+    setAssigningTutors(true);
+
+    try {
+      const token = getAuthToken();
+      const assignments = selectedTutors.map((tutor) => {
+        const tutorId = tutor?.id || tutor;
+        return {
+          user: tutorId,
+          course: selectedCourse,
+          term: selectedTerm,
+        };
+      });
+
+      // Make all assignments in parallel
+      const results = await Promise.allSettled(
+        assignments.map((assignment) =>
+          axios.post(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-tutor-assignments/`,
+            assignment,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
+        )
+      );
+
+      // Count successes and failures
+      const successful = results.filter((r) => r.status === "fulfilled").length;
+      const failed = results.filter((r) => r.status === "rejected").length;
+
+      if (failed === 0) {
+        toast.success(
+          `Successfully assigned ${successful} tutor(s) to the course`
+        );
         setOpenAssignModal(false);
-        setSelectedTutor("");
+        setSelectedTutors([]);
         setSelectedCourse("");
         setSelectedTerm("");
         refetchAssignments();
-      },
-      onError: (error) => {
-        const errorData = error.response?.data;
-        if (typeof errorData === "string") {
-          toast.error(errorData);
-        } else if (typeof errorData === "object" && errorData !== null) {
-          const messages = Object.values(errorData)
-            .map((msg) => (Array.isArray(msg) ? msg.join(" ") : msg))
-            .join(" ");
-          toast.error(messages);
-        } else {
-          toast.error("Failed to assign tutor");
+      } else if (successful > 0) {
+        toast.warning(
+          `Assigned ${successful} tutor(s), but ${failed} assignment(s) failed`
+        );
+        // Log errors for debugging
+        results.forEach((result, index) => {
+          if (result.status === "rejected") {
+            console.error(
+              `Failed to assign tutor ${selectedTutors[index]}:`,
+              result.reason
+            );
+          }
+        });
+        refetchAssignments();
+      } else {
+        toast.error("Failed to assign tutors");
+        // Show first error
+        const firstError = results.find((r) => r.status === "rejected");
+        if (firstError?.reason?.response?.data) {
+          const errorData = firstError.reason.response.data;
+          if (typeof errorData === "string") {
+            toast.error(errorData);
+          } else if (typeof errorData === "object") {
+            const messages = Object.values(errorData)
+              .map((msg) => (Array.isArray(msg) ? msg.join(" ") : msg))
+              .join(" ");
+            toast.error(messages);
+          }
         }
-      },
+      }
+    } catch (error) {
+      console.error("Error assigning tutors:", error);
+      const errorData = error.response?.data;
+      if (typeof errorData === "string") {
+        toast.error(errorData);
+      } else if (typeof errorData === "object" && errorData !== null) {
+        const messages = Object.values(errorData)
+          .map((msg) => (Array.isArray(msg) ? msg.join(" ") : msg))
+          .join(" ");
+        toast.error(messages);
+      } else {
+        toast.error("Failed to assign tutors");
+      }
+    } finally {
+      setAssigningTutors(false);
     }
-  );
+  };
 
   // Delete assignment mutation
   const { mutate: deleteAssignment } = useDelete(
@@ -580,6 +663,50 @@ function Page() {
     } finally {
       setIsLoadingStudents(false);
     }
+  };
+
+  // Get tutors assigned to a specific course
+  const getTutorsForSelectedCourse = (courseId) => {
+    if (!courseId || !assignments.length) return [];
+    const courseIdNum =
+      typeof courseId === "string" ? parseInt(courseId) : courseId;
+    const courseAssignments = assignments.filter((assignment) => {
+      const assignmentCourseId = assignment.course?.id || assignment.course;
+      const assignmentCourseIdNum =
+        typeof assignmentCourseId === "string"
+          ? parseInt(assignmentCourseId)
+          : assignmentCourseId;
+      return (
+        assignmentCourseIdNum === courseIdNum || assignmentCourseId === courseId
+      );
+    });
+
+    // Extract unique tutor IDs from assignments
+    const tutorIds = new Set();
+    courseAssignments.forEach((assignment) => {
+      const tutorId = assignment.user?.id || assignment.user;
+      if (tutorId) tutorIds.add(tutorId);
+    });
+
+    // Return tutors that match the IDs
+    return tutors.filter((tutor) => {
+      const tutorId = tutor.id;
+      const tutorIdNum =
+        typeof tutorId === "string" ? parseInt(tutorId) : tutorId;
+      return Array.from(tutorIds).some((id) => {
+        const idNum = typeof id === "string" ? parseInt(id) : id;
+        return idNum === tutorIdNum || id === tutorId;
+      });
+    });
+  };
+
+  // TODO: Filter courses by term once backend endpoint is updated
+  // Currently, courses are not associated with terms during registration,
+  // so we show all courses regardless of term selection
+  // Handle term selection change for tutor assignment
+  const handleTermChangeForAssignment = (termId) => {
+    setSelectedTerm(termId);
+    // Note: Course filtering by term will be implemented once backend supports it
   };
 
   // Handle course selection change for tutor-student assignment
@@ -964,76 +1091,34 @@ function Page() {
             {/* Tutor Assignment Modal */}
             <Dialog
               open={openAssignModal}
-              onClose={() => setOpenAssignModal(false)}
+              onClose={() => {
+                setOpenAssignModal(false);
+                setSelectedTerm("");
+                setSelectedCourse("");
+                setSelectedTutors([]);
+              }}
               maxWidth="sm"
               fullWidth
             >
-              <DialogTitle>Assign Tutor to Course</DialogTitle>
+              <DialogTitle>Assign Tutors to Course</DialogTitle>
               <DialogContent>
                 <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    assignTutor({
-                      user: selectedTutor,
-                      course: selectedCourse,
-                      term: selectedTerm,
-                    });
-                  }}
+                  onSubmit={handleAssignMultipleTutors}
                   className="space-y-4 mt-2"
                 >
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel id="tutor-label">Tutor</InputLabel>
-                    <Select
-                      labelId="tutor-label"
-                      value={selectedTutor}
-                      onChange={(e) => setSelectedTutor(e.target.value)}
-                      label="Tutor"
-                      required
-                    >
-                      {tutorsLoading ? (
-                        <MenuItem disabled>Loading tutors...</MenuItem>
-                      ) : tutors.length > 0 ? (
-                        tutors.map((tutor) => (
-                          <MenuItem key={tutor.id} value={tutor.id}>
-                            {tutor.first_name} {tutor.last_name} ({tutor.email})
-                          </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled>No tutors found</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel id="course-label">Course</InputLabel>
-                    <Select
-                      labelId="course-label"
-                      value={selectedCourse}
-                      onChange={(e) => setSelectedCourse(e.target.value)}
-                      label="Course"
-                      required
-                    >
-                      {allCourses && allCourses.length > 0 ? (
-                        allCourses.map((course) => (
-                          <MenuItem key={course.id} value={course.id}>
-                            {course.title || course.name}
-                          </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled>No courses found</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
                   <FormControl fullWidth margin="normal">
                     <InputLabel id="term-label">Term</InputLabel>
                     <Select
                       labelId="term-label"
                       value={selectedTerm}
-                      onChange={(e) => setSelectedTerm(e.target.value)}
+                      onChange={(e) =>
+                        handleTermChangeForAssignment(e.target.value)
+                      }
                       label="Term"
                       required
                     >
                       {termsLoading ? (
-                        <MenuItem disabled>Loading courses...</MenuItem>
+                        <MenuItem disabled>Loading terms...</MenuItem>
                       ) : terms.length > 0 ? (
                         terms.map((term) => (
                           <MenuItem key={term.id} value={term.id}>
@@ -1057,9 +1142,85 @@ function Page() {
                       )}
                     </Select>
                   </FormControl>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel id="course-label">Course</InputLabel>
+                    <Select
+                      labelId="course-label"
+                      value={selectedCourse}
+                      onChange={(e) => setSelectedCourse(e.target.value)}
+                      label="Course"
+                      required
+                    >
+                      {allCourses && allCourses.length > 0 ? (
+                        allCourses.map((course) => (
+                          <MenuItem key={course.id} value={course.id}>
+                            {course.title || course.name}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled>No courses found</MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                  <Autocomplete
+                    fullWidth
+                    multiple
+                    options={tutors || []}
+                    getOptionLabel={(option) =>
+                      option
+                        ? `${option.first_name || ""} ${
+                            option.last_name || ""
+                          } (${option.email || ""})`.trim()
+                        : ""
+                    }
+                    value={selectedTutors}
+                    onChange={(event, newValue) => {
+                      setSelectedTutors(newValue);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Tutors"
+                        margin="normal"
+                        disabled={tutorsLoading}
+                        placeholder="Select one or more tutors"
+                        inputProps={{
+                          ...params.inputProps,
+                          required: false,
+                        }}
+                      />
+                    )}
+                    renderOption={(props, option) => {
+                      const tutorId = option.id;
+                      const tutorName = `${option.first_name || ""} ${
+                        option.last_name || ""
+                      } (${option.email || ""})`.trim();
+
+                      return (
+                        <li {...props} key={tutorId}>
+                          <Checkbox
+                            checked={selectedTutors.some(
+                              (t) => (t?.id || t) === tutorId
+                            )}
+                          />
+                          <ListItemText primary={tutorName} />
+                        </li>
+                      );
+                    }}
+                    isOptionEqualToValue={(option, value) => {
+                      if (!value || !option) return false;
+                      return option.id === value.id;
+                    }}
+                    loading={tutorsLoading}
+                  />
                   <DialogActions>
                     <Button
-                      onClick={() => setOpenAssignModal(false)}
+                      onClick={() => {
+                        setOpenAssignModal(false);
+                        setSelectedTerm("");
+                        setSelectedCourse("");
+                        setSelectedTutors([]);
+                      }}
                       color="primary"
                     >
                       Cancel
@@ -1067,9 +1228,13 @@ function Page() {
                     <Button
                       type="submit"
                       color="secondary"
-                      disabled={assigning}
+                      disabled={assigningTutors || selectedTutors.length === 0}
                     >
-                      {assigning ? "Assigning..." : "Assign"}
+                      {assigningTutors
+                        ? `Assigning ${selectedTutors.length} tutor(s)...`
+                        : `Assign ${selectedTutors.length || ""} Tutor${
+                            selectedTutors.length !== 1 ? "s" : ""
+                          }`}
                     </Button>
                   </DialogActions>
                 </form>
@@ -1122,7 +1287,14 @@ function Page() {
 
                   <Autocomplete
                     fullWidth
-                    options={tutors || []}
+                    options={
+                      selectedCourseForStudents
+                        ? getTutorsForSelectedCourse(
+                            selectedCourseForStudents?.id ||
+                              selectedCourseForStudents
+                          )
+                        : []
+                    }
                     getOptionLabel={(option) =>
                       option
                         ? `${option.first_name || ""} ${
@@ -1140,14 +1312,19 @@ function Page() {
                         label="Tutor"
                         margin="normal"
                         required
-                        disabled={tutorsLoading}
+                        disabled={
+                          tutorsLoading ||
+                          !selectedCourseForStudents ||
+                          assignmentsLoading
+                        }
                       />
                     )}
                     isOptionEqualToValue={(option, value) => {
                       if (!value || !option) return false;
                       return option.id === value.id;
                     }}
-                    loading={tutorsLoading}
+                    loading={tutorsLoading || assignmentsLoading}
+                    disabled={!selectedCourseForStudents}
                   />
 
                   <Autocomplete
