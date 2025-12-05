@@ -11,6 +11,13 @@ import { fetchProgrammes } from "@/utils/redux/slices/programmeSlice";
 import Image from "next/image";
 import { getAuthToken } from "@/hooks/axios/axios";
 import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
+import {
   FaCaretDown,
   FaChevronDown,
   FaChevronUp,
@@ -160,6 +167,11 @@ function EditCoursePage() {
   const [terms, setTerms] = useState([]);
   const [selectedTerm, setSelectedTerm] = useState("");
   const [isEnrollLoading, setIsEnrollLoading] = useState(false);
+  const [isUnenrollModalOpen, setIsUnenrollModalOpen] = useState(false);
+  const [unenrollStudentData, setUnenrollStudentData] = useState({
+    userId: null,
+    termId: null,
+  });
 
   const [sections, setSections] = useState({
     courseDetails: true,
@@ -209,7 +221,7 @@ function EditCoursePage() {
   const fetchAllStudents = async () => {
     try {
       const response = await axios.get(
-        "https://ihsaanlms.onrender.com/api/all-student",
+        "https://api.ihsaanacademia.com/api/all-student",
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -225,7 +237,7 @@ function EditCoursePage() {
   const fetchEnrolledStudents = async () => {
     try {
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/course/courses/${courseId}/enrolled_students/`,
+        `https://api.ihsaanacademia.com/course/courses/${courseId}/enrolled_students/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -263,7 +275,7 @@ function EditCoursePage() {
       await Promise.all(
         enrollments.map((enrollment) =>
           axios.post(
-            "https://ihsaanlms.onrender.com/course/course-enrollments/",
+            "https://api.ihsaanacademia.com/course/course-enrollments/",
             enrollment,
             {
               headers: {
@@ -296,7 +308,7 @@ function EditCoursePage() {
   const fetchTerms = async () => {
     try {
       const response = await axios.get(
-        "https://ihsaanlms.onrender.com/terms/",
+        "https://api.ihsaanacademia.com/terms/",
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -312,7 +324,7 @@ function EditCoursePage() {
   const fetchCourse = async () => {
     try {
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/course/courses/${courseId}/`,
+        `https://api.ihsaanacademia.com/course/courses/${courseId}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -397,7 +409,7 @@ function EditCoursePage() {
       setVideoToCloudinaryLoading(true);
       setVideoToCloudinaryError(null);
       const response = await axios.post(
-        `https://ihsaanlms.onrender.com/resource/course-video/`,
+        `https://api.ihsaanacademia.com/resource/course-video/`,
         formData,
         {
           headers: {
@@ -449,7 +461,7 @@ function EditCoursePage() {
       );
 
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/course/course-videos/",
+        "https://api.ihsaanacademia.com/course/course-videos/",
         {
           ...newVideoData,
           course: parseInt(courseId),
@@ -498,7 +510,7 @@ function EditCoursePage() {
 
     try {
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/resource/course-materials/",
+        "https://api.ihsaanacademia.com/resource/course-materials/",
         formData,
         {
           headers: {
@@ -542,7 +554,7 @@ function EditCoursePage() {
 
     try {
       const response = await axios.put(
-        `https://ihsaanlms.onrender.com/course/courses/${courseId}/`,
+        `https://api.ihsaanacademia.com/course/courses/${courseId}/`,
         courseData,
         {
           headers: {
@@ -586,7 +598,7 @@ function EditCoursePage() {
       const { id: materialResourceId } = await uploadImageToCloudinary(file);
 
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/course/course-materials/",
+        "https://api.ihsaanacademia.com/course/course-materials/",
         {
           course: parseInt(courseId),
           section: parseInt(newMaterialData.section),
@@ -621,7 +633,7 @@ function EditCoursePage() {
       if (!confirmDelete) return;
 
       await axios.delete(
-        `https://ihsaanlms.onrender.com/course/course-videos/${videoId}/`,
+        `https://api.ihsaanacademia.com/course/course-videos/${videoId}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -644,7 +656,7 @@ function EditCoursePage() {
       if (!confirmDelete) return;
 
       await axios.delete(
-        `https://ihsaanlms.onrender.com/course/course-materials/${materialId}/`,
+        `https://api.ihsaanacademia.com/course/course-materials/${materialId}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -659,15 +671,21 @@ function EditCoursePage() {
     }
   };
 
-  const handleUnenrollStudent = async (userId, termId) => {
-    try {
-      const confirmUnenroll = window.confirm(
-        "Are you sure you want to unenroll this student?"
-      );
-      if (!confirmUnenroll) return;
+  const handleOpenUnenrollModal = (userId, termId) => {
+    setUnenrollStudentData({ userId, termId });
+    setIsUnenrollModalOpen(true);
+  };
 
+  const handleCloseUnenrollModal = () => {
+    setIsUnenrollModalOpen(false);
+    setUnenrollStudentData({ userId: null, termId: null });
+  };
+
+  const handleConfirmUnenroll = async () => {
+    const { userId, termId } = unenrollStudentData;
+    try {
       const response = await axios.post(
-        `https://ihsaanlms.onrender.com/course/courses/${courseId}/unenroll/`,
+        `https://api.ihsaanacademia.com/course/courses/${courseId}/unenroll/`,
         {
           user_id: userId,
           term_id: termId,
@@ -682,17 +700,22 @@ function EditCoursePage() {
       console.log("Unenroll response:", response.data);
       toast.success("Student unenrolled successfully!");
       fetchEnrolledStudents();
+      handleCloseUnenrollModal();
     } catch (error) {
       console.log(error, "error here");
       toast.error("Failed to unenroll student");
     }
   };
 
+  const handleUnenrollStudent = async (userId, termId) => {
+    handleOpenUnenrollModal(userId, termId);
+  };
+
   const fetchCourseSections = async () => {
     if (!courseId) return;
     try {
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/course/course-sections/?course=${courseId}`,
+        `https://api.ihsaanacademia.com/course/course-sections/?course=${courseId}`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -762,7 +785,7 @@ function EditCoursePage() {
 
       // Send update to API
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/course/course-sections/update_order/",
+        "https://api.ihsaanacademia.com/course/course-sections/update_order/",
         payload,
         {
           headers: {
@@ -814,7 +837,7 @@ function EditCoursePage() {
     setIsLoading(true); // Use a general loading state or create a new one for sections
     try {
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/course/course-sections/",
+        "https://api.ihsaanacademia.com/course/course-sections/",
         {
           ...newSectionData,
           course: parseInt(courseId), // Ensure courseId is an integer
@@ -1860,6 +1883,38 @@ function EditCoursePage() {
 
           <hr className="my-6 mb-16 border-t-4 border-blue-600 shadow-md" />
         </div>
+
+        {/* Unenroll Confirmation Modal */}
+        <Dialog
+          open={isUnenrollModalOpen}
+          onClose={handleCloseUnenrollModal}
+          aria-labelledby="unenroll-student-dialog-title"
+          aria-describedby="unenroll-student-dialog-description"
+        >
+          <DialogTitle id="unenroll-student-dialog-title">
+            Are you sure you want to unenroll this student?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="unenroll-student-dialog-description">
+              This action will remove the student from the course. They will no
+              longer have access to course materials and videos.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <button
+              onClick={handleCloseUnenrollModal}
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-100 transition-all duration-300"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmUnenroll}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-800 transition-all duration-300"
+            >
+              Unenroll
+            </button>
+          </DialogActions>
+        </Dialog>
       </main>
     </div>
   );

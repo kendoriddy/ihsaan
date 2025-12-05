@@ -25,7 +25,7 @@ export const fetchCourses = createAsyncThunk(
         params.append("search", search);
       }
 
-      const url = `https://ihsaanlms.onrender.com/course/courses/?${params.toString()}`;
+      const url = `https://api.ihsaanacademia.com/course/courses/?${params.toString()}`;
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,

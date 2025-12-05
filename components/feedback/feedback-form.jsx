@@ -252,7 +252,7 @@ export default function FeedbackForm({ isOpen, onClose, userRole, onSubmit }) {
 
       try {
         const userResponse = await fetch(
-          "https://ihsaanlms.onrender.com/api/auth/logged-in-user/",
+          "https://api.ihsaanacademia.com/api/auth/logged-in-user/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

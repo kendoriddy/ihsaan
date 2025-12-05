@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const apiLink = "https://ihsaanlms.onrender.com/api";
-export const apiLink2 = "https://ihsaanlms.onrender.com";
+export const apiLink = "https://api.ihsaanacademia.com/api";
+export const apiLink2 = "https://api.ihsaanacademia.com";
 
 // Create Axios instance without initial auth header
 const http = axios.create({

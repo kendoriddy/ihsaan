@@ -8,7 +8,7 @@ export const submitAssessment = createAsyncThunk(
   async ({ sectionId, answers }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://ihsaanlms.onrender.com/assessment/mcquestions/course-section/${sectionId}/submit/`,
+        `https://api.ihsaanacademia.com/assessment/mcquestions/course-section/${sectionId}/submit/`,
         { answers },
         {
           headers: {
@@ -20,7 +20,7 @@ export const submitAssessment = createAsyncThunk(
 
       // Fetch detailed results
       const resultsResponse = await axios.get(
-        `https://ihsaanlms.onrender.com/assessment/mcq-responses/${response.data.mcq_response_id}/`,
+        `https://api.ihsaanacademia.com/assessment/mcq-responses/${response.data.mcq_response_id}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,

@@ -95,7 +95,7 @@ const Page = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          "https://ihsaanlms.onrender.com/api/my-quran-tutor-application/",
+          "https://api.ihsaanacademia.com/api/my-quran-tutor-application/",
           {
             headers: { Authorization: `Bearer ${token}` },
           }

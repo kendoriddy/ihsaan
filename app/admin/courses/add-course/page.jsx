@@ -57,7 +57,7 @@ function Page() {
 
     try {
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/resource/course-materials/",
+        "https://api.ihsaanacademia.com/resource/course-materials/",
         formData,
         {
           headers: {
@@ -109,7 +109,7 @@ function Page() {
 
     try {
       const response = await axios.post(
-        "https://ihsaanlms.onrender.com/course/courses/",
+        "https://api.ihsaanacademia.com/course/courses/",
         courseData,
         {
           headers: {

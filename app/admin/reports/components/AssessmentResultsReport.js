@@ -86,7 +86,7 @@ const AssessmentResultsReport = () => {
         params.append("created_before", filters.createdBefore);
 
       const response = await axios.get(
-        `https://ihsaanlms.onrender.com/assessment/grades/?${params.toString()}`,
+        `https://api.ihsaanacademia.com/assessment/grades/?${params.toString()}`,
         { headers }
       );
       setResults(response.data.results);

@@ -24,7 +24,7 @@ function Footer() {
   };
 
   const { mutate: subscribe, isLoading } = usePost(
-    "https://ihsaanlms.onrender.com/newsletter/api/subscribers/",
+    "https://api.ihsaanacademia.com/newsletter/api/subscribers/",
     {
       onSuccess: (response, { resetForm }) => {
         toast.success("Subscribed successfully");
