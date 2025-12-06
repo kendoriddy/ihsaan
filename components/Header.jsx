@@ -68,15 +68,19 @@ function Header() {
   );
   const authenticatedUsersPayload =
     getAuthUserInformation && getAuthUserInformation?.data;
-  if (typeof window !== "undefined" && getAuthUserInformation?.data) {
-    localStorage.setItem(
-      "userFullData",
-      JSON.stringify(getAuthUserInformation?.data)
-    );
-    if (getAuthUserInformation?.data?.id) {
-      localStorage.setItem("userId", getAuthUserInformation.data.id);
+
+  // Move localStorage access to useEffect to prevent hydration issues
+  useEffect(() => {
+    if (typeof window !== "undefined" && getAuthUserInformation?.data) {
+      localStorage.setItem(
+        "userFullData",
+        JSON.stringify(getAuthUserInformation?.data)
+      );
+      if (getAuthUserInformation?.data?.id) {
+        localStorage.setItem("userId", getAuthUserInformation.data.id);
+      }
     }
-  }
+  }, [getAuthUserInformation?.data]);
 
   const isAuth = useSelector(selectIsAuth);
   const signedInUserName = useSelector(currentlyLoggedInUser);
