@@ -68,12 +68,14 @@ function Header() {
   );
   const authenticatedUsersPayload =
     getAuthUserInformation && getAuthUserInformation?.data;
-  if (typeof window !== "undefined") {
+  if (typeof window !== "undefined" && getAuthUserInformation?.data) {
     localStorage.setItem(
       "userFullData",
-      JSON.stringify(getAuthUserInformation?.data),
-      localStorage.setItem("userId", getAuthUserInformation?.data.id)
+      JSON.stringify(getAuthUserInformation?.data)
     );
+    if (getAuthUserInformation?.data?.id) {
+      localStorage.setItem("userId", getAuthUserInformation.data.id);
+    }
   }
 
   const isAuth = useSelector(selectIsAuth);

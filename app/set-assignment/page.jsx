@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFetch, useDelete } from "@/hooks/useHttp/useHttp";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -40,13 +40,39 @@ const AllAssignment = () => {
   const [totalAssignments, setTotalAssignments] = useState(0);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null); // Anchor for the dropdown menu
   const [openQuizModal, setOpenQuizModal] = useState(false);
+  const [tutorId, setTutorId] = useState(null);
 
-  const tutorId =
-    typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  // Get tutorId from localStorage or userFullData
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Try to get userId directly
+      let userId = localStorage.getItem("userId");
+      
+      // If userId is not available, try to get it from userFullData
+      if (!userId) {
+        const userFullData = localStorage.getItem("userFullData");
+        if (userFullData) {
+          try {
+            const userData = JSON.parse(userFullData);
+            userId = userData?.id || null;
+          } catch (e) {
+            console.error("Error parsing userFullData:", e);
+          }
+        }
+      }
+      
+      setTutorId(userId);
+    }
+  }, []);
+
+  // Build URL with tutor parameter only if tutorId is available
+  const fetchUrl = tutorId
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/?tutor=${tutorId}&page_size=15&page=${page}`
+    : `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/?page_size=15&page=${page}`;
 
   const { isLoading, data, refetch, isFetching } = useFetch(
-    "assignments",
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base/?tutor=${tutorId}&page_size=15&page=${page}`,
+    ["assignments", page, tutorId],
+    fetchUrl,
     (data) => {
       if (data?.total) {
         setTotalAssignments(data.total);
