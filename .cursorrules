@@ -1,0 +1,42 @@
+# Cursor Rules for Ihsaan LMS Project
+
+## Backend API Guidelines
+
+### 1. Never Expose Base URL
+
+- **NEVER** hardcode base URLs directly in code
+- **NEVER** expose base URLs in client-side code, logs, error messages, or comments
+- Always use environment variables (e.g., `process.env.NEXT_PUBLIC_API_BASE_URL`) for base URLs
+- If a base URL must be referenced, ensure it's stored in environment variables and never committed to version control
+- When creating new API calls, use the existing axios instance or environment variables, never hardcode URLs
+
+### 2. Backend Endpoints Reference
+
+- **ALWAYS** check `IhsaanLms.yaml` for backend endpoint definitions before creating new API calls
+- The `IhsaanLms.yaml` file contains the OpenAPI 3.0.3 specification with all available backend endpoints
+- When implementing API calls:
+  1. First, search `IhsaanLms.yaml` for the relevant endpoint using grep or semantic search
+  2. Verify the endpoint path, HTTP method, parameters, and request/response schemas
+  3. Use the exact endpoint paths as defined in the YAML file
+  4. Follow the parameter structure and naming conventions from the YAML specification
+- If an endpoint doesn't exist in `IhsaanLms.yaml`, verify with the backend team before implementing
+
+#### Working with IhsaanLms.yaml Efficiently
+
+- **Search by endpoint path**: Use grep to find specific paths (e.g., `/assessment/base/`, `/course/courses/`)
+- **Search by operationId**: Each endpoint has an `operationId` that follows the pattern `{tag}_{path}_{method}` (e.g., `assessment_base_list`)
+- **Search by tag**: Endpoints are grouped by tags (e.g., `assessment`, `course`, `books`, `api`)
+- **Check request/response schemas**: Look for `$ref: '#/components/schemas/...'` to find schema definitions
+- **Verify parameters**: Check `parameters` section for query params, path params, and request body structure
+- When debugging frontend API issues, compare the frontend implementation against the YAML specification:
+  - Endpoint path (must match exactly)
+  - HTTP method (GET, POST, PUT, PATCH, DELETE)
+  - Required vs optional parameters
+  - Request body structure
+  - Expected response schema
+
+## General Code Quality
+
+- Maintain consistency with existing codebase patterns
+- Follow Next.js best practices
+- Use TypeScript/JavaScript conventions as established in the project

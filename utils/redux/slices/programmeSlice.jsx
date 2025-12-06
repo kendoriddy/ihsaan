@@ -3,13 +3,23 @@ import http, { http2 } from "@/hooks/axios/axios";
 
 export const fetchProgrammes = createAsyncThunk(
   "programmes/fetchProgrammes",
-  async ({ page = 1, pageSize = 10 } = {}) => {
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      page_size: pageSize.toString(),
-    });
-    const response = await http2.get(`programmes?${queryParams.toString()}`);
-    return response.data;
+  async ({ page = 1, pageSize = 10 } = {}, { rejectWithValue }) => {
+    try {
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        page_size: pageSize.toString(),
+      });
+      // Use trailing slash to match API spec: /programmes/
+      const response = await http2.get(`/programmes/?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      // Provide more detailed error information
+      const errorMessage = error.response?.data?.detail || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          "Failed to fetch programmes";
+      return rejectWithValue(errorMessage);
+    }
   }
 );
 

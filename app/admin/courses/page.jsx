@@ -18,7 +18,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Image from "next/image";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
@@ -48,6 +48,7 @@ import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
 import Autocomplete from "@mui/material/Autocomplete";
 import { getAuthToken } from "@/hooks/axios/axios";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 function Page() {
   const pathname = usePathname();
@@ -56,7 +57,18 @@ function Page() {
 
   const [currentRoute, setCurrentRoute] = useState("");
 
+  // Constants
+  const coursesPerPage = 10;
+
+  // Track if initial mount has happened
+  const hasMountedRef = useRef(false);
+
+  // Fetch courses on mount - show cached data immediately, refresh in background
   useEffect(() => {
+    if (hasMountedRef.current) return; // Only run once on mount
+    hasMountedRef.current = true;
+
+    // Always fetch - Redux will show cached data if available while fetching
     dispatch(
       fetchCourses({
         page: 1,
@@ -65,7 +77,7 @@ function Page() {
         search: null,
       })
     );
-  }, [dispatch]);
+  }, [dispatch, coursesPerPage]);
 
   // Fetch programmes for filter dropdown
   useEffect(() => {
@@ -102,6 +114,7 @@ function Page() {
     courseCount,
     status,
     totalPages,
+    isRefreshing,
   } = useSelector((state) => state.course);
 
   console.log(allCourses, "courses here:", courseCount);
@@ -117,7 +130,6 @@ function Page() {
   const [openSubMenuIndex, setOpenSubMenuIndex] = useState(null);
   const [activeTab, setActiveTab] = useState("draft");
   const [currentPage, setCurrentPage] = useState(1);
-  const coursesPerPage = 10;
 
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -232,7 +244,7 @@ function Page() {
       const token = localStorage.getItem("token"); // Retrieve token from local storage
 
       const response = await axios.delete(
-        `https://api.ihsaanacademia.com/course/courses/${courseToDelete}/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/${courseToDelete}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`, // Add token to headers
@@ -310,6 +322,31 @@ function Page() {
   const [openDeassignDialog, setOpenDeassignDialog] = useState(false);
   const [courseTutorToDeassign, setCourseTutorToDeassign] = useState(null);
 
+  // Collapsible sections state
+  const [collapsedSections, setCollapsedSections] = useState({
+    courses: false,
+    tutorCourseAssignments: false,
+    tutorStudentAssignments: false,
+  });
+
+  // Filter states for Tutor-Course Assignments
+  const [tutorCourseFilters, setTutorCourseFilters] = useState({
+    course: "",
+    term: "",
+    tutor: "",
+    is_active: "",
+    search: "",
+  });
+
+  // Filter states for Tutor-Student Assignments
+  const [tutorStudentFilters, setTutorStudentFilters] = useState({
+    course: "",
+    tutor: "",
+    student: "",
+    is_active: "",
+    search: "",
+  });
+
   // Fetch tutors
   const { data: tutorsData, isLoading: tutorsLoading } = useFetch(
     "tutors",
@@ -324,27 +361,68 @@ function Page() {
   );
   const terms = termsData?.data?.results || [];
 
-  // Fetch assignments
+  // Build query string for tutor-course assignments filters
+  const tutorCourseAssignmentsUrl = useMemo(() => {
+    const params = new URLSearchParams();
+    if (tutorCourseFilters.course)
+      params.append("course", tutorCourseFilters.course);
+    if (tutorCourseFilters.term) params.append("term", tutorCourseFilters.term);
+    if (tutorCourseFilters.tutor)
+      params.append("user", tutorCourseFilters.tutor);
+    if (tutorCourseFilters.is_active !== "")
+      params.append("is_active", tutorCourseFilters.is_active);
+    if (tutorCourseFilters.search)
+      params.append("search", tutorCourseFilters.search);
+    const queryString = params.toString();
+    return `${
+      process.env.NEXT_PUBLIC_API_BASE_URL
+    }/course/course-tutor-assignments/${queryString ? `?${queryString}` : ""}`;
+  }, [tutorCourseFilters]);
+
+  // Fetch assignments with filters
   const {
     data: assignmentsData,
     isLoading: assignmentsLoading,
     refetch: refetchAssignments,
   } = useFetch(
-    "tutorAssignments",
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/course-tutor-assignments/`
+    ["tutorAssignments", tutorCourseFilters],
+    tutorCourseAssignmentsUrl
   );
   console.log(assignmentsData, "assignments data here:");
-  const assignments = assignmentsData?.data || [];
+  // API returns direct array: [{...}, {...}]
+  // useFetch returns axios response object, so assignmentsData.data is the actual API response (the array)
+  const assignments = Array.isArray(assignmentsData?.data)
+    ? assignmentsData.data
+    : assignmentsData?.data?.results || [];
   console.log(assignments, "assignments here:");
 
-  // Fetch tutor-student assignments
+  // Build query string for tutor-student assignments filters
+  const tutorStudentAssignmentsUrl = useMemo(() => {
+    const params = new URLSearchParams();
+    if (tutorStudentFilters.course)
+      params.append("course", tutorStudentFilters.course);
+    if (tutorStudentFilters.tutor)
+      params.append("tutor", tutorStudentFilters.tutor);
+    if (tutorStudentFilters.student)
+      params.append("student", tutorStudentFilters.student);
+    if (tutorStudentFilters.is_active !== "")
+      params.append("is_active", tutorStudentFilters.is_active);
+    if (tutorStudentFilters.search)
+      params.append("search", tutorStudentFilters.search);
+    const queryString = params.toString();
+    return `${
+      process.env.NEXT_PUBLIC_API_BASE_URL
+    }/course/tutor-student-assignments/${queryString ? `?${queryString}` : ""}`;
+  }, [tutorStudentFilters]);
+
+  // Fetch tutor-student assignments with filters
   const {
     data: tutorStudentAssignmentsData,
     isLoading: tutorStudentAssignmentsLoading,
     refetch: refetchTutorStudentAssignments,
   } = useFetch(
-    "tutorStudentAssignments",
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/tutor-student-assignments/`
+    ["tutorStudentAssignments", tutorStudentFilters],
+    tutorStudentAssignmentsUrl
   );
   const tutorStudentAssignments =
     tutorStudentAssignmentsData?.data?.results || [];
@@ -700,13 +778,45 @@ function Page() {
     });
   };
 
-  // TODO: Filter courses by term once backend endpoint is updated
-  // Currently, courses are not associated with terms during registration,
-  // so we show all courses regardless of term selection
   // Handle term selection change for tutor assignment
   const handleTermChangeForAssignment = (termId) => {
     setSelectedTerm(termId);
-    // Note: Course filtering by term will be implemented once backend supports it
+    // Clear selected course if it doesn't match the new term
+    if (selectedCourse) {
+      const currentCourse = allCourses.find(
+        (c) => c.id === parseInt(selectedCourse) || c.id === selectedCourse
+      );
+      const termIdNum = termId ? parseInt(termId) : null;
+      const courseTermId = currentCourse?.term
+        ? typeof currentCourse.term === "object"
+          ? currentCourse.term.id
+          : currentCourse.term
+        : null;
+
+      // If course term doesn't match selected term, clear the selection
+      if (termIdNum && courseTermId !== termIdNum) {
+        setSelectedCourse("");
+      }
+    }
+  };
+
+  // Filter courses based on selected term
+  const getFilteredCoursesForTerm = () => {
+    if (!selectedTerm) {
+      // If no term selected, show all courses
+      return allCourses || [];
+    }
+    const termIdNum = parseInt(selectedTerm);
+    // Filter courses that match the selected term (or have null term)
+    return (allCourses || []).filter((course) => {
+      const courseTermId = course.term
+        ? typeof course.term === "object"
+          ? course.term.id
+          : course.term
+        : null;
+      // Show courses with matching term or null term (courses without term assignment)
+      return courseTermId === termIdNum || courseTermId === null;
+    });
   };
 
   // Handle course selection change for tutor-student assignment
@@ -1150,15 +1260,25 @@ function Page() {
                       onChange={(e) => setSelectedCourse(e.target.value)}
                       label="Course"
                       required
+                      disabled={!selectedTerm}
                     >
-                      {allCourses && allCourses.length > 0 ? (
-                        allCourses.map((course) => (
+                      {!selectedTerm ? (
+                        <MenuItem disabled>Please select a term first</MenuItem>
+                      ) : getFilteredCoursesForTerm().length > 0 ? (
+                        getFilteredCoursesForTerm().map((course) => (
                           <MenuItem key={course.id} value={course.id}>
                             {course.title || course.name}
+                            {!course.term && (
+                              <span className="ml-2 text-xs text-gray-500">
+                                (No term)
+                              </span>
+                            )}
                           </MenuItem>
                         ))
                       ) : (
-                        <MenuItem disabled>No courses found</MenuItem>
+                        <MenuItem disabled>
+                          No courses found for this term
+                        </MenuItem>
                       )}
                     </Select>
                   </FormControl>
@@ -1346,6 +1466,15 @@ function Page() {
                         disabled={
                           isLoadingStudents || !selectedCourseForStudents
                         }
+                        helperText={
+                          isLoadingStudents
+                            ? "Loading students enrolled in this course..."
+                            : !selectedCourseForStudents
+                            ? "Please select a course first"
+                            : courseStudents.length === 0
+                            ? "No students enrolled in this course"
+                            : ""
+                        }
                       />
                     )}
                     renderOption={(props, option) => {
@@ -1415,95 +1544,141 @@ function Page() {
               </DialogContent>
             </Dialog>
 
-            {/* LIST COURSES */}
-            <section className="py-12 ">
-              <div className="flex flex-col md:flex-row items-center justify-center flex-wrap gap-8">
-                {status === "loading" ? (
-                  <div>Loading...</div>
-                ) : (
-                  allCourses?.map((course) => (
-                    <div
-                      key={course.id}
-                      className="group shadow-xl w-[250px] rounded-md overflow-hidden mt-8 bg-gray-100 "
-                    >
-                      <div className=" w-full h-[200px] relative">
-                        <Image
-                          src={
-                            course.image_url?.startsWith("http")
-                              ? course.image_url
-                              : IMAGES.course_1
-                          }
-                          // width={200}
-                          // height={300}
-                          fill
-                          alt={course.title}
-                          objectFit="cover"
-                        />
-                      </div>
-                      {/* course bottom */}
-                      <div className="px-2 py-2">
-                        <div className="text-xm text-red-600">
-                          {course.category}
-                        </div>
-                        <div className="min-h-[50px]">
-                          <h3 className="text-lg font-semibold">
-                            {course.title}
-                          </h3>
-                        </div>
-
-                        {/* Course Description */}
-                        <div className="text-sm text-gray-700 capitalize italic py-2">
-                          {course.description}
-                        </div>
-
-                        {/* Created Date */}
-                        <div className="text-xs py-2 text-neutral-600">
-                          Created on:{" "}
-                          {format(
-                            new Date(course.created_at),
-                            "MMMM d, yyyy h:mm a"
-                          )}
-                        </div>
-
-                        <div className="flex justify-between items-center py-2 text-xs">
-                          <div
-                            className="px-3 py-2 border-2 border-primary hover:bg-blue-600 hover:text-white cursor-pointer transition-all duration-300 rounded "
-                            onClick={() => handleEditCourse(course?.id)}
-                          >
-                            Edit
-                          </div>
-                          <div
-                            className="bg-red-600 px-3 py-2 text-white cursor-pointer hover:bg-red-800 transition-all duration-300 rounded"
-                            onClick={() => handleOpenDeleteModal(course?.id)}
-                          >
-                            Delete
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </section>
-
-            {/* Pagination */}
-            {status !== "loading" && courseCount !== 0 && (
-              <section className="pt-4 pb-12">
-                <div className="w-4/5 mx-auto border flex flex-col lg:flex-row justify-between items-center px-4 rounded">
-                  <div>Total COURSES: {courseCount}</div>
-                  <div>
-                    <Stack spacing={2} className="py-5">
-                      <Pagination
-                        count={totalPages}
-                        variant="outlined"
-                        shape="rounded"
-                        onChange={handleChange}
-                      />
-                    </Stack>
-                  </div>
+            {/* Collapsible Section: Courses */}
+            <div className="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
+              <div
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors border-b"
+                onClick={() =>
+                  setCollapsedSections((prev) => ({
+                    ...prev,
+                    courses: !prev.courses,
+                  }))
+                }
+              >
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    Courses ({courseCount || 0})
+                  </h2>
+                  {isRefreshing && allCourses.length > 0 && (
+                    <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full flex items-center gap-1">
+                      <span className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></span>
+                      Refreshing...
+                    </span>
+                  )}
                 </div>
-              </section>
-            )}
+                <div className="flex items-center gap-2">
+                  {collapsedSections.courses ? (
+                    <FaChevronDown className="text-gray-500" />
+                  ) : (
+                    <FaChevronUp className="text-gray-500" />
+                  )}
+                </div>
+              </div>
+              {!collapsedSections.courses && (
+                <div className="p-4">
+                  {/* LIST COURSES */}
+                  <section className="py-12 ">
+                    <div className="flex flex-col md:flex-row items-center justify-center flex-wrap gap-8">
+                      {status === "loading" && allCourses.length === 0 ? (
+                        <div className="w-full text-center py-8">
+                          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                          <p className="mt-2 text-gray-600">
+                            Loading courses...
+                          </p>
+                        </div>
+                      ) : allCourses.length === 0 ? (
+                        <div className="w-full text-center py-8 text-gray-500">
+                          No courses found
+                        </div>
+                      ) : (
+                        allCourses?.map((course) => (
+                          <div
+                            key={course.id}
+                            className="group shadow-xl w-[250px] rounded-md overflow-hidden mt-8 bg-gray-100 "
+                          >
+                            <div className=" w-full h-[200px] relative">
+                              <Image
+                                src={
+                                  course.image_url?.startsWith("http")
+                                    ? course.image_url
+                                    : IMAGES.course_1
+                                }
+                                // width={200}
+                                // height={300}
+                                fill
+                                alt={course.title}
+                                objectFit="cover"
+                              />
+                            </div>
+                            {/* course bottom */}
+                            <div className="px-2 py-2">
+                              <div className="text-xm text-red-600">
+                                {course.category}
+                              </div>
+                              <div className="min-h-[50px]">
+                                <h3 className="text-lg font-semibold">
+                                  {course.title}
+                                </h3>
+                              </div>
+
+                              {/* Course Description */}
+                              <div className="text-sm text-gray-700 capitalize italic py-2">
+                                {course.description}
+                              </div>
+
+                              {/* Created Date */}
+                              <div className="text-xs py-2 text-neutral-600">
+                                Created on:{" "}
+                                {format(
+                                  new Date(course.created_at),
+                                  "MMMM d, yyyy h:mm a"
+                                )}
+                              </div>
+
+                              <div className="flex justify-between items-center py-2 text-xs">
+                                <div
+                                  className="px-3 py-2 border-2 border-primary hover:bg-blue-600 hover:text-white cursor-pointer transition-all duration-300 rounded "
+                                  onClick={() => handleEditCourse(course?.id)}
+                                >
+                                  Edit
+                                </div>
+                                <div
+                                  className="bg-red-600 px-3 py-2 text-white cursor-pointer hover:bg-red-800 transition-all duration-300 rounded"
+                                  onClick={() =>
+                                    handleOpenDeleteModal(course?.id)
+                                  }
+                                >
+                                  Delete
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </section>
+
+                  {/* Pagination */}
+                  {status !== "loading" && courseCount !== 0 && (
+                    <section className="pt-4 pb-12">
+                      <div className="w-4/5 mx-auto border flex flex-col lg:flex-row justify-between items-center px-4 rounded">
+                        <div>Total COURSES: {courseCount}</div>
+                        <div>
+                          <Stack spacing={2} className="py-5">
+                            <Pagination
+                              count={totalPages}
+                              variant="outlined"
+                              shape="rounded"
+                              onChange={handleChange}
+                            />
+                          </Stack>
+                        </div>
+                      </div>
+                    </section>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Delete Confirmation Modal */}
             <Dialog
@@ -1537,222 +1712,534 @@ function Page() {
               </DialogActions>
             </Dialog>
 
-            {/* Tutor to Course Assignments Table */}
-            <div className="mt-8 mb-8">
-              <h2 className="text-lg font-semibold mb-4">
-                Tutor to Course Assignments
-              </h2>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell className="font-semibold">Tutor</TableCell>
-                      <TableCell className="font-semibold">Course</TableCell>
-                      <TableCell className="font-semibold">Term</TableCell>
-                      <TableCell className="font-semibold">
-                        Assigned At
-                      </TableCell>
-                      <TableCell className="font-semibold">Status</TableCell>
-                      <TableCell className="font-semibold">Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {assignmentsLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center py-4">
-                          Loading tutor assignments...
-                        </TableCell>
-                      </TableRow>
-                    ) : assignments.length > 0 ? (
-                      assignments.map((assignment) => {
-                        const course = allCourses.find(
-                          (c) =>
-                            c.id === assignment.course ||
-                            c.id === assignment.course?.id
-                        );
-                        const term = terms.find(
-                          (t) =>
-                            t.id === assignment.term ||
-                            t.id === assignment.term?.id
-                        );
+            {/* Collapsible Section: Tutor to Course Assignments */}
+            <div className="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
+              <div
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors border-b"
+                onClick={() =>
+                  setCollapsedSections((prev) => ({
+                    ...prev,
+                    tutorCourseAssignments: !prev.tutorCourseAssignments,
+                  }))
+                }
+              >
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Tutor to Course Assignments ({assignments.length})
+                </h2>
+                <div className="flex items-center gap-2">
+                  {collapsedSections.tutorCourseAssignments ? (
+                    <FaChevronDown className="text-gray-500" />
+                  ) : (
+                    <FaChevronUp className="text-gray-500" />
+                  )}
+                </div>
+              </div>
+              {!collapsedSections.tutorCourseAssignments && (
+                <div className="p-4">
+                  {/* Filters for Tutor-Course Assignments */}
+                  <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                      Filters
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Course</InputLabel>
+                        <Select
+                          value={tutorCourseFilters.course}
+                          onChange={(e) =>
+                            setTutorCourseFilters({
+                              ...tutorCourseFilters,
+                              course: e.target.value,
+                            })
+                          }
+                          label="Course"
+                        >
+                          <MenuItem value="">
+                            <em>All Courses</em>
+                          </MenuItem>
+                          {allCourses.map((course) => (
+                            <MenuItem key={course.id} value={course.id}>
+                              {course.title || course.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
 
-                        return (
-                          <TableRow key={assignment.id}>
-                            <TableCell>
-                              {assignment.tutor_full_name ||
-                                `${assignment.first_name || ""} ${
-                                  assignment.last_name || ""
-                                }`.trim() ||
-                                "N/A"}
-                            </TableCell>
-                            <TableCell>
-                              {course
-                                ? course.title || course.name
-                                : assignment.course || "N/A"}
-                            </TableCell>
-                            <TableCell>
-                              {term
-                                ? `${term.name} (${
-                                    term.session?.year || "N/A"
-                                  })`
-                                : assignment.term || "N/A"}
-                            </TableCell>
-                            <TableCell>
-                              {assignment.assigned_at
-                                ? format(
-                                    new Date(assignment.assigned_at),
-                                    "MMMM d, yyyy h:mm a"
-                                  )
-                                : "-"}
-                            </TableCell>
-                            <TableCell>
-                              <span
-                                className={`px-2 py-1 rounded text-sm ${
-                                  assignment.is_active
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
-                              >
-                                {assignment.is_active ? "Active" : "Inactive"}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex gap-2">
-                                <IconButton
-                                  color="primary"
-                                  onClick={() =>
-                                    handleOpenEditCourseTutorModal(
-                                      assignment.id
-                                    )
-                                  }
-                                  size="small"
-                                >
-                                  <EditIcon />
-                                </IconButton>
-                                <IconButton
-                                  color="error"
-                                  onClick={() =>
-                                    handleOpenDeassignDialog(assignment.id)
-                                  }
-                                  size="small"
-                                  title="Deassign"
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </div>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Term</InputLabel>
+                        <Select
+                          value={tutorCourseFilters.term}
+                          onChange={(e) =>
+                            setTutorCourseFilters({
+                              ...tutorCourseFilters,
+                              term: e.target.value,
+                            })
+                          }
+                          label="Term"
+                        >
+                          <MenuItem value="">
+                            <em>All Terms</em>
+                          </MenuItem>
+                          {terms.map((term) => (
+                            <MenuItem key={term.id} value={term.id}>
+                              {term.name} ({term.session?.year || "N/A"})
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Tutor</InputLabel>
+                        <Select
+                          value={tutorCourseFilters.tutor}
+                          onChange={(e) =>
+                            setTutorCourseFilters({
+                              ...tutorCourseFilters,
+                              tutor: e.target.value,
+                            })
+                          }
+                          label="Tutor"
+                        >
+                          <MenuItem value="">
+                            <em>All Tutors</em>
+                          </MenuItem>
+                          {tutors.map((tutor) => (
+                            <MenuItem key={tutor.id} value={tutor.id}>
+                              {tutor.first_name} {tutor.last_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Status</InputLabel>
+                        <Select
+                          value={tutorCourseFilters.is_active}
+                          onChange={(e) =>
+                            setTutorCourseFilters({
+                              ...tutorCourseFilters,
+                              is_active: e.target.value,
+                            })
+                          }
+                          label="Status"
+                        >
+                          <MenuItem value="">
+                            <em>All</em>
+                          </MenuItem>
+                          <MenuItem value="true">Active</MenuItem>
+                          <MenuItem value="false">Inactive</MenuItem>
+                        </Select>
+                      </FormControl>
+
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Search"
+                        value={tutorCourseFilters.search}
+                        onChange={(e) =>
+                          setTutorCourseFilters({
+                            ...tutorCourseFilters,
+                            search: e.target.value,
+                          })
+                        }
+                        placeholder="Search assignments..."
+                      />
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() =>
+                          setTutorCourseFilters({
+                            course: "",
+                            term: "",
+                            tutor: "",
+                            is_active: "",
+                            search: "",
+                          })
+                        }
+                      >
+                        Clear Filters
+                      </Button>
+                    </div>
+                  </div>
+
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell className="font-semibold">Tutor</TableCell>
+                          <TableCell className="font-semibold">
+                            Course
+                          </TableCell>
+                          <TableCell className="font-semibold">Term</TableCell>
+                          <TableCell className="font-semibold">
+                            Assigned At
+                          </TableCell>
+                          <TableCell className="font-semibold">
+                            Status
+                          </TableCell>
+                          <TableCell className="font-semibold">
+                            Actions
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {assignmentsLoading ? (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-4">
+                              Loading tutor assignments...
                             </TableCell>
                           </TableRow>
-                        );
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center py-4">
-                          No tutor-to-course assignments found.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                        ) : assignments.length > 0 ? (
+                          assignments.map((assignment) => {
+                            const course = allCourses.find(
+                              (c) =>
+                                c.id === assignment.course ||
+                                c.id === assignment.course?.id
+                            );
+                            const term = terms.find(
+                              (t) =>
+                                t.id === assignment.term ||
+                                t.id === assignment.term?.id
+                            );
+
+                            return (
+                              <TableRow key={assignment.id}>
+                                <TableCell>
+                                  {assignment.tutor_full_name ||
+                                    `${assignment.first_name || ""} ${
+                                      assignment.last_name || ""
+                                    }`.trim() ||
+                                    "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {course
+                                    ? course.title || course.name
+                                    : assignment.course || "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {term
+                                    ? `${term.name} (${
+                                        term.session?.year || "N/A"
+                                      })`
+                                    : assignment.term || "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {assignment.assigned_at
+                                    ? format(
+                                        new Date(assignment.assigned_at),
+                                        "MMMM d, yyyy h:mm a"
+                                      )
+                                    : "-"}
+                                </TableCell>
+                                <TableCell>
+                                  <span
+                                    className={`px-2 py-1 rounded text-sm ${
+                                      assignment.is_active
+                                        ? "bg-green-100 text-green-800"
+                                        : "bg-red-100 text-red-800"
+                                    }`}
+                                  >
+                                    {assignment.is_active
+                                      ? "Active"
+                                      : "Inactive"}
+                                  </span>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex gap-2">
+                                    <IconButton
+                                      color="primary"
+                                      onClick={() =>
+                                        handleOpenEditCourseTutorModal(
+                                          assignment.id
+                                        )
+                                      }
+                                      size="small"
+                                    >
+                                      <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                      color="error"
+                                      onClick={() =>
+                                        handleOpenDeassignDialog(assignment.id)
+                                      }
+                                      size="small"
+                                      title="Deassign"
+                                    >
+                                      <DeleteIcon />
+                                    </IconButton>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-4">
+                              No tutor-to-course assignments found.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </div>
+              )}
             </div>
 
-            {/* Tutor-Student Assignments Table */}
-            <div className="mt-8 mb-8">
-              <h2 className="text-lg font-semibold mb-4">
-                Tutor-Student Assignments
-              </h2>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell className="font-semibold">Tutor</TableCell>
-                      <TableCell className="font-semibold">Student</TableCell>
-                      <TableCell className="font-semibold">Course</TableCell>
-                      <TableCell className="font-semibold">Notes</TableCell>
-                      <TableCell className="font-semibold">Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {tutorStudentAssignmentsLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-4">
-                          Loading...
-                        </TableCell>
-                      </TableRow>
-                    ) : tutorStudentAssignments.length > 0 ? (
-                      tutorStudentAssignments.map((assignment) => {
-                        const tutor = tutors.find(
-                          (t) =>
-                            t.id === assignment.tutor ||
-                            t.id === assignment.tutor?.id
-                        );
-                        const student = allStudents.find(
-                          (s) =>
-                            s.id === assignment.student ||
-                            s.id === assignment.student?.id
-                        );
-                        const course = allCourses.find(
-                          (c) =>
-                            c.id === assignment.course ||
-                            c.id === assignment.course?.id
-                        );
+            {/* Collapsible Section: Tutor-Student Assignments */}
+            <div className="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
+              <div
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors border-b"
+                onClick={() =>
+                  setCollapsedSections((prev) => ({
+                    ...prev,
+                    tutorStudentAssignments: !prev.tutorStudentAssignments,
+                  }))
+                }
+              >
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Tutor-Student Assignments ({tutorStudentAssignments.length})
+                </h2>
+                <div className="flex items-center gap-2">
+                  {collapsedSections.tutorStudentAssignments ? (
+                    <FaChevronDown className="text-gray-500" />
+                  ) : (
+                    <FaChevronUp className="text-gray-500" />
+                  )}
+                </div>
+              </div>
+              {!collapsedSections.tutorStudentAssignments && (
+                <div className="p-4">
+                  {/* Filters for Tutor-Student Assignments */}
+                  <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                      Filters
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Course</InputLabel>
+                        <Select
+                          value={tutorStudentFilters.course}
+                          onChange={(e) =>
+                            setTutorStudentFilters({
+                              ...tutorStudentFilters,
+                              course: e.target.value,
+                            })
+                          }
+                          label="Course"
+                        >
+                          <MenuItem value="">
+                            <em>All Courses</em>
+                          </MenuItem>
+                          {allCourses.map((course) => (
+                            <MenuItem key={course.id} value={course.id}>
+                              {course.title || course.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
 
-                        return (
-                          <TableRow key={assignment.id}>
-                            <TableCell>
-                              {tutor
-                                ? `${tutor.first_name} ${tutor.last_name} (${tutor.email})`
-                                : assignment.tutor || "N/A"}
-                            </TableCell>
-                            <TableCell>
-                              {student
-                                ? `${student.first_name} ${student.last_name} (${student.email})`
-                                : assignment.student || "N/A"}
-                            </TableCell>
-                            <TableCell>
-                              {course
-                                ? course.title || course.name
-                                : assignment.course || "N/A"}
-                            </TableCell>
-                            <TableCell>{assignment.notes || "-"}</TableCell>
-                            <TableCell>
-                              <div className="flex gap-2">
-                                <IconButton
-                                  color="primary"
-                                  onClick={() =>
-                                    handleOpenEditModal(assignment.id)
-                                  }
-                                  size="small"
-                                >
-                                  <EditIcon />
-                                </IconButton>
-                                <IconButton
-                                  color="error"
-                                  onClick={() =>
-                                    handleOpenDeleteTutorStudentDialog(
-                                      assignment.id
-                                    )
-                                  }
-                                  size="small"
-                                  title="Delete"
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </div>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Tutor</InputLabel>
+                        <Select
+                          value={tutorStudentFilters.tutor}
+                          onChange={(e) =>
+                            setTutorStudentFilters({
+                              ...tutorStudentFilters,
+                              tutor: e.target.value,
+                            })
+                          }
+                          label="Tutor"
+                        >
+                          <MenuItem value="">
+                            <em>All Tutors</em>
+                          </MenuItem>
+                          {tutors.map((tutor) => (
+                            <MenuItem key={tutor.id} value={tutor.id}>
+                              {tutor.first_name} {tutor.last_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Student</InputLabel>
+                        <Select
+                          value={tutorStudentFilters.student}
+                          onChange={(e) =>
+                            setTutorStudentFilters({
+                              ...tutorStudentFilters,
+                              student: e.target.value,
+                            })
+                          }
+                          label="Student"
+                        >
+                          <MenuItem value="">
+                            <em>All Students</em>
+                          </MenuItem>
+                          {allStudents.map((student) => (
+                            <MenuItem key={student.id} value={student.id}>
+                              {student.first_name} {student.last_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Status</InputLabel>
+                        <Select
+                          value={tutorStudentFilters.is_active}
+                          onChange={(e) =>
+                            setTutorStudentFilters({
+                              ...tutorStudentFilters,
+                              is_active: e.target.value,
+                            })
+                          }
+                          label="Status"
+                        >
+                          <MenuItem value="">
+                            <em>All</em>
+                          </MenuItem>
+                          <MenuItem value="true">Active</MenuItem>
+                          <MenuItem value="false">Inactive</MenuItem>
+                        </Select>
+                      </FormControl>
+
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Search"
+                        value={tutorStudentFilters.search}
+                        onChange={(e) =>
+                          setTutorStudentFilters({
+                            ...tutorStudentFilters,
+                            search: e.target.value,
+                          })
+                        }
+                        placeholder="Search assignments..."
+                      />
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() =>
+                          setTutorStudentFilters({
+                            course: "",
+                            tutor: "",
+                            student: "",
+                            is_active: "",
+                            search: "",
+                          })
+                        }
+                      >
+                        Clear Filters
+                      </Button>
+                    </div>
+                  </div>
+
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell className="font-semibold">Tutor</TableCell>
+                          <TableCell className="font-semibold">
+                            Student
+                          </TableCell>
+                          <TableCell className="font-semibold">
+                            Course
+                          </TableCell>
+                          <TableCell className="font-semibold">Notes</TableCell>
+                          <TableCell className="font-semibold">
+                            Actions
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {tutorStudentAssignmentsLoading ? (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-4">
+                              Loading...
                             </TableCell>
                           </TableRow>
-                        );
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-4">
-                          No tutor-student assignments found.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                        ) : tutorStudentAssignments.length > 0 ? (
+                          tutorStudentAssignments.map((assignment) => {
+                            const tutor = tutors.find(
+                              (t) =>
+                                t.id === assignment.tutor ||
+                                t.id === assignment.tutor?.id
+                            );
+                            const student = allStudents.find(
+                              (s) =>
+                                s.id === assignment.student ||
+                                s.id === assignment.student?.id
+                            );
+                            const course = allCourses.find(
+                              (c) =>
+                                c.id === assignment.course ||
+                                c.id === assignment.course?.id
+                            );
+
+                            return (
+                              <TableRow key={assignment.id}>
+                                <TableCell>
+                                  {tutor
+                                    ? `${tutor.first_name} ${tutor.last_name} (${tutor.email})`
+                                    : assignment.tutor || "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {student
+                                    ? `${student.first_name} ${student.last_name} (${student.email})`
+                                    : assignment.student || "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {course
+                                    ? course.title || course.name
+                                    : assignment.course || "N/A"}
+                                </TableCell>
+                                <TableCell>{assignment.notes || "-"}</TableCell>
+                                <TableCell>
+                                  <div className="flex gap-2">
+                                    <IconButton
+                                      color="primary"
+                                      onClick={() =>
+                                        handleOpenEditModal(assignment.id)
+                                      }
+                                      size="small"
+                                    >
+                                      <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                      color="error"
+                                      onClick={() =>
+                                        handleOpenDeleteTutorStudentDialog(
+                                          assignment.id
+                                        )
+                                      }
+                                      size="small"
+                                      title="Delete"
+                                    >
+                                      <DeleteIcon />
+                                    </IconButton>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-4">
+                              No tutor-student assignments found.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </div>
+              )}
             </div>
 
             {/* Edit Assignment Modal */}
