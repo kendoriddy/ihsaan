@@ -118,6 +118,7 @@ function EditCoursePage() {
     name: "",
     code: "",
     programme: "",
+    term: "",
     image_url: "",
   });
 
@@ -188,6 +189,7 @@ function EditCoursePage() {
   }, [pathname]);
 
   const { programmes } = useSelector((state) => state.programme);
+  const [currentProgrammeName, setCurrentProgrammeName] = useState("");
 
   const toggleOption = (index) => {
     setOpenSubMenuIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -308,7 +310,7 @@ function EditCoursePage() {
   const fetchTerms = async () => {
     try {
       const response = await axios.get(
-        "https://api.ihsaanacademia.com/terms/",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -324,7 +326,7 @@ function EditCoursePage() {
   const fetchCourse = async () => {
     try {
       const response = await axios.get(
-        `https://api.ihsaanacademia.com/course/courses/${courseId}/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/${courseId}/`,
         {
           headers: {
             Authorization: `Bearer ${getAuthToken()}`,
@@ -332,15 +334,35 @@ function EditCoursePage() {
         }
       );
       const course = response.data;
+      // Extract programme ID - handle both object and string formats
+      // API returns programme as UUID string (e.g., "874e775f-8410-45ea-a9bc-7f82ed67fd4c")
+      // or potentially as object with id property
+      let programmeId = "";
+      if (typeof course.programme === "string") {
+        programmeId = course.programme;
+      } else if (course.programme && typeof course.programme === "object") {
+        programmeId = course.programme.id || "";
+      }
+
+      // Store programme name if available (from programme_name field or programme object)
+      const programmeName =
+        course.programme_name || course.programme?.name || "";
+
       setCourseData({
         title: course.title,
         description: course.description,
         order: course.order || "",
         name: course.title,
         code: course.code,
-        programme: course.programme,
+        programme: programmeId,
+        term: course.term || "",
         image_url: course.image_url,
       });
+
+      // Store programme name for display
+      if (programmeName) {
+        setCurrentProgrammeName(programmeName);
+      }
       if (course.image_url) {
         const normalizedUrl = normalizeUrl(course.image_url);
         if (normalizedUrl) {
@@ -553,9 +575,15 @@ function EditCoursePage() {
     setIsLoading(true);
 
     try {
+      // Prepare payload - term is optional, send null if empty, convert to number if selected
+      const payload = {
+        ...courseData,
+        term: courseData.term ? parseInt(courseData.term, 10) : null,
+      };
+
       const response = await axios.put(
-        `https://api.ihsaanacademia.com/course/courses/${courseId}/`,
-        courseData,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/${courseId}/`,
+        payload,
         {
           headers: {
             "Content-Type": "application/json",
@@ -963,7 +991,7 @@ function EditCoursePage() {
                       Programme
                     </label>
                     <select
-                      value={courseData.programme}
+                      value={courseData.programme || ""}
                       onChange={(e) =>
                         setCourseData({
                           ...courseData,
@@ -976,11 +1004,53 @@ function EditCoursePage() {
                       <option value="" disabled>
                         Select a programme
                       </option>
-                      {programmes.map((programme) => (
-                        <option key={programme.id} value={programme.id}>
-                          {programme.name}
+                      {programmes.length > 0 ? (
+                        programmes.map((programme) => (
+                          <option key={programme.id} value={programme.id}>
+                            {programme.name}
+                          </option>
+                        ))
+                      ) : courseData.programme ? (
+                        <option value={courseData.programme}>
+                          {currentProgrammeName ||
+                            `Programme ${courseData.programme}`}
                         </option>
-                      ))}
+                      ) : null}
+                    </select>
+                    {courseData.programme && programmes.length === 0 && (
+                      <p className="mt-1 text-xs text-gray-500">
+                        Note: Programme list not available. Current programme:{" "}
+                        {currentProgrammeName || courseData.programme}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Term{" "}
+                      <span className="text-gray-500 text-xs">(Optional)</span>
+                    </label>
+                    <select
+                      value={courseData.term}
+                      onChange={(e) =>
+                        setCourseData({
+                          ...courseData,
+                          term: e.target.value,
+                        })
+                      }
+                      className="mt-1 block w-full p-2 border rounded-md"
+                    >
+                      <option value="">Select a term (optional)</option>
+                      {terms.length > 0 ? (
+                        terms.map((term) => (
+                          <option key={term.id} value={term.id}>
+                            {term.name} ({term.session?.year || "N/A"})
+                            {term.is_active && " [ACTIVE]"}
+                          </option>
+                        ))
+                      ) : (
+                        <option disabled>No terms found</option>
+                      )}
                     </select>
                   </div>
 

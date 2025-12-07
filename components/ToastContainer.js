@@ -7,8 +7,15 @@ let toastId = 0;
 
 const ToastContainer = () => {
   const [toasts, setToasts] = useState([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const handleShowToast = (e) => {
       const { message, type } = e.detail;
       const id = toastId++;
@@ -27,6 +34,10 @@ const ToastContainer = () => {
       window.removeEventListener("showToast", handleShowToast);
     };
   }, []);
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className="fixed top-5 right-5 z-50 ">

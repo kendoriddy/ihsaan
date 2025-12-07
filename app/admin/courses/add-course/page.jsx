@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
 import { getAuthToken } from "@/hooks/axios/axios";
 import { normalizeUrl } from "@/utils/utilFunctions";
+import { useFetch } from "@/hooks/useHttp/useHttp";
 
 function Page() {
   const dispatch = useDispatch();
@@ -21,6 +22,7 @@ function Page() {
     name: "",
     code: "",
     programme: "",
+    term: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +34,13 @@ function Page() {
   useEffect(() => {
     dispatch(fetchProgrammes({ page: 1, pageSize: 10 }));
   }, [dispatch]);
+
+  // Fetch terms
+  const { data: termsData, isLoading: termsLoading } = useFetch(
+    "terms",
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms/`
+  );
+  const terms = termsData?.data?.results || [];
 
   useEffect(() => {
     let storedToken = localStorage.getItem("token");
@@ -57,7 +66,7 @@ function Page() {
 
     try {
       const response = await axios.post(
-        "https://api.ihsaanacademia.com/resource/course-materials/",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/resource/course-materials/`,
         formData,
         {
           headers: {
@@ -108,9 +117,15 @@ function Page() {
     setIsLoading(true);
 
     try {
+      // Prepare payload - term is optional, send null if empty, convert to number if selected
+      const payload = {
+        ...courseData,
+        term: courseData.term ? parseInt(courseData.term, 10) : null,
+      };
+
       const response = await axios.post(
-        "https://api.ihsaanacademia.com/course/courses/",
-        courseData,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/`,
+        payload,
         {
           headers: {
             "Content-Type": "application/json",
@@ -148,6 +163,7 @@ function Page() {
         name: "",
         code: "",
         programme: "",
+        term: "",
       });
     }
   };
@@ -258,6 +274,33 @@ function Page() {
                   {programme.name}
                 </option>
               ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Term <span className="text-gray-500 text-xs">(Optional)</span>
+            </label>
+            <select
+              value={courseData.term}
+              onChange={(e) =>
+                setCourseData({ ...courseData, term: e.target.value })
+              }
+              className="mt-1 block w-full p-2 border rounded-md"
+            >
+              <option value="">Select a term (optional)</option>
+              {termsLoading ? (
+                <option disabled>Loading terms...</option>
+              ) : terms.length > 0 ? (
+                terms.map((term) => (
+                  <option key={term.id} value={term.id}>
+                    {term.name} ({term.session?.year || "N/A"})
+                    {term.is_active && " [ACTIVE]"}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No terms found</option>
+              )}
             </select>
           </div>
 

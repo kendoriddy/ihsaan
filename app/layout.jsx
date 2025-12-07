@@ -14,21 +14,21 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <Suspense>
-      <ReduxProvider>
-        <ThemeProvider theme={muiTheme}>
-          <html lang="en">
-            <Provider>
-              <FrontendCartProvider>
-                <body className={`font-nunito text-sm`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`font-nunito text-sm`} suppressHydrationWarning>
+        <Suspense>
+          <ReduxProvider>
+            <ThemeProvider theme={muiTheme}>
+              <Provider>
+                <FrontendCartProvider>
                   {children}
                   <Toastify />
-                </body>
-              </FrontendCartProvider>
-            </Provider>
-          </html>
-        </ThemeProvider>
-      </ReduxProvider>
-    </Suspense>
+                </FrontendCartProvider>
+              </Provider>
+            </ThemeProvider>
+          </ReduxProvider>
+        </Suspense>
+      </body>
+    </html>
   );
 }

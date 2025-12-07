@@ -25,7 +25,7 @@ export const fetchCourses = createAsyncThunk(
         params.append("search", search);
       }
 
-      const url = `https://api.ihsaanacademia.com/course/courses/?${params.toString()}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?${params.toString()}`;
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -51,28 +51,48 @@ const courseSlice = createSlice({
     totalPages: 0,
     nextPageUrl: null,
     prevPageUrl: null,
-    status: "idle",
+    status: "idle", // idle, loading, succeeded, failed
+    isRefreshing: false, // For background refresh
     error: null,
+    lastFetchedParams: null, // Store last fetch params to avoid unnecessary refetches
   },
-  reducers: {},
+  reducers: {
+    setRefreshing: (state, action) => {
+      state.isRefreshing = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCourses.pending, (state) => {
-        state.status = "loading";
+        // Only set status to loading if we don't have cached data
+        if (state.courses.length === 0) {
+          state.status = "loading";
+        } else {
+          // If we have cached data, just mark as refreshing
+          state.isRefreshing = true;
+        }
       })
       .addCase(fetchCourses.fulfilled, (state, action) => {
         state.status = "succeeded";
+        state.isRefreshing = false;
         state.courses = action.payload.results;
         state.courseCount = action.payload.total;
         state.totalPages = action.payload.total_pages;
         state.nextPageUrl = action.payload.next;
         state.prevPageUrl = action.payload.previous;
+        state.error = null;
       })
       .addCase(fetchCourses.rejected, (state, action) => {
-        state.status = "failed";
+        // Only set status to failed if we don't have cached data
+        if (state.courses.length === 0) {
+          state.status = "failed";
+        }
+        state.isRefreshing = false;
         state.error = action.payload || "Failed to fetch courses";
       });
   },
 });
+
+export const { setRefreshing } = courseSlice.actions;
 
 export default courseSlice.reducer;

@@ -17,18 +17,32 @@ export const useFrontendCart = () => {
 export const FrontendCartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Set mounted state to ensure we only access localStorage on client
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Check if user is logged in on mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!token);
+    }
   }, []);
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem("frontendCart");
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
+    if (typeof window !== "undefined") {
+      const savedCart = localStorage.getItem("frontendCart");
+      if (savedCart) {
+        try {
+          setCartItems(JSON.parse(savedCart));
+        } catch (error) {
+          console.error("Error parsing cart from localStorage:", error);
+        }
+      }
     }
   }, []);
 

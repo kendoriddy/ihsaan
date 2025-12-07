@@ -20,6 +20,7 @@ const ManualGrading = () => {
   const [fetchAll, setFetchAll] = useState(false);
   const [totalCourses, setTotalCourses] = useState(10);
   const [selectedAssessment, setSelectedAssessment] = useState(null);
+  const [tutorId, setTutorId] = useState(null);
 
   const formatDate = (date) => {
     return date
@@ -31,20 +32,49 @@ const ManualGrading = () => {
       : "N/A";
   };
 
-  const tutorId =
-    typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  // Get tutorId from localStorage or userFullData
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Try to get userId directly
+      let userId = localStorage.getItem("userId");
+      
+      // If userId is not available, try to get it from userFullData
+      if (!userId) {
+        const userFullData = localStorage.getItem("userFullData");
+        if (userFullData) {
+          try {
+            const userData = JSON.parse(userFullData);
+            userId = userData?.id || null;
+          } catch (e) {
+            console.error("Error parsing userFullData:", e);
+          }
+        }
+      }
+      
+      setTutorId(userId);
+    }
+  }, []);
+
+  // Build URL with tutor parameter only if tutorId is available
+  const fetchUrl = tutorId
+    ? `${
+        process.env.NEXT_PUBLIC_API_BASE_URL
+      }/assessment/base/?tutor=${tutorId}&question_type=FILE_UPLOAD&page_size=${
+        fetchAll ? totalCourses : 10
+      }`
+    : `${
+        process.env.NEXT_PUBLIC_API_BASE_URL
+      }/assessment/base/?question_type=FILE_UPLOAD&page_size=${
+        fetchAll ? totalCourses : 10
+      }`;
 
   const {
     isLoading,
     data: AssessmentsList,
     refetch,
   } = useFetch(
-    "assessments",
-    `${
-      process.env.NEXT_PUBLIC_API_BASE_URL
-    }/assessment/base/?tutor=${tutorId}&question_type=FILE_UPLOAD&page_size=${
-      fetchAll ? totalCourses : 10
-    }`,
+    ["assessments", tutorId, fetchAll, totalCourses],
+    fetchUrl,
     (data) => {
       if (data?.total && !fetchAll) {
         setTotalCourses(data.total);
