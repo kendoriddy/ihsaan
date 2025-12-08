@@ -5,6 +5,7 @@ import { usePost } from "@/hooks/useHttp/useHttp";
 import Button from "@/components/Button";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import Swal from "sweetalert2";
 
 const AssignmentSubmission = ({ assignmentId, groupId, refetchSubmission }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -25,13 +26,19 @@ const AssignmentSubmission = ({ assignmentId, groupId, refetchSubmission }) => {
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/uploads/`,
     {
       onSuccess: () => {
-        toast.success("Assignment submitted successfully");
+        Swal.fire({
+          title: "Assignment submitted successfully",
+          icon: "success",
+          customClass: { confirmButton: "my-confirm-btn" },
+        });
         refetchSubmission();
       },
       onError: (error) => {
-        toast.error(
-          error.response?.data?.message || "Error submitting assignment"
-        );
+        Swal.fire({
+          title: error.response?.data?.message || "Error submitting assignment",
+          icon: "error",
+          customClass: { confirmButton: "my-confirm-btn" },
+        });
       },
     }
   );

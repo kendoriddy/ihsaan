@@ -7,6 +7,7 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { getFileType } from "@/utils/utilFunctions";
 import { useQueryClient } from "@tanstack/react-query";
+import Swal from "sweetalert2";
 
 const AssignmentSubmission = ({ assignmentId, refetchSubmission }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -19,7 +20,13 @@ const AssignmentSubmission = ({ assignmentId, refetchSubmission }) => {
         // Success handler for file upload
       },
       onError: (error) => {
-        toast.error(error.response?.data?.message || "Error uploading file");
+        Swal.fire({
+          title:
+            error.response?.data?.message ||
+            "Error uloading file, please try again",
+          icon: "error",
+          customClass: { confirmButton: "my-confirm-btn" },
+        });
       },
     }
   );
@@ -28,14 +35,20 @@ const AssignmentSubmission = ({ assignmentId, refetchSubmission }) => {
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/uploads/`,
     {
       onSuccess: () => {
-        toast.success("Assignment submitted successfully");
+        Swal.fire({
+          title: "Assignment submitted successfully",
+          icon: "success",
+          customClass: { confirmButton: "my-confirm-btn" },
+        });
         queryClient.refetchQueries("assignmentsList");
         refetchSubmission();
       },
       onError: (error) => {
-        toast.error(
-          error.response?.data?.message || "Error submitting assignment"
-        );
+        Swal.fire({
+          title: error.response?.data?.message || "Error submitting assignment",
+          icon: "error",
+          customClass: { confirmButton: "my-confirm-btn" },
+        });
       },
     }
   );

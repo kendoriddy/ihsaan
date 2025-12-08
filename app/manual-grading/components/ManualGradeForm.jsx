@@ -14,6 +14,7 @@ import Button from "@/components/Button";
 import { usePost, useFetch, usePatch } from "@/hooks/useHttp/useHttp";
 import { manualGradeSchema } from "@/components/validationSchemas/ValidationSchema";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 const ManualGradeForm = ({
   grade = null,
@@ -105,21 +106,9 @@ const ManualGradeForm = ({
         const messages = Object.values(errorData)
           .map((msg) => (Array.isArray(msg) ? msg.join(" ") : msg))
           .join(" ");
-        Swal.fire({
-          title: messages,
-          icon: "error",
-          customClass: {
-            confirmButton: "my-confirm-btn",
-          },
-        });
+        toast.success(messages);
       } else {
-        Swal.fire({
-          title: `Failed to ${isEdit ? "update" : "create"} manual grade`,
-          icon: "error",
-          customClass: {
-            confirmButton: "my-confirm-btn",
-          },
-        });
+        toast.error(`Failed to ${isEdit ? "update" : "create"} manual grade`);
       }
     };
 

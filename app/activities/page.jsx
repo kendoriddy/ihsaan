@@ -199,6 +199,7 @@ const StudentInfoPage = () => {
             >
               Courses
             </button>
+
             <button
               className={`px-4 py-2 font-medium ${
                 coursesOrGrade === "grades"
@@ -209,6 +210,7 @@ const StudentInfoPage = () => {
             >
               Grades
             </button>
+
             <button
               className={`px-4 py-2 font-medium ${
                 coursesOrGrade === "other_grades"
@@ -223,6 +225,7 @@ const StudentInfoPage = () => {
         </div>
 
         <div>
+          {/* If session or term is missing */}
           {!selectedSession || !selectedTerm ? (
             <div>
               <Lottie
@@ -237,54 +240,72 @@ const StudentInfoPage = () => {
                 for a specific year
               </p>
             </div>
-          ) : isFetchingCourses ||
-            isFetchingGrades ||
-            isFetchingManualGrades ||
-            !studentId ? (
-            <div className="flex gap-2">
-              <Loader size={20} />
-              <p className="animate-pulse">
-                Fetching your academic details for the selected year
-              </p>
-            </div>
           ) : (
             <>
-              {coursesOrGrade === "courses" &&
-                (StudentCourses?.data?.results?.length > 0 ? (
-                  <CoursesList courses={StudentCourses.data} />
-                ) : (
-                  <div className="text-center py-8">
-                    <Lottie
-                      animationData={animation}
-                      loop={false}
-                      autoPlay
-                      className="w-48 h-48 mx-auto"
-                    />
-                    <p className="mt-4 text-gray-600">
-                      You are not enrolled in any courses for this session &
-                      term.
-                    </p>
-                  </div>
-                ))}
+              {coursesOrGrade === "courses" && (
+                <>
+                  {isFetchingCourses && !studentId ? (
+                    <div className="flex gap-2">
+                      <Loader size={20} />
+                      <p className="animate-pulse">
+                        Fetching enrolled courses...
+                      </p>
+                    </div>
+                  ) : StudentCourses?.data?.results?.length > 0 ? (
+                    <CoursesList courses={StudentCourses.data} />
+                  ) : (
+                    <div className="text-center py-8">
+                      <Lottie
+                        animationData={animation}
+                        loop={false}
+                        autoPlay
+                        className="w-48 h-48 mx-auto"
+                      />
+                      <p className="mt-4 text-gray-600">
+                        You are not enrolled in any courses for this session &
+                        term.
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
 
               {coursesOrGrade === "grades" && (
-                <GradesArea
-                  grades={Grades?.data?.results || []}
-                  totalGrades={totalGrades}
-                  onPageChange={handleGradesPageChange}
-                  isLoading={isFetchingGrades}
-                  currentPage={gradesPage}
-                />
+                <>
+                  {isFetchingGrades && !studentId ? (
+                    <div className="flex gap-2">
+                      <Loader size={20} />
+                      <p className="animate-pulse">Fetching grades...</p>
+                    </div>
+                  ) : (
+                    <GradesArea
+                      grades={Grades?.data?.results || []}
+                      totalGrades={totalGrades}
+                      onPageChange={handleGradesPageChange}
+                      isLoading={isFetchingGrades}
+                      currentPage={gradesPage}
+                    />
+                  )}
+                </>
               )}
 
               {coursesOrGrade === "other_grades" && (
-                <OtherGrades
-                  grades={manualGrades?.data?.results || []}
-                  totalGrades={totalManualGrades}
-                  onPageChange={handleManualGradesPageChange}
-                  isLoading={isFetchingManualGrades}
-                  currentPage={manualGradesPage}
-                />
+                <>
+                  {isFetchingManualGrades && !studentId ? (
+                    <div className="flex gap-2">
+                      <Loader size={20} />
+                      <p className="animate-pulse">Fetching other grades...</p>
+                    </div>
+                  ) : (
+                    <OtherGrades
+                      grades={manualGrades?.data?.results || []}
+                      totalGrades={totalManualGrades}
+                      onPageChange={handleManualGradesPageChange}
+                      isLoading={isFetchingManualGrades}
+                      currentPage={manualGradesPage}
+                    />
+                  )}
+                </>
               )}
             </>
           )}

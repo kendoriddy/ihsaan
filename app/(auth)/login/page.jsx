@@ -39,6 +39,7 @@ const LogIn = () => {
       localStorage.setItem("token", data.access);
       localStorage.setItem("refresh-token", data.refresh);
       localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("userId", JSON.stringify(data.id));
       localStorage.setItem("roles", JSON.stringify(data.roles));
       router.push("/admin/dashboard");
       toast.success("Logged in successfully");
