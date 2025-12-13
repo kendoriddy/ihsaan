@@ -30,7 +30,6 @@ function Page() {
   };
   const { mutate, isLoading } = usePost("/auth/password-reset-confirm/", {
     onSuccess: (response) => {
-      console.log(response);
       const { data } = response;
       toast.info(data.message || data.detail);
       setTimeout(() => {
