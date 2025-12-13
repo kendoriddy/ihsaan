@@ -188,6 +188,17 @@ export const manualGradeReasonSchema = Yup.object().shape({
   description: Yup.string().required("Reason description is required"),
 });
 
+export const manualGradeSchema = Yup.object().shape({
+  course: Yup.string().required("Course is required"),
+  student: Yup.string().required("Student is required"),
+  reason: Yup.string().required("Reason is required"),
+  score: Yup.number()
+    .min(0, "Score must be at least 0")
+    .max(100, "Score cannot exceed 100")
+    .required("Score is required"),
+  details: Yup.string(),
+});
+
 export const categorySchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
   description: Yup.string().required("Description is required"),
