@@ -26,7 +26,6 @@ function Page() {
   };
   const { mutate, isLoading } = usePost("api/auth/login", {
     onSuccess: (response) => {
-      console.log(response);
       const { data } = response;
       toast.info(data.message);
       setTimeout(() => {
