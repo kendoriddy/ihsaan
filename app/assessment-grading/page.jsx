@@ -37,7 +37,7 @@ const ManualGrading = () => {
     if (typeof window !== "undefined") {
       // Try to get userId directly
       let userId = localStorage.getItem("userId");
-      
+
       // If userId is not available, try to get it from userFullData
       if (!userId) {
         const userFullData = localStorage.getItem("userFullData");
@@ -50,7 +50,7 @@ const ManualGrading = () => {
           }
         }
       }
-      
+
       setTutorId(userId);
     }
   }, []);
