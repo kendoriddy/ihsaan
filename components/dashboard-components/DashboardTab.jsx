@@ -534,7 +534,7 @@ const DashboardTab = () => {
                     <strong>Duration:</strong> {programme.duration_months}{" "}
                     months
                   </p>
-                  {programme.courses.length > 0 ? (
+                  {/* {programme.courses.length > 0 ? (
                     <div className="mt-2">
                       <h4 className="text-sm font-semibold">Courses:</h4>
                       <ul className="list-disc list-inside text-sm text-gray-700">
@@ -549,7 +549,7 @@ const DashboardTab = () => {
                     <p className="text-sm text-gray-500 mt-2">
                       No courses available
                     </p>
-                  )}
+                  )} */}
                 </div>
               ))}
             </div>
