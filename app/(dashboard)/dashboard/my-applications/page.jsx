@@ -55,8 +55,6 @@ const Page = () => {
 
   const userRoles = useSelector((state) => state.user.user.roles);
 
-  console.log(userRoles, "user roles:");
-
   const handleFormClose = () => {
     setFormOpen(false);
     setApplicationType("");
@@ -79,7 +77,6 @@ const Page = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      console.log(response.data, "user data:");
       setUserApplications(response.data.results);
     } catch (error) {
       console.error("Error fetching application data:", error);
@@ -126,7 +123,6 @@ const Page = () => {
   };
 
   const handleEditApplicationBtn = (application) => {
-    console.log(application, "user application:");
     setSelectedApplication(application);
     setOpen(true);
   };
