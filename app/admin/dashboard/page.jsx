@@ -34,7 +34,9 @@ function Page() {
       try {
         setIsLoading(true);
         const token = getAuthToken();
-        const response = await axios.get(
+        
+        // Fetch admin dashboard stats
+        const dashboardResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/dashboard/admin_dashboard/`,
           {
             headers: {
@@ -43,7 +45,54 @@ function Page() {
           }
         );
 
-        const stats = response.data;
+        const stats = dashboardResponse.data;
+
+        // Fetch pending feedback counts for different recipients
+        const feedbackPromises = [
+          // Pending feedback directed to admins (platform feedback)
+          axios.get(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/feedback-ticket/feedbacks/?is_resolved=false&subject=platform&page_size=1`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          ),
+          // Pending feedback directed to tutors
+          axios.get(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/feedback-ticket/feedbacks/?is_resolved=false&subject=tutor&page_size=1`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          ),
+          // Pending feedback directed to students (course feedback)
+          axios.get(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/feedback-ticket/feedbacks/?is_resolved=false&subject=course&page_size=1`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          ),
+        ];
+
+        const feedbackResponses = await Promise.allSettled(feedbackPromises);
+        
+        // Extract counts from feedback responses
+        const pendingFeedbackToAdmins = 
+          feedbackResponses[0].status === 'fulfilled' 
+            ? feedbackResponses[0].value.data.count || 0 
+            : 0;
+        const pendingFeedbackToTutors = 
+          feedbackResponses[1].status === 'fulfilled' 
+            ? feedbackResponses[1].value.data.count || 0 
+            : 0;
+        const pendingFeedbackToStudents = 
+          feedbackResponses[2].status === 'fulfilled' 
+            ? feedbackResponses[2].value.data.count || 0 
+            : 0;
 
         // Map API response to dashboard items
         setDashboardItems((prevItems) =>
@@ -79,8 +128,22 @@ function Page() {
                   ...item,
                   value: stats.pending_student_applications_count || 0,
                 };
-              // Items 7-10 (feedback and students per programme) are not in the API response
-              // Keep their default value of 0
+              case 7:
+                return {
+                  ...item,
+                  value: pendingFeedbackToAdmins,
+                };
+              case 8:
+                return {
+                  ...item,
+                  value: pendingFeedbackToTutors,
+                };
+              case 9:
+                return {
+                  ...item,
+                  value: pendingFeedbackToStudents,
+                };
+              // Item 10 (students per programme) is not in the API response
               default:
                 return item;
             }

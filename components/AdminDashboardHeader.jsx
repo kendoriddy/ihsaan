@@ -109,7 +109,7 @@ function AdminDashboardHeader({ toggleSidebar }) {
               <Link href={"/admin/settings"}>My account</Link>
             </MenuItem>
             <MenuItem onClick={handleLogOut}>
-              <Link href={"/admin/login"}>Logout</Link>
+              <Link href={"/login"}>Logout</Link>
             </MenuItem>
           </Menu>
         </div>

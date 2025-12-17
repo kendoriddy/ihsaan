@@ -22,7 +22,7 @@ function Page() {
       const { data } = response;
       toast.info(data.message);
       setTimeout(() => {
-        router.push("/admin/login");
+        router.push("/login");
       }, 2000);
     },
     onError: (error) => {
@@ -79,7 +79,7 @@ function Page() {
 
             <div className="text-gray-400">
               Remember your password ?{" "}
-              <Link href="/admin/login" className="link">
+              <Link href="/login" className="link">
                 Login{" "}
               </Link>{" "}
             </div>
