@@ -13,16 +13,17 @@ const CreateTerm = () => {
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms/`,
     {
       onSuccess: (response) => {
-        Swal.fire({
-          title: "Terms created successfully",
-          icon: "success",
-          customClass: { confirmButton: "my-confirm-btn" },
-        });
-        resetForm();
+        if (response.status === 201) {
+          Swal.fire({
+            title: "Terms created successfully",
+            icon: "success",
+            customClass: { confirmButton: "my-confirm-btn" },
+          });
+        }
       },
       onError: (error) => {
         Swal.fire({
-          title: error.response?.data?.message || "Failed to delete",
+          title: error.response?.data?.message || "Failed to create term",
           icon: "error",
           customClass: { confirmButton: "my-confirm-btn" },
         });
@@ -40,8 +41,11 @@ const CreateTerm = () => {
 
   // Formik form submission handler
   const handleSubmit = (values, { resetForm }) => {
-    createTerm(values);
-    resetForm();
+    createTerm(values, {
+      onSuccess: () => {
+        resetForm();
+      },
+    });
   };
   const { isLoading, data, refetch, isFetching } = useFetch(
     "academicSession",
