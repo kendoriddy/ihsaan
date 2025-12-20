@@ -84,7 +84,7 @@ const EditQuizQuestion = ({
                   as={TextField}
                   fullWidth
                   size="small"
-                  placeholder="Correct answer (A,B,C etc)"
+                  placeholder="Correct answer (A,B,C,D etc)"
                 />
               </div>
 
