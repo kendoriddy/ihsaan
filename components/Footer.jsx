@@ -112,12 +112,9 @@ function Footer() {
             <li className="hover:text-[#ff6600]">
               <Link href="/courses">Courses</Link>
             </li>
-            <li className="hover:text-[#ff6600]">
-              <Link href="/faq">FAQs</Link>
-            </li>
-            <li className="hover:text-[#ff6600]">
-              <Link href="/contact">Contact Us</Link>
-            </li>
+            <Link href="/#faqs" scroll={false}>
+              FAQs
+            </Link>
           </ul>
         </div>
 
@@ -126,7 +123,7 @@ function Footer() {
           <div className="flex gap-3">
             <PhoneIcon />
             <Link href="tel:+2348130938573" className="hover:text-[#ff6600]">
-              +2348000000000
+              +2348130938573
             </Link>
           </div>
           <div className="flex gap-3 py-1">
