@@ -47,7 +47,7 @@ const AllAssignment = () => {
     if (typeof window !== "undefined") {
       // Try to get userId directly
       let userId = localStorage.getItem("userId");
-      
+
       // If userId is not available, try to get it from userFullData
       if (!userId) {
         const userFullData = localStorage.getItem("userFullData");
@@ -60,7 +60,7 @@ const AllAssignment = () => {
           }
         }
       }
-      
+
       setTutorId(userId);
     }
   }, []);
@@ -87,7 +87,7 @@ const AllAssignment = () => {
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/base`,
     {
       onSuccess: () => {
-        toast.success("Assessnment deleted successfully");
+        toast.success("Assessment deleted successfully");
         queryClient.invalidateQueries("assignments");
         setOpenDeleteDialog(false);
       },
@@ -105,10 +105,9 @@ const AllAssignment = () => {
 
   const handleDelete = () => {
     if (selectedAssignment?.id) {
-      questionDelete(`${selectedAssignment.id}/`);
+      questionDelete(`${selectedAssignment.id}`);
     }
   };
-  console.log(selectedAssignment, "assessment:::::");
 
   // Handle Menu Open
   const handleMenuOpen = (event, assignment) => {
@@ -141,10 +140,11 @@ const AllAssignment = () => {
               <TableHead>
                 <TableRow>
                   <TableCell className="text-nowrap">
-                    Assignment Title
+                    Assessment Title
                   </TableCell>
                   <TableCell className="text-nowrap">Description</TableCell>
-                  <TableCell className="text-nowrap">Assignment Type</TableCell>
+                  <TableCell className="text-nowrap">Assessment Type</TableCell>
+                  <TableCell className="text-nowrap">Quiz/File</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -163,6 +163,15 @@ const AllAssignment = () => {
                         <TableCell>{assignment.description}</TableCell>
                         <TableCell className="capitalize">
                           {assignment.type.toLowerCase()}
+                        </TableCell>
+                        <TableCell className="capitalize">
+                          {assignment.question_type === "MCQ"
+                            ? "Quiz"
+                            : assignment.question_type === "FILE_UPLOAD"
+                            ? "File"
+                            : assignment.question_type === "MANUAL"
+                            ? "Manual grading"
+                            : "Others"}
                         </TableCell>
                         <TableCell>
                           <IconButton

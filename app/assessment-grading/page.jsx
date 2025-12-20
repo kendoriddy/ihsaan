@@ -157,7 +157,7 @@ const ManualGrading = () => {
                 </MenuItem>
               ))
             ) : (
-              <MenuItem disabled>No courses available</MenuItem>
+              <MenuItem disabled>No assignments available to grade</MenuItem>
             )}
           </Select>
         </FormControl>

@@ -177,7 +177,7 @@ const SubmissionsList = ({ assessmentId }) => {
       {loadingSubmissions ? (
         <div className="text-gray-500">Loading submissions...</div>
       ) : submissions.length === 0 ? (
-        <div className="text-gray-500">No submissions found</div>
+        <div className="text-gray-500 text-lg">No submissions found</div>
       ) : (
         <List>
           {submissions.map((submission) => {

@@ -107,7 +107,7 @@ const ListTerms = () => {
                       <Button
                         onClick={() => {
                           setSelectedTerm(term);
-                          setOpenDeleteDialog(true);
+                           setOpenDeleteDialog(true);
                         }}
                       >
                         <Delete />

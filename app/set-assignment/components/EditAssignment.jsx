@@ -76,6 +76,7 @@ const EditAssignmentQuestion = ({
   // Update form state when selectedAssignment changes
   useEffect(() => {
     if (selectedAssignment) {
+      console.log("this is assignment", selectedAssignment);
       setEditedAssignment({
         title: selectedAssignment.title || "",
         description: selectedAssignment.description || "",
@@ -154,41 +155,46 @@ const EditAssignmentQuestion = ({
                 disabled={isUpdating}
               />
 
-              {/* Type Dropdown */}
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Type</InputLabel>
-                <Select
-                  label="Type"
-                  name="type"
-                  value={editedAssignment.type}
-                  onChange={handleInputChange}
-                  disabled={isUpdating}
-                >
-                  {typeOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              {selectedAssignment &&
+                selectedAssignment.question_type !== "MCQ" && (
+                  <>
+                    {/* Type Dropdown */}
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>Type</InputLabel>
+                      <Select
+                        label="Type"
+                        name="type"
+                        value={editedAssignment.type}
+                        onChange={handleInputChange}
+                        disabled={isUpdating}
+                      >
+                        {typeOptions.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
 
-              {/* Question Type Dropdown */}
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Question Type</InputLabel>
-                <Select
-                  label="Question Type"
-                  name="question_type"
-                  value={editedAssignment.question_type}
-                  onChange={handleInputChange}
-                  disabled={isUpdating}
-                >
-                  {questionTypeOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                    {/* Question Type Dropdown */}
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>Question Type</InputLabel>
+                      <Select
+                        label="Question Type"
+                        name="question_type"
+                        value={editedAssignment.question_type}
+                        onChange={handleInputChange}
+                        disabled={isUpdating}
+                      >
+                        {questionTypeOptions.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </>
+                )}
 
               {/* Max Score */}
               <TextField
