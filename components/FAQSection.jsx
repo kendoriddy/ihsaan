@@ -39,7 +39,7 @@ export default function FAQSection() {
 
   if (loading) {
     return (
-      <section className="py-12 bg-white">
+      <section id="faqs"  className="py-12 bg-white">
         <div
           className="text-center mb-6 font-semibold text-3xl"
           style={{ color: "#7e1a0b" }}
@@ -55,7 +55,7 @@ export default function FAQSection() {
 
   if (error) {
     return (
-      <section className="py-12 bg-white">
+      <section id="faqs"  className="py-12 bg-white">
         <div
           className="text-center mb-6 font-semibold text-3xl"
           style={{ color: "#7e1a0b" }}
@@ -70,7 +70,7 @@ export default function FAQSection() {
   }
 
   return (
-    <section className="py-12 bg-white">
+    <section id="faqs" className="py-12 bg-white">
       <div
         className="text-center mb-6 font-semibold text-3xl"
         style={{ color: "#7e1a0b" }}

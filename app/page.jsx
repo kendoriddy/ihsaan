@@ -177,6 +177,23 @@ function Page() {
     e.preventDefault();
     // Your form submission logic here
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const hash = window.location.hash;
+
+    if (hash === "#faqs") {
+      const el = document.getElementById("faqs");
+
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth" });
+        }, 200); // wait for hydration + data load
+      }
+    }
+  }, []);
+
   return (
     <div>
       <div className="relative">
