@@ -15,7 +15,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { Skeleton } from "@mui/material";
-import { logoutAfterSixHours } from "@/utils/utilFunctions";
+import { logoutAfterSixHours, normalizeUrl } from "@/utils/utilFunctions";
 import { useFetch } from "@/hooks/useHttp/useHttp";
 import Loader from "@/components/Loader";
 import "slick-carousel/slick/slick.css";
@@ -26,17 +26,35 @@ function Page() {
   const router = useRouter();
   const searchRef = useRef(null);
   const [searchVariable, setSearchVariable] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
   const [FAQs, setFAQs] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [suggestedCourses, setSuggestedCourses] = useState([]);
-  // const { data: quotesList, isLoading } = useFetch("quotes", `/quotes`);
-  const [quotes, setQuotes] = useState(null);
-  // useEffect(() => {
-  //   if (quotesList?.data?.length) {
-  //     const randomIndex = Math.floor(Math.random() * quotesList?.data?.length);
-  //     setQuotes(quotesList?.data[randomIndex]);
-  //   }
-  // }, [quotesList]);
+
+  // Fetch courses
+  const { data: coursesList } = useFetch(
+    "courses",
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?page_size=6
+    `,
+    (data) => {}
+  );
+
+  const courses = coursesList?.data?.results || [];
+
+  // Fetch courses
+  const {
+    isLoading,
+    data: CoursesList,
+    refetch,
+  } = useFetch(
+    ["courses", debouncedSearch],
+    debouncedSearch
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?search=${debouncedSearch}`
+      : null,
+    () => {}
+  );
+
+  const Courses = CoursesList?.data?.results || [];
+  console.log("courses searched", Courses);
 
   const slides = [
     <div key="1" className="p-0 text-left">
@@ -147,6 +165,14 @@ function Page() {
     },
   ];
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchVariable.trim());
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [searchVariable]);
+
   var settings = {
     dots: false,
     infinite: true,
@@ -163,19 +189,9 @@ function Page() {
     // Log out after 6 hours
     logoutAfterSixHours();
   }, []);
-  useEffect(() => {
-    // if (searchVariable.length >= 3) {
-    //   fetchSuggestedCourses(searchVariable);
-    // } else {
-    //   setSuggestedCourses([]);
-    // }
-  }, [searchVariable]);
+
   const handleSearchChange = (e) => {
     setSearchVariable(e.target.value);
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Your form submission logic here
   };
 
   useEffect(() => {
@@ -230,12 +246,7 @@ function Page() {
 
               {/* Search Bar */}
               <div className="py-2">
-                <form
-                  action=""
-                  method="post"
-                  className="w-full flex flex-col sm:flex-row justify-start items-center gap-2"
-                  onSubmit={handleSubmit}
-                >
+                <form className="relative w-full flex flex-col sm:flex-row items-center gap-2">
                   <div className="w-full sm:w-[70%] border border-red-600 rounded-md py-2 px-3 flex items-center">
                     <input
                       type="text"
@@ -247,32 +258,41 @@ function Page() {
                   </div>
 
                   {/* Search Suggestions */}
-                  <div
-                    className={`absolute top-12 left-0 bg-gray-200 rounded z-10 w-[calc(100%)] sm:w-[calc(70%-78px)] 
-            ${searchVariable.length >= 3 ? "block" : "hidden"}`}
-                  >
-                    <ul className="w-full">
-                      {suggestedCourses?.slice(0, 6).map((course, index) => (
-                        <li
-                          key={index}
-                          className="py-2 px-2 hover:bg-gray-300 cursor-pointer"
-                        >
-                          <Link href={`/courses/${course.id}`}>
-                            {course.title}
+                  {debouncedSearch.length >= 2 && (
+                    <div className="absolute top-full mt-2 w-full sm:w-[70%] bg-white rounded-xl shadow-lg border z-20">
+                      <ul className="divide-y max-h-[300px] overflow-y-auto">
+                        {Courses?.length > 0 ? (
+                          Courses?.map((course) => (
+                            <li
+                              key={course.id}
+                              className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition"
+                            >
+                              <Link
+                                href={`/courses/${course.id}`}
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                {course.title}
+                              </Link>
+                            </li>
+                          ))
+                        ) : (
+                          <li className="px-4 py-3 text-sm text-gray-500">
+                            No courses found
+                          </li>
+                        )}
+
+                        <li className="px-4 py-3 text-sm bg-gray-50">
+                          Can’t find what you’re looking for? Reach out to us at{" "}
+                          <Link
+                            href="mailto:contact@ihsaanacademy.com"
+                            className="hover:text-[#ff6600]"
+                          >
+                            contact@ihsaanacademy.com
                           </Link>
                         </li>
-                      ))}
-                      <li className="py-2 px-2">
-                        Can't find what you are looking for?{" "}
-                        <Link
-                          href="/courses"
-                          className="text-blue-600 underline"
-                        >
-                          Click here
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
+                      </ul>
+                    </div>
+                  )}
                 </form>
               </div>
             </div>
@@ -453,13 +473,13 @@ function Page() {
                   <p className="text-gray-600 mb-4">
                     Location: {event.location}
                   </p>
-                  <Link
+                  {/* <Link
                     href="/events"
                     className="text-sm font-semibold"
                     style={{ color: "#ff6600" }}
                   >
                     Learn More →
-                  </Link>
+                  </Link> */}
                 </div>
               ))}
             </div>
@@ -494,16 +514,16 @@ function Page() {
             <div className="flex flex-wrap justify-center gap-6 flex-col md:flex-row items-center ">
               {courses && (
                 <>
-                  {courses?.slice(0, 6)?.map((course) => {
+                  {courses?.map((course) => {
                     return (
                       <Link
+                        href={`/courses/${course.id}`}
                         key={course?.id}
-                        href={`/courses/${course?.id}`}
-                        className="group border w-1/4 min-w-[300px] max-w-[500px] rounded-md overflow-hidden cursor-pointer  shadow-md  hover:bg-neutral-200  transition-all duration-300 lg:mt-4 "
+                        className="flex flex-col h-full group border w-1/4 min-w-[300px] max-w-[500px] rounded-md overflow-hidden cursor-pointer  shadow-md  hover:bg-neutral-200  transition-all duration-300 lg:mt-4 "
                       >
-                        <div className="overflow-hidden">
+                        <div className="overflow-hidden h-[200px]">
                           <Image
-                            src={course?.blog_image || IMAGES.logo}
+                            src={normalizeUrl(course?.image_url) || IMAGES.logo}
                             alt={course?.title}
                             width={500}
                             height={300}
@@ -520,15 +540,9 @@ function Page() {
                           </div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <Image
-                                src={course?.author?.image || IMAGES.logo}
-                                alt="author"
-                                width={30}
-                                height={30}
-                                className="rounded-full"
-                              />
                               <div className="text-primary text-xs">
-                                {course?.instructor_name}
+                                {course?.tutors[0]?.tutor_full_name}{" "}
+                                {course?.tutors > 1 ? "and more" : ""}
                               </div>
                             </div>
                           </div>
