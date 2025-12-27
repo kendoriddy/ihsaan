@@ -14,6 +14,7 @@ import {
   TableRow,
   Paper,
   IconButton,
+  Button as MuiButton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -2358,7 +2359,7 @@ function Page() {
                   />
 
                   <DialogActions>
-                    <Button
+                    <MuiButton
                       onClick={() => {
                         setOpenEditAssignmentModal(false);
                         setSelectedAssignment(null);
@@ -2370,14 +2371,15 @@ function Page() {
                       color="primary"
                     >
                       Cancel
-                    </Button>
-                    <Button
+                    </MuiButton>
+                    <MuiButton
                       type="submit"
-                      color="secondary"
+                      color="primary"
+                      variant="contained"
                       disabled={updatingAssignment}
                     >
                       {updatingAssignment ? "Updating..." : "Update"}
-                    </Button>
+                    </MuiButton>
                   </DialogActions>
                 </form>
               </DialogContent>
@@ -2538,15 +2540,19 @@ function Page() {
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button
+                <MuiButton
                   onClick={handleCloseDeleteCourseTutorDialog}
                   color="primary"
                 >
                   Cancel
-                </Button>
-                <Button onClick={handleConfirmDeleteCourseTutor} color="error">
+                </MuiButton>
+                <MuiButton
+                  onClick={handleConfirmDeleteCourseTutor}
+                  color="error"
+                  variant="contained"
+                >
                   Delete
-                </Button>
+                </MuiButton>
               </DialogActions>
             </Dialog>
 
@@ -2568,12 +2574,16 @@ function Page() {
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleCloseDeassignDialog} color="primary">
+                <MuiButton onClick={handleCloseDeassignDialog} color="primary">
                   Cancel
-                </Button>
-                <Button onClick={handleConfirmDeassign} color="warning">
+                </MuiButton>
+                <MuiButton
+                  onClick={handleConfirmDeassign}
+                  color="warning"
+                  variant="contained"
+                >
                   Deassign
-                </Button>
+                </MuiButton>
               </DialogActions>
             </Dialog>
 
@@ -2594,15 +2604,19 @@ function Page() {
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button
+                <MuiButton
                   onClick={handleCloseDeleteTutorStudentDialog}
                   color="primary"
                 >
                   Cancel
-                </Button>
-                <Button onClick={handleConfirmDeleteTutorStudent} color="error">
+                </MuiButton>
+                <MuiButton
+                  onClick={handleConfirmDeleteTutorStudent}
+                  color="error"
+                  variant="contained"
+                >
                   Delete
-                </Button>
+                </MuiButton>
               </DialogActions>
             </Dialog>
           </div>

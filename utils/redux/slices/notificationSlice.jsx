@@ -274,6 +274,7 @@ const notificationSlice = createSlice({
         );
         if (notification) {
           notification.is_read = true;
+          notification.isRead = true; // Also set camelCase for consistency
         }
         // Also update in recent notifications if it exists there
         const recentNotification = state.recentNotifications.find(
@@ -281,6 +282,7 @@ const notificationSlice = createSlice({
         );
         if (recentNotification) {
           recentNotification.is_read = true;
+          recentNotification.isRead = true; // Also set camelCase for consistency
         }
         // Decrease unread count
         if (state.unreadCount > 0) {
@@ -300,12 +302,14 @@ const notificationSlice = createSlice({
       })
       .addCase(markAllNotificationsAsRead.fulfilled, (state) => {
         state.markAllReadStatus = "succeeded";
-        // Mark all notifications as read
+        // Mark all notifications as read (set both property names for consistency)
         state.notifications.forEach((notification) => {
           notification.is_read = true;
+          notification.isRead = true;
         });
         state.recentNotifications.forEach((notification) => {
           notification.is_read = true;
+          notification.isRead = true;
         });
         // Reset unread count
         state.unreadCount = 0;
