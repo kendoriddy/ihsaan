@@ -166,7 +166,9 @@ export default function QuranTutorDashboardPage() {
                         Full Name
                       </div>
                       <div className="font-medium text-gray-800">
-                        {application.first_name} {application.last_name}
+                        {[application.first_name, application.middle_name, application.last_name]
+                          .filter(Boolean)
+                          .join(" ")}
                       </div>
                     </div>
                     <div className="bg-gray-50 rounded-xl p-4">

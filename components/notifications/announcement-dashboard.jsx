@@ -177,17 +177,17 @@ export default function AnnouncementDashboard({ userRole }) {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                 Announcement Center
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 mt-1 text-sm sm:text-base">
                 Create and manage your announcements
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center sm:justify-end gap-3">
               {/* <button
                 onClick={() => setShowNotifications(true)}
                 className="relative p-3 text-gray-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
@@ -205,10 +205,10 @@ export default function AnnouncementDashboard({ userRole }) {
               </button> */}
               <button
                 onClick={() => setShowComposer(true)}
-                className="bg-red-800 hover:bg-red-900 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-lg hover:shadow-xl"
+                className="bg-red-800 hover:bg-red-900 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl w-full sm:w-auto"
               >
                 <Add className="w-5 h-5" />
-                Create Announcement
+                <span className="text-sm sm:text-base">Create Announcement</span>
               </button>
             </div>
           </div>
@@ -216,13 +216,13 @@ export default function AnnouncementDashboard({ userRole }) {
       </div>
 
       {/* Tabs */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="border-b border-gray-200">
-            <div className="flex">
+          <div className="border-b border-gray-200 overflow-x-auto">
+            <div className="flex min-w-max">
               {/* <button
                 onClick={() => setActiveTab("create")}
-                className={`px-6 py-4 font-medium transition-colors flex items-center gap-2 ${
+                className={`px-4 sm:px-6 py-3 sm:py-4 font-medium transition-colors flex items-center gap-2 ${
                   activeTab === "create"
                     ? "text-red-800 border-b-2 border-red-800 bg-red-50"
                     : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
@@ -233,19 +233,19 @@ export default function AnnouncementDashboard({ userRole }) {
               </button> */}
               <button
                 onClick={() => setActiveTab("history")}
-                className={`px-6 py-4 font-medium transition-colors flex items-center gap-2 ${
+                className={`px-4 sm:px-6 py-3 sm:py-4 font-medium transition-colors flex items-center gap-2 whitespace-nowrap ${
                   activeTab === "history"
                     ? "text-red-800 border-b-2 border-red-800 bg-red-50"
                     : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                 }`}
               >
                 <History className="w-4 h-4" />
-                History & Analytics
+                <span className="text-sm sm:text-base">History & Analytics</span>
               </button>
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {activeTab === "create" && (
               <div className="text-center py-12">
                 <div className="w-20 h-20 bg-gradient-to-br from-red-800 to-red-900 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">

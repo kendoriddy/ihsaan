@@ -163,7 +163,7 @@ const DASHBOARD_LIST = {
       path: "/admin/student",
     },
     { id: 8, name: "Courses", path: "/admin/courses" },
-    { id: 9, name: "Products", icon: StorefrontIcon, path: "/admin/products" },
+    // { id: 9, name: "Products", icon: StorefrontIcon, path: "/admin/products" },
     { id: 10, name: "FAQs", path: "/admin/faqs" },
     { id: 11, name: "Quotes", path: "/admin/quotes" },
     {

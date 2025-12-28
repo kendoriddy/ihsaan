@@ -5,6 +5,7 @@ import { Formik, Form } from "formik";
 import AuthButton from "./AuthButton";
 import { countryNames } from "@/utils/utilFunctions";
 import { toast } from "react-toastify";
+import http from "@/hooks/axios/axios";
 
 const ajzaaOptions = Array.from({ length: 30 }, (_, i) => ({
   key: `${i + 1}`,
@@ -117,17 +118,14 @@ const QuranTutorApplicationModal = ({ isOpen, handleClose }) => {
         ro.gender = !!userFullData.gender; // gender readonly if present
         setReadonlyFields(ro);
         // Fetch existing application
-        const token = localStorage.getItem("token");
-        const res = await fetch(
-          "https://api.ihsaanacademia.com/api/my-quran-tutor-application/",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        if (res.ok) {
-          const appData = await res.json();
+        try {
+          const response = await http.get("/my-quran-tutor-application/");
+          const appData = response.data;
           setApplication(appData);
           if (appData.status) setStatus(appData.status);
+        } catch (fetchErr) {
+          // Application might not exist yet, which is fine
+          console.log("No existing application found");
         }
       } catch (err) {
         setError("Failed to load application data.");
@@ -151,24 +149,13 @@ const QuranTutorApplicationModal = ({ isOpen, handleClose }) => {
   // On submit: POST or PATCH
   const handleSubmit = async (values, { setSubmitting }) => {
     setError("");
-    console.log("hereee");
     try {
-      const token = localStorage.getItem("token");
-      const method = application ? "PATCH" : "POST";
-      const url = "https://api.ihsaanacademia.com/api/apply-quran-tutor/";
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(values),
-      });
-      if (!res.ok) throw new Error("Failed to submit application");
-      const updated = await res.json();
+      const method = application ? "patch" : "post";
+      const response = await http[method]("/apply-quran-tutor/", values);
+      const updated = response.data;
       toast.success("Application successful");
       // Update userFullData in localStorage with updated keys only
-      if (method === "PATCH" && updated) {
+      if (method === "patch" && updated) {
         const userFullData =
           JSON.parse(localStorage.getItem("userFullData")) || {};
         const keysToUpdate = [
@@ -191,10 +178,14 @@ const QuranTutorApplicationModal = ({ isOpen, handleClose }) => {
         });
         localStorage.setItem("userFullData", JSON.stringify(userFullData));
       }
+      // Update application state to reflect changes
+      if (updated) {
+        setApplication(updated);
+      }
       handleClose();
     } catch (err) {
       console.log(err, "error::");
-      toast.error(err.message || "Submission failed");
+      toast.error(err.response?.data?.detail || err.message || "Submission failed");
     } finally {
       setSubmitting(false);
     }

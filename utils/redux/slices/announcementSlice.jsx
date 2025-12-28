@@ -64,7 +64,8 @@ export const updateAnnouncement = createAsyncThunk(
     { rejectWithValue, dispatch }
   ) => {
     try {
-      const response = await http2.put(
+      // Use PATCH for partial updates (more flexible than PUT)
+      const response = await http2.patch(
         `/announcement/announcements/${announcementId}/`,
         announcementData
       );
@@ -74,9 +75,14 @@ export const updateAnnouncement = createAsyncThunk(
 
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update announcement"
-      );
+      // Provide more detailed error messages
+      const errorMessage = 
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        (typeof error.response?.data === 'string' ? error.response.data : null) ||
+        Object.values(error.response?.data || {}).flat().join(', ') ||
+        "Failed to update announcement";
+      return rejectWithValue(errorMessage);
     }
   }
 );

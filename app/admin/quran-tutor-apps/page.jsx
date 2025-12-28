@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Header from "@/components/Header";
-import DashboardSidebar from "@/components/DashboardSidebar";
 import { usePathname } from "next/navigation";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
 import AdminDashboardHeader from "@/components/AdminDashboardHeader";
-import Modal from "@/components/validation/Modal";
 import clsx from "clsx";
 import TutorApplicationModal from "./TutorApplicationModal";
+import http from "@/hooks/axios/axios";
 
 export default function AdminQuranTutorAppsPage() {
   const currentRoute = usePathname();
@@ -34,23 +32,26 @@ export default function AdminQuranTutorAppsPage() {
       setLoading(true);
       setError("");
       try {
-        const token = localStorage.getItem("token");
-        const params = [];
-        if (statusFilter) params.push(`application_status=${statusFilter}`);
-        if (search) params.push(`search=${encodeURIComponent(search)}`);
-        if (page) params.push(`page=${page}`);
-        const url = `https://api.ihsaanacademia.com/api/list-quran-tutor-applications/?${params.join(
-          "&"
-        )}`;
-        const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` },
+        const params = {};
+        if (statusFilter) {
+          params.quran_tutor_application_status = statusFilter;
+        }
+        if (search) {
+          params.search = search;
+        }
+        if (page) {
+          params.page = page;
+        }
+        const response = await http.get("/list-quran-tutor-applications/", {
+          params,
         });
-        if (!res.ok) throw new Error("Failed to fetch tutors");
-        const data = await res.json();
+        const data = response.data;
         setTutors(data.results || []);
         setTotalPages(data.total_pages || 1);
       } catch (err) {
-        setError(err.message || "Failed to load data");
+        setError(
+          err.response?.data?.detail || err.message || "Failed to load data"
+        );
       } finally {
         setLoading(false);
       }
@@ -61,21 +62,13 @@ export default function AdminQuranTutorAppsPage() {
   const handleStatusChange = async (id, status) => {
     setActionLoading(id + status);
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        `https://api.ihsaanacademia.com/api/quran-tutors/${id}/`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ quran_tutor_application_status: status }),
-        }
-      );
-      if (!res.ok) throw new Error("Failed to update status");
+      await http.patch(`/quran-tutors/${id}/`, {
+        quran_tutor_application_status: status,
+      });
     } catch (err) {
-      alert(err.message || "Failed to update status");
+      alert(
+        err.response?.data?.detail || err.message || "Failed to update status"
+      );
     } finally {
       setActionLoading("");
     }
@@ -88,19 +81,16 @@ export default function AdminQuranTutorAppsPage() {
     setModalError("");
     setViewModalOpen(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        `https://api.ihsaanacademia.com/api/admin/quran-tutors/${id}/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (!res.ok) throw new Error("Failed to fetch application");
-      const data = await res.json();
+      const response = await http.get(`/admin/quran-tutors/${id}/`);
+      const data = response.data;
       setSelectedTutor(data.results?.[0] || data);
       setRejectionReason("");
     } catch (err) {
-      setModalError(err.message || "Failed to load application");
+      setModalError(
+        err.response?.data?.detail ||
+          err.message ||
+          "Failed to load application"
+      );
     } finally {
       setModalLoading(false);
     }
@@ -111,27 +101,17 @@ export default function AdminQuranTutorAppsPage() {
     if (!selectedTutorId) return;
     setModalLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        `https://api.ihsaanacademia.com/api/admin/quran-tutors/${selectedTutorId}/status/`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            quran_tutor_application_status: status,
-            quran_tutor_rejection_reason:
-              status === "REJECTED" ? rejectionReason : "",
-          }),
-        }
-      );
-      if (!res.ok) throw new Error("Failed to update status");
+      await http.patch(`/admin/quran-tutors/${selectedTutorId}/status/`, {
+        quran_tutor_application_status: status,
+        quran_tutor_rejection_reason:
+          status === "REJECTED" ? rejectionReason : "",
+      });
       setViewModalOpen(false);
       setActionLoading(selectedTutorId + status); // trigger refetch
     } catch (err) {
-      setModalError(err.message || "Failed to update status");
+      setModalError(
+        err.response?.data?.detail || err.message || "Failed to update status"
+      );
     } finally {
       setModalLoading(false);
     }
@@ -163,6 +143,12 @@ export default function AdminQuranTutorAppsPage() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const clearFilters = () => {
+    setSearch("");
+    setStatusFilter("");
+    setPage(1);
+  };
+
   return (
     <>
       <AdminDashboardHeader toggleSidebar={toggleSidebar} />
@@ -185,7 +171,7 @@ export default function AdminQuranTutorAppsPage() {
         >
           <h1 className="text-2xl font-bold mb-6">Qur'an Tutor Applications</h1>
           {/* Filters */}
-          <div className="flex flex-wrap gap-4 mb-4">
+          <div className="flex flex-wrap gap-4 mb-4 items-center">
             <input
               type="text"
               placeholder="Search by name or email"
@@ -203,6 +189,14 @@ export default function AdminQuranTutorAppsPage() {
               <option value="ACCEPTED">Accepted</option>
               <option value="REJECTED">Rejected</option>
             </select>
+            {(search || statusFilter) && (
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded transition-colors"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
           {loading ? (
             <div>Loading...</div>
@@ -229,7 +223,9 @@ export default function AdminQuranTutorAppsPage() {
                   {tutors.map((tutor) => (
                     <tr key={tutor.id} className="even:bg-gray-50">
                       <td className="border px-4 py-2">
-                        {tutor.first_name + " " + tutor.last_name}
+                        {[tutor.first_name, tutor.middle_name, tutor.last_name]
+                          .filter(Boolean)
+                          .join(" ")}
                       </td>
                       <td className="border px-4 py-2">{tutor.email}</td>
                       <td className="border px-4 py-2">
