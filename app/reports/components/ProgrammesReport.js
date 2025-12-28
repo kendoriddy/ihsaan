@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Paper,
@@ -17,11 +17,11 @@ import {
   MenuItem,
   Typography,
   CircularProgress,
-  Chip,
   Button,
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Divider,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import axios from "axios";
@@ -34,6 +34,9 @@ const ProgrammesReport = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalProgrammes, setTotalProgrammes] = useState(0);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [filters, setFilters] = useState({
     search: "",
     type: "",
@@ -42,34 +45,29 @@ const ProgrammesReport = () => {
     level: "",
   });
 
-  const fetchProgrammes = async () => {
+  const fetchProgrammes = useCallback(async () => {
     try {
       setLoading(true);
       const headers = {
         Authorization: `Bearer ${getAuthToken()}`,
       };
 
-      // Build query parameters
       const params = new URLSearchParams();
-
-      // Add pagination parameters
       params.append("page", page + 1);
       params.append("page_size", rowsPerPage);
 
-      // Add filter parameters
       if (filters.search) params.append("search", filters.search);
       if (filters.type) params.append("type", filters.type);
       if (filters.classGroup) params.append("class_group", filters.classGroup);
-      if (filters.specialType)
-        params.append("special_type", filters.specialType);
+      if (filters.specialType) params.append("special_type", filters.specialType);
       if (filters.level) params.append("level", filters.level);
 
       const response = await axios.get(
         `https://api.ihsaanacademia.com/programmes/?${params.toString()}`,
         { headers }
       );
-      setProgrammes(response.data.results);
-      setTotalProgrammes(response.data.total);
+      setProgrammes(response.data.results || []);
+      setTotalProgrammes(response.data.total || 0);
       setError(null);
     } catch (err) {
       setError("Failed to fetch programmes");
@@ -77,33 +75,39 @@ const ProgrammesReport = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, page, rowsPerPage]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchTerm }));
+      setPage(0);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchProgrammes();
-  }, [filters, page, rowsPerPage]);
+  }, [fetchProgrammes]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    fetchProgrammes();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    fetchProgrammes();
   };
 
   const handleFilterChange = (filterName) => (event) => {
-    setFilters({
-      ...filters,
+    setFilters((prev) => ({
+      ...prev,
       [filterName]: event.target.value,
-    });
+    }));
     setPage(0);
-    fetchProgrammes();
   };
 
   const clearFilters = () => {
+    setSearchTerm("");
     setFilters({
       search: "",
       type: "",
@@ -112,38 +116,12 @@ const ProgrammesReport = () => {
       level: "",
     });
     setPage(0);
-    fetchProgrammes();
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString();
   };
-
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
 
   return (
     <Box>
@@ -153,9 +131,9 @@ const ProgrammesReport = () => {
             fullWidth
             label="Search"
             variant="outlined"
-            value={filters.search}
-            onChange={handleFilterChange("search")}
-            placeholder="Search by name or code"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Name or code..."
           />
         </Grid>
         <Grid item xs={12} md={3}>
@@ -194,78 +172,88 @@ const ProgrammesReport = () => {
             onClick={clearFilters}
             sx={{ height: "56px" }}
           >
-            Clear Filters
+            Clear
           </Button>
         </Grid>
       </Grid>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Code</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Class Group</TableCell>
-              <TableCell>Special Type</TableCell>
-              <TableCell>Level</TableCell>
-              <TableCell>Duration (Months)</TableCell>
-              <TableCell>Courses</TableCell>
-              <TableCell>Created At</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {programmes.map((programme) => (
-              <TableRow key={programme.id}>
-                <TableCell>{programme.code}</TableCell>
-                <TableCell>{programme.name}</TableCell>
-                <TableCell>{programme.type_name}</TableCell>
-                <TableCell>{programme.class_group_name}</TableCell>
-                <TableCell>{programme.special_type_name}</TableCell>
-                <TableCell>{programme.level_name}</TableCell>
-                <TableCell>{programme.duration_months}</TableCell>
-                <TableCell>
-                  <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography>
-                        {programme.courses.length} Courses
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {programme.courses.map((course) => (
-                        <Box key={course.id} sx={{ mb: 2 }}>
-                          <Typography variant="subtitle2">
-                            {course.title}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {course.description}
-                          </Typography>
-                          <Typography variant="body2">
-                            Assessment Count: {course.assessment_count}
-                          </Typography>
-                          <Typography variant="body2">
-                            Enrolled Users: {course.enrolled_users.length}
-                          </Typography>
-                        </Box>
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-                </TableCell>
-                <TableCell>{formatDate(programme.created_at)}</TableCell>
+      {loading ? (
+        <Box display="flex" justifyContent="center" py={10}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Typography color="error" textAlign="center">{error}</Typography>
+      ) : (
+        <TableContainer component={Paper}>
+          {/* Removed minWidth: 1000 to follow AssessmentResultsReport layout */}
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Code</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Class Group</TableCell>
+                <TableCell>Level</TableCell>
+                <TableCell>Duration</TableCell>
+                <TableCell>Courses</TableCell>
+                <TableCell>Created At</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={totalProgrammes}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {programmes.length > 0 ? (
+                programmes.map((programme) => (
+                  <TableRow key={programme.id} hover>
+                    <TableCell sx={{ fontWeight: "bold" }}>{programme.code}</TableCell>
+                    <TableCell>{programme.name}</TableCell>
+                    <TableCell>{programme.type_name}</TableCell>
+                    <TableCell>{programme.class_group_name}</TableCell>
+                    <TableCell>{programme.level_name}</TableCell>
+                    <TableCell>{programme.duration_months} Months</TableCell>
+                    <TableCell sx={{ minWidth: '200px' }}>
+                      <Accordion sx={{ boxShadow: "none", border: "1px solid #eee" }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography variant="body2">
+                            {programme.courses?.length || 0} Courses
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails sx={{ maxHeight: "200px", overflowY: "auto", p: 1 }}>
+                          {(programme.courses || []).map((course, idx) => (
+                            <Box key={course.id || idx} sx={{ mb: 1 }}>
+                              <Typography variant="caption" sx={{ fontWeight: "bold", display: "block" }}>
+                                {course.title || "Untitled Course"}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Assessments: {course.assessment_count || 0} | Users: {course.enrolled_users?.length || 0}
+                              </Typography>
+                              {idx < (programme.courses?.length || 0) - 1 && <Divider sx={{ my: 0.5 }} />}
+                            </Box>
+                          ))}
+                        </AccordionDetails>
+                      </Accordion>
+                    </TableCell>
+                    <TableCell>{formatDate(programme.created_at)}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+                    No programmes found matching the filters.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={totalProgrammes}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
     </Box>
   );
 };

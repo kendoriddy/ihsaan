@@ -15,8 +15,9 @@ import {
   Flag,
   CheckCircle,
   Warning,
+  Close,
 } from "@mui/icons-material";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Modal, Box, IconButton } from "@mui/material"; // Added Modal and Box
 import {
   fetchFeedbacksWithCurrentFilters,
   updateFeedback,
@@ -32,6 +33,7 @@ import {
 export default function AdminFeedbackPanel() {
   const dispatch = useDispatch();
   const [selectedFeedback, setSelectedFeedback] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for the view modal
 
   // Redux state
   const {
@@ -114,7 +116,6 @@ export default function AdminFeedbackPanel() {
     });
   };
 
-  // Since we're fetching filtered data from the API, we don't need client-side filtering
   const filteredFeedback = feedbacks || [];
 
   const handleStatusChange = (feedbackId, isResolved) => {
@@ -132,7 +133,17 @@ export default function AdminFeedbackPanel() {
     }
   };
 
-  // Filter handlers using Redux actions
+  // NEW: Handler for viewing feedback details
+  const handleViewDetails = (feedback) => {
+    setSelectedFeedback(feedback);
+    setIsModalOpen(true);
+  };
+
+  // NEW: Handler for reply/share
+  const handleReply = (email) => {
+    window.location.href = `mailto:${email}?subject=Feedback Follow-up`;
+  };
+
   const handleSubjectFilterChange = (subject) => {
     dispatch(setSubjectFilter(subject));
   };
@@ -149,7 +160,6 @@ export default function AdminFeedbackPanel() {
     dispatch(clearFilters());
   };
 
-  // Pagination handlers
   const handlePageChange = (page) => {
     dispatch(setPage(page));
   };
@@ -166,7 +176,6 @@ export default function AdminFeedbackPanel() {
     }
   };
 
-  // Show loading state
   if (status === "loading") {
     return (
       <div className="w-full flex items-center justify-center py-12">
@@ -178,7 +187,6 @@ export default function AdminFeedbackPanel() {
     );
   }
 
-  // Show error state
   if (status === "failed" && error) {
     return (
       <div className="w-full flex items-center justify-center py-12">
@@ -201,6 +209,37 @@ export default function AdminFeedbackPanel() {
 
   return (
     <div className="w-full">
+      {/* View Modal */}
+      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] md:w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 outline-none">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-800">Feedback Details</h2>
+            <IconButton onClick={() => setIsModalOpen(false)}>
+              <Close />
+            </IconButton>
+          </div>
+          {selectedFeedback && (
+            <div className="space-y-4">
+              <div className="flex justify-between border-b pb-2">
+                <span className="text-gray-500">From:</span>
+                <span className="font-medium text-sm md:text-base">{selectedFeedback.email}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span className="text-gray-500">Subject:</span>
+                <span className="capitalize font-medium">{selectedFeedback.subject}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span className="text-gray-500">Rating:</span>
+                <div className="flex">{renderStars(selectedFeedback.rating)}</div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-xl mt-4 max-h-[40vh] overflow-y-auto">
+                <p className="text-gray-700 whitespace-pre-wrap">{selectedFeedback.message}</p>
+              </div>
+            </div>
+          )}
+        </Box>
+      </Modal>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -243,7 +282,6 @@ export default function AdminFeedbackPanel() {
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 mb-6">
         <div className="p-6 border-b border-gray-200">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -255,12 +293,11 @@ export default function AdminFeedbackPanel() {
               />
             </div>
 
-            {/* Filters */}
-            <div className="flex gap-3">
+            <div className="flex flex-wrap md:flex-nowrap gap-3">
               <select
                 value={filters.is_resolved}
                 onChange={(e) => handleStatusFilterChange(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
+                className="flex-1 md:flex-none px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -270,7 +307,7 @@ export default function AdminFeedbackPanel() {
               <select
                 value={filters.subject}
                 onChange={(e) => handleSubjectFilterChange(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
+                className="flex-1 md:flex-none px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700 bg-white"
               >
                 <option value="all">All Types</option>
                 <option value="course">Courses</option>
@@ -282,7 +319,7 @@ export default function AdminFeedbackPanel() {
 
               <button
                 onClick={handleClearFilters}
-                className="px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600"
+                className="w-full md:w-auto px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600"
                 title="Clear all filters"
               >
                 Clear
@@ -291,11 +328,9 @@ export default function AdminFeedbackPanel() {
           </div>
         </div>
 
-        {/* Results */}
         <div className="p-4 bg-gray-50">
           <p className="text-sm text-gray-600">
-            Showing {filteredFeedback.length} of {total_count || 0} feedback
-            entries
+            Showing {filteredFeedback.length} of {total_count || 0} feedback entries
           </p>
         </div>
 
@@ -304,126 +339,122 @@ export default function AdminFeedbackPanel() {
           {filteredFeedback.length === 0 ? (
             <div className="p-12 text-center">
               <FeedbackIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-800 mb-2">
-                No feedback found
-              </h3>
-              <p className="text-gray-500">
-                Try adjusting your search or filter criteria.
-              </p>
+              <h3 className="text-lg font-medium text-gray-800 mb-2">No feedback found</h3>
+              <p className="text-gray-500">Try adjusting your search or filter criteria.</p>
             </div>
           ) : (
             filteredFeedback.map((feedback) => (
-              <div
-                key={feedback.id}
-                className="p-6 hover:bg-gray-50 transition-colors"
-              >
+              <div key={feedback.id} className="p-4 md:p-6 hover:bg-gray-50 transition-colors">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
                       {getEntityIcon(feedback.subject)}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-gray-800">
-                          {feedback.email}
-                        </span>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-1 md:gap-2 mb-1">
+                        <span className="font-medium text-gray-800 truncate text-sm md:text-base">{feedback.email}</span>
                         {feedback.subject_detail && (
-                          <>
+                          <div className="flex items-center gap-1 md:gap-2 overflow-hidden">
                             <span className="text-gray-400">→</span>
-                            <span className="text-gray-600">
+                            <span className="text-gray-600 text-xs md:text-sm truncate">
                               {typeof feedback.subject_detail === "string"
                                 ? feedback.subject_detail
                                 : feedback.subject_detail.title ||
                                   (feedback.subject_detail.first_name &&
                                   feedback.subject_detail.last_name
                                     ? `${feedback.subject_detail.first_name} ${feedback.subject_detail.last_name}`
-                                    : feedback.subject_detail.name ||
-                                      `ID: ${
-                                        feedback.subject_detail.id || "Unknown"
-                                      }`)}
+                                    : feedback.subject_detail.name || `ID: ${feedback.subject_detail.id}`)}
                             </span>
-                          </>
+                          </div>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full capitalize">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2 py-0.5 md:py-1 bg-gray-100 text-gray-600 text-[10px] md:text-xs rounded-full capitalize">
                           {feedback.subject}
                         </span>
                         <span
-                          className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${getStatusColor(
+                          className={`px-2 py-0.5 md:py-1 text-[10px] md:text-xs rounded-full flex items-center gap-1 ${getStatusColor(
                             feedback.is_resolved
                           )}`}
                         >
                           {getStatusIcon(feedback.is_resolved)}
                           {feedback.is_resolved ? "Resolved" : "Active"}
                         </span>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-[10px] md:text-sm text-gray-500">
                           {formatDate(feedback.created_at)}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  {/* Desktop Only Actions */}
+                  <div className="hidden md:flex items-center gap-2">
                     {feedback.rating > 0 && (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 mr-2">
                         {renderStars(feedback.rating)}
                       </div>
                     )}
-                    <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                    <button 
+                      onClick={() => handleViewDetails(feedback)}
+                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
                       <Visibility className="w-4 h-4" />
                     </button>
-                    <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                    <button 
+                      onClick={() => handleReply(feedback.email)}
+                      className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                    >
                       <Reply className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(feedback.id)}
                       disabled={deleteStatus === "loading"}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                     >
-                      {deleteStatus === "loading" ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        <Delete className="w-4 h-4" />
-                      )}
+                      {deleteStatus === "loading" ? <CircularProgress size={16} /> : <Delete className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                  <p className="text-gray-700 leading-relaxed">
-                    {feedback.message}
-                  </p>
+                {/* Message Section */}
+                <div className="bg-gray-50 rounded-xl p-3 md:p-4 mb-4">
+                  <p className="text-gray-700 leading-relaxed text-sm md:text-base">{feedback.message}</p>
                 </div>
 
-                {!feedback.is_resolved && (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleStatusChange(feedback.id, true)}
-                      disabled={updateStatus === "loading"}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                      {updateStatus === "loading" && (
-                        <CircularProgress size={16} color="inherit" />
-                      )}
-                      Mark as Resolved
-                    </button>
+                {/* Mobile Bottom Action Bar */}
+                <div className="flex flex-col md:flex-row gap-3">
+                  <button
+                    onClick={() => handleStatusChange(feedback.id, !feedback.is_resolved)}
+                    disabled={updateStatus === "loading"}
+                    className={`px-4 py-2.5 md:py-2 ${feedback.is_resolved ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2 font-medium`}
+                  >
+                    {updateStatus === "loading" && <CircularProgress size={16} color="inherit" />}
+                    Mark as {feedback.is_resolved ? "Active" : "Resolved"}
+                  </button>
+
+                  {/* Mobile Only: Icons at the bottom row */}
+                  <div className="flex md:hidden items-center justify-between pt-2 border-t border-gray-100">
+                    <div className="flex gap-0.5">
+                       {feedback.rating > 0 && renderStars(feedback.rating)}
+                    </div>
+                    <div className="flex gap-2">
+                      <IconButton size="small" onClick={() => handleViewDetails(feedback)} className="bg-blue-50 text-blue-600">
+                        <Visibility fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => handleReply(feedback.email)} className="bg-green-50 text-green-600">
+                        <Reply fontSize="small" />
+                      </IconButton>
+                      <IconButton 
+                        size="small" 
+                        onClick={() => handleDelete(feedback.id)} 
+                        disabled={deleteStatus === "loading"}
+                        className="bg-red-50 text-red-600"
+                      >
+                        <Delete fontSize="small" />
+                      </IconButton>
+                    </div>
                   </div>
-                )}
-                {feedback.is_resolved && (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleStatusChange(feedback.id, false)}
-                      disabled={updateStatus === "loading"}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                      {updateStatus === "loading" && (
-                        <CircularProgress size={16} color="inherit" />
-                      )}
-                      Mark as Active
-                    </button>
-                  </div>
-                )}
+                </div>
               </div>
             ))
           )}
@@ -433,54 +464,21 @@ export default function AdminFeedbackPanel() {
         {total_pages > 1 && (
           <div className="p-4 bg-gray-50 border-t border-gray-200">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                Page {current_page} of {total_pages} • Showing{" "}
-                {feedbacks.length} of {total_count} feedback entries
+              <div className="text-xs md:text-sm text-gray-600">
+                Page {current_page} of {total_pages}
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePreviousPage}
                   disabled={!previous || status === "loading"}
-                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-300 rounded-lg bg-white disabled:opacity-50"
                 >
                   Previous
                 </button>
-
-                {/* Page numbers */}
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, total_pages) }, (_, i) => {
-                    let pageNum;
-                    if (total_pages <= 5) {
-                      pageNum = i + 1;
-                    } else if (current_page <= 3) {
-                      pageNum = i + 1;
-                    } else if (current_page >= total_pages - 2) {
-                      pageNum = total_pages - 4 + i;
-                    } else {
-                      pageNum = current_page - 2 + i;
-                    }
-
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => handlePageChange(pageNum)}
-                        disabled={status === "loading"}
-                        className={`px-3 py-2 text-sm border rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                          current_page === pageNum
-                            ? "bg-red-800 text-white border-red-800"
-                            : "border-gray-300 hover:bg-gray-50"
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                </div>
-
                 <button
                   onClick={handleNextPage}
                   disabled={!next || status === "loading"}
-                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-300 rounded-lg bg-white disabled:opacity-50"
                 >
                   Next
                 </button>

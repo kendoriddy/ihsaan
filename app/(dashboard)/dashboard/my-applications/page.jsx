@@ -62,30 +62,45 @@ const Page = () => {
 
   const handleApplicationTypeSelect = (applicationType) => {
     setApplicationType(applicationType);
-    // setFormData({});
     setFormOpen(true);
   };
 
-  const fetchApplicationData = async () => {
+   const fetchApplicationData = async () => {
+
     try {
+
       setIsLoading(true);
+
       let endpoint = userRoles.includes("TUTOR")
+
         ? "/tutor/applications/list/"
+
         : "/student/applications/list/";
+
       const response = await baseurl.get(endpoint, {
+
         headers: {
+
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+
         },
+
       });
+
       setUserApplications(response.data.results);
+
     } catch (error) {
+
       console.error("Error fetching application data:", error);
+
     } finally {
+
       setIsLoading(false);
+
     }
+
   };
 
-  // Fetch Qur'an Tutor application
   useEffect(() => {
     async function fetchQuranTutorApp() {
       setQuranTutorAppLoading(true);
@@ -140,13 +155,12 @@ const Page = () => {
     label: `${i + 1} year${i + 1 > 1 ? "s" : ""}`,
   }));
 
-  // Helper for status badge
   const getStatusColor = (status) =>
-    clsx("text-white px-4 py-2 rounded-full", {
-      "bg-green-500": status?.toUpperCase() === "ACCEPTED",
+    clsx("text-white px-4 py-2 rounded-full text-xs font-bold", {
+      "bg-green-500": status?.toUpperCase() === "ACCEPTED" || status?.toUpperCase() === "APPROVED",
       "bg-yellow-500": status?.toUpperCase() === "PENDING",
       "bg-red-500": status?.toUpperCase() === "REJECTED",
-      "bg-gray-400": !["ACCEPTED", "PENDING", "REJECTED"].includes(
+      "bg-gray-400": !["ACCEPTED", "APPROVED", "PENDING", "REJECTED"].includes(
         status?.toUpperCase()
       ),
     });
@@ -154,22 +168,28 @@ const Page = () => {
   return (
     <RequireAuth>
       <Header />
-      <main className=" py-2 flex">
+      <main className="py-2 flex flex-col md:flex-row">
         <DashboardSidebar currentRoute={currentRoute} />
-        <section className="flex flex-col md:flex-row p-4 justify-self-center flex-1 min-h-screen">
-          <div className="px-4  w-full py-8 lg:py-0">
-            {/* Waving Hand */}
-            <div className="flex items-center justify-between">
-              <div className="text-sm my-3">
-                Welcome <span className="text-lg">{user?.first_name}</span>{" "}
-                <WavingHand sx={{ color: "blue", fontSize: "2rem" }} />
+        <section className="flex-1 p-4 min-h-screen overflow-hidden">
+          <div className="w-full">
+            
+            {/* 1. mt-12 on mobile pushes text below sidebar toggle.
+                2. items-end and flex-col sm:flex-row keeps alignment clean.
+            */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-12 md:mt-0 mb-6 gap-4">
+              <div className="text-sm">
+                Welcome <span className="text-lg font-semibold">{user?.first_name}</span>{" "}
+                <WavingHand sx={{ color: "blue", fontSize: "1.5rem" }} />
               </div>
-              <div>
+              
+              {/* Force the button container to align right on mobile and desktop */}
+              <div className="w-full sm:w-auto flex justify-end">
                 <Button
                   aria-controls="application-menu"
                   aria-haspopup="true"
                   onClick={handleMenuOpen}
-                  className="px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]"
+                  variant="contained"
+                  className="px-4 py-2 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103] w-auto"
                 >
                   Create new application
                 </Button>
@@ -201,137 +221,98 @@ const Page = () => {
               </div>
             </div>
 
-            {/*  Table */}
-            <div className="flex-1 max-h-[500px] overflow-y-scroll relative">
-              <table className="table-auto w-full rounded bg-gray-50 ">
-                <thead className="sticky top-[-20px] bg-gray-100 z-20 text-left">
-                  <tr className="border text-red-600">
-                    <th className=" border px-4 py-2">#</th>
-                    <th className=" border px-4 py-2">Application type</th>
-                    <th className=" border px-4 py-2">Name</th>
-                    <th className=" border px-4 py-2">Gender </th>
-                    <th className=" border px-4 py-2">
-                      Highest Qualification{" "}
-                    </th>
-                    <th className=" border px-4 py-2">Years of Experience</th>
-                    <th className=" border px-4 py-2">Application Status</th>
-                    <th className=" border px-4 py-2">Action</th>
-                  </tr>
-                </thead>
-                {isLoading
-                  ? "Loading..."
-                  : userApplications && (
-                      <tbody>
-                        {/* Qur'an Tutor Application Row */}
+            {/* Responsive Table Wrapper */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
+              <div className="min-w-[800px]">
+                <table className="table-auto w-full text-left border-collapse">
+                  <thead className="bg-gray-100 sticky top-0 z-10">
+                    <tr className="text-red-600">
+                      <th className="px-4 py-3 border-b">#</th>
+                      <th className="px-4 py-3 border-b">Application type</th>
+                      <th className="px-4 py-3 border-b">Name</th>
+                      <th className="px-4 py-3 border-b">Gender</th>
+                      <th className="px-4 py-3 border-b">Highest Qualification</th>
+                      <th className="px-4 py-3 border-b">Years of Experience</th>
+                      <th className="px-4 py-3 border-b text-center">Status</th>
+                      <th className="px-4 py-3 border-b text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {isLoading ? (
+                      <tr>
+                        <td colSpan="8" className="p-10 text-center">Loading...</td>
+                      </tr>
+                    ) : (
+                      <>
                         {quranTutorApp && (
-                          <tr className="even:bg-gray-100 hover:bg-gray-200">
-                            <td className="border px-4 py-2">QURAN-TUTOR</td>
-                            <td className="border px-4 py-2">
-                              Qur'an Tutor Application
-                            </td>
-                            <td className="border px-4 py-2">
-                              {quranTutorApp.first_name}{" "}
-                              {quranTutorApp.last_name}
-                            </td>
-                            <td className="border px-4 py-2">
-                              {quranTutorApp.gender}
-                            </td>
-                            <td className="border px-4 py-2">-</td>
-                            <td className="border px-4 py-2">
-                              {quranTutorApp.years_of_experience || "N/A"}
-                            </td>
-                            <td className="border px-4 py-2">
-                              <span
-                                className={getStatusColor(
-                                  quranTutorApp.status || "PENDING"
-                                )}
-                              >
+                          <tr className="border-b even:bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <td className="px-4 py-3 font-medium">QURAN-TUTOR</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">Qur'an Tutor Application</td>
+                            <td className="px-4 py-3">{quranTutorApp.first_name} {quranTutorApp.last_name}</td>
+                            <td className="px-4 py-3">{quranTutorApp.gender}</td>
+                            <td className="px-4 py-3 text-gray-400">-</td>
+                            <td className="px-4 py-3">{quranTutorApp.years_of_experience || "N/A"}</td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={getStatusColor(quranTutorApp.status || "PENDING")}>
                                 {quranTutorApp.status || "PENDING"}
                               </span>
                             </td>
-
-                            <td className="border px-4 py-2">
-                              <button className="px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]">
-                                <a href="/dashboard/quran-tutor">
-                                  View Details
-                                </a>
-                              </button>
+                            <td className="px-4 py-3 text-center">
+                              <a 
+                                href="/dashboard/quran-tutor"
+                                className="inline-block px-3 py-1 rounded-md text-white text-sm font-medium transition duration-300 bg-primary hover:bg-[#f34103]"
+                              >
+                                View Details
+                              </a>
                             </td>
                           </tr>
                         )}
-                        {/* Existing application rows */}
-                        {userApplications.map((application, index) => (
-                          <tr
-                            key={application.id}
-                            className="even:bg-gray-100 hover:bg-gray-200"
-                          >
-                            <td className="border px-4 py-2">
-                              {application.id}
+                        {userApplications.map((application) => (
+                          <tr key={application.id} className="border-b even:bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <td className="px-4 py-3">{application.id}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">
+                              {userRoles?.includes("TUTOR") ? "Tutor Application" : "Student Application"}
                             </td>
-                            <td className="border px-4 py-2">
-                              {userRoles?.includes("TUTOR")
-                                ? "Tutor Application"
-                                : "Student Application"}
+                            <td className="px-4 py-3">
+                              {application.user_details.first_name} {application.user_details.last_name}
                             </td>
-                            <td className="border px-4 py-2">
-                              {application.user_details.first_name +
-                                " " +
-                                application.user_details.last_name}
+                            <td className="px-4 py-3">{application.gender}</td>
+                            <td className="px-4 py-3">
+                              {formatQualification(application.highest_qualification) || "N/A"}
                             </td>
-                            <td className="border px-4 py-2">
-                              {application.gender}
-                            </td>
-                            <td className="border px-4 py-2">
-                              {formatQualification(
-                                application.highest_qualification
-                              ) || "N/A"}
-                            </td>
-                            <td className="border px-4 py-2">
-                              {application.years_of_experience || "N/A"}
-                            </td>
-                            <td className="border px-4 py-2">
-                              <button
-                                className={`${
-                                  application.tutor_application_status ===
-                                    "APPROVED" ||
-                                  application.student_application_status ===
-                                    "APPROVED"
-                                    ? "bg-green-500"
-                                    : application.tutor_application_status ===
-                                        "REJECTED" ||
-                                      application.student_application_status ===
-                                        "REJECTED"
-                                    ? "bg-red-500"
-                                    : "bg-yellow-500"
-                                } text-white px-4 py-2 rounded-full`}
-                              >
+                            <td className="px-4 py-3">{application.years_of_experience || "N/A"}</td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={getStatusColor(
+                                userRoles?.includes("TUTOR") 
+                                  ? application.tutor_application_status 
+                                  : application.student_application_status
+                              )}>
                                 {userRoles?.includes("TUTOR")
                                   ? application.tutor_application_status
                                   : application.student_application_status}
-                              </button>
+                              </span>
                             </td>
-
-                            <td className="border px-4 py-2">
+                            <td className="px-4 py-3 text-center">
                               <button
-                                className={`px-3 py-1 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103]`}
-                                onClick={() =>
-                                  handleEditApplicationBtn(application)
-                                }
+                                className="px-3 py-1 rounded-md text-white text-sm font-medium transition duration-300 bg-primary hover:bg-[#f34103]"
+                                onClick={() => handleEditApplicationBtn(application)}
                               >
                                 View Details
                               </button>
                             </td>
                           </tr>
                         ))}
-                      </tbody>
+                      </>
                     )}
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Modal */}
+      {/* View Details Modal */}
       <Modal open={open} onClose={handleClose}>
         <EditApplication
           selectedApplication={selectedApplication}
@@ -340,9 +321,9 @@ const Page = () => {
         />
       </Modal>
 
-      {/* Modal for form submission */}
+      {/* Create Form Modal */}
       <Modal open={formOpen} onClose={handleFormClose}>
-        <Box className="modal-box bg-white w-full md:w-[60vw] m-auto h-[90%] overflow-scroll mt-5 md:mt-[50px] rounded">
+        <Box className="modal-box bg-white w-[95%] md:w-[60vw] m-auto h-[90%] overflow-y-auto mt-5 md:mt-[50px] rounded-lg shadow-xl">
           {applicationType === "Tutor Application" ? (
             <TutorForm
               fetchApplicationData={fetchApplicationData}

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Paper,
@@ -17,7 +19,6 @@ import {
   MenuItem,
   Typography,
   CircularProgress,
-  Chip,
   Button,
   Accordion,
   AccordionSummary,
@@ -41,6 +42,7 @@ const ProgrammesReport = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalProgrammes, setTotalProgrammes] = useState(0);
+  
   const [filters, setFilters] = useState({
     search: "",
     type: "",
@@ -48,37 +50,36 @@ const ProgrammesReport = () => {
     specialType: "",
     level: "",
   });
+  
   const [selectedProgramme, setSelectedProgramme] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const fetchProgrammes = async () => {
+  // LOGIC FIX: Wrapped in useCallback to prevent unnecessary re-renders
+  const fetchProgrammes = useCallback(async () => {
     try {
       setLoading(true);
       const headers = {
         Authorization: `Bearer ${getAuthToken()}`,
       };
 
-      // Build query parameters
       const params = new URLSearchParams();
-
-      // Add pagination parameters
       params.append("page", page + 1);
       params.append("page_size", rowsPerPage);
 
-      // Add filter parameters
       if (filters.search) params.append("search", filters.search);
       if (filters.type) params.append("type", filters.type);
       if (filters.classGroup) params.append("class_group", filters.classGroup);
-      if (filters.specialType)
-        params.append("special_type", filters.specialType);
+      if (filters.specialType) params.append("special_type", filters.specialType);
       if (filters.level) params.append("level", filters.level);
 
       const response = await axios.get(
         `https://api.ihsaanacademia.com/programmes/?${params.toString()}`,
         { headers }
       );
-      setProgrammes(response.data.results);
-      setTotalProgrammes(response.data.total);
+      
+      // ERROR FIX: Optional chaining and fallbacks
+      setProgrammes(response.data?.results || []);
+      setTotalProgrammes(response.data?.total || 0);
       setError(null);
     } catch (err) {
       setError("Failed to fetch programmes");
@@ -86,30 +87,27 @@ const ProgrammesReport = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage, filters]);
 
   useEffect(() => {
     fetchProgrammes();
-  }, [filters, page, rowsPerPage]);
+  }, [fetchProgrammes]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    fetchProgrammes();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    fetchProgrammes();
   };
 
   const handleFilterChange = (filterName) => (event) => {
-    setFilters({
-      ...filters,
+    setFilters((prev) => ({
+      ...prev,
       [filterName]: event.target.value,
-    });
+    }));
     setPage(0);
-    fetchProgrammes();
   };
 
   const clearFilters = () => {
@@ -121,10 +119,10 @@ const ProgrammesReport = () => {
       level: "",
     });
     setPage(0);
-    fetchProgrammes();
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString();
   };
 
@@ -140,13 +138,10 @@ const ProgrammesReport = () => {
 
   return (
     <Box>
-      <div className="bg-white p-6 rounded-xl shadow space-y-6">
+      <div className="bg-white p-6 rounded-xl shadow space-y-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search Input */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Search
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
             <input
               type="text"
               value={filters.search}
@@ -156,11 +151,8 @@ const ProgrammesReport = () => {
             />
           </div>
 
-          {/* Type Select */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Type
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
             <select
               value={filters.type}
               onChange={handleFilterChange("type")}
@@ -172,7 +164,6 @@ const ProgrammesReport = () => {
             </select>
           </div>
 
-          {/* Clear Button */}
           <div className="flex items-end">
             <button
               onClick={clearFilters}
@@ -185,93 +176,76 @@ const ProgrammesReport = () => {
       </div>
 
       {loading && (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="40px"
-        >
+        <Box display="flex" justifyContent="center" alignItems="center" py={4}>
           <CircularProgress />
         </Box>
       )}
 
       {error ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="400px"
-        >
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
           <Typography color="error">{error}</Typography>
         </Box>
       ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Code</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Class Group</TableCell>
-                <TableCell>Special Type</TableCell>
-                <TableCell>Level</TableCell>
-                <TableCell>Duration (Months)</TableCell>
-                <TableCell>Courses</TableCell>
-                <TableCell>Created At</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {programmes.map((programme) => (
-                <TableRow
-                  key={programme.id}
-                  hover
-                  style={{ cursor: "pointer", transition: "background 0.2s" }}
-                  onClick={() => handleRowClick(programme)}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "#f0f4ff",
-                    },
-                  }}
-                >
-                  <TableCell>{programme.code}</TableCell>
-                  <TableCell>{programme.name}</TableCell>
-                  <TableCell>{programme.type_name}</TableCell>
-                  <TableCell>{programme.class_group_name}</TableCell>
-                  <TableCell>{programme.special_type_name}</TableCell>
-                  <TableCell>{programme.level_name}</TableCell>
-                  <TableCell>{programme.duration_months}</TableCell>
-                  <TableCell>
-                    <Accordion>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography>
-                          {programme.courses.length} Courses
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        {programme.courses.map((course) => (
-                          <Box key={course.id} sx={{ mb: 2 }}>
-                            <Typography variant="subtitle2">
-                              {course.title}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {course.description}
-                            </Typography>
-                            <Typography variant="body2">
-                              Assessment Count: {course.assessment_count}
-                            </Typography>
-                            <Typography variant="body2">
-                              Enrolled Users: {course.enrolled_users.length}
-                            </Typography>
-                          </Box>
-                        ))}
-                      </AccordionDetails>
-                    </Accordion>
-                  </TableCell>
-                  <TableCell>{formatDate(programme.created_at)}</TableCell>
+        <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 2 }}>
+          {/* MOBILE RESPONSIVENESS: Container with scroll and min-width */}
+          <TableContainer sx={{ maxHeight: 600 }}>
+            <Table stickyHeader sx={{ minWidth: 900 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Code</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Class Group</TableCell>
+                  <TableCell>Special Type</TableCell>
+                  <TableCell>Level</TableCell>
+                  <TableCell>Duration</TableCell>
+                  <TableCell>Courses</TableCell>
+                  <TableCell>Created At</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {programmes.map((programme) => (
+                  <TableRow
+                    key={programme.id}
+                    hover
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleRowClick(programme)}
+                  >
+                    <TableCell sx={{ fontWeight: 'bold' }}>{programme.code}</TableCell>
+                    <TableCell>{programme.name}</TableCell>
+                    <TableCell>{programme.type_name}</TableCell>
+                    <TableCell>{programme.class_group_name}</TableCell>
+                    <TableCell>{programme.special_type_name}</TableCell>
+                    <TableCell>{programme.level_name}</TableCell>
+                    <TableCell>{programme.duration_months} Months</TableCell>
+                    <TableCell sx={{ minWidth: '220px' }}>
+                      <Accordion onClick={(e) => e.stopPropagation()}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography variant="body2">
+                            {/* ERROR FIX: Optional Chaining */}
+                            {programme.courses?.length || 0} Courses
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails sx={{ maxHeight: 200, overflowY: 'auto' }}>
+                          {(programme.courses || []).map((course) => (
+                            <Box key={course.id} sx={{ mb: 2 }}>
+                              <Typography variant="subtitle2" sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
+                                {course.title}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Assessments: {course.assessment_count || 0} | Users: {course.enrolled_users?.length || 0}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </AccordionDetails>
+                      </Accordion>
+                    </TableCell>
+                    <TableCell>{formatDate(programme.created_at)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
@@ -281,98 +255,43 @@ const ProgrammesReport = () => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        </TableContainer>
+        </Paper>
       )}
 
-      {/* Programme Details Modal */}
-      <Dialog
-        open={modalOpen}
-        onClose={handleCloseModal}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            p: 2,
-            background: "linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)",
-            boxShadow: 6,
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            pb: 0,
-          }}
-        >
+      {/* Details Modal */}
+      <Dialog open={modalOpen} onClose={handleCloseModal} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>Programme Details</span>
-          <IconButton onClick={handleCloseModal}>
-            <CloseIcon />
-          </IconButton>
+          <IconButton onClick={handleCloseModal}><CloseIcon /></IconButton>
         </DialogTitle>
-        <Divider sx={{ mb: 2 }} />
+        <Divider />
         <DialogContent>
           {selectedProgramme && (
-            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
-              {/* Programme Title */}
-              <h2 className="text-2xl font-bold text-indigo-700">
-                {selectedProgramme.name}
-              </h2>
-
-              {/* Programme Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-indigo-700">{selectedProgramme.name}</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Detail label="Code" value={selectedProgramme.code} />
                 <Detail label="Type" value={selectedProgramme.type_name} />
-                <Detail
-                  label="Class Group"
-                  value={selectedProgramme.class_group_name}
-                />
-                <Detail
-                  label="Special Type"
-                  value={selectedProgramme.special_type_name}
-                />
+                <Detail label="Class Group" value={selectedProgramme.class_group_name} />
                 <Detail label="Level" value={selectedProgramme.level_name} />
-                <Detail
-                  label="Duration (Months)"
-                  value={selectedProgramme.duration_months}
-                />
-                <Detail
-                  label="Created At"
-                  value={formatDate(selectedProgramme.created_at)}
-                />
               </div>
 
-              {/* Courses Section */}
-              <div className="border-t pt-4 space-y-3">
-                <h3 className="text-xl font-semibold text-indigo-700">
-                  Courses
-                </h3>
+              <div className="border-t pt-4">
+                <h3 className="text-xl font-semibold mb-4">Courses</h3>
+                {/* ERROR FIX: Optional Chaining for Modal */}
                 {selectedProgramme.courses?.length > 0 ? (
                   selectedProgramme.courses.map((course) => (
-                    <div
-                      key={course.id}
-                      className="border-l-4 border-indigo-500 bg-slate-100 rounded-md p-4"
-                    >
-                      <h4 className="text-lg font-semibold text-gray-800">
-                        {course.title}
-                      </h4>
-                      <p className="text-sm text-gray-600">
-                        {course.description || "No description provided."}
-                      </p>
-                      <p className="text-sm mt-2">
-                        <span className="font-medium">Assessment Count:</span>{" "}
-                        {course.assessment_count}
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-medium">Enrolled Users:</span>{" "}
-                        {course.enrolled_users.length}
-                      </p>
+                    <div key={course.id} className="border-l-4 border-indigo-500 bg-slate-50 p-4 mb-3 rounded">
+                      <h4 className="font-bold">{course.title}</h4>
+                      <p className="text-sm text-gray-600">{course.description || "No description."}</p>
+                      <div className="flex gap-4 mt-2 text-xs font-medium">
+                        <span>Assessments: {course.assessment_count || 0}</span>
+                        <span>Enrolled: {course.enrolled_users?.length || 0}</span>
+                      </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-sm">No courses available.</p>
+                  <p className="text-gray-500">No courses available.</p>
                 )}
               </div>
             </div>

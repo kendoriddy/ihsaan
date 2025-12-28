@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Paper,
@@ -30,26 +30,28 @@ const CoursesReport = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCourses, setTotalCourses] = useState(0);
+
+  // Local state for immediate UI response
+  const [searchTerm, setSearchTerm] = useState("");
+  const [programmeTerm, setProgrammeTerm] = useState("");
+
+  // Filter state for API calls
   const [filters, setFilters] = useState({
     search: "",
     programme: "",
   });
 
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       setLoading(true);
       const headers = {
         Authorization: `Bearer ${getAuthToken()}`,
       };
 
-      // Build query parameters
       const params = new URLSearchParams();
-
-      // Add pagination parameters
       params.append("page", page + 1);
       params.append("page_size", rowsPerPage);
 
-      // Add filter parameters
       if (filters.search) params.append("search", filters.search);
       if (filters.programme) params.append("programme", filters.programme);
 
@@ -57,8 +59,8 @@ const CoursesReport = () => {
         `https://api.ihsaanacademia.com/course/courses/?${params.toString()}`,
         { headers }
       );
-      setCourses(response.data.results);
-      setTotalCourses(response.data.count);
+      setCourses(response.data.results || []);
+      setTotalCourses(response.data.count || 0);
       setError(null);
     } catch (err) {
       setError("Failed to fetch courses");
@@ -66,70 +68,49 @@ const CoursesReport = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, page, rowsPerPage]);
 
+  // Debounce logic for Search and Programme ID
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setFilters({
+        search: searchTerm,
+        programme: programmeTerm,
+      });
+      setPage(0);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm, programmeTerm]);
+
+  // Unified fetch effect
   useEffect(() => {
     fetchCourses();
-  }, [filters, page, rowsPerPage]);
+  }, [fetchCourses]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    fetchCourses();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    fetchCourses();
-  };
-
-  const handleFilterChange = (filterName) => (event) => {
-    setFilters({
-      ...filters,
-      [filterName]: event.target.value,
-    });
-    setPage(0);
-    fetchCourses();
   };
 
   const clearFilters = () => {
+    setSearchTerm("");
+    setProgrammeTerm("");
     setFilters({
       search: "",
       programme: "",
     });
     setPage(0);
-    fetchCourses();
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString();
   };
-
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
 
   return (
     <Box>
@@ -139,9 +120,9 @@ const CoursesReport = () => {
             fullWidth
             label="Search"
             variant="outlined"
-            value={filters.search}
-            onChange={handleFilterChange("search")}
-            placeholder="Search by title, name, or code"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Title, name, or code"
           />
         </Grid>
         <Grid item xs={12} md={5}>
@@ -149,8 +130,8 @@ const CoursesReport = () => {
             fullWidth
             label="Programme ID"
             variant="outlined"
-            value={filters.programme}
-            onChange={handleFilterChange("programme")}
+            value={programmeTerm}
+            onChange={(e) => setProgrammeTerm(e.target.value)}
             placeholder="Enter programme ID"
           />
         </Grid>
@@ -167,92 +148,91 @@ const CoursesReport = () => {
         </Grid>
       </Grid>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Code</TableCell>
-              <TableCell>Programme</TableCell>
-              <TableCell>Enrolled Students</TableCell>
-              <TableCell>Assessments</TableCell>
-              <TableCell>Sections</TableCell>
-              <TableCell>Created At</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {courses.map((course) => (
-              <TableRow key={course.id}>
-                <TableCell>{course.title}</TableCell>
-                <TableCell>{course.code}</TableCell>
-                <TableCell>{course.programme_name}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={`${course.enrolled_users.length} Students`}
-                    color="primary"
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={course.assessment_count}
-                    color="secondary"
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography>{course.sections.length} Sections</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {course.sections.map((section) => (
-                        <Box key={section.id} sx={{ mb: 2 }}>
-                          <Typography variant="subtitle2">
-                            {section.title}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {section.description}
-                          </Typography>
-                          <Box sx={{ mt: 1 }}>
-                            <Chip
-                              label={`${section.videos.length} Videos`}
-                              size="small"
-                              sx={{ mr: 1 }}
-                            />
-                            <Chip
-                              label={`${section.materials.length} Materials`}
-                              size="small"
-                              sx={{ mr: 1 }}
-                            />
-                            {section.has_mcq_assessment && (
-                              <Chip
-                                label="MCQ Assessment"
-                                color="success"
-                                size="small"
-                              />
-                            )}
-                          </Box>
-                        </Box>
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-                </TableCell>
-                <TableCell>{formatDate(course.created_at)}</TableCell>
+      {loading ? (
+        <Box display="flex" justifyContent="center" py={5}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Typography color="error" textAlign="center">{error}</Typography>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 800 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Title</TableCell>
+                <TableCell>Code</TableCell>
+                <TableCell>Programme</TableCell>
+                <TableCell>Enrolled</TableCell>
+                <TableCell>Assessments</TableCell>
+                <TableCell>Sections</TableCell>
+                <TableCell>Created At</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={totalCourses}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {courses.length > 0 ? (
+                courses.map((course) => (
+                  <TableRow key={course.id}>
+                    <TableCell sx={{ fontWeight: "medium" }}>{course.title}</TableCell>
+                    <TableCell>{course.code}</TableCell>
+                    <TableCell>{course.programme_name}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={`${course.enrolled_users?.length || 0} Students`}
+                        color="primary"
+                        size="small"
+                        variant="outlined"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={course.assessment_count || 0}
+                        color="secondary"
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 200 }}>
+                      <Accordion sx={{ boxShadow: "none", border: "1px solid #eee" }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography variant="body2">{course.sections?.length || 0} Sections</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          {course.sections?.map((section) => (
+                            <Box key={section.id} sx={{ mb: 1, borderBottom: "1px solid #f5f5f5", pb: 1 }}>
+                              <Typography variant="caption" sx={{ fontWeight: "bold", display: "block" }}>
+                                {section.title}
+                              </Typography>
+                              <Box sx={{ mt: 0.5, display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+                                <Chip label={`${section.videos?.length || 0}V`} size="tiny" sx={{ fontSize: "0.65rem" }} />
+                                <Chip label={`${section.materials?.length || 0}M`} size="tiny" sx={{ fontSize: "0.65rem" }} />
+                              </Box>
+                            </Box>
+                          ))}
+                        </AccordionDetails>
+                      </Accordion>
+                    </TableCell>
+                    <TableCell>{formatDate(course.created_at)}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                    No courses found matching your search.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={totalCourses}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
     </Box>
   );
 };
