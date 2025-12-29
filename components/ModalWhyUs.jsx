@@ -27,7 +27,7 @@ function ModalWhyUs() {
           className="w-4/5 max-w-[500px] rounded-md bg-neutral-50 p-4 overflow-y-scroll h-3/4 z-30"
           onClick={(e) => stopPropagation(e)}
         >
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mt-7">
             <span className="text-primary">Why Choose Us</span>
             <span className="cursor-pointer navlink">
               <CloseIcon onClick={closeModal} sx={{ fontSize: 30 }} />

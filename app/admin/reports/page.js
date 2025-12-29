@@ -8,7 +8,6 @@ import AssessmentResultsReport from "./components/AssessmentResultsReport";
 import ProgrammesReport from "./components/ProgrammesReport";
 import SessionsReport from "./components/SessionsReport";
 import CoursesReport from "./components/CoursesReport";
-import Layout from "@/components/Layout";
 import AdminDashboardHeader from "@/components/AdminDashboardHeader";
 import AdminDashboardSidebar from "@/components/AdminDashboardSidebar";
 import { usePathname } from "next/navigation";
@@ -24,7 +23,8 @@ function TabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {/* Optimized padding: p-2 on mobile, p-4 on desktop */}
+      {value === index && <Box sx={{ p: { xs: 1, md: 3 } }}>{children}</Box>}
     </div>
   );
 }
@@ -49,61 +49,82 @@ function Reports() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative min-h-screen bg-gray-50">
       <AdminDashboardHeader toggleSidebar={toggleSidebar} />
 
-      <main className="flex relative">
+      <main className="flex">
         <AdminDashboardSidebar
           isSidebarOpen={isSidebarOpen}
           toggleOption={toggleOption}
           openSubMenuIndex={openSubMenuIndex}
           currentRoute={currentRoute}
         />
+        
         <section
-          className=" lg:ml-[250px] w-screen px-2"
+          className="flex-1 w-full lg:ml-[250px] transition-all duration-300 ease-in-out"
           style={{
-            "@media (minWidth: 1024px)": {
-              width: "calc(100vw - 250px)",
-            },
+            maxWidth: "100%",
+            overflowX: "hidden" // Prevents the whole page from shaking during tab scrolls
           }}
         >
-          <Box>
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Box sx={{ width: "100%" }}>
+            <Box sx={{ borderBottom: 1, borderColor: "divider", bgcolor: "white" }}>
               <Tabs
                 value={value}
                 onChange={handleChange}
                 aria-label="reports tabs"
+                // --- MOBILE SCROLLING LOGIC ---
+                variant="scrollable"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
+                // ------------------------------
+                sx={{
+                  "& .MuiTabs-scroller": {
+                    "&::-webkit-scrollbar": { display: "none" }, // Hide scrollbar for clean UI
+                    scrollbarWidth: "none",
+                  },
+                  "& .MuiTab-root": {
+                    textTransform: "none",
+                    fontWeight: 600,
+                    minWidth: { xs: 100, sm: 160 }, // Prevents text squashing
+                  },
+                }}
               >
                 <Tab label="Users" />
                 <Tab label="Assessments" />
-                <Tab label="Assessment Results" />
+                <Tab label="Results" />
                 <Tab label="Programmes" />
                 <Tab label="Sessions" />
                 <Tab label="Courses" />
                 <Tab label="Purchases" />
               </Tabs>
             </Box>
-            <TabPanel value={value} index={0}>
-              <UsersReport />
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-              <AssessmentsReport />
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-              <AssessmentResultsReport />
-            </TabPanel>
-            <TabPanel value={value} index={3}>
-              <ProgrammesReport />
-            </TabPanel>
-            <TabPanel value={value} index={4}>
-              <SessionsReport />
-            </TabPanel>
-            <TabPanel value={value} index={5}>
-              <CoursesReport />
-            </TabPanel>
-            <TabPanel value={value} index={6}>
-              <Typography>Purchases Report - Coming Soon</Typography>
-            </TabPanel>
+
+            <div className="max-w-[1600px] mx-auto">
+                <TabPanel value={value} index={0}>
+                <UsersReport />
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                <AssessmentsReport />
+                </TabPanel>
+                <TabPanel value={value} index={2}>
+                <AssessmentResultsReport />
+                </TabPanel>
+                <TabPanel value={value} index={3}>
+                <ProgrammesReport />
+                </TabPanel>
+                <TabPanel value={value} index={4}>
+                <SessionsReport />
+                </TabPanel>
+                <TabPanel value={value} index={5}>
+                <CoursesReport />
+                </TabPanel>
+                <TabPanel value={value} index={6}>
+                <Box sx={{ p: 4, textAlign: 'center' }}>
+                    <Typography color="text.secondary">Purchases Report - Coming Soon</Typography>
+                </Box>
+                </TabPanel>
+            </div>
           </Box>
         </section>
       </main>

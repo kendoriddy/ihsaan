@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Paper,
@@ -30,6 +30,17 @@ const AssessmentResultsReport = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalResults, setTotalResults] = useState(0);
+
+  // Local state for text inputs to prevent keystroke lag
+  const [textFilters, setTextFilters] = useState({
+    assessment: "",
+    course: "",
+    student: "",
+    tutor: "",
+    group: "",
+    term: "",
+  });
+
   const [filters, setFilters] = useState({
     assessment: "",
     assessmentType: "",
@@ -44,44 +55,36 @@ const AssessmentResultsReport = () => {
     createdBefore: "",
   });
 
-  const fetchResults = async () => {
+  const fetchResults = useCallback(async () => {
     try {
       setLoading(true);
       const headers = {
         Authorization: `Bearer ${getAuthToken()}`,
       };
 
-      // Build query parameters
       const params = new URLSearchParams();
-
-      // Add pagination parameters
       params.append("page", page + 1);
       params.append("page_size", rowsPerPage);
 
       // Add filter parameters
       if (filters.assessment) params.append("assessment", filters.assessment);
-      if (filters.assessmentType)
-        params.append("assessment_type", filters.assessmentType);
+      if (filters.assessmentType) params.append("assessment_type", filters.assessmentType);
       if (filters.course) params.append("course", filters.course);
       if (filters.group) params.append("group", filters.group);
-      if (filters.isPublished !== "")
-        params.append("is_published", filters.isPublished);
-      if (filters.questionType)
-        params.append("question_type", filters.questionType);
+      if (filters.isPublished !== "") params.append("is_published", filters.isPublished);
+      if (filters.questionType) params.append("question_type", filters.questionType);
       if (filters.student) params.append("student", filters.student);
       if (filters.term) params.append("term", filters.term);
       if (filters.tutor) params.append("tutor", filters.tutor);
-      if (filters.createdAfter)
-        params.append("created_after", filters.createdAfter);
-      if (filters.createdBefore)
-        params.append("created_before", filters.createdBefore);
+      if (filters.createdAfter) params.append("created_after", filters.createdAfter);
+      if (filters.createdBefore) params.append("created_before", filters.createdBefore);
 
       const response = await axios.get(
         `https://api.ihsaanacademia.com/assessment/grades/?${params.toString()}`,
         { headers }
       );
-      setResults(response.data.results);
-      setTotalResults(response.data.total);
+      setResults(response.data.results || []);
+      setTotalResults(response.data.total || 0);
       setError(null);
     } catch (err) {
       setError("Failed to fetch assessment results");
@@ -89,33 +92,62 @@ const AssessmentResultsReport = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, page, rowsPerPage]);
 
+  // Debounce logic for text-based filters
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setFilters((prev) => ({
+        ...prev,
+        assessment: textFilters.assessment,
+        course: textFilters.course,
+        student: textFilters.student,
+        tutor: textFilters.tutor,
+        group: textFilters.group,
+        term: textFilters.term,
+      }));
+      setPage(0);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [textFilters]);
+
+  // Unified fetch effect
   useEffect(() => {
     fetchResults();
-  }, [filters, page, rowsPerPage]);
+  }, [fetchResults]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    fetchResults();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    fetchResults();
+  };
+
+  const handleTextChange = (e) => {
+    const { name, value } = e.target;
+    setTextFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFilterChange = (filterName) => (event) => {
-    setFilters({
-      ...filters,
+    setFilters((prev) => ({
+      ...prev,
       [filterName]: event.target.value,
-    });
+    }));
     setPage(0);
-    fetchResults();
   };
 
   const clearFilters = () => {
+    setTextFilters({
+      assessment: "",
+      course: "",
+      student: "",
+      tutor: "",
+      group: "",
+      term: "",
+    });
     setFilters({
       assessment: "",
       assessmentType: "",
@@ -130,38 +162,12 @@ const AssessmentResultsReport = () => {
       createdBefore: "",
     });
     setPage(0);
-    fetchResults();
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString();
   };
-
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
 
   return (
     <Box>
@@ -170,9 +176,10 @@ const AssessmentResultsReport = () => {
           <TextField
             fullWidth
             label="Assessment ID"
+            name="assessment"
             variant="outlined"
-            value={filters.assessment}
-            onChange={handleFilterChange("assessment")}
+            value={textFilters.assessment}
+            onChange={handleTextChange}
           />
         </Grid>
         <Grid item xs={12} md={3}>
@@ -219,12 +226,6 @@ const AssessmentResultsReport = () => {
           </FormControl>
         </Grid>
 
-        {/* Date Range Filters */}
-        <Grid item xs={12}>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Date Filters
-          </Typography>
-        </Grid>
         <Grid item xs={12} md={3}>
           <TextField
             fullWidth
@@ -246,50 +247,22 @@ const AssessmentResultsReport = () => {
           />
         </Grid>
 
-        {/* Additional Filters */}
         <Grid item xs={12} md={3}>
           <TextField
             fullWidth
             label="Course ID"
-            variant="outlined"
-            value={filters.course}
-            onChange={handleFilterChange("course")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Term ID"
-            variant="outlined"
-            value={filters.term}
-            onChange={handleFilterChange("term")}
+            name="course"
+            value={textFilters.course}
+            onChange={handleTextChange}
           />
         </Grid>
         <Grid item xs={12} md={3}>
           <TextField
             fullWidth
             label="Student ID"
-            variant="outlined"
-            value={filters.student}
-            onChange={handleFilterChange("student")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Tutor ID"
-            variant="outlined"
-            value={filters.tutor}
-            onChange={handleFilterChange("tutor")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Group ID"
-            variant="outlined"
-            value={filters.group}
-            onChange={handleFilterChange("group")}
+            name="student"
+            value={textFilters.student}
+            onChange={handleTextChange}
           />
         </Grid>
         <Grid item xs={12} md={3}>
@@ -305,53 +278,67 @@ const AssessmentResultsReport = () => {
         </Grid>
       </Grid>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Student Name</TableCell>
-              <TableCell>Assessment Title</TableCell>
-              <TableCell>Course</TableCell>
-              <TableCell>Score</TableCell>
-              <TableCell>Percentage</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Graded By</TableCell>
-              <TableCell>Feedback</TableCell>
-              <TableCell>Created At</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {results.map((result) => (
-              <TableRow key={result.id}>
-                <TableCell>{result.student_name}</TableCell>
-                <TableCell>{result.assessment_title}</TableCell>
-                <TableCell>{result.course_title}</TableCell>
-                <TableCell>{`${result.score}/${result.assessment_max_score}`}</TableCell>
-                <TableCell>{`${result.percentage_score}%`}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={result.is_passing ? "Passing" : "Failing"}
-                    color={result.is_passing ? "success" : "error"}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>{result.graded_by_name}</TableCell>
-                <TableCell>{result.feedback}</TableCell>
-                <TableCell>{formatDate(result.created_at)}</TableCell>
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Typography color="error" textAlign="center">{error}</Typography>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Student Name</TableCell>
+                <TableCell>Assessment Title</TableCell>
+                <TableCell>Course</TableCell>
+                <TableCell>Score</TableCell>
+                <TableCell>Percentage</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Graded By</TableCell>
+                <TableCell>Created At</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={totalResults}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {results.length > 0 ? (
+                results.map((result) => (
+                  <TableRow key={result.id}>
+                    <TableCell>{result.student_name}</TableCell>
+                    <TableCell>{result.assessment_title}</TableCell>
+                    <TableCell>{result.course_title}</TableCell>
+                    <TableCell>{`${result.score}/${result.assessment_max_score}`}</TableCell>
+                    <TableCell>{`${result.percentage_score}%`}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={result.is_passing ? "Passing" : "Failing"}
+                        color={result.is_passing ? "success" : "error"}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>{result.graded_by_name}</TableCell>
+                    <TableCell>{formatDate(result.created_at)}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+                    No results found matching your criteria.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={totalResults}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
     </Box>
   );
 };

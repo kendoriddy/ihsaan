@@ -21,7 +21,12 @@ function TabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {/* Reduced padding for mobile (p: 1) and standard for desktop (sm: 3) */}
+      {value === index && (
+        <Box sx={{ p: { xs: 1, sm: 3 } }}>
+          {children}
+        </Box>
+      )}
     </div>
   );
 }
@@ -35,10 +40,22 @@ function Reports() {
 
   return (
     <Layout>
-      <Box sx={{ width: "100%" }}>
+      <Box sx={{ width: "100%", overflowX: "hidden" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={value} onChange={handleChange} aria-label="reports tabs">
-            <Tab label="Users" />
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="reports tabs"
+            variant="scrollable" // Enables horizontal scrolling for tabs
+            scrollButtons="auto" // Shows arrows when content overflows
+            allowScrollButtonsMobile // Ensures arrows appear on touch devices
+            sx={{
+              "& .MuiTabs-indicator": {
+                height: 3,
+              },
+            }}
+          >
+            {/* <Tab label="Users" /> */}
             <Tab label="Assessments" />
             <Tab label="Assessment Results" />
             <Tab label="Programmes" />
@@ -47,26 +64,26 @@ function Reports() {
             <Tab label="Purchases" />
           </Tabs>
         </Box>
-        <TabPanel value={value} index={0}>
+        {/* <TabPanel value={value} index={0}>
           <UsersReport />
-        </TabPanel>
-        <TabPanel value={value} index={1}>
+        </TabPanel> */}
+        <TabPanel value={value} index={0}>
           <AssessmentsReport />
         </TabPanel>
-        <TabPanel value={value} index={2}>
+        <TabPanel value={value} index={1}>
           <AssessmentResultsReport />
         </TabPanel>
-        <TabPanel value={value} index={3}>
+        <TabPanel value={value} index={2}>
           <ProgrammesReport />
         </TabPanel>
-        <TabPanel value={value} index={4}>
+        <TabPanel value={value} index={3}>
           <SessionsReport />
         </TabPanel>
-        <TabPanel value={value} index={5}>
+        <TabPanel value={value} index={4}>
           <CoursesReport />
         </TabPanel>
-        <TabPanel value={value} index={6}>
-          <Typography>Purchases Report - Coming Soon</Typography>
+        <TabPanel value={value} index={5}>
+          <Typography sx={{ p: 2 }}>Purchases Report - Coming Soon</Typography>
         </TabPanel>
       </Box>
     </Layout>

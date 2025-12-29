@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Paper,
@@ -30,6 +30,10 @@ const AssessmentsReport = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalAssessments, setTotalAssessments] = useState(0);
+  
+  // Internal search state to allow smooth typing
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [filters, setFilters] = useState({
     search: "",
     type: "",
@@ -46,39 +50,31 @@ const AssessmentsReport = () => {
     endsBefore: "",
   });
 
-  const fetchAssessments = async () => {
+  const fetchAssessments = useCallback(async () => {
     try {
       setLoading(true);
       const headers = {
         Authorization: `Bearer ${getAuthToken()}`,
       };
 
-      // Build query parameters
       const params = new URLSearchParams();
-
-      // Add pagination parameters
-      params.append("page", page + 1); // API uses 1-based indexing
+      params.append("page", page + 1);
       params.append("page_size", rowsPerPage);
 
-      // Add filter parameters
       if (filters.search) params.append("search", filters.search);
       if (filters.type) params.append("type", filters.type);
-      if (filters.questionType)
-        params.append("question_type", filters.questionType);
+      if (filters.questionType) params.append("question_type", filters.questionType);
       if (filters.course) params.append("course", filters.course);
       if (filters.term) params.append("term", filters.term);
       if (filters.tutor) params.append("tutor", filters.tutor);
+      
+      // Ensure boolean strings are passed correctly
       if (filters.isActive !== "") params.append("is_active", filters.isActive);
 
-      // Date filters
-      if (filters.createdAfter)
-        params.append("created_after", filters.createdAfter);
-      if (filters.createdBefore)
-        params.append("created_before", filters.createdBefore);
-      if (filters.startsAfter)
-        params.append("starts_after", filters.startsAfter);
-      if (filters.startsBefore)
-        params.append("starts_before", filters.startsBefore);
+      if (filters.createdAfter) params.append("created_after", filters.createdAfter);
+      if (filters.createdBefore) params.append("created_before", filters.createdBefore);
+      if (filters.startsAfter) params.append("starts_after", filters.startsAfter);
+      if (filters.startsBefore) params.append("starts_before", filters.startsBefore);
       if (filters.endsAfter) params.append("ends_after", filters.endsAfter);
       if (filters.endsBefore) params.append("ends_before", filters.endsBefore);
 
@@ -86,8 +82,9 @@ const AssessmentsReport = () => {
         `https://api.ihsaanacademia.com/assessment/base/?${params.toString()}`,
         { headers }
       );
-      setAssessments(response.data.results);
-      setTotalAssessments(response.data.total);
+      
+      setAssessments(response.data.results || []);
+      setTotalAssessments(response.data.total || 0);
       setError(null);
     } catch (err) {
       setError("Failed to fetch assessments");
@@ -95,21 +92,30 @@ const AssessmentsReport = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, page, rowsPerPage]);
 
+  // Handle Search Debounce: Only update filters.search 500ms after user stops typing
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setFilters(prev => ({ ...prev, search: searchTerm }));
+      setPage(0);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  // Main Effect: Fetch data when filters (except search typing), page or rows change
   useEffect(() => {
     fetchAssessments();
-  }, [filters, page, rowsPerPage]); // Refetch when filters, page, or rowsPerPage change
+  }, [fetchAssessments]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    fetchAssessments();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Reset to first page when changing rows per page
-    fetchAssessments();
+    setPage(0);
   };
 
   const handleFilterChange = (filterName) => (event) => {
@@ -117,19 +123,15 @@ const AssessmentsReport = () => {
       ...filters,
       [filterName]: event.target.value,
     });
-    setPage(0); // Reset to first page when filters change
-    fetchAssessments();
+    setPage(0);
   };
 
-  const handleSearch = (event) => {
-    setFilters({
-      ...filters,
-      search: event.target.value,
-    });
-    setPage(0); // Reset to first page when search changes
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
   };
 
   const clearFilters = () => {
+    setSearchTerm("");
     setFilters({
       search: "",
       type: "",
@@ -145,50 +147,25 @@ const AssessmentsReport = () => {
       endsAfter: "",
       endsBefore: "",
     });
-    setPage(0); // Reset to first page when clearing filters
+    setPage(0);
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString();
   };
 
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
-
   return (
-    <Box>
+    <Box sx={{ p: 2 }}>
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} md={3}>
           <TextField
             fullWidth
             label="Search"
             variant="outlined"
-            value={filters.search}
-            onChange={handleSearch}
-            placeholder="Search by title, description, course, or tutor"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="Search title, course, or tutor..."
           />
         </Grid>
         <Grid item xs={12} md={3}>
@@ -236,12 +213,7 @@ const AssessmentsReport = () => {
         </Grid>
 
         {/* Date Range Filters */}
-        <Grid item xs={12}>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Date Filters
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2}>
           <TextField
             fullWidth
             label="Created After"
@@ -251,7 +223,7 @@ const AssessmentsReport = () => {
             InputLabelProps={{ shrink: true }}
           />
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2}>
           <TextField
             fullWidth
             label="Created Before"
@@ -261,49 +233,7 @@ const AssessmentsReport = () => {
             InputLabelProps={{ shrink: true }}
           />
         </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Starts After"
-            type="date"
-            value={filters.startsAfter}
-            onChange={handleFilterChange("startsAfter")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Starts Before"
-            type="date"
-            value={filters.startsBefore}
-            onChange={handleFilterChange("startsBefore")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Ends After"
-            type="date"
-            value={filters.endsAfter}
-            onChange={handleFilterChange("endsAfter")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Ends Before"
-            type="date"
-            value={filters.endsBefore}
-            onChange={handleFilterChange("endsBefore")}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-
-        {/* Additional Filters */}
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2}>
           <TextField
             fullWidth
             label="Course ID"
@@ -312,16 +242,7 @@ const AssessmentsReport = () => {
             onChange={handleFilterChange("course")}
           />
         </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            fullWidth
-            label="Term ID"
-            variant="outlined"
-            value={filters.term}
-            onChange={handleFilterChange("term")}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2}>
           <TextField
             fullWidth
             label="Tutor ID"
@@ -330,7 +251,7 @@ const AssessmentsReport = () => {
             onChange={handleFilterChange("tutor")}
           />
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={4}>
           <Button
             fullWidth
             variant="outlined"
@@ -338,58 +259,72 @@ const AssessmentsReport = () => {
             onClick={clearFilters}
             sx={{ height: "56px" }}
           >
-            Clear Filters
+            Clear All Filters
           </Button>
         </Grid>
       </Grid>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Course</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Question Type</TableCell>
-              <TableCell>Tutor</TableCell>
-              <TableCell>Start Date</TableCell>
-              <TableCell>End Date</TableCell>
-              <TableCell>Max Score</TableCell>
-              <TableCell>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {assessments.map((assessment) => (
-              <TableRow key={assessment.id}>
-                <TableCell>{assessment.title}</TableCell>
-                <TableCell>{assessment.course_title}</TableCell>
-                <TableCell>{assessment.type}</TableCell>
-                <TableCell>{assessment.question_type}</TableCell>
-                <TableCell>{assessment.tutor_name}</TableCell>
-                <TableCell>{formatDate(assessment.start_date)}</TableCell>
-                <TableCell>{formatDate(assessment.end_date)}</TableCell>
-                <TableCell>{assessment.max_score}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={assessment.is_active ? "Active" : "Inactive"}
-                    color={assessment.is_active ? "success" : "default"}
-                    size="small"
-                  />
-                </TableCell>
+      {loading ? (
+        <Box display="flex" justifyContent="center" py={5}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Typography color="error" textAlign="center">{error}</Typography>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Title</TableCell>
+                <TableCell>Course</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Question Type</TableCell>
+                <TableCell>Tutor</TableCell>
+                <TableCell>Start Date</TableCell>
+                <TableCell>End Date</TableCell>
+                <TableCell>Max Score</TableCell>
+                <TableCell>Status</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={totalAssessments}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {assessments.length > 0 ? (
+                assessments.map((assessment) => (
+                  <TableRow key={assessment.id}>
+                    <TableCell>{assessment.title}</TableCell>
+                    <TableCell>{assessment.course_title}</TableCell>
+                    <TableCell>{assessment.type}</TableCell>
+                    <TableCell>{assessment.question_type}</TableCell>
+                    <TableCell>{assessment.tutor_name}</TableCell>
+                    <TableCell>{formatDate(assessment.start_date)}</TableCell>
+                    <TableCell>{formatDate(assessment.end_date)}</TableCell>
+                    <TableCell>{assessment.max_score}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={assessment.is_active ? "Active" : "Inactive"}
+                        color={assessment.is_active ? "success" : "default"}
+                        size="small"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} align="center">No assessments found.</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={totalAssessments}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
     </Box>
   );
 };
