@@ -23,8 +23,9 @@ function Page() {
       }, 2000);
     },
     onError: (error) => {
+      console.log(error, "what is this error");
       Swal.fire({
-        title: error.message,
+        title: error.response.data.detail,
         icon: "error",
         customClass: {
           confirmButton: "my-confirm-btn",

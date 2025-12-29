@@ -169,7 +169,7 @@ const StudentRegistrationFlow = ({ setOpen, selectedProgramme = null }) => {
 
   if (registrationStatus === "success") {
     return (
-      <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-2xl w-full mx-4">
+      <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-2xl w-full mx-0">
         <div className="bg-green-500 text-white py-4 px-6 flex justify-between items-center">
           <h2 className="text-2xl font-bold">Registration Successful!</h2>
         </div>
@@ -309,7 +309,7 @@ const StudentRegistrationFlow = ({ setOpen, selectedProgramme = null }) => {
 
   if (registrationStatus === "error") {
     return (
-      <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-2xl w-full mx-4">
+      <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-2xl w-full mx-0">
         <div className="bg-red-500 text-white py-4 px-6 flex justify-between items-center">
           <h2 className="text-2xl font-bold">Registration Failed</h2>
         </div>
@@ -361,7 +361,7 @@ const StudentRegistrationFlow = ({ setOpen, selectedProgramme = null }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-2xl w-full mx-4">
+    <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-2xl w-full mx-0">
       <div className="bg-primary text-white py-4 px-6 flex justify-between items-center">
         <h2 className="text-2xl font-bold">
           Register for {getProgrammeDisplayName(selectedProgramme)}

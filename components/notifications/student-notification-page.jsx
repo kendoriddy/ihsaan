@@ -140,17 +140,22 @@ export default function StudentNotificationPage({
   const displayNotifications =
     viewMode === "recent" ? recentNotifications : notifications;
 
+  // Helper function to check if notification is read (handles both isRead and is_read)
+  const isNotificationRead = (notification) => {
+    return notification.is_read || notification.isRead || false;
+  };
+
   // Filter notifications based on read status
   const filteredNotifications = displayNotifications.filter((notification) => {
     if (filter === "all") return true;
-    if (filter === "unread") return !notification.isRead;
-    if (filter === "read") return notification.isRead;
+    if (filter === "unread") return !isNotificationRead(notification);
+    if (filter === "read") return isNotificationRead(notification);
     return true;
   });
 
   // Use API unread count if available, otherwise fallback to local calculation
   const unreadCount =
-    apiUnreadCount || notifications.filter((n) => !n.isRead).length;
+    apiUnreadCount || notifications.filter((n) => !isNotificationRead(n)).length;
 
   const handleNotificationClick = (notification) => {
     // Fetch notification details from API
@@ -356,7 +361,7 @@ export default function StudentNotificationPage({
                 key={notification.id}
                 onClick={() => handleNotificationClick(notification)}
                 className={`p-6 hover:bg-gray-50 cursor-pointer transition-colors ${
-                  !notification.isRead
+                  !isNotificationRead(notification)
                     ? "bg-blue-50 border-l-4 border-l-blue-500"
                     : ""
                 }`}
@@ -388,7 +393,7 @@ export default function StudentNotificationPage({
                         >
                           {notification.type}
                         </span>
-                        {!notification.isRead && (
+                        {!isNotificationRead(notification) && (
                           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                         )}
                       </div>
@@ -439,7 +444,7 @@ export default function StudentNotificationPage({
                           {formatDate(notification.createdAt)}
                         </span>
                         <div className="flex items-center gap-2">
-                          {!notification.isRead && (
+                          {!isNotificationRead(notification) && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();

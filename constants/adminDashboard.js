@@ -469,13 +469,6 @@ const ADMINDASHBOARD = {
       icon: SentimentDissatisfiedIcon,
       value: 0, // Replace with actual value
     },
-    {
-      id: 10,
-      label: "Number of students per programme",
-      abbr: "Students per programme",
-      icon: SocialDistanceIcon,
-      value: 0, // Replace with actual value
-    },
   ],
 };
 

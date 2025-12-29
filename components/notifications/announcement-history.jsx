@@ -140,13 +140,13 @@ export default function AnnouncementHistory({
 
   console.log(filteredAnnouncements, "filteredAnnouncements!!!");
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="w-full overflow-x-hidden">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           Announcement History
         </h1>
-        <p className="text-gray-600">View and manage your sent announcements</p>
+        <p className="text-gray-600 text-sm sm:text-base">View and manage your sent announcements</p>
       </div>
 
       {/* Stats Cards */}
@@ -220,7 +220,7 @@ export default function AnnouncementHistory({
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
         <div className="flex flex-wrap gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -290,10 +290,10 @@ export default function AnnouncementHistory({
           filteredAnnouncements.map((announcement) => (
             <div
               key={announcement.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
+              className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-3">
                     <h3 className="text-lg font-semibold text-gray-900">
                       {announcement.title}
@@ -316,12 +316,12 @@ export default function AnnouncementHistory({
                     {announcement.content}
                   </p>
 
-                  <div className="flex items-center gap-6 text-sm text-gray-500">
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-sm text-gray-500">
                     <div className="flex items-center gap-2">
                       {getTargetIcon(
                         announcement.announcement_type?.toLowerCase()
                       )}
-                      <span>
+                      <span className="text-xs sm:text-sm">
                         {getTargetLabel(
                           announcement.announcement_type?.toLowerCase(),
                           announcement.course_title
@@ -331,31 +331,31 @@ export default function AnnouncementHistory({
 
                     <div className="flex items-center gap-2">
                       <People className="w-4 h-4" />
-                      <span>
+                      <span className="text-xs sm:text-sm">
                         {announcement.total_recipients || 0} recipients
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <TrendingUp className="w-4 h-4" />
-                      <span>{getReadRate(announcement)}% read rate</span>
+                      <span className="text-xs sm:text-sm">{getReadRate(announcement)}% read rate</span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <CalendarToday className="w-4 h-4" />
-                      <span>{formatDate(announcement.created_at)}</span>
+                      <span className="text-xs sm:text-sm">{formatDate(announcement.created_at)}</span>
                     </div>
 
                     {announcement.has_attachments && (
                       <div className="flex items-center gap-2">
                         <AttachFile className="w-4 h-4" />
-                        <span>Has attachments</span>
+                        <span className="text-xs sm:text-sm">Has attachments</span>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 ml-4">
+                <div className="flex items-center gap-2 sm:ml-4 flex-shrink-0">
                   <button
                     onClick={() => onEdit(announcement.id)}
                     className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

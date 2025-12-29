@@ -70,8 +70,9 @@ export default function AnnouncementViewEditModal({
         announcement_type: announcement.announcement_type || "",
         announcement_class: announcement.announcement_class || "INFORMATIONAL",
         delivery_method: announcement.delivery_method || "IN_APP",
-        course: announcement.course || "",
-        term: announcement.term || "",
+        // Convert course and term to strings for select elements
+        course: announcement.course ? String(announcement.course) : "",
+        term: announcement.term ? String(announcement.term) : "",
         is_active: announcement.is_active !== false,
       });
     }
@@ -199,14 +200,23 @@ export default function AnnouncementViewEditModal({
       announcement_class: formData.announcement_class,
       delivery_method: formData.delivery_method,
       is_active: formData.is_active,
+      // Include created_by from the original announcement (required field)
+      created_by: announcement.created_by,
     };
 
-    // Add course and term only if they are provided
-    if (formData.course) {
-      payload.course = parseInt(formData.course);
+    // Add course and term - convert strings to integers or set to null
+    if (formData.course && formData.course !== "") {
+      const courseId = parseInt(formData.course);
+      payload.course = isNaN(courseId) ? null : courseId;
+    } else {
+      payload.course = null;
     }
-    if (formData.term) {
-      payload.term = parseInt(formData.term);
+    
+    if (formData.term && formData.term !== "") {
+      const termId = parseInt(formData.term);
+      payload.term = isNaN(termId) ? null : termId;
+    } else {
+      payload.term = null;
     }
 
     onSave(announcement.id, payload);

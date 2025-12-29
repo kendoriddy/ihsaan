@@ -1290,7 +1290,7 @@ function Header() {
                 {!isAuth && (
                   <li>
                     <Link
-                      href="/admin/login"
+                      href="/login"
                       className={` navlink ${
                         currentRoute.includes("/admin") && "text-primary"
                       }`}

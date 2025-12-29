@@ -48,7 +48,7 @@ const SecondaryProgramme = ({ setOpen }) => {
 
   return (
     <div>
-      <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-2xl w-full mx-4">
+      <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-2xl w-full mx-0">
         {/* Header with decorative Islamic pattern */}
         <div className="bg-primary text-white py-4 px-6 flex justify-between items-center">
           <h2 className="text-2xl font-bold">Welcome to Secondary Programme</h2>

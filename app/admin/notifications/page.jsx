@@ -56,29 +56,18 @@ function Page() {
         />
 
         {/* Right Main Body */}
-        <section
-          className="lg:ml-[250px] w-screen px-2"
-          style={{
-            "@media (min-width: 1024px)": {
-              width: "calc(100vw - 250px)",
-            },
-          }}
-        >
-          <div>
-            <div className="w-full h-20 border rounded">
-              <div className="min-h-screen bg-gray-50">
-                {/* Header */}
-                <div className="bg-white shadow-sm border-b border-gray-200 p-4">
-                  <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-gray-800">
-                      IHSAAN Announcement System
-                    </h1>
-                  </div>
-                </div>
-
-                <AnnouncementDashboard userRole={userRole} />
+        <section className="lg:ml-[250px] w-full lg:w-[calc(100vw-250px)] overflow-x-hidden">
+          <div className="w-full min-h-screen bg-gray-50">
+            {/* Header */}
+            <div className="bg-white shadow-sm border-b border-gray-200 p-4">
+              <div className="max-w-7xl mx-auto">
+                <h1 className="text-xl font-bold text-gray-800">
+                  IHSAAN Announcement System
+                </h1>
               </div>
             </div>
+
+            <AnnouncementDashboard userRole={userRole} />
           </div>
         </section>
       </main>
