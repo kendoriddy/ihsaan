@@ -13,10 +13,7 @@ import {
   CheckCircle,
   Cancel,
   Close,
-  Star,
-  StarBorder,
   AccessTime,
-  School,
   Verified,
 } from "@mui/icons-material";
 
@@ -34,69 +31,6 @@ export default function ViewProfileModal({
   const fullName =
     `${tutor.first_name} ${tutor.middle_name} ${tutor.last_name}`.trim();
 
-  const mockData = {
-    rating: 4.8,
-    totalReviews: 127,
-    totalStudents: 89,
-    yearsExperience: 5,
-    specializations: [
-      "Tajweed",
-      "Memorization",
-      "Recitation",
-      "Arabic Grammar",
-    ],
-    certifications: [
-      "Ijazah in Qira'at",
-      "Islamic Studies Degree",
-      "Arabic Language Certificate",
-    ],
-    availability: [
-      { day: "Monday", times: ["9:00 AM - 12:00 PM", "2:00 PM - 6:00 PM"] },
-      { day: "Tuesday", times: ["9:00 AM - 12:00 PM", "2:00 PM - 6:00 PM"] },
-      { day: "Wednesday", times: ["9:00 AM - 12:00 PM"] },
-      { day: "Thursday", times: ["9:00 AM - 12:00 PM", "2:00 PM - 6:00 PM"] },
-      { day: "Friday", times: ["2:00 PM - 6:00 PM"] },
-      { day: "Saturday", times: ["9:00 AM - 12:00 PM", "2:00 PM - 6:00 PM"] },
-      { day: "Sunday", times: ["Unavailable"] },
-    ],
-    reviews: [
-      {
-        id: 1,
-        student: "Ahmad K.",
-        rating: 5,
-        comment:
-          "Excellent teacher! Very patient and knowledgeable. My Tajweed has improved significantly.",
-        date: "2 weeks ago",
-      },
-      {
-        id: 2,
-        student: "Fatima S.",
-        rating: 5,
-        comment:
-          "MashAllah, Brother Abu is an amazing teacher. Highly recommend for Quran memorization.",
-        date: "1 month ago",
-      },
-      {
-        id: 3,
-        student: "Omar M.",
-        rating: 4,
-        comment:
-          "Great teacher with excellent Arabic pronunciation. Very helpful and encouraging.",
-        date: "2 months ago",
-      },
-    ],
-  };
-
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }, (_, i) =>
-      i < Math.floor(rating) ? (
-        <Star key={i} className="w-4 h-4 text-yellow-500" />
-      ) : (
-        <StarBorder key={i} className="w-4 h-4 text-gray-400" />
-      )
-    );
-  };
-
   return (
     <Modal
       open={isOpen}
@@ -106,7 +40,6 @@ export default function ViewProfileModal({
     >
       <Box className="flex items-center justify-center min-h-screen p-4 outline-none">
         <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden mx-auto border border-gray-200">
-          
           {/* Header Section (Reduced vertically) */}
           <div className="bg-gradient-to-r from-red-50 to-orange-50 p-4 border-b border-gray-200 flex-shrink-0">
             <div className="flex items-start justify-between">
@@ -133,17 +66,9 @@ export default function ViewProfileModal({
                     <h2 className="text-xl font-bold text-gray-900">
                       {fullName}
                     </h2>
-                    <Verified className="w-5 h-5 text-blue-600" />
-                  </div>
-
-                  <div className="flex items-center gap-2 mb-2">
-                    {renderStars(mockData.rating)}
-                    <span className="text-xs font-bold text-gray-800">
-                      {mockData.rating}
-                    </span>
-                    <span className="text-xs text-gray-600 font-medium">
-                      ({mockData.totalReviews} reviews)
-                    </span>
+                    {tutor.is_verified && (
+                      <Verified className="w-5 h-5 text-blue-600" />
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-700 font-medium mb-2">
@@ -155,14 +80,20 @@ export default function ViewProfileModal({
                       <Public className="w-3.5 h-3.5 text-red-800" />
                       <span>{tutor.country_of_residence}</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <School className="w-3.5 h-3.5 text-red-800" />
-                      <span>{mockData.totalStudents} Students</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <AccessTime className="w-3.5 h-3.5 text-red-800" />
-                      <span>{mockData.yearsExperience} Years Exp</span>
-                    </div>
+                    {tutor.years_of_experience && (
+                      <div className="flex items-center gap-1.5">
+                        <AccessTime className="w-3.5 h-3.5 text-red-800" />
+                        <span>{tutor.years_of_experience} Years Exp</span>
+                      </div>
+                    )}
+                    {tutor.tejweed_level && (
+                      <div className="flex items-center gap-1.5">
+                        <MenuBook className="w-3.5 h-3.5 text-red-800" />
+                        <span className="capitalize">
+                          {tutor.tejweed_level.toLowerCase()}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div
@@ -204,9 +135,7 @@ export default function ViewProfileModal({
                 >
                   Book Trial
                 </button>
-                <button 
-                  className="border-2 border-red-800 text-red-800 hover:bg-red-50 text-sm font-bold py-2 px-6 rounded-xl transition-all active:scale-95"
-                >
+                <button className="border-2 border-red-800 text-red-800 hover:bg-red-50 text-sm font-bold py-2 px-6 rounded-xl transition-all active:scale-95">
                   Message
                 </button>
               </div>
@@ -243,74 +172,62 @@ export default function ViewProfileModal({
           <div className="p-6 overflow-y-auto flex-1 bg-white">
             {activeTab === "overview" && (
               <div className="space-y-6 animate-in fade-in duration-300">
-                <div>
-                  <h3 className="text-base font-bold text-gray-900 mb-2 border-l-4 border-red-800 pl-3">
-                    About
-                  </h3>
-                  <p className="text-gray-800 leading-relaxed text-sm font-medium">
-                    {tutor.bio}
-                  </p>
-                </div>
+                {tutor.bio && (
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900 mb-2 border-l-4 border-red-800 pl-3">
+                      About
+                    </h3>
+                    <p className="text-gray-800 leading-relaxed text-sm font-medium">
+                      {tutor.bio}
+                    </p>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-center">
-                    <Language className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-                    <div className="text-[10px] font-bold text-blue-900 uppercase">Languages</div>
-                    <div className="text-xs font-bold text-blue-700 mt-1">
-                      {tutor.languages.join(", ")}
+                  {tutor.languages && tutor.languages.length > 0 && (
+                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-center">
+                      <Language className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                      <div className="text-[10px] font-bold text-blue-900 uppercase">
+                        Languages
+                      </div>
+                      <div className="text-xs font-bold text-blue-700 mt-1">
+                        {Array.isArray(tutor.languages)
+                          ? tutor.languages.join(", ")
+                          : tutor.languages}
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className="bg-purple-50 border border-purple-100 rounded-xl p-3 text-center">
                     <MenuBook className="w-5 h-5 text-purple-600 mx-auto mb-1" />
-                    <div className="text-[10px] font-bold text-purple-900 uppercase">Ajzaa</div>
+                    <div className="text-[10px] font-bold text-purple-900 uppercase">
+                      Ajzaa
+                    </div>
                     <div className="text-xs font-bold text-purple-700 mt-1">
                       {tutor.ajzaa_memorized}
                     </div>
                   </div>
-                  <div className="bg-green-50 border border-green-100 rounded-xl p-3 text-center">
-                    <AccountBalance className="w-5 h-5 text-green-600 mx-auto mb-1" />
-                    <div className="text-[10px] font-bold text-green-900 uppercase">Sect</div>
-                    <div className="text-xs font-bold text-green-700 mt-1">
-                      {tutor.sect}
-                    </div>
-                  </div>
-                  <div className="bg-orange-50 border border-orange-100 rounded-xl p-3 text-center">
-                    <Public className="w-5 h-5 text-orange-600 mx-auto mb-1" />
-                    <div className="text-[10px] font-bold text-orange-900 uppercase">Origin</div>
-                    <div className="text-xs font-bold text-orange-700 mt-1">
-                      {tutor.country_of_origin}
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-bold text-gray-900 mb-2 border-l-4 border-red-800 pl-3">
-                    Specializations
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {mockData.specializations.map((spec, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-red-800 text-white rounded-full text-[10px] font-bold shadow-sm"
-                      >
-                        {spec}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-bold text-gray-900 mb-2 border-l-4 border-red-800 pl-3">
-                    Certifications
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {mockData.certifications.map((cert, index) => (
-                      <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-100">
-                        <Verified className="w-4 h-4 text-green-600" />
-                        <span className="text-gray-800 font-bold text-xs">{cert}</span>
+                  {tutor.sect && (
+                    <div className="bg-green-50 border border-green-100 rounded-xl p-3 text-center">
+                      <AccountBalance className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                      <div className="text-[10px] font-bold text-green-900 uppercase">
+                        Sect
                       </div>
-                    ))}
-                  </div>
+                      <div className="text-xs font-bold text-green-700 mt-1">
+                        {tutor.sect}
+                      </div>
+                    </div>
+                  )}
+                  {tutor.country_of_origin && (
+                    <div className="bg-orange-50 border border-orange-100 rounded-xl p-3 text-center">
+                      <Public className="w-5 h-5 text-orange-600 mx-auto mb-1" />
+                      <div className="text-[10px] font-bold text-orange-900 uppercase">
+                        Origin
+                      </div>
+                      <div className="text-xs font-bold text-orange-700 mt-1">
+                        {tutor.country_of_origin}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -318,21 +235,14 @@ export default function ViewProfileModal({
             {activeTab === "availability" && (
               <div className="space-y-2 animate-in fade-in duration-300">
                 <h3 className="text-base font-bold text-gray-900 mb-3 border-l-4 border-red-800 pl-3">
-                  Weekly Schedule
+                  Availability
                 </h3>
-                {mockData.availability.map((schedule, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200"
-                  >
-                    <div className="font-bold text-sm text-gray-900">
-                      {schedule.day}
-                    </div>
-                    <div className="text-xs font-bold text-red-800">
-                      {schedule.times.join(" • ")}
-                    </div>
-                  </div>
-                ))}
+                <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center">
+                  <p className="text-gray-600 text-sm">
+                    Availability information is not currently available. Please
+                    contact the tutor directly to schedule sessions.
+                  </p>
+                </div>
               </div>
             )}
 
@@ -342,39 +252,12 @@ export default function ViewProfileModal({
                   <h3 className="text-base font-bold text-red-900">
                     Student Reviews
                   </h3>
-                  <div className="flex items-center gap-2">
-                    {renderStars(mockData.rating)}
-                    <span className="font-black text-red-900 text-sm">
-                      {mockData.rating}
-                    </span>
-                  </div>
                 </div>
-
-                {mockData.reviews.map((review) => (
-                  <div key={review.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                          <Person className="w-5 h-5 text-gray-500" />
-                        </div>
-                        <span className="font-bold text-sm text-gray-900">
-                          {review.student}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-0.5">
-                          {renderStars(review.rating)}
-                        </div>
-                        <span className="text-[10px] font-bold text-gray-400">
-                          {review.date}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="text-gray-700 text-xs font-medium italic leading-relaxed">
-                      "{review.comment}"
-                    </p>
-                  </div>
-                ))}
+                <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center">
+                  <p className="text-gray-600 text-sm">
+                    Reviews are not currently available for this tutor.
+                  </p>
+                </div>
               </div>
             )}
           </div>

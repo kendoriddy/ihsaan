@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProductById } from "@/utils/redux/slices/productSlice";
+import { fetchCourseById } from "@/utils/redux/slices/courseSlice";
 import { addItemToCart, checkoutCart } from "@/utils/redux/slices/cartSlice";
 import { useFrontendCart } from "@/utils/FrontendCartContext";
 import Header from "@/components/Header";
@@ -34,7 +34,7 @@ import {
 export default function CourseDetail({ params }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { currentProduct, status } = useSelector((state) => state.products);
+  const { currentCourse, status } = useSelector((state) => state.course);
   const { itemCount, cart } = useSelector((state) => state.cart);
   const {
     addToCart: addToFrontendCart,
@@ -55,7 +55,7 @@ export default function CourseDetail({ params }) {
     const fetchCourseData = async () => {
       setIsLoading(true);
       try {
-        await dispatch(fetchProductById(params.id)).unwrap();
+        await dispatch(fetchCourseById(params.id)).unwrap();
       } catch (error) {
         toast.error("Failed to fetch course details");
       } finally {
@@ -80,7 +80,7 @@ export default function CourseDetail({ params }) {
     if (isLoggedIn) {
       // Logged-in user: use backend cart
       const existingItem = cart?.items?.find(
-        (item) => item.product.id === currentProduct.id
+        (item) => item.product?.id === currentCourse.id
       );
 
       if (existingItem) {
@@ -90,7 +90,7 @@ export default function CourseDetail({ params }) {
 
       try {
         await dispatch(
-          addItemToCart({ productId: currentProduct.id, quantity: 1 })
+          addItemToCart({ productId: currentCourse.id, quantity: 1 })
         ).unwrap();
         toast.success("Course added to cart successfully!");
       } catch (error) {
@@ -100,7 +100,7 @@ export default function CourseDetail({ params }) {
       // Non-logged-in user: use frontend cart
       const frontendCartItems = getCartItems();
       const existingItem = frontendCartItems.find(
-        (item) => item.id === currentProduct.id
+        (item) => item.id === currentCourse.id
       );
 
       if (existingItem) {
@@ -108,14 +108,14 @@ export default function CourseDetail({ params }) {
         return;
       }
 
-      addToFrontendCart(currentProduct);
+      addToFrontendCart(currentCourse);
       toast.success("Course added to cart successfully!");
     }
   };
 
   // Handle buy now
   const handleBuyNow = () => {
-    if (!currentProduct) {
+    if (!currentCourse) {
       toast.error("Course information not available");
       return;
     }
@@ -137,7 +137,7 @@ export default function CourseDetail({ params }) {
       return;
     }
 
-    if (!currentProduct) {
+    if (!currentCourse) {
       toast.error("Course information not available");
       return;
     }
@@ -151,7 +151,7 @@ export default function CourseDetail({ params }) {
       // Simulate Paystack payment flow
       console.log("Initiating payment...");
       console.log("Payment Reference:", ref);
-      console.log("Amount:", currentProduct.price);
+      console.log("Amount:", currentCourse.price);
       console.log("Customer Email:", email);
 
       // Simulate payment processing steps
@@ -171,7 +171,7 @@ export default function CourseDetail({ params }) {
       // Add the course to cart first
       await dispatch(
         addItemToCart({
-          productId: currentProduct.id,
+          productId: currentCourse.id,
           quantity: 1,
         })
       ).unwrap();
@@ -191,10 +191,11 @@ export default function CourseDetail({ params }) {
 
   // Format price
   const formatPrice = (price) => {
+    if (!price || Number.parseFloat(price) === 0) return "Free";
     return new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: "NGN",
-    }).format(price);
+    }).format(Number.parseFloat(price));
   };
 
   // Format date
@@ -218,7 +219,7 @@ export default function CourseDetail({ params }) {
     );
   }
 
-  if (!currentProduct) {
+  if (!currentCourse) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
@@ -259,7 +260,7 @@ export default function CourseDetail({ params }) {
               Courses
             </Link>
             <span>/</span>
-            <span className="text-gray-900">{currentProduct.title}</span>
+            <span className="text-gray-900">{currentCourse?.title || currentCourse?.name}</span>
           </nav>
         </div>
       </div>
@@ -274,7 +275,7 @@ export default function CourseDetail({ params }) {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                    {currentProduct.title}
+                    {currentCourse?.title || currentCourse?.name}
                   </h1>
                   <p className="text-gray-600 mb-4">
                     Learn from the best instructors at IHSAAN ACADEMIA
@@ -301,18 +302,14 @@ export default function CourseDetail({ params }) {
                     </span>
                   </div>
 
-                  {/* Course Type Badge */}
-                  <div className="mb-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        currentProduct.type === "COURSE"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {currentProduct.type}
-                    </span>
-                  </div>
+                  {/* Programme Name */}
+                  {currentCourse?.programme_name && (
+                    <div className="mb-4">
+                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                        {currentCourse.programme_name}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Action Buttons */}
@@ -330,31 +327,29 @@ export default function CourseDetail({ params }) {
               <div className="relative h-64 bg-gray-200 rounded-lg overflow-hidden mb-6">
                 <Image
                   src={
-                    currentProduct.image?.startsWith("http")
-                      ? currentProduct.image
+                    currentCourse?.image_url?.startsWith("http")
+                      ? currentCourse.image_url
                       : IMAGES.course_1
                   }
-                  alt={currentProduct.title}
+                  alt={currentCourse?.title || currentCourse?.name || "Course"}
                   fill
                   className="object-cover"
                 />
-                {currentProduct.type === "COURSE" && (
-                  <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                    <div className="bg-white rounded-full p-4">
-                      <PlayIcon className="h-8 w-8 text-blue-600" />
-                    </div>
+                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                  <div className="bg-white rounded-full p-4">
+                    <PlayIcon className="h-8 w-8 text-blue-600" />
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Course Description */}
               <div className="prose max-w-none">
                 <h3 className="text-xl font-semibold mb-4">
-                  About this {currentProduct.type.toLowerCase()}
+                  About this course
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
-                  {currentProduct.description ||
-                    `This is a comprehensive ${currentProduct.type.toLowerCase()} designed to help you master the subject matter. Whether you're a beginner or looking to advance your skills, this ${currentProduct.type.toLowerCase()} provides the knowledge and tools you need to succeed.`}
+                  {currentCourse?.description ||
+                    "This is a comprehensive course designed to help you master the subject matter. Whether you're a beginner or looking to advance your skills, this course provides the knowledge and tools you need to succeed."}
                 </p>
               </div>
             </div>
@@ -424,7 +419,7 @@ export default function CourseDetail({ params }) {
                 <div className="mb-6">
                   <div className="flex items-baseline space-x-2">
                     <span className="text-3xl font-bold text-gray-900">
-                      {formatPrice(currentProduct.price)}
+                      {formatPrice(currentCourse?.price)}
                     </span>
                     {/* {parseFloat(currentProduct.price) > 0 && (
                       <span className="text-lg text-gray-500 line-through">
@@ -448,14 +443,14 @@ export default function CourseDetail({ params }) {
                     if (isLoggedIn) {
                       // Check backend cart for logged-in users
                       existingItem = cart?.items?.find(
-                        (item) => item.product.id === currentProduct.id
+                        (item) => item.product?.id === currentCourse.id
                       );
                       isInCart = !!existingItem;
                     } else {
                       // Check frontend cart for non-logged-in users
                       const frontendCartItems = getCartItems();
                       existingItem = frontendCartItems.find(
-                        (item) => item.id === currentProduct.id
+                        (item) => item.id === currentCourse.id
                       );
                       isInCart = !!existingItem;
                     }
@@ -556,10 +551,10 @@ export default function CourseDetail({ params }) {
               <div className="mb-6">
                 <div className="text-center mb-4">
                   <h4 className="font-medium text-gray-900">
-                    {currentProduct?.title}
+                    {currentCourse?.title || currentCourse?.name}
                   </h4>
                   <p className="text-2xl font-bold text-green-600">
-                    {formatPrice(currentProduct?.price || 0)}
+                    {formatPrice(currentCourse?.price || 0)}
                   </p>
                 </div>
               </div>
@@ -637,7 +632,7 @@ export default function CourseDetail({ params }) {
                 </p>
                 <p className="text-sm text-gray-600">
                   <span className="font-medium">Amount:</span>{" "}
-                  {formatPrice(currentProduct?.price || 0)}
+                  {formatPrice(currentCourse?.price || 0)}
                 </p>
               </div>
               <div className="space-y-2">
@@ -692,7 +687,7 @@ export default function CourseDetail({ params }) {
                 </p>
                 <p className="text-sm text-green-800">
                   <span className="font-medium">Amount Paid:</span>{" "}
-                  {formatPrice(currentProduct?.price || 0)}
+                  {formatPrice(currentCourse?.price || 0)}
                 </p>
                 <p className="text-sm text-green-800">
                   <span className="font-medium">Status:</span>{" "}
