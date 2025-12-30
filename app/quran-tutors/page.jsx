@@ -1,103 +1,130 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, FilterList } from "@mui/icons-material";
 import QuranTutorFilters from "@/components/QuranTutorFilters";
 import QuranTutorCard from "@/components/QuranTutorCard";
 import Header from "@/components/Header";
-
-// Mock data for tutors
-const mockTutors = [
-  {
-    id: 1,
-    profile_picture: "/assets/images/user1.webp",
-    gender: "male",
-    display_face: true,
-    first_name: "Abu (Abdir Rahman)",
-    middle_name: "",
-    last_name: "Riyadh",
-    country_of_origin: "Nigeria",
-    country_of_residence: "Nigeria",
-    ajzaa_memorized: 8,
-    languages: ["Arabic", "English"],
-    sect: "Sunni",
-    available: true,
-    bio: "As Salaam Alaykum. This is Abu AbdirRahman, a good speaker of English and Arabic language. I teach adults and kids. I can teach you the recitation of the Qur'an from scratch, assist you with your memorization of the Qur'an, perfect your recitation...",
-    hourly_rate: 2000,
-    currency: "naira",
-  },
-  {
-    id: 2,
-    profile_picture: "/assets/images/user2.webp",
-    gender: "male",
-    display_face: true,
-    first_name: "Muhammad",
-    middle_name: "",
-    last_name: "Sufyan",
-    country_of_origin: "Pakistan",
-    country_of_residence: "Pakistan",
-    ajzaa_memorized: 5,
-    languages: ["English", "Urdu", "Hindi"],
-    sect: "Sunni",
-    available: false,
-    bio: "Assalamu alaikum. If the heart is hardened, the soul is weakened, and the stimuli of desires and worldly affairs fall into it, then we need to reform the soul, soften the heart and strengthen the relationship with Allah. Reading the Quran and understanding it...",
-    hourly_rate: 5000,
-    currency: "naira",
-  },
-];
+import { useFetch } from "@/hooks/useHttp/useHttp";
+import Loader from "@/components/Loader";
 
 export default function QuranTutorsPage() {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Filter and search logic
-  const filteredTutors = mockTutors.filter((tutor) => {
-    // Search logic
-    const searchLower = search.toLowerCase();
-    const matchesSearch =
-      tutor.first_name.toLowerCase().includes(searchLower) ||
-      tutor.last_name.toLowerCase().includes(searchLower) ||
-      (tutor.middle_name &&
-        tutor.middle_name.toLowerCase().includes(searchLower)) ||
-      tutor.country_of_origin.toLowerCase().includes(searchLower) ||
-      tutor.country_of_residence.toLowerCase().includes(searchLower) ||
-      tutor.languages.some((lang) => lang.toLowerCase().includes(searchLower));
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
 
-    // Apply filters
-    if (filters.gender && tutor.gender !== filters.gender) return false;
-    if (
-      filters.country_of_origin &&
-      !tutor.country_of_origin
-        .toLowerCase()
-        .includes(filters.country_of_origin.toLowerCase())
-    )
-      return false;
-    if (
-      filters.country_of_residence &&
-      !tutor.country_of_residence
-        .toLowerCase()
-        .includes(filters.country_of_residence.toLowerCase())
-    )
-      return false;
-    if (
-      filters.language &&
-      !tutor.languages.some((lang) =>
-        lang.toLowerCase().includes(filters.language.toLowerCase())
-      )
-    )
-      return false;
-    if (filters.available && String(tutor.available) !== filters.available)
-      return false;
-    if (filters.sect && tutor.sect !== filters.sect) return false;
-    if (
-      filters.ajzaa_memorized &&
-      String(tutor.ajzaa_memorized) !== String(filters.ajzaa_memorized)
-    )
-      return false;
+    return () => clearTimeout(timer);
+  }, [search]);
 
-    return matchesSearch;
-  });
+  // Build query parameters from filters and search
+  const queryParams = useMemo(() => {
+    const params = new URLSearchParams();
+
+    // Add search
+    if (debouncedSearch) {
+      params.append("search", debouncedSearch);
+    }
+
+    // Add filters
+    if (filters.gender) {
+      params.append("gender", filters.gender);
+    }
+    if (filters.country_of_origin) {
+      params.append("country_of_origin", filters.country_of_origin);
+    }
+    if (filters.country_of_residence) {
+      params.append("country_of_residence", filters.country_of_residence);
+    }
+    if (filters.language) {
+      params.append("languages", filters.language);
+    }
+    if (filters.sect) {
+      // Map filter sect values to API enum values
+      const sectMap = {
+        Sunni: "SUNNI",
+        Shia: "SHIA",
+        Sufi: "SUFI",
+        Others: "OTHER",
+      };
+      params.append("religion_sect", sectMap[filters.sect] || filters.sect);
+    }
+    if (filters.ajzaa_memorized) {
+      params.append("ajzaa_memorized_min", filters.ajzaa_memorized);
+    }
+    // Only show accepted tutors (approved tutors)
+    params.append("application_status", "ACCEPTED");
+
+    return params.toString();
+  }, [debouncedSearch, filters]);
+
+  // Fetch tutors from API
+  const {
+    isLoading,
+    data: tutorsData,
+    error,
+    isError,
+  } = useFetch(
+    ["quran-tutors", queryParams],
+    queryParams
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/quran-tutors/?${queryParams}`
+      : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/quran-tutors/?application_status=ACCEPTED`,
+    () => {}
+  );
+
+  // Transform API data to match component expectations
+  const tutors = useMemo(() => {
+    // The API response is nested in data.data (axios response wrapper)
+    const apiResponse = tutorsData?.data || tutorsData;
+    if (!apiResponse?.results) return [];
+
+    return apiResponse.results.map((tutor) => {
+      // Parse languages from comma-separated string to array
+      const languages = tutor.languages
+        ? tutor.languages.split(",").map((lang) => lang.trim())
+        : [];
+
+      // Map religion_sect enum to display format
+      const sectMap = {
+        SUNNI: "Sunni",
+        SHIA: "Shia",
+        SUFI: "Sufi",
+        OTHER: "Others",
+      };
+      const sect = tutor.religion_sect
+        ? sectMap[tutor.religion_sect] || tutor.religion_sect
+        : "";
+
+      return {
+        id: tutor.id,
+        profile_picture:
+          tutor.profile_picture_url || "/assets/images/user1.webp",
+        gender: tutor.gender || "",
+        display_face: tutor.display_profile_pic !== false,
+        first_name: tutor.first_name || "",
+        middle_name: tutor.middle_name || "",
+        last_name: tutor.last_name || "",
+        country_of_origin: tutor.country_of_origin || "",
+        country_of_residence: tutor.country_of_residence || "",
+        ajzaa_memorized: tutor.ajzaa_memorized || 0,
+        languages: languages,
+        sect: sect,
+        available: true, // Default to true, API doesn't provide this field
+        bio: tutor.tutor_summary || "",
+        hourly_rate: 0, // API doesn't provide this field
+        currency: "credits", // Default currency
+        years_of_experience: tutor.years_of_experience || null,
+        tejweed_level: tutor.tejweed_level || "",
+        is_verified: tutor.is_verified || false,
+      };
+    });
+  }, [tutorsData]);
 
   return (
     <>
@@ -148,20 +175,22 @@ export default function QuranTutorsPage() {
                     Filters
                   </button>
 
-                  {/* Sort */}
-                  <select className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-red-700 focus:border-red-700 transition-all duration-200 bg-white text-gray-700">
-                    <option>Sort by Rate</option>
-                    <option>Sort by Rating</option>
-                    <option>Sort by Experience</option>
-                  </select>
                 </div>
 
                 {/* Results Count */}
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <p className="text-sm text-gray-600">
-                    Showing{" "}
-                    <span className="font-medium">{filteredTutors.length}</span>{" "}
+                    Showing <span className="font-medium">{tutors.length}</span>{" "}
                     tutors
+                    {(() => {
+                      const apiResponse = tutorsData?.data || tutorsData;
+                      return apiResponse?.total !== undefined ? (
+                        <span className="text-gray-500">
+                          {" "}
+                          of {apiResponse.total} total
+                        </span>
+                      ) : null;
+                    })()}
                   </p>
                 </div>
               </div>
@@ -176,26 +205,52 @@ export default function QuranTutorsPage() {
                 </div>
               )}
 
-              {/* Tutors Grid */}
-              <div className="space-y-6">
-                {filteredTutors.length === 0 ? (
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Search className="w-8 h-8 text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      No tutors found
-                    </h3>
-                    <p className="text-gray-500">
-                      Try adjusting your search criteria or filters
-                    </p>
+              {/* Loading State */}
+              {isLoading && (
+                <div className="flex justify-center items-center py-12">
+                  <Loader />
+                </div>
+              )}
+
+              {/* Error State */}
+              {isError && !isLoading && (
+                <div className="bg-white rounded-2xl shadow-sm border border-red-200 p-12 text-center">
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-8 h-8 text-red-400" />
                   </div>
-                ) : (
-                  filteredTutors.map((tutor) => (
-                    <QuranTutorCard key={tutor.id} tutor={tutor} />
-                  ))
-                )}
-              </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Error loading tutors
+                  </h3>
+                  <p className="text-gray-500">
+                    {error?.response?.data?.message ||
+                      error?.message ||
+                      "Failed to load tutors. Please try again later."}
+                  </p>
+                </div>
+              )}
+
+              {/* Tutors Grid */}
+              {!isLoading && !isError && (
+                <div className="space-y-6">
+                  {tutors.length === 0 ? (
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Search className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        No tutors found
+                      </h3>
+                      <p className="text-gray-500">
+                        Try adjusting your search criteria or filters
+                      </p>
+                    </div>
+                  ) : (
+                    tutors.map((tutor) => (
+                      <QuranTutorCard key={tutor.id} tutor={tutor} />
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

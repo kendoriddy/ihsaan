@@ -37,7 +37,7 @@ function Page() {
     `,
     (data) => {}
   );
-
+  console.log("coursesList:::", coursesList);
   const courses = coursesList?.data?.results || [];
 
   // Fetch courses
@@ -541,8 +541,8 @@ function Page() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <div className="text-primary text-xs">
-                                {course?.tutors[0]?.tutor_full_name}{" "}
-                                {course?.tutors > 1 ? "and more" : ""}
+                                {course?.tutors?.[0]?.tutor_full_name}{" "}
+                                {course?.tutors?.length > 1 ? "and more" : ""}
                               </div>
                             </div>
                           </div>
