@@ -27,7 +27,12 @@ const UsersReport = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  
+  // Real-time search for the input field
   const [searchTerm, setSearchTerm] = useState("");
+  // Debounced search for the actual filtering logic
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  
   const [userType, setUserType] = useState("student");
   const [filters, setFilters] = useState({
     country: "",
@@ -48,7 +53,7 @@ const UsersReport = () => {
 
       const response = await axios.get(endpoint, { headers });
 
-      setUsers(response.data.results);
+      setUsers(response.data.results || []);
       setError(null);
     } catch (err) {
       setError("Failed to fetch users");
@@ -58,9 +63,19 @@ const UsersReport = () => {
     }
   };
 
+  // Fetch only when userType changes
   useEffect(() => {
     fetchUsers();
   }, [userType]);
+
+  // Debounce logic: update debouncedSearchTerm 500ms after user stops typing
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -71,7 +86,7 @@ const UsersReport = () => {
     setPage(0);
   };
 
-  const handleSearch = (event) => {
+  const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
     setPage(0);
   };
@@ -89,11 +104,13 @@ const UsersReport = () => {
     setPage(0);
   };
 
+  // Filtering logic uses the debouncedSearchTerm
   const filteredUsers = users.filter((user) => {
+    const searchLower = debouncedSearchTerm.toLowerCase();
     const matchesSearch =
-      user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      (user.first_name || "").toLowerCase().includes(searchLower) ||
+      (user.last_name || "").toLowerCase().includes(searchLower) ||
+      (user.email || "").toLowerCase().includes(searchLower);
 
     const matchesFilters =
       (!filters.country || user.country === filters.country) &&
@@ -131,7 +148,6 @@ const UsersReport = () => {
       </Box>
     );
   }
-  console.log(filteredUsers, "users:");
 
   return (
     <Box>
@@ -142,7 +158,8 @@ const UsersReport = () => {
             label="Search"
             variant="outlined"
             value={searchTerm}
-            onChange={handleSearch}
+            onChange={handleSearchChange}
+            placeholder="Name or email..."
           />
         </Grid>
         <Grid item xs={12} md={3}>
@@ -167,7 +184,7 @@ const UsersReport = () => {
               onChange={handleFilterChange("country")}
             >
               <MenuItem value="">All</MenuItem>
-              {Array.from(new Set(users.map((user) => user.country))).map(
+              {[...new Set(users.map((user) => user.country))].filter(Boolean).map(
                 (country) => (
                   <MenuItem key={country} value={country}>
                     {country}
@@ -222,23 +239,33 @@ const UsersReport = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredUsers
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.country}</TableCell>
-                  <TableCell>{user.gender}</TableCell>
-                  <TableCell>
-                    {userType === "student"
-                      ? user.student_application_status
-                      : user.tutor_application_status}
-                  </TableCell>
-                  <TableCell>{user.highest_qualification}</TableCell>
-                  <TableCell>{user.years_of_experience}</TableCell>
-                </TableRow>
-              ))}
+            {filteredUsers.length > 0 ? (
+              filteredUsers
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>{`${user.first_name || ""} ${user.last_name || ""}`}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.country}</TableCell>
+                    <TableCell>{user.gender}</TableCell>
+                    <TableCell>
+                      {userType === "student"
+                        ? user.student_application_status
+                        : user.tutor_application_status}
+                    </TableCell>
+                    <TableCell>{user.highest_qualification || "N/A"}</TableCell>
+                    <TableCell>{user.years_of_experience || "0"}</TableCell>
+                  </TableRow>
+                ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                  <Typography variant="body1" color="textSecondary">
+                    No users found matching your criteria.
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
         <TablePagination

@@ -153,9 +153,13 @@ const ManualGradeForm = ({
                   }}
                   error={touched.course && Boolean(errors.course)}
                 >
-                  {courses.map((c) => (
-                    <MenuItem key={c.id} value={c.id}>
-                      {c.title}
+                  <MenuItem value="" disabled className="animate animate-pulse">
+                    {loadingCourses ? "Fetching courses..." : "Select course"}
+                  </MenuItem>
+
+                  {courses.map((course) => (
+                    <MenuItem key={course.id} value={course.id}>
+                      {course.title}
                     </MenuItem>
                   ))}
                 </Field>
@@ -202,6 +206,9 @@ const ManualGradeForm = ({
                   name="reason"
                   error={touched.reason && Boolean(errors.reason)}
                 >
+                  <MenuItem value="" disabled className="animate animate-pulse">
+                    {loadingReasons ? "Fetching reasons..." : "Select reason"}
+                  </MenuItem>
                   {reasons?.map((reason) => (
                     <MenuItem key={reason.id} value={reason.id}>
                       {reason.description}

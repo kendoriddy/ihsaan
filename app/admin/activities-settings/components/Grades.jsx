@@ -40,7 +40,7 @@ const Grades = () => {
   const { data: termData, isFetching: isFetchingTerms } = useFetch(
     "terms",
     selectedSession
-      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/?session=${selectedSession}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms/?session=${selectedSession}`
       : null
   );
   const Terms = termData?.data?.results || [];

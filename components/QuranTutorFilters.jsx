@@ -5,7 +5,6 @@ import {
   Public,
   Home,
   Language,
-  Schedule,
   AccountBalance,
   MenuBook,
 } from "@mui/icons-material";
@@ -45,17 +44,6 @@ export default function QuranTutorFilters({ filters, setFilters }) {
       placeholder: "e.g., Arabic, English",
     },
     {
-      key: "available",
-      label: "Availability",
-      icon: <Schedule className="w-5 h-5 text-green-600" />,
-      type: "select",
-      options: [
-        { value: "", label: "Any Availability" },
-        { value: "true", label: "Available Now" },
-        { value: "false", label: "Not Available" },
-      ],
-    },
-    {
       key: "sect",
       label: "Islamic Sect",
       icon: <AccountBalance className="w-5 h-5 text-indigo-600" />,
@@ -65,7 +53,6 @@ export default function QuranTutorFilters({ filters, setFilters }) {
         { value: "Sunni", label: "Sunni" },
         { value: "Shia", label: "Shia" },
         { value: "Sufi", label: "Sufi" },
-        { value: "Ahmadiyya", label: "Ahmadiyya" },
         { value: "Others", label: "Others" },
       ],
     },

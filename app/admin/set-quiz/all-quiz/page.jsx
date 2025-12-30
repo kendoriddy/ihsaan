@@ -126,7 +126,7 @@ const AllQuiz = () => {
 
   const handleDelete = () => {
     if (selectedQuestion?.id) {
-      questionDelete(`${selectedQuestion.id}/`);
+      questionDelete(`${selectedQuestion.id}`);
     }
   };
 

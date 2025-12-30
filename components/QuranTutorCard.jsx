@@ -11,20 +11,22 @@ import {
 } from "@mui/icons-material";
 import BookTrialModal from "./book-trial-modal";
 import ViewProfileModal from "./view-profile-modal";
+// import SendMessageModal from "./send-message-modal"; // New Component
 import { useState } from "react";
 
+/* Quran Tutor Card Component */
 export default function QuranTutorCard({ tutor }) {
   const fullName =
     `${tutor.first_name} ${tutor.middle_name} ${tutor.last_name}`.trim();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState(false);
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
       {/* Header */}
       <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6">
         <div className="flex items-start gap-4">
-          {/* Profile Picture */}
           <div className="relative">
             <div className="w-20 h-20 bg-gradient-to-br from-red-800 to-red-900 rounded-2xl flex items-center justify-center shadow-lg">
               <Person className="w-10 h-10 text-white" />
@@ -42,7 +44,6 @@ export default function QuranTutorCard({ tutor }) {
             </div>
           </div>
 
-          {/* Basic Info */}
           <div className="flex-1">
             <h3 className="text-xl font-bold text-gray-800 mb-1">{fullName}</h3>
             <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
@@ -67,7 +68,6 @@ export default function QuranTutorCard({ tutor }) {
             </div>
           </div>
 
-          {/* Rate */}
           <div className="text-right">
             <div className="text-2xl font-bold text-red-800">
               {tutor.hourly_rate}
@@ -81,7 +81,6 @@ export default function QuranTutorCard({ tutor }) {
 
       {/* Content */}
       <div className="p-6 space-y-4">
-        {/* Stats */}
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-blue-50 rounded-xl p-3">
             <div className="flex items-center gap-2 mb-1">
@@ -106,7 +105,6 @@ export default function QuranTutorCard({ tutor }) {
           </div>
         </div>
 
-        {/* Additional Info */}
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-gray-600">
             <AccountBalance className="w-4 h-4" />
@@ -118,14 +116,12 @@ export default function QuranTutorCard({ tutor }) {
           </div>
         </div>
 
-        {/* Bio */}
         <div className="bg-gray-50 rounded-xl p-4">
           <p className="text-sm text-gray-700 leading-relaxed line-clamp-3">
             {tutor.bio}
           </p>
         </div>
 
-        {/* Actions */}
         <div className="flex gap-3 pt-2">
           <button
             onClick={() => setShowProfileModal(true)}
@@ -141,6 +137,7 @@ export default function QuranTutorCard({ tutor }) {
           </button>
         </div>
       </div>
+
       <ViewProfileModal
         tutor={tutor}
         isOpen={showProfileModal}
@@ -149,6 +146,10 @@ export default function QuranTutorCard({ tutor }) {
           setShowProfileModal(false);
           setShowBookingModal(true);
         }}
+        onSendMessage={() => {
+          setShowProfileModal(false);
+          setShowMessageModal(true);
+        }}
       />
 
       <BookTrialModal
@@ -156,6 +157,12 @@ export default function QuranTutorCard({ tutor }) {
         isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
       />
+
+      {/* <SendMessageModal
+        tutor={tutor}
+        isOpen={showMessageModal}
+        onClose={() => setShowMessageModal(false)}
+      /> */}
     </div>
   );
 }

@@ -644,7 +644,8 @@ function Header() {
                 </MenuItem>
                 <MenuItem
                   onClick={() => {
-                    router.push("/courses");
+                    handleOpenModal("teacher");
+                    setType("teacher");
                     handleCoursesMenuClose();
                   }}
                   sx={{

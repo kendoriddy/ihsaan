@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Paper,
@@ -25,26 +25,28 @@ const SessionsReport = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalSessions, setTotalSessions] = useState(0);
+
+  // Local state for immediate UI feedback while typing
+  const [searchTerm, setSearchTerm] = useState("");
+  const [yearTerm, setYearTerm] = useState("");
+
+  // Filter state that actually triggers the API call
   const [filters, setFilters] = useState({
     search: "",
     year: "",
   });
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     try {
       setLoading(true);
       const headers = {
         Authorization: `Bearer ${getAuthToken()}`,
       };
 
-      // Build query parameters
       const params = new URLSearchParams();
-
-      // Add pagination parameters
       params.append("page", page + 1);
       params.append("page_size", rowsPerPage);
 
-      // Add filter parameters
       if (filters.search) params.append("search", filters.search);
       if (filters.year) params.append("year", filters.year);
 
@@ -52,8 +54,8 @@ const SessionsReport = () => {
         `https://api.ihsaanacademia.com/academic-sessions/?${params.toString()}`,
         { headers }
       );
-      setSessions(response.data.results);
-      setTotalSessions(response.data.total);
+      setSessions(response.data.results || []);
+      setTotalSessions(response.data.total || 0);
       setError(null);
     } catch (err) {
       setError("Failed to fetch sessions");
@@ -61,70 +63,49 @@ const SessionsReport = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, page, rowsPerPage]);
 
+  // Debounce Logic: Updates the 'filters' state 500ms after typing stops
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setFilters({
+        search: searchTerm,
+        year: yearTerm,
+      });
+      setPage(0);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm, yearTerm]);
+
+  // Main Fetch Effect
   useEffect(() => {
     fetchSessions();
-  }, [filters, page, rowsPerPage]);
+  }, [fetchSessions]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    fetchSessions();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    fetchSessions();
-  };
-
-  const handleFilterChange = (filterName) => (event) => {
-    setFilters({
-      ...filters,
-      [filterName]: event.target.value,
-    });
-    setPage(0);
-    fetchSessions();
   };
 
   const clearFilters = () => {
+    setSearchTerm("");
+    setYearTerm("");
     setFilters({
       search: "",
       year: "",
     });
     setPage(0);
-    fetchSessions();
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString();
   };
-
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
 
   return (
     <Box>
@@ -134,9 +115,9 @@ const SessionsReport = () => {
             fullWidth
             label="Search"
             variant="outlined"
-            value={filters.search}
-            onChange={handleFilterChange("search")}
-            placeholder="Search by year"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search sessions..."
           />
         </Grid>
         <Grid item xs={12} md={5}>
@@ -144,8 +125,8 @@ const SessionsReport = () => {
             fullWidth
             label="Year"
             variant="outlined"
-            value={filters.year}
-            onChange={handleFilterChange("year")}
+            value={yearTerm}
+            onChange={(e) => setYearTerm(e.target.value)}
             placeholder="e.g., 2025/2026"
           />
         </Grid>
@@ -162,47 +143,63 @@ const SessionsReport = () => {
         </Grid>
       </Grid>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Year</TableCell>
-              <TableCell>Start Date</TableCell>
-              <TableCell>End Date</TableCell>
-              <TableCell>Duration (Days)</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {sessions.map((session) => {
-              const startDate = new Date(session.start_date);
-              const endDate = new Date(session.end_date);
-              const durationDays = Math.ceil(
-                (endDate - startDate) / (1000 * 60 * 60 * 24)
-              );
+      {loading ? (
+        <Box display="flex" justifyContent="center" py={5}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Typography color="error" textAlign="center">{error}</Typography>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Year</TableCell>
+                <TableCell>Start Date</TableCell>
+                <TableCell>End Date</TableCell>
+                <TableCell>Duration (Days)</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {sessions.length > 0 ? (
+                sessions.map((session) => {
+                  const startDate = new Date(session.start_date);
+                  const endDate = new Date(session.end_date);
+                  const durationDays = isNaN(startDate) || isNaN(endDate) 
+                    ? "N/A" 
+                    : Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-              return (
-                <TableRow key={session.id}>
-                  <TableCell>{session.id}</TableCell>
-                  <TableCell>{session.year}</TableCell>
-                  <TableCell>{formatDate(session.start_date)}</TableCell>
-                  <TableCell>{formatDate(session.end_date)}</TableCell>
-                  <TableCell>{durationDays}</TableCell>
+                  return (
+                    <TableRow key={session.id}>
+                      <TableCell>{session.id}</TableCell>
+                      <TableCell>{session.year}</TableCell>
+                      <TableCell>{formatDate(session.start_date)}</TableCell>
+                      <TableCell>{formatDate(session.end_date)}</TableCell>
+                      <TableCell>{durationDays}</TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
+                    No sessions found.
+                  </TableCell>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={totalSessions}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={totalSessions}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
     </Box>
   );
 };

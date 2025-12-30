@@ -60,13 +60,6 @@ const EditQuizQuestion = ({
             <div className="space-y-4">
               <div>
                 <label className="block font-medium mb-1">Question</label>
-                {/* <Field
-                  name="question_text"
-                  as={TextField}
-                  fullWidth
-                  size="small"
-                  placeholder="Enter question"
-                /> */}
                 <Editor name="question_text" className="w-full" />
               </div>
 
@@ -91,18 +84,7 @@ const EditQuizQuestion = ({
                   as={TextField}
                   fullWidth
                   size="small"
-                  placeholder="Correct answer"
-                />
-              </div>
-
-              <div>
-                <label className="block font-medium mb-1">Section</label>
-                <Field
-                  name="section"
-                  as={TextField}
-                  fullWidth
-                  size="small"
-                  placeholder="e.g. Chapter 1"
+                  placeholder="Correct answer (A,B,C,D etc)"
                 />
               </div>
 

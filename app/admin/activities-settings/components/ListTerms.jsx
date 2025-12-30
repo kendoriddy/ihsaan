@@ -40,12 +40,12 @@ const ListTerms = () => {
   const Terms = data?.data?.results || [];
 
   // DELETE TERM
-  const { mutate: sessionDelete, isLoading: isDeleting } = useDelete(
+  const { mutate: termDelete, isLoading: isDeleting } = useDelete(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/terms`,
     {
       onSuccess: () => {
         toast.success("Deleted successfully");
-        queryClient.invalidateQueries("terms");
+        queryClient.invalidateQueries({ queryKey: ["terms"] });
         setOpenDeleteDialog(false);
       },
       onError: (error) => {
@@ -61,9 +61,9 @@ const ListTerms = () => {
   };
 
   const handleDelete = () => {
-    if (selectedTerm?.id) {
-      sessionDelete(`${selectedTerm.id}/`);
-    }
+    if (!selectedTerm?.id) return;
+
+    termDelete(`${selectedTerm.id}`);
   };
 
   return (
@@ -107,7 +107,7 @@ const ListTerms = () => {
                       <Button
                         onClick={() => {
                           setSelectedTerm(term);
-                          setOpenDeleteDialog(true);
+                           setOpenDeleteDialog(true);
                         }}
                       >
                         <Delete />

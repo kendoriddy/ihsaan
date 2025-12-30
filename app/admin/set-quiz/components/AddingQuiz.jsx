@@ -457,7 +457,9 @@ const AddingQuiz = () => {
   const handleCloseIdModal = () => setShowIdModal(false);
 
   // Preview manual questions
-  const handlePreviewManualQuestions = (values) => {
+  const handlePreviewManualQuestions = (e, values) => {
+    e.preventDefault();
+    e.stopPropagation();
     // Filter out empty questions
     const validQuestions = values.questions.filter(
       (q) => q.question_text.trim() !== "" && q.correct_answer !== ""
@@ -824,7 +826,7 @@ const AddingQuiz = () => {
               <Button
                 type="button"
                 color="primary"
-                onClick={() => handlePreviewManualQuestions(values)}
+                onClick={(e) => handlePreviewManualQuestions(e, values)}
                 disabled={!values.course_id || !values.course_section_id}
                 className="w-full px-4 py-2 rounded-md"
               >
