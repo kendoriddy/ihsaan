@@ -1,6 +1,5 @@
-import { getAuthToken } from "@/hooks/axios/axios";
+import http from "@/hooks/axios/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 
 // Async thunk to fetch courses
 export const fetchCourses = createAsyncThunk(
@@ -9,8 +8,6 @@ export const fetchCourses = createAsyncThunk(
     { page = 1, page_size = 10, programme = null, search = null },
     { rejectWithValue }
   ) => {
-    const token = getAuthToken();
-
     try {
       // Build query parameters
       const params = new URLSearchParams();
@@ -25,18 +22,33 @@ export const fetchCourses = createAsyncThunk(
         params.append("search", search);
       }
 
+      // Use http instance which handles auth conditionally (only if token exists)
+      // This matches the behavior of useFetch hook used on landing page
       const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?${params.toString()}`;
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await http.get(url);
 
-      console.log(response.data, "response wow:");
       return response.data; // Return the fetched data
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch courses"
+      );
+    }
+  }
+);
+
+// Async thunk to fetch single course by ID
+export const fetchCourseById = createAsyncThunk(
+  "courses/fetchCourseById",
+  async (courseId, { rejectWithValue }) => {
+    try {
+      // Use http instance which handles auth conditionally (only if token exists)
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/${courseId}/`;
+      const response = await http.get(url);
+
+      return response.data; // Return the fetched data
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch course details"
       );
     }
   }
@@ -47,6 +59,7 @@ const courseSlice = createSlice({
   name: "courses",
   initialState: {
     courses: [],
+    currentCourse: null,
     courseCount: 0,
     totalPages: 0,
     nextPageUrl: null,
@@ -59,6 +72,12 @@ const courseSlice = createSlice({
   reducers: {
     setRefreshing: (state, action) => {
       state.isRefreshing = action.payload;
+    },
+    clearCurrentCourse: (state) => {
+      state.currentCourse = null;
+    },
+    clearError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -89,10 +108,23 @@ const courseSlice = createSlice({
         }
         state.isRefreshing = false;
         state.error = action.payload || "Failed to fetch courses";
+      })
+      // Fetch single course by ID
+      .addCase(fetchCourseById.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchCourseById.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.currentCourse = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchCourseById.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to fetch course details";
       });
   },
 });
 
-export const { setRefreshing } = courseSlice.actions;
+export const { setRefreshing, clearCurrentCourse, clearError } = courseSlice.actions;
 
 export default courseSlice.reducer;
