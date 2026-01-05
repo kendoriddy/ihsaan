@@ -21,7 +21,6 @@ import axios from "axios";
 const TutorForm = ({
   fetchApplicationData,
   handleFormClose,
-  handleMenuClose,
 }) => {
   const [isCreating, setIsCreating] = useState(false);
 
@@ -63,7 +62,6 @@ const TutorForm = ({
     } finally {
       setIsCreating(false);
       setSubmitting(false);
-      handleMenuClose();
       handleFormClose();
     }
   };
@@ -79,10 +77,7 @@ const TutorForm = ({
                   <h2 className="mb-4">Tutor Application Form</h2>
                   <div
                     className="cursor-pointer text-red-600 hover:text-blue-600 transition-all duration-300"
-                    onClick={() => {
-                      handleMenuClose();
-                      handleFormClose();
-                    }}
+                    onClick={handleFormClose}
                   >
                     Close
                   </div>

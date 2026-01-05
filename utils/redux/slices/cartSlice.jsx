@@ -31,7 +31,12 @@ export const addItemToCart = createAsyncThunk(
       // If no cart exists, get or create one
       if (!cart || !cart.id) {
         const cartResponse = await dispatch(getOrCreateCart()).unwrap();
-        cart = cartResponse;
+        cart = cartResponse.cart || cartResponse;
+      }
+
+      // Ensure cart has an id before proceeding
+      if (!cart || !cart.id) {
+        return rejectWithValue("Failed to get or create cart");
       }
 
       const payload = {
@@ -67,7 +72,12 @@ export const removeItemFromCart = createAsyncThunk(
       // If no cart exists, get or create one
       if (!cart || !cart.id) {
         const cartResponse = await dispatch(getOrCreateCart()).unwrap();
-        cart = cartResponse;
+        cart = cartResponse.cart || cartResponse;
+      }
+
+      // Ensure cart has an id before proceeding
+      if (!cart || !cart.id) {
+        return rejectWithValue("Failed to get or create cart");
       }
 
       const payload = {
@@ -103,7 +113,12 @@ export const checkoutCart = createAsyncThunk(
       // If no cart exists, get or create one
       if (!cart || !cart.id) {
         const cartResponse = await dispatch(getOrCreateCart()).unwrap();
-        cart = cartResponse;
+        cart = cartResponse.cart || cartResponse;
+      }
+
+      // Ensure cart has an id before proceeding
+      if (!cart || !cart.id) {
+        return rejectWithValue("Failed to get or create cart");
       }
 
       const response = await http2.post(`/products/carts/${cart.id}/checkout/`);

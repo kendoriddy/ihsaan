@@ -448,27 +448,6 @@ const ADMINDASHBOARD = {
       icon: AppRegistrationIcon,
       value: 0, // Replace with actual value
     },
-    {
-      id: 7,
-      label: "Number of pending feedback directed to the admins",
-      abbr: "Feedback to admins",
-      icon: SentimentNeutralIcon,
-      value: 0, // Replace with actual value
-    },
-    {
-      id: 8,
-      label: "Number of pending feedback directed to the tutors",
-      abbr: "Feedback to tutors",
-      icon: SentimentSatisfiedAltIcon,
-      value: 0, // Replace with actual value
-    },
-    {
-      id: 9,
-      label: "Number of pending feedback directed to the students",
-      abbr: "Feedback to students",
-      icon: SentimentDissatisfiedIcon,
-      value: 0, // Replace with actual value
-    },
   ],
 };
 

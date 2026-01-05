@@ -59,12 +59,12 @@ const DASHBOARD_LIST = {
       icon: StorefrontIcon,
       path: "/store",
     },
-    {
-      id: 12,
-      name: "Applications",
-      icon: BookmarkIcon,
-      path: "/dashboard/my-applications",
-    },
+    // {
+    //   id: 12,
+    //   name: "Applications",
+    //   icon: BookmarkIcon,
+    //   path: "/dashboard/my-applications",
+    // },
     {
       id: 15,
       name: "Forums",

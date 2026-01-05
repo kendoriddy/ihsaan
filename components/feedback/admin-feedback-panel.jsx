@@ -21,6 +21,7 @@ import { CircularProgress, Modal, Box, IconButton } from "@mui/material"; // Add
 import {
   fetchFeedbacksWithCurrentFilters,
   updateFeedback,
+  markFeedbackAsResolved,
   deleteFeedback,
   clearErrors,
   setSubjectFilter,
@@ -42,6 +43,7 @@ export default function AdminFeedbackPanel() {
     status,
     error,
     updateStatus,
+    markAsResolvedStatus,
     deleteStatus,
     filters,
     current_page,
@@ -118,13 +120,35 @@ export default function AdminFeedbackPanel() {
 
   const filteredFeedback = feedbacks || [];
 
-  const handleStatusChange = (feedbackId, isResolved) => {
-    dispatch(
-      updateFeedback({
-        feedbackId,
-        feedbackData: { is_resolved: isResolved },
-      })
-    );
+  const handleStatusChange = (feedback, isResolved) => {
+    // If marking as resolved, use the mark_as_resolved endpoint
+    if (isResolved) {
+      const payload = {
+        user: feedback.user || null,
+        email: feedback.email || "",
+        subject: feedback.subject || null,
+        subject_id: feedback.subject_id || null,
+        country: feedback.country || null,
+        message: feedback.message || null,
+        rating: feedback.rating || null,
+        resource: feedback.resource || 0,
+      };
+
+      dispatch(
+        markFeedbackAsResolved({
+          feedbackId: feedback.id,
+          feedbackData: payload,
+        })
+      );
+    } else {
+      // If marking as active, use the regular update endpoint
+      dispatch(
+        updateFeedback({
+          feedbackId: feedback.id,
+          feedbackData: { is_resolved: false },
+        })
+      );
+    }
   };
 
   const handleDelete = (feedbackId) => {
@@ -213,7 +237,9 @@ export default function AdminFeedbackPanel() {
       <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] md:w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 outline-none">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-800">Feedback Details</h2>
+            <h2 className="text-xl font-bold text-gray-800">
+              Feedback Details
+            </h2>
             <IconButton onClick={() => setIsModalOpen(false)}>
               <Close />
             </IconButton>
@@ -222,18 +248,26 @@ export default function AdminFeedbackPanel() {
             <div className="space-y-4">
               <div className="flex justify-between border-b pb-2">
                 <span className="text-gray-500">From:</span>
-                <span className="font-medium text-sm md:text-base">{selectedFeedback.email}</span>
+                <span className="font-medium text-sm md:text-base">
+                  {selectedFeedback.email}
+                </span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span className="text-gray-500">Subject:</span>
-                <span className="capitalize font-medium">{selectedFeedback.subject}</span>
+                <span className="capitalize font-medium">
+                  {selectedFeedback.subject}
+                </span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span className="text-gray-500">Rating:</span>
-                <div className="flex">{renderStars(selectedFeedback.rating)}</div>
+                <div className="flex">
+                  {renderStars(selectedFeedback.rating)}
+                </div>
               </div>
               <div className="bg-gray-50 p-4 rounded-xl mt-4 max-h-[40vh] overflow-y-auto">
-                <p className="text-gray-700 whitespace-pre-wrap">{selectedFeedback.message}</p>
+                <p className="text-gray-700 whitespace-pre-wrap">
+                  {selectedFeedback.message}
+                </p>
               </div>
             </div>
           )}
@@ -330,7 +364,8 @@ export default function AdminFeedbackPanel() {
 
         <div className="p-4 bg-gray-50">
           <p className="text-sm text-gray-600">
-            Showing {filteredFeedback.length} of {total_count || 0} feedback entries
+            Showing {filteredFeedback.length} of {total_count || 0} feedback
+            entries
           </p>
         </div>
 
@@ -339,12 +374,19 @@ export default function AdminFeedbackPanel() {
           {filteredFeedback.length === 0 ? (
             <div className="p-12 text-center">
               <FeedbackIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-800 mb-2">No feedback found</h3>
-              <p className="text-gray-500">Try adjusting your search or filter criteria.</p>
+              <h3 className="text-lg font-medium text-gray-800 mb-2">
+                No feedback found
+              </h3>
+              <p className="text-gray-500">
+                Try adjusting your search or filter criteria.
+              </p>
             </div>
           ) : (
             filteredFeedback.map((feedback) => (
-              <div key={feedback.id} className="p-4 md:p-6 hover:bg-gray-50 transition-colors">
+              <div
+                key={feedback.id}
+                className="p-4 md:p-6 hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3 md:gap-4">
                     <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -352,7 +394,9 @@ export default function AdminFeedbackPanel() {
                     </div>
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-1 md:gap-2 mb-1">
-                        <span className="font-medium text-gray-800 truncate text-sm md:text-base">{feedback.email}</span>
+                        <span className="font-medium text-gray-800 truncate text-sm md:text-base">
+                          {feedback.email}
+                        </span>
                         {feedback.subject_detail && (
                           <div className="flex items-center gap-1 md:gap-2 overflow-hidden">
                             <span className="text-gray-400">→</span>
@@ -363,7 +407,8 @@ export default function AdminFeedbackPanel() {
                                   (feedback.subject_detail.first_name &&
                                   feedback.subject_detail.last_name
                                     ? `${feedback.subject_detail.first_name} ${feedback.subject_detail.last_name}`
-                                    : feedback.subject_detail.name || `ID: ${feedback.subject_detail.id}`)}
+                                    : feedback.subject_detail.name ||
+                                      `ID: ${feedback.subject_detail.id}`)}
                             </span>
                           </div>
                         )}
@@ -394,13 +439,13 @@ export default function AdminFeedbackPanel() {
                         {renderStars(feedback.rating)}
                       </div>
                     )}
-                    <button 
+                    <button
                       onClick={() => handleViewDetails(feedback)}
                       className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     >
                       <Visibility className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleReply(feedback.email)}
                       className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                     >
@@ -411,29 +456,35 @@ export default function AdminFeedbackPanel() {
                       disabled={deleteStatus === "loading"}
                       className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                     >
-                      {deleteStatus === "loading" ? <CircularProgress size={16} /> : <Delete className="w-4 h-4" />}
+                      {deleteStatus === "loading" ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        <Delete className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                 </div>
 
                 {/* Message Section */}
                 <div className="bg-gray-50 rounded-xl p-3 md:p-4 mb-4">
-                  <p className="text-gray-700 leading-relaxed text-sm md:text-base">{feedback.message}</p>
+                  <p className="text-gray-700 leading-relaxed text-sm md:text-base">
+                    {feedback.message}
+                  </p>
                 </div>
 
                 {/* Mobile Bottom Action Bar */}
                 <div className="flex flex-col md:flex-row gap-3">
-                  <button
-                    onClick={() => handleStatusChange(feedback.id, !feedback.is_resolved)}
-                    disabled={updateStatus === "loading"}
+                  {/* <button
+                    onClick={() => handleStatusChange(feedback, !feedback.is_resolved)}
+                    disabled={markAsResolvedStatus === "loading" || updateStatus === "loading"}
                     className={`px-4 py-2.5 md:py-2 ${feedback.is_resolved ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2 font-medium`}
                   >
-                    {updateStatus === "loading" && <CircularProgress size={16} color="inherit" />}
+                    {(markAsResolvedStatus === "loading" || updateStatus === "loading") && <CircularProgress size={16} color="inherit" />}
                     Mark as {feedback.is_resolved ? "Active" : "Resolved"}
-                  </button>
+                  </button> */}
 
                   {/* Mobile Only: Icons at the bottom row */}
-                  <div className="flex md:hidden items-center justify-between pt-2 border-t border-gray-100">
+                  {/* <div className="flex md:hidden items-center justify-between pt-2 border-t border-gray-100">
                     <div className="flex gap-0.5">
                        {feedback.rating > 0 && renderStars(feedback.rating)}
                     </div>
@@ -453,7 +504,7 @@ export default function AdminFeedbackPanel() {
                         <Delete fontSize="small" />
                       </IconButton>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             ))

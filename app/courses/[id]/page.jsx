@@ -311,16 +311,6 @@ export default function CourseDetail({ params }) {
                     </div>
                   )}
                 </div>
-
-                {/* Action Buttons */}
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                    <HeartIcon className="h-6 w-6" />
-                  </button>
-                  <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                    <ShareIcon className="h-6 w-6" />
-                  </button>
-                </div>
               </div>
 
               {/* Course Image */}
