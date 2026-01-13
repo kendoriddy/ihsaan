@@ -40,6 +40,6 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-          cd /opt/ihsaan
+          cd /opt/ihsaanfrontend/ihsaan
           git pull
           pm2 restart ihsaan
