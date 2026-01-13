@@ -18,8 +18,6 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  Menu,
-  MenuItem,
 } from "@mui/material";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -49,9 +47,13 @@ const Page = () => {
   const [quranTutorApp, setQuranTutorApp] = useState(null);
   const [quranTutorAppLoading, setQuranTutorAppLoading] = useState(false);
 
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
+  const handleCreateApplication = () => {
+    if (userRoles?.includes("TUTOR")) {
+      handleApplicationTypeSelect("Tutor Application");
+    } else if (userRoles?.includes("STUDENT")) {
+      handleApplicationTypeSelect("Student Application");
+    }
+  };
 
   const userRoles = useSelector((state) => state.user.user.roles);
 
@@ -65,40 +67,26 @@ const Page = () => {
     setFormOpen(true);
   };
 
-   const fetchApplicationData = async () => {
-
+  const fetchApplicationData = async () => {
     try {
-
       setIsLoading(true);
 
       let endpoint = userRoles.includes("TUTOR")
-
         ? "/tutor/applications/list/"
-
         : "/student/applications/list/";
 
       const response = await baseurl.get(endpoint, {
-
         headers: {
-
           Authorization: `Bearer ${localStorage.getItem("token")}`,
-
         },
-
       });
 
       setUserApplications(response.data.results);
-
     } catch (error) {
-
       console.error("Error fetching application data:", error);
-
     } finally {
-
       setIsLoading(false);
-
     }
-
   };
 
   useEffect(() => {
@@ -157,7 +145,9 @@ const Page = () => {
 
   const getStatusColor = (status) =>
     clsx("text-white px-4 py-2 rounded-full text-xs font-bold", {
-      "bg-green-500": status?.toUpperCase() === "ACCEPTED" || status?.toUpperCase() === "APPROVED",
+      "bg-green-500":
+        status?.toUpperCase() === "ACCEPTED" ||
+        status?.toUpperCase() === "APPROVED",
       "bg-yellow-500": status?.toUpperCase() === "PENDING",
       "bg-red-500": status?.toUpperCase() === "REJECTED",
       "bg-gray-400": !["ACCEPTED", "APPROVED", "PENDING", "REJECTED"].includes(
@@ -172,52 +162,31 @@ const Page = () => {
         <DashboardSidebar currentRoute={currentRoute} />
         <section className="flex-1 p-4 min-h-screen overflow-hidden">
           <div className="w-full">
-            
             {/* 1. mt-12 on mobile pushes text below sidebar toggle.
                 2. items-end and flex-col sm:flex-row keeps alignment clean.
             */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-12 md:mt-0 mb-6 gap-4">
               <div className="text-sm">
-                Welcome <span className="text-lg font-semibold">{user?.first_name}</span>{" "}
+                Welcome{" "}
+                <span className="text-lg font-semibold">
+                  {user?.first_name}
+                </span>{" "}
                 <WavingHand sx={{ color: "blue", fontSize: "1.5rem" }} />
               </div>
-              
+
               {/* Force the button container to align right on mobile and desktop */}
               <div className="w-full sm:w-auto flex justify-end">
                 <Button
-                  aria-controls="application-menu"
-                  aria-haspopup="true"
-                  onClick={handleMenuOpen}
+                  onClick={handleCreateApplication}
                   variant="contained"
+                  disabled={
+                    !userRoles?.includes("TUTOR") &&
+                    !userRoles?.includes("STUDENT")
+                  }
                   className="px-4 py-2 rounded-md text-white font-medium transition duration-300 bg-primary hover:bg-[#f34103] w-auto"
                 >
                   Create new application
                 </Button>
-                <Menu
-                  id="application-menu"
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                >
-                  {userRoles?.includes("TUTOR") && (
-                    <MenuItem
-                      onClick={() =>
-                        handleApplicationTypeSelect("Tutor Application")
-                      }
-                    >
-                      Tutor Application
-                    </MenuItem>
-                  )}
-                  {userRoles?.includes("STUDENT") && (
-                    <MenuItem
-                      onClick={() =>
-                        handleApplicationTypeSelect("Student Application")
-                      }
-                    >
-                      Student Application
-                    </MenuItem>
-                  )}
-                </Menu>
               </div>
             </div>
 
@@ -231,8 +200,12 @@ const Page = () => {
                       <th className="px-4 py-3 border-b">Application type</th>
                       <th className="px-4 py-3 border-b">Name</th>
                       <th className="px-4 py-3 border-b">Gender</th>
-                      <th className="px-4 py-3 border-b">Highest Qualification</th>
-                      <th className="px-4 py-3 border-b">Years of Experience</th>
+                      <th className="px-4 py-3 border-b">
+                        Highest Qualification
+                      </th>
+                      <th className="px-4 py-3 border-b">
+                        Years of Experience
+                      </th>
                       <th className="px-4 py-3 border-b text-center">Status</th>
                       <th className="px-4 py-3 border-b text-center">Action</th>
                     </tr>
@@ -240,25 +213,42 @@ const Page = () => {
                   <tbody>
                     {isLoading ? (
                       <tr>
-                        <td colSpan="8" className="p-10 text-center">Loading...</td>
+                        <td colSpan="8" className="p-10 text-center">
+                          Loading...
+                        </td>
                       </tr>
                     ) : (
                       <>
                         {quranTutorApp && (
                           <tr className="border-b even:bg-gray-50 hover:bg-gray-100 transition-colors">
-                            <td className="px-4 py-3 font-medium">QURAN-TUTOR</td>
-                            <td className="px-4 py-3 text-sm text-gray-600">Qur'an Tutor Application</td>
-                            <td className="px-4 py-3">{quranTutorApp.first_name} {quranTutorApp.last_name}</td>
-                            <td className="px-4 py-3">{quranTutorApp.gender}</td>
+                            <td className="px-4 py-3 font-medium">
+                              QURAN-TUTOR
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-600">
+                              Qur'an Tutor Application
+                            </td>
+                            <td className="px-4 py-3">
+                              {quranTutorApp.first_name}{" "}
+                              {quranTutorApp.last_name}
+                            </td>
+                            <td className="px-4 py-3">
+                              {quranTutorApp.gender}
+                            </td>
                             <td className="px-4 py-3 text-gray-400">-</td>
-                            <td className="px-4 py-3">{quranTutorApp.years_of_experience || "N/A"}</td>
+                            <td className="px-4 py-3">
+                              {quranTutorApp.years_of_experience || "N/A"}
+                            </td>
                             <td className="px-4 py-3 text-center">
-                              <span className={getStatusColor(quranTutorApp.status || "PENDING")}>
+                              <span
+                                className={getStatusColor(
+                                  quranTutorApp.status || "PENDING"
+                                )}
+                              >
                                 {quranTutorApp.status || "PENDING"}
                               </span>
                             </td>
                             <td className="px-4 py-3 text-center">
-                              <a 
+                              <a
                                 href="/dashboard/quran-tutor"
                                 className="inline-block px-3 py-1 rounded-md text-white text-sm font-medium transition duration-300 bg-primary hover:bg-[#f34103]"
                               >
@@ -268,25 +258,37 @@ const Page = () => {
                           </tr>
                         )}
                         {userApplications.map((application) => (
-                          <tr key={application.id} className="border-b even:bg-gray-50 hover:bg-gray-100 transition-colors">
+                          <tr
+                            key={application.id}
+                            className="border-b even:bg-gray-50 hover:bg-gray-100 transition-colors"
+                          >
                             <td className="px-4 py-3">{application.id}</td>
                             <td className="px-4 py-3 text-sm text-gray-600">
-                              {userRoles?.includes("TUTOR") ? "Tutor Application" : "Student Application"}
+                              {userRoles?.includes("TUTOR")
+                                ? "Tutor Application"
+                                : "Student Application"}
                             </td>
                             <td className="px-4 py-3">
-                              {application.user_details.first_name} {application.user_details.last_name}
+                              {application.user_details.first_name}{" "}
+                              {application.user_details.last_name}
                             </td>
                             <td className="px-4 py-3">{application.gender}</td>
                             <td className="px-4 py-3">
-                              {formatQualification(application.highest_qualification) || "N/A"}
+                              {formatQualification(
+                                application.highest_qualification
+                              ) || "N/A"}
                             </td>
-                            <td className="px-4 py-3">{application.years_of_experience || "N/A"}</td>
+                            <td className="px-4 py-3">
+                              {application.years_of_experience || "N/A"}
+                            </td>
                             <td className="px-4 py-3 text-center">
-                              <span className={getStatusColor(
-                                userRoles?.includes("TUTOR") 
-                                  ? application.tutor_application_status 
-                                  : application.student_application_status
-                              )}>
+                              <span
+                                className={getStatusColor(
+                                  userRoles?.includes("TUTOR")
+                                    ? application.tutor_application_status
+                                    : application.student_application_status
+                                )}
+                              >
                                 {userRoles?.includes("TUTOR")
                                   ? application.tutor_application_status
                                   : application.student_application_status}
@@ -295,7 +297,9 @@ const Page = () => {
                             <td className="px-4 py-3 text-center">
                               <button
                                 className="px-3 py-1 rounded-md text-white text-sm font-medium transition duration-300 bg-primary hover:bg-[#f34103]"
-                                onClick={() => handleEditApplicationBtn(application)}
+                                onClick={() =>
+                                  handleEditApplicationBtn(application)
+                                }
                               >
                                 View Details
                               </button>
@@ -328,13 +332,11 @@ const Page = () => {
             <TutorForm
               fetchApplicationData={fetchApplicationData}
               handleFormClose={handleFormClose}
-              handleMenuClose={handleMenuClose}
             />
           ) : (
             <StudentForm
               fetchApplicationData={fetchApplicationData}
               handleFormClose={handleFormClose}
-              handleMenuClose={handleMenuClose}
             />
           )}
         </Box>

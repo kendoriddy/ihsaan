@@ -147,6 +147,28 @@ export const updateFeedback = createAsyncThunk(
   }
 );
 
+// Async thunk to mark feedback as resolved
+export const markFeedbackAsResolved = createAsyncThunk(
+  "feedback/markFeedbackAsResolved",
+  async ({ feedbackId, feedbackData }, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await http2.post(
+        `/feedback-ticket/feedbacks/${feedbackId}/mark_as_resolved/`,
+        feedbackData
+      );
+
+      // Refetch feedbacks to get the latest data
+      dispatch(fetchFeedbacksWithCurrentFilters());
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to mark feedback as resolved"
+      );
+    }
+  }
+);
+
 // Async thunk to delete feedback
 export const deleteFeedback = createAsyncThunk(
   "feedback/deleteFeedback",
@@ -199,12 +221,14 @@ const feedbackSlice = createSlice({
     fetchDetailStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     createStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     updateStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+    markAsResolvedStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     deleteStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     uploadResourceStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
     fetchDetailError: null,
     createError: null,
     updateError: null,
+    markAsResolvedError: null,
     deleteError: null,
     uploadResourceError: null,
     // Filter state management
@@ -224,6 +248,7 @@ const feedbackSlice = createSlice({
       state.fetchDetailError = null;
       state.createError = null;
       state.updateError = null;
+      state.markAsResolvedError = null;
       state.deleteError = null;
       state.uploadResourceError = null;
     },
@@ -238,6 +263,10 @@ const feedbackSlice = createSlice({
     resetUpdateStatus: (state) => {
       state.updateStatus = "idle";
       state.updateError = null;
+    },
+    resetMarkAsResolvedStatus: (state) => {
+      state.markAsResolvedStatus = "idle";
+      state.markAsResolvedError = null;
     },
     resetDeleteStatus: (state) => {
       state.deleteStatus = "idle";
@@ -392,6 +421,20 @@ const feedbackSlice = createSlice({
         state.updateStatus = "failed";
         state.updateError = action.payload || "Failed to update feedback";
       })
+      // Mark feedback as resolved
+      .addCase(markFeedbackAsResolved.pending, (state) => {
+        state.markAsResolvedStatus = "loading";
+        state.markAsResolvedError = null;
+      })
+      .addCase(markFeedbackAsResolved.fulfilled, (state, action) => {
+        state.markAsResolvedStatus = "succeeded";
+        state.markAsResolvedError = null;
+      })
+      .addCase(markFeedbackAsResolved.rejected, (state, action) => {
+        state.markAsResolvedStatus = "failed";
+        state.markAsResolvedError =
+          action.payload || "Failed to mark feedback as resolved";
+      })
       // Delete feedback
       .addCase(deleteFeedback.pending, (state) => {
         state.deleteStatus = "loading";
@@ -427,6 +470,7 @@ export const {
   resetFetchDetailStatus,
   resetCreateStatus,
   resetUpdateStatus,
+  resetMarkAsResolvedStatus,
   resetDeleteStatus,
   resetUploadResourceStatus,
   clearSelectedFeedback,

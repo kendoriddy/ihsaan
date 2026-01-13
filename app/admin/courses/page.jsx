@@ -2577,13 +2577,12 @@ function Page() {
                 <MuiButton onClick={handleCloseDeassignDialog} color="primary">
                   Cancel
                 </MuiButton>
-                <MuiButton
+                <button
                   onClick={handleConfirmDeassign}
-                  color="warning"
-                  variant="contained"
+                  className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition-colors"
                 >
                   Deassign
-                </MuiButton>
+                </button>
               </DialogActions>
             </Dialog>
 
@@ -2610,13 +2609,12 @@ function Page() {
                 >
                   Cancel
                 </MuiButton>
-                <MuiButton
+                <button
                   onClick={handleConfirmDeleteTutorStudent}
-                  color="error"
-                  variant="contained"
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
                 >
                   Delete
-                </MuiButton>
+                </button>
               </DialogActions>
             </Dialog>
           </div>
