@@ -13,6 +13,7 @@ function CommentItem({
   replies,
   repliesLoading,
   repliesError,
+  isAuthenticated = false,
 }) {
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -30,6 +31,7 @@ function CommentItem({
   }, [depth, fetchReplies, comment.id, repliesFetched]);
 
   const handleReply = async () => {
+    if (!isAuthenticated) return;
     if (replyContent.trim()) {
       await onReply(replyContent, comment.id);
       setReplyContent("");
@@ -126,8 +128,14 @@ function CommentItem({
             <p className="text-gray-800 mb-3">{comment.content}</p>
             {depth === 0 && (
               <button
-                onClick={() => setIsReplying(true)}
-                className="text-[#ff6600] hover:text-[#e55a00] text-sm font-medium"
+                onClick={() => {
+                  if (isAuthenticated) {
+                    setIsReplying(true);
+                  }
+                }}
+                disabled={!isAuthenticated}
+                className="text-[#ff6600] hover:text-[#e55a00] text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[#ff6600]"
+                title={!isAuthenticated ? "Please login to reply" : ""}
               >
                 Reply
               </button>
@@ -208,7 +216,7 @@ function CommentItem({
               {repliesError[comment.id]}
             </div>
           )}
-          {replies && replies[comment.id] && replies[comment.id].length > 0 && (
+              {replies && replies[comment.id] && replies[comment.id].length > 0 && (
             <div className="space-y-2">
               {replies[comment.id].map((reply) => (
                 <CommentItem
@@ -219,6 +227,7 @@ function CommentItem({
                   onDelete={() => onDelete(reply.id)}
                   currentUser={currentUser}
                   depth={depth + 1}
+                  isAuthenticated={isAuthenticated}
                 />
               ))}
             </div>
@@ -243,6 +252,22 @@ export default function CommentSystem({
 }) {
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      setIsAuthenticated(!!token);
+    };
+    
+    checkAuth();
+    // Check on storage changes (in case user logs in/out in another tab)
+    if (typeof window !== "undefined") {
+      window.addEventListener("storage", checkAuth);
+      return () => window.removeEventListener("storage", checkAuth);
+    }
+  }, []);
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) return;
@@ -293,17 +318,32 @@ export default function CommentSystem({
 
         {/* Add new comment */}
         <div className="mb-8">
+          {!isAuthenticated && (
+            <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-amber-800 text-sm">
+                Please{" "}
+                <a
+                  href="/login"
+                  className="text-[#7e1a0b] font-medium hover:underline"
+                >
+                  login
+                </a>{" "}
+                to post a comment.
+              </p>
+            </div>
+          )}
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Share your thoughts..."
-            className="w-full p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent outline-none"
+            placeholder={isAuthenticated ? "Share your thoughts..." : "Please login to comment..."}
+            disabled={!isAuthenticated}
+            className="w-full p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
             rows={4}
           />
           <div className="flex justify-end mt-3">
             <button
               onClick={handleSubmitComment}
-              disabled={isSubmitting || !newComment.trim()}
+              disabled={!isAuthenticated || isSubmitting || !newComment.trim()}
               className="px-6 py-2 bg-[#7e1a0b] text-white rounded-lg hover:bg-[#6d1609] disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               {isSubmitting ? "Posting..." : "Post Comment"}
@@ -332,6 +372,7 @@ export default function CommentSystem({
                 replies={replies}
                 repliesLoading={repliesLoading}
                 repliesError={repliesError}
+                isAuthenticated={isAuthenticated}
               />
             ))
           )}

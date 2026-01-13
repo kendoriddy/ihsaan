@@ -873,7 +873,7 @@ function Header() {
                 </Menu>
               </li>
             )}
-            <li>
+            {/* <li>
               <button
                 onClick={() => setIsCartDrawerOpen(true)}
                 className="navlink cursor-pointer"
@@ -882,7 +882,7 @@ function Header() {
                   <AddShoppingCartIcon />
                 </Badge>
               </button>
-            </li>
+            </li> */}
             <li>
               {isAuth ? (
                 <div className="navlink" onClick={logOut}>

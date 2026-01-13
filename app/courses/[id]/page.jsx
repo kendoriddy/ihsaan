@@ -260,7 +260,9 @@ export default function CourseDetail({ params }) {
               Courses
             </Link>
             <span>/</span>
-            <span className="text-gray-900">{currentCourse?.title || currentCourse?.name}</span>
+            <span className="text-gray-900">
+              {currentCourse?.title || currentCourse?.name}
+            </span>
           </nav>
         </div>
       </div>
@@ -282,7 +284,7 @@ export default function CourseDetail({ params }) {
                   </p>
 
                   {/* Rating and Reviews */}
-                  <div className="flex items-center space-x-4 mb-4">
+                  {/* <div className="flex items-center space-x-4 mb-4">
                     <div className="flex items-center">
                       <div className="flex items-center">
                         {[1, 2, 3, 4, 5].map((star) => (
@@ -300,26 +302,17 @@ export default function CourseDetail({ params }) {
                     <span className="text-sm text-gray-500">
                       0 students enrolled
                     </span>
-                  </div>
+                  </div> */}
 
                   {/* Programme Name */}
                   {currentCourse?.programme_name && (
                     <div className="mb-4">
+                      <span className="text-gray-900">Programme: </span>
                       <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                         {currentCourse.programme_name}
                       </span>
                     </div>
                   )}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                    <HeartIcon className="h-6 w-6" />
-                  </button>
-                  <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                    <ShareIcon className="h-6 w-6" />
-                  </button>
                 </div>
               </div>
 
@@ -335,11 +328,11 @@ export default function CourseDetail({ params }) {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                {/* <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
                   <div className="bg-white rounded-full p-4">
                     <PlayIcon className="h-8 w-8 text-blue-600" />
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Course Description */}
@@ -355,7 +348,7 @@ export default function CourseDetail({ params }) {
             </div>
 
             {/* What You'll Learn */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            {/* <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <h3 className="text-xl font-semibold mb-4">What you'll learn</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[
@@ -372,10 +365,10 @@ export default function CourseDetail({ params }) {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
 
             {/* Course Requirements */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            {/* <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <h3 className="text-xl font-semibold mb-4">Requirements</h3>
               <ul className="space-y-2 text-gray-700">
                 <li>• Basic computer skills</li>
@@ -383,7 +376,7 @@ export default function CourseDetail({ params }) {
                 <li>• Dedication to learn</li>
                 <li>• No prior experience required</li>
               </ul>
-            </div>
+            </div> */}
 
             {/* Course Details */}
             <div className="bg-white rounded-lg shadow-md p-6">
@@ -391,7 +384,9 @@ export default function CourseDetail({ params }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center space-x-3">
                   <ClockIcon className="h-5 w-5 text-gray-400" />
-                  <span className="text-gray-700">Duration: 10 hours</span>
+                  <span className="text-gray-700">
+                    Title: {currentCourse?.title || currentCourse?.name}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <UserIcon className="h-5 w-5 text-gray-400" />
@@ -401,7 +396,9 @@ export default function CourseDetail({ params }) {
                 </div>
                 <div className="flex items-center space-x-3">
                   <PlayIcon className="h-5 w-5 text-gray-400" />
-                  <span className="text-gray-700">Lectures: 50+ videos</span>
+                  <span className="text-gray-700">
+                    Programme: {currentCourse?.programme_name}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <CheckIcon className="h-5 w-5 text-gray-400" />
@@ -457,7 +454,7 @@ export default function CourseDetail({ params }) {
 
                     return (
                       <>
-                        <button
+                        {/* <button
                           onClick={handleAddToCart}
                           disabled={isInCart}
                           className={`w-full py-3 px-4 rounded-md transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
@@ -467,7 +464,7 @@ export default function CourseDetail({ params }) {
                           }`}
                         >
                           {isInCart ? "✓ Already in Cart" : "Add to Cart"}
-                        </button>
+                        </button> */}
 
                         <button
                           onClick={handleBuyNow}
@@ -475,48 +472,9 @@ export default function CourseDetail({ params }) {
                         >
                           {isLoggedIn ? "Buy Now" : "Buy Now (Register First)"}
                         </button>
-
-                        {isInCart && (
-                          <Link
-                            href={isLoggedIn ? "/cart" : "/frontend-cart"}
-                            className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-md hover:bg-gray-200 transition-colors duration-200 font-medium text-center block"
-                          >
-                            View Cart (
-                            {isLoggedIn ? itemCount : getCartItemCount()} items)
-                          </Link>
-                        )}
                       </>
                     );
                   })()}
-                </div>
-
-                {/* Course Includes */}
-                <div className="border-t pt-6">
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    This course includes:
-                  </h4>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li className="flex items-center space-x-2">
-                      <CheckIconSolid className="h-4 w-4 text-green-500" />
-                      <span>10 hours on-demand video</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <CheckIconSolid className="h-4 w-4 text-green-500" />
-                      <span>Downloadable resources</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <CheckIconSolid className="h-4 w-4 text-green-500" />
-                      <span>Full lifetime access</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <CheckIconSolid className="h-4 w-4 text-green-500" />
-                      <span>Certificate of completion</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <CheckIconSolid className="h-4 w-4 text-green-500" />
-                      <span>Access on mobile and TV</span>
-                    </li>
-                  </ul>
                 </div>
 
                 {/* 30-Day Money-Back Guarantee */}

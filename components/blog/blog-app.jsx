@@ -19,6 +19,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
+import { toast } from "react-toastify";
 
 export default function BlogApp() {
   const [currentView, setCurrentView] = useState("list");
@@ -300,7 +301,12 @@ export default function BlogApp() {
         );
         setComments((prev) => [...prev, res.data]);
       } catch (err) {
-        alert("Failed to post comment.");
+        console.log("err:::", err);
+        if (err.response?.status === 401) {
+          toast.error("Please login to make a comment");
+        } else {
+          toast.error("Failed to post comment. Please try again.");
+        }
       }
     } else {
       // New reply
@@ -324,7 +330,11 @@ export default function BlogApp() {
             : [res.data],
         }));
       } catch (err) {
-        alert("Failed to post reply.");
+        if (err.response?.status === 401) {
+          toast.error("Please login to post a reply");
+        } else {
+          toast.error("Failed to post reply. Please try again.");
+        }
       }
     }
   };
