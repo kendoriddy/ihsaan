@@ -175,7 +175,7 @@ const Page = () => {
               </div>
 
               {/* Force the button container to align right on mobile and desktop */}
-              <div className="w-full sm:w-auto flex justify-end">
+              {/* <div className="w-full sm:w-auto flex justify-end">
                 <Button
                   onClick={handleCreateApplication}
                   variant="contained"
@@ -187,7 +187,7 @@ const Page = () => {
                 >
                   Create new application
                 </Button>
-              </div>
+              </div> */}
             </div>
 
             {/* Responsive Table Wrapper */}
