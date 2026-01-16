@@ -23,7 +23,6 @@ function Page() {
       }, 2000);
     },
     onError: (error) => {
-      console.log(error, "what is this error");
       Swal.fire({
         title: error.response.data.detail,
         icon: "error",

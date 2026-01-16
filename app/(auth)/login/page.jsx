@@ -33,7 +33,6 @@ const LogIn = () => {
   const { mutate, isLoading } = usePost("/auth/login", {
     onSuccess: (response) => {
       const { data } = response;
-      console.log(data, "data sent");
 
       dispatch(loginUserSuccess({ payload: data }));
       localStorage.setItem("token", data.access);
@@ -48,8 +47,6 @@ const LogIn = () => {
         : router.push("/dashboard");
     },
     onError: (error) => {
-      console.log(error, "Error occurred");
-
       // Check if error.response exists
       if (error.response) {
         const errorMessage =
