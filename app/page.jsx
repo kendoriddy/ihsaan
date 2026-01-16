@@ -37,7 +37,6 @@ function Page() {
     `,
     (data) => {}
   );
-  console.log("coursesList:::", coursesList);
   const courses = coursesList?.data?.results || [];
 
   // Fetch courses
@@ -54,7 +53,6 @@ function Page() {
   );
 
   const Courses = CoursesList?.data?.results || [];
-  console.log("courses searched", Courses);
 
   const slides = [
     <div key="1" className="p-0 text-left">
