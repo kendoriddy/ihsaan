@@ -1,5 +1,0 @@
-NEXT_PUBLIC_DEV = http://localhost:3000/
-NEXT_PUBLIC_PROD = https://api.ihsaanacademia.com/api
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="dhpswjep4"
-NEXT_PUBLIC_NODE_ENV = "development"
-NEXT_PUBLIC_API_BASE_URL=https://api.ihsaanacademia.com
