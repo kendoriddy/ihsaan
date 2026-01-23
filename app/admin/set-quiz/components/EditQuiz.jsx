@@ -7,6 +7,7 @@ import { Formik, Form, Field } from "formik";
 import { TextField } from "@mui/material";
 import Editor from "@/components/Editor";
 import Button from "@/components/Button";
+import * as Yup from "yup";
 
 const EditQuizQuestion = ({
   setOpenUpdateModal,
@@ -38,6 +39,13 @@ const EditQuizQuestion = ({
     [selectedQuestion]
   );
 
+  const validationSchema = Yup.object().shape({
+    correct_answer: Yup.string()
+      .required("Correct answer is required")
+      .trim()
+      .min(1, "Correct answer cannot be empty"),
+  });
+
   const handleSubmit = (values) => {
     updateQuestion(values);
   };
@@ -53,9 +61,10 @@ const EditQuizQuestion = ({
       <Formik
         enableReinitialize
         initialValues={initialValues}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ values, setFieldValue }) => (
+        {({ values, setFieldValue, errors, touched }) => (
           <Form>
             <div className="space-y-4">
               <div>
@@ -85,6 +94,12 @@ const EditQuizQuestion = ({
                   fullWidth
                   size="small"
                   placeholder="Correct answer (A,B,C,D etc)"
+                  error={touched.correct_answer && !!errors.correct_answer}
+                  helperText={
+                    touched.correct_answer && errors.correct_answer
+                      ? errors.correct_answer
+                      : ""
+                  }
                 />
               </div>
 
@@ -92,7 +107,7 @@ const EditQuizQuestion = ({
                 <Button
                   type="submit"
                   className="rounded-md"
-                  disabled={isUpdating}
+                  disabled={isUpdating || !values.correct_answer?.trim()}
                 >
                   {isUpdating ? "Updating..." : "Update Question"}
                 </Button>
