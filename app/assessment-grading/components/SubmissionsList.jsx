@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -28,6 +28,9 @@ const SubmissionsList = ({ assessmentId }) => {
   const [isPublished, setIsPublished] = useState(false);
   const [grades, setGrades] = useState([]);
 
+  // Ref to handle auto-scrolling to the latest comment
+  const commentsEndRef = useRef(null);
+
   // Fetch submissions
   const {
     isLoading: loadingSubmissions,
@@ -48,11 +51,11 @@ const SubmissionsList = ({ assessmentId }) => {
       : null
   );
 
-  // Fetch comments
+  // Fetch comments - Added page_size=100 to bypass the 10-item limit
   const { data: commentsData, refetch: refetchComments } = useFetch(
     "comments",
     selectedSubmission?.grade_id
-      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grade-comments/?grade=${selectedSubmission.grade_id}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grade-comments/?grade=${selectedSubmission.grade_id}&page_size=100`
       : null
   );
 
@@ -74,6 +77,13 @@ const SubmissionsList = ({ assessmentId }) => {
       setGrades(gradesData.data.results);
     }
   }, [gradesData]);
+
+  // Scroll to bottom whenever comments change
+  useEffect(() => {
+    if (commentsEndRef.current) {
+      commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [commentsData]);
 
   const submissions = submissionsData?.data?.results || [];
 
@@ -116,7 +126,6 @@ const SubmissionsList = ({ assessmentId }) => {
       updateGrade(
         {
           url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/grades/${existingGrade.id}/`,
-          // id: existingGrade.id,
           data: payload,
         },
         {
@@ -347,17 +356,23 @@ const SubmissionsList = ({ assessmentId }) => {
         </DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
-            <List>
-              {commentsData?.data?.results?.map((c) => (
-                <div key={c.id} className="mb-3">
-                  <div className="text-gray-800">{c.content}</div>
-                  <div className="text-xs text-gray-500">
-                    By {c.author_name} on {formatDate(c.created_at)}
+            {/* Scrollable Container for the Comment List */}
+            <Box sx={{ maxHeight: "350px", overflowY: "auto", mb: 3, pr: 1 }}>
+              <List>
+                {commentsData?.data?.results?.map((c) => (
+                  <div key={c.id} className="mb-3">
+                    <div className="text-gray-800">{c.content}</div>
+                    <div className="text-xs text-gray-500">
+                      By {c.author_name} on {formatDate(c.created_at)}
+                    </div>
+                    <hr className="my-2" />
                   </div>
-                  <hr className="my-2" />
-                </div>
-              ))}
-            </List>
+                ))}
+                {/* Dummy div to anchor the scroll-to-bottom behavior */}
+                <div ref={commentsEndRef} />
+              </List>
+            </Box>
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Add Comment

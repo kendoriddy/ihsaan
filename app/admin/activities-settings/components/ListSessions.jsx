@@ -62,7 +62,7 @@ const AllSessions = () => {
 
   const handleDelete = () => {
     if (selectedSession?.id) {
-      sessionDelete(`${selectedSession.id}/`);
+      sessionDelete(`${selectedSession.id}`);
     }
   };
 

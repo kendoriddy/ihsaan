@@ -198,57 +198,55 @@ const DashboardTab = () => {
     }
   };
 
-  const handleClassSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      setIsLoading(true);
+ const handleClassSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    setIsLoading(true);
 
-      // Convert class_number to a Number before sending the payload
-      console.log(classForm, "classForm:");
-      const payload = {
-        ...classForm,
-        level: Number(classForm.level),
-      };
+    const payload = {
+      ...classForm,
+      level: Number(classForm.level),
+    };
 
-      if (editClassMode) {
-        // PATCH request for editing
-        await axios.patch(
-          `https://api.ihsaanacademia.com/classes/${selectedClass.id}/`,
-          payload,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        console.log("Programme updated successfully");
-        toast.success("Programme updated successfully");
-        dispatch(fetchClasses({ page: 1, pageSize: 10 }));
-      } else {
-        // POST request for adding a new programme
-        await axios.post("https://api.ihsaanacademia.com/classes/", payload, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        console.log("Programme added successfully");
-      }
-      setClassOpen(false); // Close the modal after successful submission
-      console.log("Programme added successfully:", response.data);
-      dispatch(fetchClasses({ page: 1, pageSize: 10 })); // Refresh the programmes list
-    } catch (error) {
-      console.error("Error adding programme:", error.response?.data || error);
-    } finally {
-      setIsLoading(false);
-      setEditClassMode(false);
-      setClassForm({
-        level: "",
-        class_number: "",
-      }); // Reset form fields
+    const token = localStorage.getItem("token");
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    if (editClassMode) {
+      // PATCH request for editing
+      await axios.patch(
+        `https://api.ihsaanacademia.com/classes/${selectedClass.id}/`,
+        payload,
+        config
+      );
+      toast.success("Programme updated successfully");
+    } else {
+      // POST request for adding a new programme
+      await axios.post("https://api.ihsaanacademia.com/classes/", payload, config);
+      toast.success("Programme added successfully");
     }
-  };
+
+    // --- REFRESH LOGIC ---
+    setClassOpen(false); 
+    // This triggers Redux to go get the new data from the server
+    dispatch(fetchClasses({ page: 1, pageSize: 10 })); 
+
+  } catch (error) {
+    console.error("Error saving programme:", error.response?.data || error);
+    toast.error("Failed to save. Please try again.");
+  } finally {
+    setIsLoading(false);
+    setEditClassMode(false);
+    setClassForm({
+      level: "",
+      class_number: "",
+    }); 
+  }
+};
 
   const handleLevelSubmit = async (e) => {
     e.preventDefault();
@@ -258,7 +256,7 @@ const DashboardTab = () => {
       // Convert class_number to a Number before sending the payload
       const payload = {
         ...levelForm,
-        level: Number(levelForm.level),
+        level: String(levelForm.level),
       };
 
       if (editClassMode) {
@@ -659,14 +657,18 @@ const DashboardTab = () => {
                     <MoreVert />
                   </IconButton>
                   <Menu
-                    anchorEl={anchorElClass}
-                    open={openClassMenu}
-                    onClose={handleLevelMenuClose}
-                  >
-                    <MenuItem onClick={handleEditLevel}>Edit</MenuItem>
-                    <MenuItem onClick={handleLevelDelete}>Delete</MenuItem>
-                  </Menu>
-
+                      // 1. Point to the Level anchor, not the Class anchor
+                      anchorEl={anchorElLevel} 
+                      
+                      // 2. Use the Level open state (or a Boolean check on the anchor)
+                      open={Boolean(anchorElLevel)} 
+                      
+                      // 3. Ensure the close function resets anchorElLevel to null
+                      onClose={handleLevelMenuClose} 
+                    >
+                      <MenuItem onClick={handleEditLevel}>Edit</MenuItem>
+                      <MenuItem onClick={handleLevelDelete}>Delete</MenuItem>
+                    </Menu>
                   <h3 className="text-lg font-bold text-gray-800">
                     {level.level}
                   </h3>
@@ -947,66 +949,61 @@ const DashboardTab = () => {
       </Modal>
 
       {/* Modal for Adding/Editing Level */}
-      <Modal
-        isOpen={levelOpen}
-        title={editLevelMode ? "Edit Level" : "Add Level"}
-        handleClose={() => {
-          setLevelOpen(false);
-          setEditLevelMode(false); // Reset edit mode
-        }}
+   <Modal
+  isOpen={levelOpen}
+  title={editLevelMode ? "Edit Level" : "Add Level"}
+  handleClose={() => {
+    setLevelOpen(false);
+    setEditLevelMode(false);
+  }}
+>
+  <form onSubmit={handleLevelSubmit} className="space-y-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Order</label>
+      <input
+        type="number" // Changed to number as 'order' is usually an integer
+        name="order"
+        value={levelForm.order}
+        onChange={handleLevelInputChange}
+        className="mt-1 block w-full p-2 border rounded-md"
+        required
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Level</label>
+      <select
+        name="level"
+        value={levelForm.level}
+        onChange={handleLevelInputChange}
+        className="mt-1 block w-full p-2 border rounded-md"
+        required
       >
-        <form onSubmit={handleLevelSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Order
-            </label>
-            <input
-              type="text"
-              name="order"
-              value={levelForm.order}
-              onChange={handleLevelInputChange}
-              className="mt-1 block w-full p-2 border rounded-md"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Level
-            </label>
-            <select
-              name="level"
-              value={levelForm.level}
-              onChange={handleLevelInputChange}
-              className="mt-1 block w-full p-2 border rounded-md"
-              required
-            >
-              <option value="" disabled>
-                Select a level
-              </option>
-              {levels.map((level) => (
-                <option key={level.id} value={level.id}>
-                  {level.level}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => setClassOpen(false)}
-              className="mr-2 px-4 py-2 border rounded-md"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-primary text-white rounded-md"
-            >
-              {isLoading ? "Submitting..." : "Submit"}
-            </button>
-          </div>
-        </form>
-      </Modal>
+        <option value="" disabled>Select a level</option>
+        {levels.map((level) => (
+          <option key={level.id} value={level.level}>
+            {level.level}
+          </option>
+        ))}
+      </select>
+    </div>
+    <div className="flex justify-end">
+      <button
+        type="button"
+        onClick={() => setLevelOpen(false)} // FIXED: Was setClassOpen
+        className="mr-2 px-4 py-2 border rounded-md"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="px-4 py-2 bg-primary text-white rounded-md"
+      >
+        {isLoading ? "Submitting..." : "Submit"}
+      </button>
+    </div>
+  </form>
+</Modal>
     </div>
   );
 };

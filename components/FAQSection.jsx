@@ -14,9 +14,16 @@ export default function FAQSection() {
         const token =
           typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-        // Extract base domain from API_BASE_URL (remove /api part for FAQ endpoints)
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-        const faqBaseUrl = apiUrl.replace("/api", "");
+      
+const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.ihsaanacademia.com/api";
+
+
+const faqBaseUrl = apiBase.endsWith("/api") 
+    ? apiBase.slice(0, -4) 
+    : "https://api.ihsaanacademia.com";
+
+
+
 
         const response = await axios.get(`${faqBaseUrl}/faqs/faq/`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},

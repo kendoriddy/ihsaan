@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import {
   TextField,
@@ -22,44 +22,48 @@ const ManualGradeForm = ({
   onClose,
   onSuccess,
 }) => {
+  const [selectedCourseId, setSelectedCourseId] = useState(grade?.course || "");
+
+  // 1. Fetch Courses
   const {
     isLoading: loadingCourses,
     data: coursesData,
-    refetch: refetchCourses,
-    isFetching: isFetchingCourses,
   } = useFetch(
     ["courses"],
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/`,
-    (data) => {
-      if (data?.total) {
-        // You can handle data.total here if needed
-      }
-    }
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/`
   );
   const courses = coursesData?.data?.results || [];
 
+  // 2. Fetch Reasons
   const {
     isLoading: loadingReasons,
     data: reasonsData,
-    refetch: refetchReasons,
-    isFetching: isFetchingReasons,
   } = useFetch(
     ["reasons"],
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/reason-options/`,
-    (data) => {
-      if (data?.total) {
-        // You can handle data.total here if needed
-      }
-    }
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/reason-options/`
   );
   const reasons = reasonsData?.data?.results || [];
 
-  // Create mutation
+  // 3. Fetch enrolled students
+  // Simplified configuration to resolve the "success is not a function" type error
+  const {
+    data: studentsData,
+    isFetching: isFetchingStudents,
+    isError: studentFetchError,
+  } = useFetch(
+    ["course-students", selectedCourseId],
+    selectedCourseId
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/${selectedCourseId}/enrolled_students/`
+      : null
+  );
+
+  const students = studentsData?.data?.students || [];
+
+  // Mutations
   const { mutate: createManualGrade, isLoading: isCreating } = usePost(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/manual-grades/`
   );
 
-  // Update mutation
   const { mutate: updateManualGrade, isLoading: isUpdating } = usePatch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/assessment/manual-grades/${grade?.id}/`
   );
@@ -75,20 +79,16 @@ const ManualGradeForm = ({
   const handleSubmit = (values, { resetForm }) => {
     const submitData = {
       ...values,
-      score: parseFloat(values.score), // Ensure score is a number
+      score: parseFloat(values.score),
     };
 
     const onSuccessCallback = () => {
       Swal.fire({
         title: `Manual grade ${isEdit ? "updated" : "created"} successfully`,
         icon: "success",
-        customClass: {
-          confirmButton: "my-confirm-btn",
-        },
+        customClass: { confirmButton: "my-confirm-btn" },
       });
-      if (!isEdit) {
-        resetForm();
-      }
+      if (!isEdit) resetForm();
       onSuccess?.();
     };
 
@@ -98,30 +98,22 @@ const ManualGradeForm = ({
         Swal.fire({
           title: errorData,
           icon: "error",
-          customClass: {
-            confirmButton: "my-confirm-btn",
-          },
+          customClass: { confirmButton: "my-confirm-btn" },
         });
       } else if (errorData && typeof errorData === "object") {
         const messages = Object.values(errorData)
           .map((msg) => (Array.isArray(msg) ? msg.join(" ") : msg))
           .join(" ");
-        toast.success(messages);
+        toast.error(messages || "An error occurred");
       } else {
         toast.error(`Failed to ${isEdit ? "update" : "create"} manual grade`);
       }
     };
 
     if (isEdit) {
-      updateManualGrade(submitData, {
-        onSuccess: onSuccessCallback,
-        onError: onErrorCallback,
-      });
+      updateManualGrade(submitData, { onSuccess: onSuccessCallback, onError: onErrorCallback });
     } else {
-      createManualGrade(submitData, {
-        onSuccess: onSuccessCallback,
-        onError: onErrorCallback,
-      });
+      createManualGrade(submitData, { onSuccess: onSuccessCallback, onError: onErrorCallback });
     }
   };
 
@@ -136,27 +128,28 @@ const ManualGradeForm = ({
         enableReinitialize={true}
       >
         {({ values, errors, touched, setFieldValue }) => {
-          const selectedCourse = courses.find((c) => c.id === values.course);
+          // If no students are found after fetching, show "No students"
+          const noStudentsFound = !isFetchingStudents && selectedCourseId && students.length === 0;
 
           return (
             <Form>
-              {/* Course */}
-              <FormControl fullWidth margin="normal">
+              {/* Course Selector */}
+              <FormControl fullWidth margin="normal" error={touched.course && Boolean(errors.course)}>
                 <InputLabel>Course</InputLabel>
                 <Field
                   as={Select}
                   name="course"
                   disabled={isEdit}
                   onChange={(e) => {
-                    setFieldValue("course", e.target.value);
-                    setFieldValue("student", ""); // Reset student when course changes
+                    const val = e.target.value;
+                    setFieldValue("course", val);
+                    setFieldValue("student", ""); 
+                    setSelectedCourseId(val); 
                   }}
-                  error={touched.course && Boolean(errors.course)}
                 >
-                  <MenuItem value="" disabled className="animate animate-pulse">
+                  <MenuItem value="" disabled>
                     {loadingCourses ? "Fetching courses..." : "Select course"}
                   </MenuItem>
-
                   {courses.map((course) => (
                     <MenuItem key={course.id} value={course.id}>
                       {course.title}
@@ -164,65 +157,62 @@ const ManualGradeForm = ({
                   ))}
                 </Field>
                 {touched.course && errors.course && (
-                  <div className="text-red-500 text-sm mt-1">
-                    {errors.course}
-                  </div>
+                  <div className="text-red-500 text-sm mt-1">{errors.course}</div>
                 )}
               </FormControl>
 
-              {/* Student */}
-              <FormControl fullWidth margin="normal">
+              {/* Student Selector */}
+              <FormControl 
+                fullWidth 
+                margin="normal" 
+                error={touched.student && (Boolean(errors.student) || noStudentsFound)}
+              >
                 <InputLabel>Student</InputLabel>
                 <Field
                   as={Select}
                   name="student"
-                  disabled={!selectedCourse || isEdit}
-                  error={touched.student && Boolean(errors.student)}
+                  disabled={!selectedCourseId || isEdit} 
                 >
-                  {selectedCourse?.enrolled_users?.length > 0 ? (
-                    selectedCourse?.enrolled_users?.map((s) => (
+                  {isFetchingStudents ? (
+                    <MenuItem value="" disabled>Loading students...</MenuItem>
+                  ) : students.length > 0 ? (
+                    students.map((s) => (
                       <MenuItem key={s.id} value={s.id}>
-                        {s.first_name} {s.last_name}
+                        {s.fullname}
                       </MenuItem>
                     ))
                   ) : (
                     <MenuItem value="" disabled>
-                      There is no student assigned to this course.
+                      {selectedCourseId 
+                        ? (studentFetchError ? "Error fetching students" : "No student assigned to this course") 
+                        : "Select a course first"}
                     </MenuItem>
                   )}
                 </Field>
-                {touched.student && errors.student && (
+                {(touched.student && errors.student) || noStudentsFound ? (
                   <div className="text-red-500 text-sm mt-1">
-                    {errors.student}
+                    {noStudentsFound ? "Please select a course that has enrolled students." : errors.student}
                   </div>
-                )}
+                ) : null}
               </FormControl>
 
-              {/* Reason */}
-              <FormControl fullWidth margin="normal">
+              {/* Reason Selector */}
+              <FormControl fullWidth margin="normal" error={touched.reason && Boolean(errors.reason)}>
                 <InputLabel>Reason</InputLabel>
-                <Field
-                  as={Select}
-                  name="reason"
-                  error={touched.reason && Boolean(errors.reason)}
-                >
-                  <MenuItem value="" disabled className="animate animate-pulse">
-                    {loadingReasons ? "Fetching reasons..." : "Select reason"}
-                  </MenuItem>
-                  {reasons?.map((reason) => (
-                    <MenuItem key={reason.id} value={reason.id}>
-                      {reason.description}
+                <Field as={Select} name="reason">
+                  <MenuItem value="" disabled>Select reason</MenuItem>
+                  {reasons.map((r) => (
+                    <MenuItem key={r.id} value={r.id}>
+                      {r.description}
                     </MenuItem>
                   ))}
                 </Field>
                 {touched.reason && errors.reason && (
-                  <div className="text-red-500 text-sm mt-1">
-                    {errors.reason}
-                  </div>
+                  <div className="text-red-500 text-sm mt-1">{errors.reason}</div>
                 )}
               </FormControl>
 
-              {/* Score */}
+              {/* Score Field */}
               <Field
                 as={TextField}
                 fullWidth
@@ -230,12 +220,11 @@ const ManualGradeForm = ({
                 type="number"
                 label="Score"
                 name="score"
-                inputProps={{ min: 0, max: 100, step: 0.1 }}
                 error={touched.score && Boolean(errors.score)}
                 helperText={touched.score && errors.score}
               />
 
-              {/* Details */}
+              {/* Details Field */}
               <Field
                 as={TextField}
                 fullWidth
@@ -248,25 +237,16 @@ const ManualGradeForm = ({
                 helperText={touched.details && errors.details}
               />
 
-              {/* Submit Buttons */}
               <div className="flex justify-end gap-3 mt-6">
-                <Button
-                  type="button"
-                  color="secondary"
-                  variant="outlined"
-                  onClick={onClose}
-                  disabled={isLoading}
-                >
+                <Button type="button" color="secondary" variant="outlined" onClick={onClose} disabled={isLoading}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading} color="primary">
-                  {isLoading
-                    ? isEdit
-                      ? "Updating..."
-                      : "Creating..."
-                    : isEdit
-                    ? "Update Grade"
-                    : "Create Grade"}
+                <Button 
+                  type="submit" 
+                  disabled={isLoading || noStudentsFound} 
+                  color="primary"
+                >
+                  {isLoading ? "Processing..." : isEdit ? "Update Grade" : "Create Grade"}
                 </Button>
               </div>
             </Form>
