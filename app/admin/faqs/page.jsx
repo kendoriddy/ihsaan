@@ -33,11 +33,16 @@ function Page() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Extract base domain from API_BASE_URL (remove /api part for FAQ endpoints)
-  const getFaqBaseUrl = () => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-    return apiUrl.replace("/api", "");
-  };
+      // Extract base domain from API_BASE_URL (remove /api part for FAQ endpoints)
+        const getFaqBaseUrl = () => {
+      // 1. Get the raw URL or use the hardcoded fallback
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.ihsaanacademia.com/api";
+
+      // 2. Use a Regex to ONLY remove "/api" if it's at the very end of the string
+      // This prevents it from breaking "api.ihsaanacademia.com"
+      return apiUrl.replace(/\/api$/, "");
+    };
+
 
   const {
     isLoading,
@@ -45,7 +50,9 @@ function Page() {
     refetch,
   } = useFetch("faqs", `${getFaqBaseUrl()}/faqs/faq/`);
 
-  const Faqs = FaqsList && FaqsList?.data?.results;
+  const Faqs = FaqsList && FaqsList?.data?.results 
+  ? [...FaqsList.data.results].sort((a, b) => a.id - b.id) 
+  : [];
 
   const [FaqMode, setFaqMode] = useState("create");
   const [open, setOpen] = useState(false);

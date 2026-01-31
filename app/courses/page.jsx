@@ -285,37 +285,37 @@ export default function Courses() {
                             View Details
                           </Link>
                           {(() => {
-                            let existingItem;
-                            let isInCart;
+                            // let existingItem;
+                            // let isInCart;
 
-                            if (isLoggedIn) {
-                              // Check backend cart for logged-in users
-                              existingItem = cart?.items?.find(
-                                (item) => item.product?.id === course.id
-                              );
-                              isInCart = !!existingItem;
-                            } else {
-                              // Check frontend cart for non-logged-in users
-                              const frontendCartItems = getCartItems();
-                              existingItem = frontendCartItems.find(
-                                (item) => item.id === course.id
-                              );
-                              isInCart = !!existingItem;
-                            }
+                            // if (isLoggedIn) {
+                            //   // Check backend cart for logged-in users
+                            //   existingItem = cart?.items?.find(
+                            //     (item) => item.product?.id === course.id
+                            //   );
+                            //   isInCart = !!existingItem;
+                            // } else {
+                            //   // Check frontend cart for non-logged-in users
+                            //   const frontendCartItems = getCartItems();
+                            //   existingItem = frontendCartItems.find(
+                            //     (item) => item.id === course.id
+                            //   );
+                            //   isInCart = !!existingItem;
+                            // }
 
-                            return (
-                              <button
-                                onClick={() => handleAddToCart(course.id)}
-                                disabled={isInCart}
-                                className={`flex-1 py-2 px-4 rounded-md transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
-                                  isInCart
-                                    ? "bg-green-600 text-white cursor-not-allowed"
-                                    : "bg-green-600 text-white hover:bg-green-700"
-                                }`}
-                              >
-                                {isInCart ? "✓ In Cart" : "Add to Cart"}
-                              </button>
-                            );
+                            // return (
+                            //   <button
+                            //     onClick={() => handleAddToCart(course.id)}
+                            //     disabled={isInCart}
+                            //     className={`flex-1 py-2 px-4 rounded-md transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
+                            //       isInCart
+                            //         ? "bg-green-600 text-white cursor-not-allowed"
+                            //         : "bg-green-600 text-white hover:bg-green-700"
+                            //     }`}
+                            //   >
+                            //     {isInCart ? "✓ In Cart" : "Add to Cart"}
+                            //   </button>
+                            // );
                           })()}
                         </div>
                       </div>

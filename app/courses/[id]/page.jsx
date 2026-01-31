@@ -452,37 +452,37 @@ export default function CourseDetail({ params }) {
                       isInCart = !!existingItem;
                     }
 
-                    return (
-                      <>
-                        {/* <button
-                          onClick={handleAddToCart}
-                          disabled={isInCart}
-                          className={`w-full py-3 px-4 rounded-md transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
-                            isInCart
-                              ? "bg-green-600 text-white cursor-not-allowed"
-                              : "bg-blue-600 text-white hover:bg-blue-700"
-                          }`}
-                        >
-                          {isInCart ? "✓ Already in Cart" : "Add to Cart"}
-                        </button> */}
+                    // return (
+                    //   <>
+                    //     {/* <button
+                    //       onClick={handleAddToCart}
+                    //       disabled={isInCart}
+                    //       className={`w-full py-3 px-4 rounded-md transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
+                    //         isInCart
+                    //           ? "bg-green-600 text-white cursor-not-allowed"
+                    //           : "bg-blue-600 text-white hover:bg-blue-700"
+                    //       }`}
+                    //     >
+                    //       {isInCart ? "✓ Already in Cart" : "Add to Cart"}
+                    //     </button> */}
 
-                        <button
-                          onClick={handleBuyNow}
-                          className="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 transition-colors duration-200 font-medium"
-                        >
-                          {isLoggedIn ? "Buy Now" : "Buy Now (Register First)"}
-                        </button>
-                      </>
-                    );
+                    //     {/* <button
+                    //       onClick={handleBuyNow}
+                    //       className="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 transition-colors duration-200 font-medium"
+                    //     >
+                    //       {isLoggedIn ? "Buy Now" : "Buy Now (Register First)"}
+                    //     </button> */}
+                    //   </>
+                    // );
                   })()}
                 </div>
 
                 {/* 30-Day Money-Back Guarantee */}
                 <div className="border-t pt-6 mt-6">
                   <div className="text-center">
-                    <p className="text-sm text-gray-600 mb-2">
+                    {/* <p className="text-sm text-gray-600 mb-2">
                       30-Day Money-Back Guarantee
-                    </p>
+                    </p> */}
                     <p className="text-xs text-gray-500">
                       Full Lifetime Access
                     </p>
