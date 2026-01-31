@@ -10,7 +10,6 @@ import Modal from "../validation/Modal";
 import axios from "axios";
 import { MoreVert } from "@mui/icons-material";
 import { toast } from "react-toastify";
-import { set } from "date-fns";
 
 const DashboardTab = () => {
   const dispatch = useDispatch();
@@ -110,7 +109,7 @@ const DashboardTab = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-          }
+          },
         );
         console.log("Programme updated successfully");
         toast.success("Programme updated successfully");
@@ -125,7 +124,7 @@ const DashboardTab = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-          }
+          },
         );
         toast.success("Programme added successfully");
         dispatch(fetchProgrammes({ page: 1, pageSize: 10 }));
@@ -165,7 +164,7 @@ const DashboardTab = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-          }
+          },
         );
         console.log("Programme updated successfully");
         toast.success("Programme updated successfully");
@@ -180,7 +179,7 @@ const DashboardTab = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-          }
+          },
         );
         console.log("Programme added successfully");
       }
@@ -198,69 +197,70 @@ const DashboardTab = () => {
     }
   };
 
- const handleClassSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    setIsLoading(true);
+  const handleClassSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
 
-    const payload = {
-      ...classForm,
-      level: Number(classForm.level),
-    };
+      const payload = {
+        ...classForm,
+        level: Number(classForm.level),
+      };
 
-    const token = localStorage.getItem("token");
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    };
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-    if (editClassMode) {
-      // PATCH request for editing
-      await axios.patch(
-        `https://api.ihsaanacademia.com/classes/${selectedClass.id}/`,
-        payload,
-        config
-      );
-      toast.success("Programme updated successfully");
-    } else {
-      // POST request for adding a new programme
-      await axios.post("https://api.ihsaanacademia.com/classes/", payload, config);
-      toast.success("Programme added successfully");
+      if (editClassMode) {
+        // PATCH request for editing
+        await axios.patch(
+          `https://api.ihsaanacademia.com/classes/${selectedClass.id}/`,
+          payload,
+          config,
+        );
+        toast.success("Programme updated successfully");
+      } else {
+        // POST request for adding a new programme
+        await axios.post(
+          "https://api.ihsaanacademia.com/classes/",
+          payload,
+          config,
+        );
+        toast.success("Programme added successfully");
+      }
+
+      // --- REFRESH LOGIC ---
+      setClassOpen(false);
+      // This triggers Redux to go get the new data from the server
+      dispatch(fetchClasses({ page: 1, pageSize: 10 }));
+    } catch (error) {
+      console.error("Error saving programme:", error.response?.data || error);
+      toast.error("Failed to save. Please try again.");
+    } finally {
+      setIsLoading(false);
+      setEditClassMode(false);
+      setClassForm({
+        level: "",
+        class_number: "",
+      });
     }
-
-    // --- REFRESH LOGIC ---
-    setClassOpen(false); 
-    // This triggers Redux to go get the new data from the server
-    dispatch(fetchClasses({ page: 1, pageSize: 10 })); 
-
-  } catch (error) {
-    console.error("Error saving programme:", error.response?.data || error);
-    toast.error("Failed to save. Please try again.");
-  } finally {
-    setIsLoading(false);
-    setEditClassMode(false);
-    setClassForm({
-      level: "",
-      class_number: "",
-    }); 
-  }
-};
+  };
 
   const handleLevelSubmit = async (e) => {
     e.preventDefault();
     try {
       setIsLoading(true);
 
-      // Convert class_number to a Number before sending the payload
       const payload = {
-        ...levelForm,
-        level: String(levelForm.level),
+        level: levelForm.level,
+        order: Number.parseInt(levelForm.order, 10) || 0,
       };
 
-      if (editClassMode) {
-        // PATCH request for editing
+      if (editLevelMode) {
         await axios.patch(
           `https://api.ihsaanacademia.com/levels/${selectedLevel.id}/`,
           payload,
@@ -269,33 +269,28 @@ const DashboardTab = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-          }
+          },
         );
-        console.log("Programme updated successfully");
-        toast.success("Programme updated successfully");
-        dispatch(fetchLevels({ page: 1, pageSize: 10 }));
+        toast.success("Level updated successfully");
       } else {
-        // POST request for adding a new programme
         await axios.post("https://api.ihsaanacademia.com/levels/", payload, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
-        console.log("Programme added successfully");
+        toast.success("Level added successfully");
       }
-      setClassOpen(false); // Close the modal after successful submission
-      console.log("Programme added successfully:", response.data);
-      dispatch(fetchLevels({ page: 1, pageSize: 10 })); // Refresh the programmes list
+      setLevelOpen(false);
+      dispatch(fetchLevels({ page: 1, pageSize: 10 }));
     } catch (error) {
-      console.error("Error adding programme:", error.response?.data || error);
+      console.error("Error saving level:", error.response?.data || error);
+      toast.error("Failed to save level");
     } finally {
       setIsLoading(false);
-      setEditClassMode(false);
-      setClassForm({
-        level: "",
-        class_number: "",
-      }); // Reset form fields
+      setEditLevelMode(false);
+      setLevelForm({ level: "", order: "" });
+      setSelectedLevel(null);
     }
   };
 
@@ -397,7 +392,7 @@ const DashboardTab = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
       console.log("Programme deleted successfully");
       toast.success("Programme deleted successfully");
@@ -418,7 +413,7 @@ const DashboardTab = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
       console.log("Programme deleted successfully");
       toast.success("Programme deleted successfully");
@@ -426,7 +421,7 @@ const DashboardTab = () => {
     } catch (error) {
       console.error(
         "Error deleting programme type:",
-        error.response?.data || error
+        error.response?.data || error,
       );
       toast.error("Error deleting programme type");
     } finally {
@@ -442,7 +437,7 @@ const DashboardTab = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
       console.log("Class deleted successfully");
       toast.success("Class deleted successfully");
@@ -450,7 +445,7 @@ const DashboardTab = () => {
     } catch (error) {
       console.error(
         "Error deleting programme type:",
-        error.response?.data || error
+        error.response?.data || error,
       );
       toast.error("Error deleting class");
     } finally {
@@ -466,19 +461,16 @@ const DashboardTab = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
       console.log("Level deleted successfully");
       toast.success("Level deleted successfully");
       dispatch(fetchLevels({ page: 1, pageSize: 10 })); // Refresh the programmes list
     } catch (error) {
-      console.error(
-        "Error deleting programme type:",
-        error.response?.data || error
-      );
-      toast.error("Error deleting class");
+      console.error("Error deleting level:", error.response?.data || error);
+      toast.error("Error deleting level");
     } finally {
-      handleClassMenuClose();
+      handleLevelMenuClose();
     }
   };
 
@@ -633,17 +625,21 @@ const DashboardTab = () => {
       case "levels":
         return (
           <>
-            <div className="flex justify-between items-center px-8 mb-4">
+            {/* <div className="flex justify-between items-center px-8 mb-4">
               <div className="text-lg font-bold">Levels</div>
               <div>
                 <Button
                   className="bg-red-600 text-white px-3 py-2 rounded hover:bg-blue-600 transition-all duration-300 cursor-pointer"
-                  onClick={() => setLevelOpen(true)}
+                  onClick={() => {
+                setLevelForm({ level: "", order: "" });
+                setEditLevelMode(false);
+                setLevelOpen(true);
+              }}
                 >
                   Add Level
                 </Button>
               </div>
-            </div>
+            </div> */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {levels.map((level) => (
                 <div
@@ -657,18 +653,16 @@ const DashboardTab = () => {
                     <MoreVert />
                   </IconButton>
                   <Menu
-                      // 1. Point to the Level anchor, not the Class anchor
-                      anchorEl={anchorElLevel} 
-                      
-                      // 2. Use the Level open state (or a Boolean check on the anchor)
-                      open={Boolean(anchorElLevel)} 
-                      
-                      // 3. Ensure the close function resets anchorElLevel to null
-                      onClose={handleLevelMenuClose} 
-                    >
-                      <MenuItem onClick={handleEditLevel}>Edit</MenuItem>
-                      <MenuItem onClick={handleLevelDelete}>Delete</MenuItem>
-                    </Menu>
+                    // 1. Point to the Level anchor, not the Class anchor
+                    anchorEl={anchorElLevel}
+                    // 2. Use the Level open state (or a Boolean check on the anchor)
+                    open={Boolean(anchorElLevel)}
+                    // 3. Ensure the close function resets anchorElLevel to null
+                    onClose={handleLevelMenuClose}
+                  >
+                    {/* <MenuItem onClick={handleEditLevel}>Edit</MenuItem> */}
+                    <MenuItem onClick={handleLevelDelete}>Delete</MenuItem>
+                  </Menu>
                   <h3 className="text-lg font-bold text-gray-800">
                     {level.level}
                   </h3>
@@ -949,61 +943,66 @@ const DashboardTab = () => {
       </Modal>
 
       {/* Modal for Adding/Editing Level */}
-   <Modal
-  isOpen={levelOpen}
-  title={editLevelMode ? "Edit Level" : "Add Level"}
-  handleClose={() => {
-    setLevelOpen(false);
-    setEditLevelMode(false);
-  }}
->
-  <form onSubmit={handleLevelSubmit} className="space-y-4">
-    <div>
-      <label className="block text-sm font-medium text-gray-700">Order</label>
-      <input
-        type="number" // Changed to number as 'order' is usually an integer
-        name="order"
-        value={levelForm.order}
-        onChange={handleLevelInputChange}
-        className="mt-1 block w-full p-2 border rounded-md"
-        required
-      />
-    </div>
-    <div>
-      <label className="block text-sm font-medium text-gray-700">Level</label>
-      <select
-        name="level"
-        value={levelForm.level}
-        onChange={handleLevelInputChange}
-        className="mt-1 block w-full p-2 border rounded-md"
-        required
+      <Modal
+        isOpen={levelOpen}
+        title={editLevelMode ? "Edit Level" : "Add Level"}
+        handleClose={() => {
+          setLevelOpen(false);
+          setEditLevelMode(false);
+        }}
       >
-        <option value="" disabled>Select a level</option>
-        {levels.map((level) => (
-          <option key={level.id} value={level.level}>
-            {level.level}
-          </option>
-        ))}
-      </select>
-    </div>
-    <div className="flex justify-end">
-      <button
-        type="button"
-        onClick={() => setLevelOpen(false)} // FIXED: Was setClassOpen
-        className="mr-2 px-4 py-2 border rounded-md"
-      >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="px-4 py-2 bg-primary text-white rounded-md"
-      >
-        {isLoading ? "Submitting..." : "Submit"}
-      </button>
-    </div>
-  </form>
-</Modal>
+        <form onSubmit={handleLevelSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Order
+            </label>
+            <input
+              type="number" // Changed to number as 'order' is usually an integer
+              name="order"
+              value={levelForm.order}
+              onChange={handleLevelInputChange}
+              className="mt-1 block w-full p-2 border rounded-md"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Level
+            </label>
+            <select
+              name="level"
+              value={levelForm.level}
+              onChange={handleLevelInputChange}
+              className="mt-1 block w-full p-2 border rounded-md"
+              required
+            >
+              <option value="" disabled>
+                Select a level
+              </option>
+              <option value="PRIMARY">Primary</option>
+              <option value="JSS">Junior Secondary</option>
+              <option value="SSS">Senior Secondary</option>
+              <option value="SPECIAL">Special</option>
+            </select>
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setLevelOpen(false)} // FIXED: Was setClassOpen
+              className="mr-2 px-4 py-2 border rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="px-4 py-2 bg-primary text-white rounded-md"
+            >
+              {isLoading ? "Submitting..." : "Submit"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };
