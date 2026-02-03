@@ -135,9 +135,9 @@ export default function ViewProfileModal({
                 >
                   Book Trial
                 </button>
-                <button className="border-2 border-red-800 text-red-800 hover:bg-red-50 text-sm font-bold py-2 px-6 rounded-xl transition-all active:scale-95">
+                {/* <button className="border-2 border-red-800 text-red-800 hover:bg-red-50 text-sm font-bold py-2 px-6 rounded-xl transition-all active:scale-95">
                   Message
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

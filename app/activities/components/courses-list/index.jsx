@@ -9,11 +9,30 @@ const CoursesList = ({ courses }) => {
         const {
           id,
           course_details,
-          course_explanatory_details,
-          tutors,
-          groups,
+          course_explanatory_details = {},
+          tutors = [],
+          groups = [],
         } = courseObj;
-        const { code, title, programme_name, image_url } = course_details;
+
+        // safe destructure of course_details
+        const { code = "", title = "", programme_name = "", image_url = "" } =
+          course_details || {};
+
+        // safe derived values
+        const enrolledCount =
+          course_explanatory_details?.enrolled_users?.length || 0;
+        const groupName = groups?.[0]?.name || "";
+        const groupStudentsCount = groups?.[0]?.students?.length || 0;
+
+        const assessments = course_explanatory_details?.assessments || [];
+        const assignmentsCount =
+          assessments.filter(
+            (assignment) => assignment?.question_type === "FILE_UPLOAD"
+          )?.length || 0;
+        const quizCount =
+          assessments.filter(
+            (assignment) => assignment?.question_type === "MCQ"
+          )?.length || 0;
 
         return (
           <div
@@ -30,7 +49,7 @@ const CoursesList = ({ courses }) => {
                   <ul className="list-none list-inside">
                     {tutors?.map((tutor, index) => (
                       <li key={index} className="font-bold">
-                        {tutor.tutor_full_name || tutor.user}
+                        {tutor?.tutor_full_name || tutor?.user}
                       </li>
                     ))}
                   </ul>
@@ -40,38 +59,25 @@ const CoursesList = ({ courses }) => {
                   <span className="text-gray-400">|</span>
                   <span className="text-nowrap flex items-center gap-1">
                     <People />{" "}
-                    {course_explanatory_details?.enrolled_users.length}
+                    {enrolledCount}
                   </span>
                 </div>
               </div>
               <div className="p-4 flex gap-2">
-                <p className="font-semibold">Group:</p> {groups[0]?.name} |
+                <p className="font-semibold">Group:</p> {groupName} |
                 <span>
-                  <People /> {groups[0]?.students.length}
+                  <People /> {groupStudentsCount}
                 </span>
               </div>
               <div className="flex gap-4 rounded- text-white p-4 bg-blue-600">
                 <div className="flex gap-2 items-center">
                   <p className="font-semibold">Assignments:</p>
-                  <span>
-                    {
-                      course_explanatory_details?.assessments.filter(
-                        (assignment) =>
-                          assignment.question_type === "FILE_UPLOAD"
-                      ).length
-                    }
-                  </span>
+                  <span>{assignmentsCount}</span>
                 </div>{" "}
                 |
                 <div className="flex gap-2 items-center">
                   <p className="font-semibold">Quiz:</p>
-                  <span>
-                    {
-                      course_explanatory_details?.assessments.filter(
-                        (assignment) => assignment.question_type === "MCQ"
-                      ).length
-                    }
-                  </span>
+                  <span>{quizCount}</span>
                 </div>
               </div>
             </div>

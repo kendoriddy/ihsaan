@@ -23,10 +23,13 @@ import "slick-carousel/slick/slick-theme.css";
 import FAQSection from "@/components/FAQSection";
 
 function Page() {
+  const [mounted, setMounted] = useState(false); // 1. Add mounted state
   const router = useRouter();
   const searchRef = useRef(null);
   const [searchVariable, setSearchVariable] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  
 
   const [FAQs, setFAQs] = useState([]);
 
@@ -40,6 +43,10 @@ function Page() {
   const courses = coursesList?.data?.results || [];
 
   // Fetch courses
+ // 1. Define the safe base first
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.ihsaanacademia.com/api";
+
+  // 2. Use that safe base in the search fetch
   const {
     isLoading,
     data: CoursesList,
@@ -47,7 +54,7 @@ function Page() {
   } = useFetch(
     ["courses", debouncedSearch],
     debouncedSearch
-      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/course/courses/?search=${debouncedSearch}`
+      ? `${apiBase}/course/courses/?search=${debouncedSearch}`
       : null,
     () => {}
   );
@@ -207,6 +214,15 @@ function Page() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    setMounted(true); // 2. Set mounted to true on client-side
+    logoutAfterSixHours();
+  }, []);
+
+  if (!mounted) {
+    return <Loader />; 
+  }
 
   return (
     <div>
