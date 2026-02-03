@@ -53,26 +53,6 @@ export default function AdminFeedbackPanel() {
     previous,
   } = useSelector((state) => state.feedback);
 
-  // --- SEARCH DEBOUNCE LOGIC ---
-  const [localSearch, setLocalSearch] = useState(filters.search);
-
-  // Sync local search with Redux (useful when filters are cleared)
-  useEffect(() => {
-    setLocalSearch(filters.search);
-  }, [filters.search]);
-
-  // Debounce effect: Wait 500ms after last keystroke before dispatching to Redux
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (localSearch !== filters.search) {
-        dispatch(setSearchFilter(localSearch));
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [localSearch, dispatch, filters.search]);
-  // -----------------------------
-
   // Fetch feedbacks on component mount and when filters change
   useEffect(() => {
     dispatch(fetchFeedbacksWithCurrentFilters());
@@ -197,7 +177,7 @@ export default function AdminFeedbackPanel() {
   };
 
   const handleSearchChange = (search) => {
-    setLocalSearch(search); // Now updates local state instead of Redux immediately
+    dispatch(setSearchFilter(search));
   };
 
   const handleClearFilters = () => {
@@ -220,7 +200,17 @@ export default function AdminFeedbackPanel() {
     }
   };
 
-  // Error state remains as a fallback, but Loading is now handled inline
+  if (status === "loading") {
+    return (
+      <div className="w-full flex items-center justify-center py-12">
+        <div className="flex flex-col items-center gap-4">
+          <CircularProgress size={40} />
+          <p className="text-gray-600">Loading feedback data...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (status === "failed" && error) {
     return (
       <div className="w-full flex items-center justify-center py-12">
@@ -331,16 +321,10 @@ export default function AdminFeedbackPanel() {
               <input
                 type="text"
                 placeholder="Search feedback..."
-                value={localSearch}
+                value={filters.search}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700"
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-700 focus:border-red-700"
               />
-              {/* NON-BLOCKING SPINNER UNDER/INSIDE SEARCH BOX */}
-              {status === "loading" && (
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                  <CircularProgress size={20} className="text-red-700" />
-                </div>
-              )}
             </div>
 
             <div className="flex flex-wrap md:flex-nowrap gap-3">
@@ -386,8 +370,8 @@ export default function AdminFeedbackPanel() {
         </div>
 
         {/* Feedback List */}
-        <div className={`divide-y divide-gray-200 transition-opacity ${status === "loading" ? "opacity-50" : "opacity-100"}`}>
-          {filteredFeedback.length === 0 && status !== "loading" ? (
+        <div className="divide-y divide-gray-200">
+          {filteredFeedback.length === 0 ? (
             <div className="p-12 text-center">
               <FeedbackIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-800 mb-2">
@@ -490,6 +474,37 @@ export default function AdminFeedbackPanel() {
 
                 {/* Mobile Bottom Action Bar */}
                 <div className="flex flex-col md:flex-row gap-3">
+                  {/* <button
+                    onClick={() => handleStatusChange(feedback, !feedback.is_resolved)}
+                    disabled={markAsResolvedStatus === "loading" || updateStatus === "loading"}
+                    className={`px-4 py-2.5 md:py-2 ${feedback.is_resolved ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2 font-medium`}
+                  >
+                    {(markAsResolvedStatus === "loading" || updateStatus === "loading") && <CircularProgress size={16} color="inherit" />}
+                    Mark as {feedback.is_resolved ? "Active" : "Resolved"}
+                  </button> */}
+
+                  {/* Mobile Only: Icons at the bottom row */}
+                  {/* <div className="flex md:hidden items-center justify-between pt-2 border-t border-gray-100">
+                    <div className="flex gap-0.5">
+                       {feedback.rating > 0 && renderStars(feedback.rating)}
+                    </div>
+                    <div className="flex gap-2">
+                      <IconButton size="small" onClick={() => handleViewDetails(feedback)} className="bg-blue-50 text-blue-600">
+                        <Visibility fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => handleReply(feedback.email)} className="bg-green-50 text-green-600">
+                        <Reply fontSize="small" />
+                      </IconButton>
+                      <IconButton 
+                        size="small" 
+                        onClick={() => handleDelete(feedback.id)} 
+                        disabled={deleteStatus === "loading"}
+                        className="bg-red-50 text-red-600"
+                      >
+                        <Delete fontSize="small" />
+                      </IconButton>
+                    </div>
+                  </div> */}
                 </div>
               </div>
             ))
