@@ -18,7 +18,6 @@ function Page() {
   };
   const { mutate, isLoading } = usePost("api/auth/password-reset/", {
     onSuccess: (response) => {
-      console.log(response);
       const { data } = response;
       toast.info(data.message);
       setTimeout(() => {
