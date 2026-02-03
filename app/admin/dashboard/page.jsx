@@ -40,7 +40,7 @@ function Page() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         const stats = response.data;
@@ -84,7 +84,7 @@ function Page() {
               default:
                 return item;
             }
-          })
+          }),
         );
       } catch (error) {
         console.error("Error fetching dashboard statistics:", error);

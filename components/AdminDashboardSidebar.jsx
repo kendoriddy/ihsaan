@@ -42,15 +42,12 @@ function AdminDashboardSidebar({
         <div className="ms-5 text-black">Admin </div>
       </div>
 
-  
-
       <div>
         {isAdmin && (
           <ul className="p-4">
             {filteredDashboardList.map((item, index) => (
               <li key={index}>
                 <Link href={item.path}>
-                
                   <span
                     className={`p-2 transition-all duration-300 rounded overflow-y-hidden flex justify-between ${
                       currentRoute === item.path
