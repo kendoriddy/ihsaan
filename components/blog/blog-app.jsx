@@ -301,7 +301,6 @@ export default function BlogApp() {
         );
         setComments((prev) => [...prev, res.data]);
       } catch (err) {
-        console.log("err:::", err);
         if (err.response?.status === 401) {
           toast.error("Please login to make a comment");
         } else {
