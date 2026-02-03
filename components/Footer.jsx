@@ -5,6 +5,7 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import XIcon from "@mui/icons-material/X";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import TelegramIcon from '@mui/icons-material/Telegram';
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import Divider from "@mui/material/Divider";
@@ -66,7 +67,7 @@ function Footer() {
           </p>
           <div className="py-2 flex gap-3">
             <Link
-              href="https://www.facebook.com"
+              href="https://www.facebook.com/ihsaanacademia"
               target="_blank"
               className="hover:text-[#ff6600]"
             >
@@ -80,25 +81,34 @@ function Footer() {
               <YouTubeIcon />
             </Link>
             <Link
-              href="https://www.x.com"
+              href="https://x.com/IhsaanAcademia"
               target="_blank"
               className="hover:text-[#ff6600]"
             >
               <XIcon />
             </Link>
             <Link
-              href="https://www.instagram.com"
+              href="https://www.instagram.com/ihsaanacademia"
               target="_blank"
               className="hover:text-[#ff6600]"
             >
               <InstagramIcon />
             </Link>
+
             <Link
               href="https://www.linkedin.com"
               target="_blank"
               className="hover:text-[#ff6600]"
             >
               <LinkedInIcon />
+            </Link>
+
+            <Link
+              href="https://t.me/ihsaanacademia"
+              target="_blank"
+              className="hover:text-[#ff6600]"
+            >
+              <TelegramIcon />
             </Link>
           </div>
         </div>
@@ -120,9 +130,12 @@ function Footer() {
 
         <div className="flex-1">
           <h3 className="text-lg font-bold py-3">Contact Us</h3>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <PhoneIcon />
-            <Link href="tel:+2348130938573" className="hover:text-[#ff6600]">
+            <Link href="tel:+2348164694173" className="hover:text-[#ff6600]">
+              +2348164694173
+            </Link>
+             <Link href="tel:+2348130938573" className="hover:text-[#ff6600] ms-3">
               +2348130938573
             </Link>
           </div>
