@@ -29,7 +29,7 @@ function Page() {
   const [token, setToken] = useState("");
   const [previewImage, setPreviewImage] = useState(""); // Store preview image
 
-  const { programmes } = useSelector((state) => state.programme);
+  const { programmes } = useSelector((state) => state.programme);    
   console.log(programmes, "programmes:");
   useEffect(() => {
     dispatch(fetchProgrammes({ page: 1, pageSize: 10 }));
