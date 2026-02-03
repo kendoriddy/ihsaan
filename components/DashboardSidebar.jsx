@@ -45,8 +45,6 @@ function DashboardSidebar({ currentRoute }) {
     }
   }, [dispatch, router]);
 
-
-
   useEffect(() => {
     if (roles.includes("STUDENT")) {
       setDashboardItems(DASHBOARD_LIST.student);
@@ -90,26 +88,20 @@ function DashboardSidebar({ currentRoute }) {
               />
             </div>
             <div className="py-2">
-              {/* <Rating
+              <Rating
                 name="read-only"
                 value={MENTORS[0].rating}
                 readOnly
                 precision={0.5}
                 size="small"
-              /> */}
-              <div className="mb-4 text-gray-300">{roles == "STUDENT,USER" ? "Student" : "Tutor"}</div>
-              <div>
-                {MENTORS[0].name.length > 20 
-                  ? MENTORS[0].name.slice(0, 20) + "..." 
-                  : MENTORS[0].name}
-              </div>
-              {/* <div className="text-gray-500">{MENTORS[0].name}</div> */}
+              />
+              <div className="text-gray-500">{MENTORS[0].title}</div>
             </div>
           </div>
         </Link>
 
         {/* Left Middle */}
-        <div className="px-4 py-10">
+        <div className="px-4 py-12">
           <ProfileCompletionRate />
         </div>
 
