@@ -34,12 +34,12 @@ function AdminDashboardSidebar({
       }  lg:w-[250px] h-auto  fixed overflow-y-scroll transition-all duration-300 py-4 bg-white border-r-2 z-30`}
       style={{ height: "calc(100vh - 64px)" }}
     >
-      <div className="text-blue-600 flex items-center px-4 gap-4">
+      <div className="text-blue-600 flex items-center px-4 gap-4">   
         <span>
           <HomeIcon />
         </span>
         <span>Main</span>
-        <div className="ms-5 text-black">Admin</div>
+        <div className="ms-5 text-black">Admin </div>
       </div>
 
   
