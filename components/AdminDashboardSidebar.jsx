@@ -46,7 +46,7 @@ function AdminDashboardSidebar({
 
       <div>
         {isAdmin && (
-          <ul className="p-3">
+          <ul className="p-4">
             {filteredDashboardList.map((item, index) => (
               <li key={index}>
                 <Link href={item.path}>
