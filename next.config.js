@@ -10,6 +10,7 @@ const nextConfig = {
       "via.placeholder.com",
       "iframe.mediadelivery.net",
       "ihsaan-new-pullzone.b-cdn.net",
+      "ihsaan-prod.b-cdn.net",
     ],
   },
 };

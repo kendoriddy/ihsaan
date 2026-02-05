@@ -59,12 +59,6 @@ const DASHBOARD_LIST = {
       icon: StorefrontIcon,
       path: "/store",
     },
-    // {
-    //   id: 12,
-    //   name: "Applications",
-    //   icon: BookmarkIcon,
-    //   path: "/dashboard/my-applications",
-    // },
     {
       id: 15,
       name: "Forums",
@@ -163,9 +157,13 @@ const DASHBOARD_LIST = {
       path: "/admin/student",
     },
     { id: 8, name: "Courses", path: "/admin/courses" },
-    // { id: 9, name: "Products", icon: StorefrontIcon, path: "/admin/products" },
     { id: 10, name: "FAQs", path: "/admin/faqs" },
     { id: 11, name: "Quotes", path: "/admin/quotes" },
+    {
+      id: 32,
+      name: "File Limits",
+      path: "/admin/file-limits",
+    },
     {
       id: 12,
       name: "Set Quiz",
@@ -183,12 +181,12 @@ const DASHBOARD_LIST = {
       path: "/admin/manual-grading",
     },
     {
-      id: 15,
+      id: 23, 
       name: "Blog Categories",
       path: "/admin/blog-categories",
     },
     {
-      id: 16,
+      id: 24, 
       name: "Blog",
       path: "/admin/blog",
     },
