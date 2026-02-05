@@ -182,6 +182,11 @@ function EditCoursePage() {
     courseSections: false,
   });
 
+  // --- NEW: dynamic file configs + token for upload security (from saved logic) ---
+  const [fileConfigs, setFileConfigs] = useState({});
+  const [configLoaded, setConfigLoaded] = useState(false);
+  const [token, setToken] = useState("");
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       setCurrentRoute(pathname);
@@ -379,6 +384,38 @@ function EditCoursePage() {
     useState(false);
   const [videoToCloudinaryError, setVideoToCloudinaryError] = useState(null);
 
+  // --- NEW: Fetch dynamic file size/security configs from API ---
+  useEffect(() => {
+    const fetchSecurityConfigs = async () => {
+      let storedToken = localStorage.getItem("token");
+      if (!storedToken) return;
+      setToken(storedToken.trim());
+
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/resource/config/`,
+          { headers: { Authorization: `Bearer ${storedToken.trim()}` } }
+        );
+
+        // Transform array [ {resource_type: 'IMAGE', max_size: 1048...} ] 
+        // into object { IMAGE: 1048576, VIDEO: 52428800 }
+        const mappedLimits = response.data.results.reduce((acc, item) => {
+          acc[item.resource_type] = item.max_size;
+          return acc;
+        }, {});
+
+        setFileConfigs(mappedLimits);
+        setConfigLoaded(true);
+        console.log("✅ Security Configs Loaded:", mappedLimits);
+      } catch (error) {
+        console.error("❌ Failed to fetch file limits.");
+        toast.error("Critical: Could not load upload security settings.");
+      }
+    };
+
+    fetchSecurityConfigs();
+  }, []);
+
   // Handle video file selection and extract duration
   const handleVideoFileChange = async (e) => {
     const file = e.target.files[0];
@@ -520,53 +557,94 @@ function EditCoursePage() {
     }
   };
 
-  const uploadImageToCloudinary = async (file) => {
-    const token = getAuthToken();
-    setImageUploadLoading(true);
-    setImageUploadSuccessful(false);
+  // --- REPLACED: uploadImageToCloudinary -> uploadToBunny with dynamic limit checks ---
+  const uploadToBunny = async (file, detectedType) => {
+    let rawToken = getAuthToken() || token || localStorage.getItem("token");
+    if (rawToken?.startsWith("Bearer ")) rawToken = rawToken.split(" ")[1];
 
+    setImageUploadLoading(true);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("title", file.name);
-    formData.append("type", "IMAGE");
+    formData.append("type", detectedType);
+    formData.append("use_streaming", true);
 
     try {
       const response = await axios.post(
-        "https://api.ihsaanacademia.com/resource/course-materials/",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/resource/course-materials/`,
         formData,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
+          headers: { Authorization: `Bearer ${rawToken?.trim()}` },
+          onUploadProgress: (progressEvent) => {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            console.log(`${detectedType} Progress: ${percent}%`);
           },
         }
       );
-      toast.success("Image uploaded successfully!");
+
+      toast.success(`${detectedType} upload successful!`);
       setImageUploadSuccessful(true);
+      // normalize returned shape to { media_url, id } like old code expects
       return { media_url: response.data.media_url, id: response.data.id };
     } catch (error) {
-      toast.error(extractErrorMessage(error, "Failed to upload image"));
+      const is413 = error.response?.status === 413;
+      toast.error(is413 ? "Server rejected file: Payload Too Large (413)." : "Upload failed.");
       throw error;
     } finally {
       setImageUploadLoading(false);
     }
   };
 
+  // --- REPLACED handleFileChange: checks dynamic config, validates size & type, previews images ---
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const preview = URL.createObjectURL(file);
+    if (!file) return;
 
-      try {
-        const { media_url } = await uploadImageToCloudinary(file);
-        console.log("hereee", media_url);
-        const normalizedUrl = normalizeUrl(media_url);
-        setCourseData({ ...courseData, image_url: normalizedUrl || media_url });
-        setPreviewImage(normalizedUrl || media_url);
-        URL.revokeObjectURL(preview);
-      } catch (error) {
-        toast.error(extractErrorMessage(error, "Image upload failed"));
+    if (!configLoaded) {
+      toast.warn("Waiting for security configurations to load...");
+      e.target.value = "";
+      return;
+    }
+
+    // IDENTIFY FILE TYPE
+    let detectedType = "DOCUMENT"; // Default
+    if (file.type.startsWith("image/")) detectedType = "IMAGE";
+    else if (file.type.startsWith("video/")) detectedType = "VIDEO";
+    else if (file.type.startsWith("audio/")) detectedType = "AUDIO";
+    else if (file.type === "application/pdf" || file.name.endsWith(".pdf")) detectedType = "DOCUMENT";
+
+    // FETCH LIMIT FOR THIS SPECIFIC TYPE
+    const limit = fileConfigs[detectedType];
+
+    if (!limit) {
+      toast.error(`Error: No database limit set for ${detectedType} files.`);
+      e.target.value = "";
+      return;
+    }
+
+    // VALIDATE SIZE
+    if (file.size > limit) {
+      const limitMB = (limit / (1024 * 1024)).toFixed(2);
+      toast.error(`File too large! Your limit for ${detectedType} is ${limitMB}MB.`);
+      e.target.value = "";
+      return;
+    }
+
+    try {
+      // Show preview only if it's an image
+      if (detectedType === "IMAGE") {
+        setPreviewImage(URL.createObjectURL(file));
       }
+
+      const { media_url, id } = await uploadToBunny(file, detectedType);
+      const normalizedUrl = normalizeUrl(media_url);
+      setCourseData({ ...courseData, image_url: normalizedUrl || media_url });
+      setPreviewImage(normalizedUrl || media_url);
+      // Keep imageUploadSuccessful handled in uploadToBunny
+    } catch (error) {
+      setPreviewImage("");
+      e.target.value = "";
+      toast.error(extractErrorMessage(error, "Image upload failed"));
     }
   };
 
@@ -623,7 +701,7 @@ function EditCoursePage() {
         return;
       }
 
-      const { id: materialResourceId } = await uploadImageToCloudinary(file);
+      const { id: materialResourceId } = await uploadToBunny(file, file.type.startsWith("image/") ? "IMAGE" : "DOCUMENT");
 
       const response = await axios.post(
         "https://api.ihsaanacademia.com/course/course-materials/",
@@ -892,6 +970,7 @@ function EditCoursePage() {
     }
   };
 
+
   return (
     <div className="relative">
       <AdminDashboardHeader toggleSidebar={toggleSidebar} />
@@ -1076,7 +1155,7 @@ function EditCoursePage() {
                           />
                         ) : (
                           <div className="mt-3 w-40 h-40 border rounded-md flex items-center justify-center text-gray-500">
-                            Invalid image URL
+                            uploading...
                           </div>
                         );
                       })()
