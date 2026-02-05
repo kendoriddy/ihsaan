@@ -145,7 +145,7 @@ const MyCoursesPage = () => {
                         >
                           <a className="block bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
                             <div className="relative w-full h-48 bg-gray-200">
-                              {/*} {course.image_url ? (
+                              {course.image_url ? (
                                 <Image
                                   src={course.image_url}
                                   alt={course.title || "Course image"}
@@ -159,7 +159,7 @@ const MyCoursesPage = () => {
                                   layout="fill"
                                   objectFit="cover"
                                 />
-                              )}*/}
+                              )}
                               {/* Payment Status Badge */}
                               <div className="absolute top-2 right-2">
                                 <span
@@ -199,7 +199,7 @@ const MyCoursesPage = () => {
                                   ).toLocaleDateString()}
                                 </span>
                                 <span
-                                  className={`inline-block text-sm font-medium py-1 px-3 rounded-full transition-colors ${
+                                  className={`inline-block text-xs font-medium py-1 px-3 rounded-full transition-colors ${
                                     course.is_paid
                                       ? "bg-primary group-hover:bg-primary text-white"
                                       : "bg-gray-300 text-gray-600"
@@ -284,9 +284,6 @@ const MyCoursesPage = () => {
                             <p className="text-gray-600 text-sm mb-2">
                               Code: {programme.code}
                             </p>
-                            {/* <p className="text-gray-600 text-sm mb-2">
-                              {programme.description}
-                            </p> */}
                             {programme.payment_status && (
                               <div className="mb-2">
                                 <span
@@ -366,7 +363,9 @@ const MyCoursesPage = () => {
                 role="alert"
               >
                 <strong className="font-bold">Error: </strong>
-                <span className="block sm:inline">{programmeCoursesError}</span>
+                <span className="block sm:inline">
+                  {programmeCoursesError}
+                </span>
                 <button
                   onClick={() => dispatch(clearProgrammeCoursesError())}
                   className="absolute top-0 right-0 px-4 py-3"
