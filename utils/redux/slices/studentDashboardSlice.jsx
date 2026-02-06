@@ -14,59 +14,49 @@ export const fetchStudentCourses = createAsyncThunk(
   "studentDashboard/fetchStudentCourses",
   async (_, { rejectWithValue }) => {
     try {
-      // First, fetch the logged-in user's ID
       const userResponse = await axios.get(LOGGED_IN_USER_ENDPOINT, {
-        headers: {
-          Authorization: `Bearer ${getAuthToken()}`,
-        },
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
       });
 
-      const userId = userResponse.data?.id;
-      if (!userId) {
-        return rejectWithValue("Could not retrieve user information.");
-      }
+      // 1. VERIFY THIS ID: Does it match the UUIDs in your JSON?
+      const userId = userResponse.data?.id; 
+      
+      if (!userId) return rejectWithValue("User ID not found");
 
-      // Then fetch course enrollments with user_id parameter
+      // 2. TRY CHANGING 'user_id' TO 'user' IF THE UUID FILTER FAILS
       const response = await axios.get(
-        `${COURSE_ENROLLMENTS_ENDPOINT}?user_id=${userId}`,
+        `${COURSE_ENROLLMENTS_ENDPOINT}?user=${userId}`, 
         {
-          headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-          },
+          headers: { Authorization: `Bearer ${getAuthToken()}` },
         }
       );
 
-      // Transform the response to match our component's expected structure
-      const transformedCourses = (response.data.results || []).map(
-        (enrollment) => ({
-          id: enrollment.course_details.id,
-          title:
-            enrollment.course_details.title || enrollment.course_details.name,
-          description: enrollment.course_details.description,
-          programme_id: enrollment.course_details.programme,
-          programme_name: enrollment.course_details.programme_name,
-          is_paid: enrollment.is_active, // Assuming active enrollment means paid
-          image_url: enrollment.course_details.image_url,
-          enrollment_id: enrollment.id,
-          enrolled_at: enrollment.enrolled_at,
-          term_details: enrollment.term_details,
-        })
-      );
+      // 3. SECURE MAPPING
+      // The JSON shows 'results' contains the enrollment objects
+      const transformedCourses = (response.data.results || []).map((enrollment) => ({
+        id: enrollment.course_details?.id,
+        title: enrollment.course_details?.title || enrollment.course_details?.name,
+        description: enrollment.course_details?.description,
+        programme_name: enrollment.course_details?.programme_name,
+        image_url: enrollment.course_details?.image_url,
+        is_active: enrollment.is_active, // Use is_active directly from the root
+        enrollment_id: enrollment.id,
+        enrolled_at: enrollment.enrolled_at,
+        term_name: enrollment.term_details?.name,
+      }));
 
       return {
         courses: transformedCourses,
         total: response.data.total || 0,
         pagination: {
-          next: response.data.next,
-          previous: response.data.previous,
+          next: response.data.links?.next, // Note: JSON has links.next, not data.next
+          previous: response.data.links?.previous,
           current_page: response.data.current_page,
           total_pages: response.data.total_pages,
         },
       };
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch student courses"
-      );
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch");
     }
   }
 );
