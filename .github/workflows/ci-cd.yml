@@ -42,4 +42,4 @@ jobs:
         script: |
           cd /opt/ihsaanfrontend/ihsaan
           git pull
-          pm2 restart ihsaan
+          pm2 stop ihsaan
